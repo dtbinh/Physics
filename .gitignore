@@ -1,0 +1,8 @@
+release/**
+Release/**
+debug/**
+Debug/**
+*.user
+*.o
+*~
+
