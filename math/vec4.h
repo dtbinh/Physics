@@ -14,12 +14,16 @@ public:
     bool                   operator == (Vec4 v);
     bool                   operator != (Vec4 v);
     Vec4                   operator + (Vec4 v);                    //soma de dois vetores
+    void                   operator += (Vec4 v);                    //soma de dois vetores
+    void                   operator -= (Vec4 v);                    //soma de dois vetores
+    void                   operator /= (float k);                    //soma de dois vetores
     Vec4                   operator ^ (Vec4 v);                    //produto vetorial entre dois vetores
     Vec4                   operator - (Vec4 v);                    //subtração de dois vetores
     Vec4                   operator / (float k);                   //divisão das componentes do vetor por um numero real
     Vec4                   operator * (float k);                   //produto das componentes do vetor por um numero real
     float                  operator * (Vec4 v);                    //produto escalar entre dois vetores (dot)
     //funções
+    Vec4                   mult(Vec4 v); //multiplica ordenada por ordenada
     void                   setVec4(Vec4 p);                        //adiciona um vetor
     void                   setVec4(float x1=0.0,float x2=0.0,float x3=0.0,float x4=1.0);
     float                  x();                                    //retorna parametro x1

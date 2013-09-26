@@ -291,15 +291,15 @@ Matrix4x4 Quaternion::getMatrix()
         // This calculation would be a lot more complicated for non-unit length quaternions
         // Note: The constructor of Matrix4 expects the Matrix in column-major format like expected by
         //   OpenGL
-//        float rot[16] = {1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f,
-//                         2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f,
-//                         2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
-//                         0.0f, 0.0f, 0.0f, 1.0f};
-
-        float rot[16] = {1.0f - 2.0f * (y2 + z2), 2.0f * (xy + wz) ,2.0f * (xz - wy) , 0.0f,
-                         2.0f * (xy - wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz + wx), 0.0f,
-                         2.0f * (xz + wy),  2.0f * (yz - wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
+        float rot[16] = {1.0f - 2.0f * (y2 + z2), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f,
+                         2.0f * (xy + wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz - wx), 0.0f,
+                         2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
                          0.0f, 0.0f, 0.0f, 1.0f};
+
+//        float rot[16] = {1.0f - 2.0f * (y2 + z2), 2.0f * (xy + wz) ,2.0f * (xz - wy) , 0.0f,
+//                         2.0f * (xy - wz), 1.0f - 2.0f * (x2 + z2), 2.0f * (yz + wx), 0.0f,
+//                         2.0f * (xz + wy),  2.0f * (yz - wx), 1.0f - 2.0f * (x2 + y2), 0.0f,
+//                         0.0f, 0.0f, 0.0f, 1.0f};
 
 
 //        this->normalize();
@@ -508,6 +508,11 @@ void Quaternion::fromAxisAngle( Vec4 axis, dReal angle ) {
     this->y = 0;
     this->z = 0;
   }
+}
+
+void Quaternion::showQuaternion()
+{
+    printf("Quaternion: (%.3f,%.3f,%.3f,%.3f)\n",this->w,this->x,this->y,this->z);
 }
 //---------------------------------------------------------------------------
 //converte Quaternion em dQuaternion

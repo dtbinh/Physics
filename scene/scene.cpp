@@ -8,37 +8,43 @@
 #include <time.h>
 #include <stdlib.h>
 #include "graphics/draw.h"
-
+bool apply = true;
 
 
 Scene::Scene(GLWidget *parent)
 {
     //loadFile(":/test.xml");
-
+this->sim_status = true;
     this->parent = parent;
     //select = new Object(this);
 Physics::initScene(this);
 this->sim_step = 67;
-Character *chara = new Character(this);
-this->characters.push_back(chara);
+this->frame_step = 1;
+this->status_motion = false;
+this->enableGravity = false;
+this->externalForce = Vec4();
+this->propKs = Vec4(1,1,1);
+this->propKd = Vec4(1,1,1);
+//Character *chara = new Character(this);
+//this->characters.push_back(chara);
 
-Object *botpiece = addObject(
-                             Vec4(1,3,1),
-                             Vec4(0,4,0),
-                             Quaternion(),TYPE_CUBE,2.0,chara
-                             );
-Object *toppiece = addObject(Vec4(1,3,1),
-                             Vec4(0,7,0),
-                             Quaternion(1,0,0,0),TYPE_CUBE,2.0,chara
-                             );
-//select = toppiece;
-//asdfg = botpiece;
-//selectedObjects.push_back(toppiece);
+//Object *botpiece = addObject(
+//                             Vec4(1,3,1),
+//                             Vec4(0,4,0),
+//                             Quaternion(),TYPE_CUBE,2.0,chara
+//                             );
+//Object *toppiece = addObject(Vec4(1,3,1),
+//                             Vec4(0,7,0),
+//                             Quaternion(1,0,0,0),TYPE_CUBE,2.0,chara
+//                             );
+////select = toppiece;
+////asdfg = botpiece;
+////selectedObjects.push_back(toppiece);
 
-Joint *joint = addJointBall(Vec4(0,5.5,0), botpiece,toppiece, chara);
-Joint *joint2 = addJointFixed(botpiece, chara);
-ControlPD *pd = new ControlPD(joint,Quaternion(Vec4(90,45,45)),Vec4(5,5,5),Vec4(0.5,0.5,0.5));
-chara->controllers.push_back(pd);
+//Joint *joint = addJointBall(Vec4(0,5.5,0), botpiece,toppiece, chara);
+//Joint *joint2 = addJointFixed(botpiece, chara);
+//ControlPD *pd = new ControlPD(joint,Quaternion(Vec4(90,45,45)),Vec4(5,5,5),Vec4(0.5,0.5,0.5));
+//chara->controllers.push_back(pd);
 //controllers.push_back(pd);
 //botpiece->appForce(5,5,0);
 //Physics::bodyAddForce(botpiece->getBody(),2,2,2);
@@ -238,7 +244,7 @@ Scene::~Scene(){
 Object* Scene::addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass,Character *character)
 {
     srand(time(NULL));
-    int r = rand() %30;
+    int r = rand() %22;
     Object *obj = new Object(this);//position,rotation,properties,type,this);
     obj->setMaterial(r);
     obj->setType(type);
@@ -274,8 +280,26 @@ void Scene::restartPhysics()
     }
     for (unsigned int i=0;i<characters.size();i++){
         characters.at(i)->restartPhysics();
+        characters.at(i)->checkContactFoot(true);
     }
+    if(enableGravity) Physics::setGravity(this,this->gravity);
+    else Physics::setGravity(this,Vec4());
 
+}
+
+void Scene::initPhysics()
+{
+    Physics::initScene(this);
+}
+
+void Scene::stopPhysics()
+{
+    sim_status = false;
+}
+
+void Scene::startPhysics()
+{
+    sim_status = true;
 }
 
 void Scene::simulationStep()
@@ -296,17 +320,39 @@ void Scene::simulationStep()
 //    }
 //Physics::simSingleStep(this);
     //Physics::simSingleStep(this);
+    if(!sim_status) return;
+    if(characters.size()>0)
+        if (status_motion)
+            if(characters.at(0)->getMoCap()->sizeFrames()>0){
+                if (frame_step>characters.at(0)->getMoCap()->sizeFrames()) frame_step = 1;
+                //float percent = frame_step/(characters.at(0)->getMoCap()->sizeFrames()*1.);
+                characters.at(0)->getMoCap()->stepFrame(frame_step);
+                frame_step+=2;
+            }
     std::vector<Object*> objs = objectsScene();
     std::vector<Joint*> jts = jointsScene();
     for(int i=0;i<this->sim_step;i++){
-           for(int i=0;i<objs.size();i++) Physics::setEnableObject(objs.at(i));
-           for(int i=0;i<jts.size();i++) Physics::setEnableJoint(jts.at(i));
-           for(int j=0;j<characters.size();j++)
-                for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
-                    (*it)->evaluate();
-                }
-            Physics::simSingleStep(this);
+           for(int i=0;i<objs.size();i++){
+               Physics::setEnableObject(objs.at(i));
+               if ((objs.at(i)->isSelected()) && !apply){
+                   objs.at(i)->addForce(this->externalForce);
+               }
+           }
+           for(unsigned int k=0;k<jts.size();k++) Physics::setEnableJoint(jts.at(k));
+           for(unsigned int j=0;j<characters.size();j++){
+
+               for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
+                   (*it)->evaluate();
+               }
+               if(characters.at(j)->balance!=NULL && enableGravity){
+                   characters.at(j)->balance->evaluate();
+                   characters.at(j)->checkContactFoot();
+               }
+
+           }
+           Physics::simSingleStep(this);
         }
+        apply = true;
 
 
 }
@@ -323,6 +369,14 @@ void Scene::draw()
     }
     for(std::vector<Object*>::iterator it = objects.begin(); it!= objects.end(); it++){
         (*it)->draw();
+    }
+    if(externalForce.module()!=0){
+            std::vector<Object*> objs = objectsScene();
+        for(int i=0;i<objs.size();i++)
+            if (objs.at(i)->isSelected()){
+                Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);
+            }
+
     }
     //Draw::drawPoint(Vec4(0,7,0));
 
@@ -364,6 +418,24 @@ void Scene::setJointGroup(dJointGroupID contactGroup)
     this->contactGroup = contactGroup;
 }
 
+void Scene::setGravityParameters(Vec4 g)
+{
+    this->gravity = g;
+}
+
+Vec4 Scene::getGravity()
+{
+    return this->gravity;
+}
+
+
+void Scene::setGravity(bool b)
+{
+    this->enableGravity = b;
+    if(enableGravity) Physics::setGravity(this,this->gravity);
+    else Physics::setGravity(this,Vec4());
+}
+
 void Scene::setSimStep(int sim_step)
 {
     this->sim_step = sim_step;
@@ -372,6 +444,24 @@ void Scene::setSimStep(int sim_step)
 int Scene::getSimStep()
 {
     return this->sim_step;
+}
+
+std::vector<GRF> Scene::getGroundForces()
+{
+    return groundForces;
+}
+
+void Scene::addGroundForce(GRF grf)
+{
+    groundForces.push_back(grf);
+}
+
+void Scene::clearGroundForces()
+{
+    for (unsigned int i=0;i<groundForces.size();i++) {
+        delete groundForces[i].jtFb;
+    }
+    groundForces.clear();
 }
 
 Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara, Vec4 limSup, Vec4 limInf)
@@ -438,9 +528,217 @@ void Scene::applyForce(Vec4 force)
 {
     Object *object = selectedObject();
     if(object!=NULL){
-        object->appForce(force.x(),force.y(),force.z());
+        apply = false;
+        object->addForce(force);
     }
 
+}
+
+void Scene::clear()
+{
+    objects.clear();
+    characters.clear();
+    Physics::closeScene(this);
+
+}
+
+Object *Scene::getObject(QString name)
+{
+    for(unsigned int i=0;i<objects.size();i++)
+        if (objects.at(i)->getName() == name) return objects.at(i);
+    return NULL;
+}
+
+void Scene::addCharacter(Character *chara)
+{
+    this->characters.push_back(chara);
+}
+
+void Scene::setExternalForce(Vec4 force)
+{
+    apply = false;
+    this->externalForce = force;
+}
+
+Vec4 Scene::getExternalForce()
+{
+    return this->externalForce;
+}
+
+void Scene::setProportionalKsPD(Vec4 ks)
+{
+    this->propKs = ks;
+    for(unsigned int i=0;i<characters.size();i++)
+        for(unsigned int j=0;j<characters.at(i)->controllers.size();j++)
+            characters.at(i)->controllers.at(j)->setProportionalKs(propKs);
+}
+
+Vec4 Scene::getProportionalKsPD()
+{
+    return propKs;
+}
+
+void Scene::setProportionalKdPD(Vec4 kd)
+{
+    this->propKd = kd;
+    for(unsigned int i=0;i<characters.size();i++)
+        for(unsigned int j=0;j<characters.at(i)->controllers.size();j++)
+            characters.at(i)->controllers.at(j)->setProportionalKd(propKd);
+}
+
+Vec4 Scene::getProportionalKdPD()
+{
+    return propKd;
+}
+
+Character *Scene::getCharacter(int i)
+{
+    return this->characters.at(i);
+}
+
+int Scene::getSizeCharacter()
+{
+    return this->characters.size();
+}
+
+void Scene::shootObject(Object *obj, int type, Vec4 begin)
+{
+
+}
+
+void Scene::setEnableTorqueBalance(bool b)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    return characters.at(0)->getBalance()->setEnableTorque(b);
+}
+
+void Scene::setEnableForceBalance(bool b)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    return characters.at(0)->getBalance()->setEnableForce(b);
+}
+
+void Scene::setEnableMomentumBalance(bool b)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    return characters.at(0)->getBalance()->setEnableMomentum(b);
+}
+
+Vec4 Scene::getKsForceBalance()
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKsForce();
+}
+
+void Scene::setKsForceBalance(Vec4 ks)
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setKsForce(ks);
+}
+
+Vec4 Scene::getKdForceBalance()
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKdForce();
+}
+
+void Scene::setKdForceBalance(Vec4 kd)
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setKdForce(kd);
+}
+
+Vec4 Scene::getKsTorqueBalance()
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKsTorque();
+}
+
+void Scene::setKsTorqueBalance(Vec4 ks)
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setKsTorque(ks);
+}
+
+Vec4 Scene::getKdTorqueBalance()
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKdTorque();
+}
+
+void Scene::setKdTorqueBalance(Vec4 kd)
+{
+    //neste caso estou fazendo a chamada do objeto caractere de valor 0, depois deixaremos esta função mais geral
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    return characters.at(0)->getBalance()->setKdTorque(kd);
+}
+
+Vec4 Scene::getKMomBalance()
+{
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKMomentum();
+}
+
+void Scene::setKMomBalance(Vec4 kmom)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setKMomentum(kmom);
+}
+
+void Scene::setCompensacao(int value)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setCompensation(value/100.);
+}
+
+void Scene::setAlphaCharacter(float val)
+{
+    if (characters.size()==0) return;
+    characters.at(0)->setAlpha(val);
+}
+
+void Scene::setWireCharacter(bool b)
+{
+    if (characters.size()==0) return;
+    characters.at(0)->setWireframe(b);
+}
+
+void Scene::setAngleBodyBalance(Vec4 v)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setDeriredQuaternion(v);
+}
+
+void Scene::restartMotionCapture()
+{
+    frame_step = 1;
+}
+
+void Scene::statusMotionCapture(bool b)
+{
+    status_motion = b;
 }
 
 

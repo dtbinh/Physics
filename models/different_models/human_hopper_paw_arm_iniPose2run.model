@@ -1,0 +1,39 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+upaxis: "y-up"
+offset: 0 0 0
+
+box part: "body1" -0.000000 1.555976 0.000000 0.000000 1.000000 0.000000 0.000000 41.420000 0 0.150000 0.672000 0.150000 0 0
+box part: "body2" 0.041484 0.990191 0.000000 10.233685 0.000000 0.000000 1.000000 20.680000 0 0.120000 0.467000 0.120000 0 0
+box part: "body3" -0.012285 0.612410 0.000000 32.766315 0.000000 0.000000 -1.000000 13.080000 0 0.100000 0.352000 0.100000 0 0
+box part: "body4" -0.048752 0.410154 0.000000 47.293327 0.000000 0.000000 1.000000 7.020000 0 0.100000 0.160000 0.100000 0 0
+box part: "body5" 0.109948 1.618579 0.000000 45.940358 0.000000 0.000000 1.000000 6.020000 0 0.100000 0.366000 0.100000 0 0
+box part: "body6" 0.372406 1.621998 0.000000 134.940358 0.000000 0.000000 1.000000 5.020000 0 0.080000 0.370000 0.080000 0 0
+
+ball joint: "joint_0" "body1" "body2" -0.000000 1.219976 0.000000
+ball joint: "joint_1" "body2" "body3" 0.082969 0.760406 0.000000
+ball joint: "joint_2" "body3" "body4" -0.107539 0.464415 0.000000
+ball joint: "joint_3" "body1" "body5" 0.000000 1.724976 0.000000
+ball joint: "joint_4" "body5" "body6" 0.241455 1.491319 0.000000
+
+paw: "paw_0" "body4" 0.000000 -0.080000 0.000000 0.100000
+
+rest_poses: "models/different_models/human_hopper_paw_arm_iniPose2run/human_hopper_paw_arm_iniPose2run_0.rest" "models/different_models/human_hopper_paw_arm_iniPose2run/human_hopper_paw_arm_iniPose2run_1.rest" "models/different_models/human_hopper_paw_arm_iniPose2run/human_hopper_paw_arm_iniPose2run_2.rest"
+realRestPose: "models/different_models/human_hopper_paw_arm_iniPose2run/human_hopper_paw_arm_iniPose2run_-1.rest"
+
+
+
+mesh: "body1" "meshes/robotv2/torso_2_s_v2.obj" 1.000000 1.000000 1.000000 84.000000 0.000000 1.000000 0.000000 0.000000 0.080000 0.000000
+mesh: "body2" "meshes/robotv2/rupperleg.obj" 1.000000 1.000000 1.000000 68.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.120000
+mesh: "body3" "meshes/robotv2/rlowerleg.obj" 1.000000 0.694444 1.000000 76.139489 -0.043552 0.997495 0.055743 0.020000 0.020000 0.130000
+mesh: "body4" "meshes/robotv2/rfoot.obj" 1.000000 1.000000 1.000000 116.044256 0.552363 0.624332 -0.552363 -0.010000 -0.000000 0.120000
+mesh: "body5" "meshes/robotv2/rupperarm.obj" 1.000000 1.000000 1.000000 101.579471 0.427786 0.442986 0.787885 0.000000 -0.040000 0.200000
+mesh: "body6" "meshes/robotv2/rlowerarm.obj" 1.000000 1.000000 1.000000 107.176895 0.417300 0.447499 0.790952 -0.010000 -0.040000 0.210000
+
+color: "body1" 0.360784 0.301961 0.196078
+color: "body2" 0.360784 0.301961 0.196078
+color: "body3" 0.360784 0.301961 0.196078
+color: "body4" 0.360784 0.301961 0.196078
+color: "body5" 0.360784 0.301961 0.196078
+color: "body6" 0.360784 0.301961 0.196078
+

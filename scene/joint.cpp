@@ -26,19 +26,117 @@ Joint::Joint(dJointID joint, Character *chara, Object *parent, Object *child, in
     this->parent = parent;
     this->child  = child;
     this->type   = type;
-    this->limSup = limSup;
-    this->limInf = limInf;
+    this->limSupA = limSup;
+    this->limInfA = limInf;
     this->character = chara;
     this->initialAnchor = new Vec4();
     this->selected = false;
     chara->joints.push_back(this);
 }
 
+void Joint::setLimitsAngularSuperior(Vec4 sup)
+{
+    this->limSupA = sup;
+}
+
+void Joint::setLimitsAngularInferior(Vec4 inf)
+{
+    this->limInfA = inf;
+}
+
+Vec4 Joint::getTorqueMax()
+{
+    return this->tqMax;
+}
+
+Vec4 Joint::getLimitAngularMax()
+{
+    return this->limSupA;
+}
+
+Vec4 Joint::getLimitAngularMin()
+{
+    return this->limInfA;
+}
+
+Vec4 Joint::getPositionAnchor()
+{
+    return Physics::getAnchorJoint(this);
+}
+
+
+
 Joint::~Joint()
 {
     delete this->material;
     delete this->initialAnchor;
     Physics::closeJoint(this);
+}
+
+Matrix Joint::getAd()
+{
+    Matrix Ad(6,6);
+    //R
+    Matrix R(3,3);
+    //matriz de rotacao da junta em relacao ao frame global (assume-se que o frame da junta eh o mesmo que o frame global - em relacao a rotacao)
+    R = R.identity();
+    Vec p = Vec(getPositionCurrent()) - Vec(Vec4());
+    //[p]R
+    Matrix pR;
+    Matrix cross_p = Matrix::crossProductMatrix(p);
+    pR = cross_p * R;
+    //Ad
+    Ad.setSubmatrix(0,0,R);
+    Ad.setSubmatrix(3,0,pR);
+    Ad.setSubmatrix(3,3,R);
+
+    return Ad;
+}
+
+Matrix Joint::getAd(Vec4 pos)
+{
+    Matrix Ad(6,6);
+    //R
+    Matrix R(3,3);
+    //matriz de rotacao da junta em relacao ao frame global (assume-se que o frame da junta eh o mesmo que o frame global - em relacao a rotacao)
+    R = R.identity();
+    Vec p = Vec(getPositionCurrent()) - Vec(pos);
+    //[p]R
+    Matrix pR;
+    Matrix cross_p = Matrix::crossProductMatrix(p);
+    pR = cross_p * R;
+    //Ad
+    Ad.setSubmatrix(0,0,R);
+    Ad.setSubmatrix(3,0,pR);
+    Ad.setSubmatrix(3,3,R);
+    return Ad;
+}
+
+Matrix Joint::getAd(Object *obj)
+{
+    // | R p |^-1   | R^t  R^t.(-p) |
+    // | 0 1 |    = |  0      1     |
+    Matrix Ad(6,6);
+    //R
+    Matrix R = Physics::getMatrixRotation(obj);
+    //matriz inversa de R
+    Matrix invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
+    R = invR;
+    Vec posJoint = Vec(getPositionCurrent()),     //posição do mundo
+         posBody = Vec(obj->getPositionCurrent()), //posição do corpo
+         p;                                   //deslocamento
+
+    p = posBody - posJoint;
+    p = R*p;
+    //[p]R
+    Matrix pR;
+    Matrix cross_p = Matrix::crossProductMatrix(p);
+    pR = cross_p * R;
+    //Ad
+    Ad.setSubmatrix(0,0,R);
+    Ad.setSubmatrix(3,0,pR);
+    Ad.setSubmatrix(3,3,R);
+    return Ad;
 }
 
 void Joint::initJoint(Vec4 anchor)
@@ -140,6 +238,11 @@ QString Joint::getName()
     return this->name;
 }
 
+Vec4 Joint::getPositionCurrent()
+{
+    return Physics::getJointBallAnchor(this);
+}
+
 void Joint::draw()
 {
     //if(this->initialAnchor==Vec4()) return;
@@ -149,11 +252,18 @@ void Joint::draw()
     }
     case (JOINT_BALL):{
         Vec4 position = Physics::getJointBallAnchor(this);
-        Draw::drawSphere(position);
+
+        if (selected) Draw::drawSphereSelected(position);
+        else Draw::drawSphere(position);
         break;
     }
     case (JOINT_FIXED):{
         break;
     }
     }
+}
+
+void Joint::setTorqueMax(Vec4 tq)
+{
+    this->tqMax = tq;
 }

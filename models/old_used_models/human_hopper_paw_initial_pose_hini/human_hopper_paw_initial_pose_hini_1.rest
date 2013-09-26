@@ -1,0 +1,19 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+upaxis: "y-up"
+offset: 0 0 0
+
+box part: "body1" -0.000000 1.137481 0.000000 0.181551 0.000000 0.000000 1.000000 38.000000 0 0.100000 0.450000 0.100000 0 0
+box part: "body2" 0.064521 0.781737 0.000000 25.181551 0.000000 0.000000 1.000000 11.000000 0 0.080000 0.300000 0.080000 0 0
+box part: "body3" -0.001321 0.570583 0.000000 59.818449 0.000000 0.000000 -1.000000 7.600000 0 0.080000 0.300000 0.080000 0 0
+box part: "body4" -0.076528 0.469987 0.000000 65.181551 0.000000 0.000000 1.000000 3.800000 0 0.080000 0.120000 0.080000 0 0
+
+ball joint: "joint_0" "body1" "body2" 0.000697 0.917482 0.000000
+ball joint: "joint_1" "body2" "body3" 0.128344 0.645993 0.000000
+ball joint: "joint_2" "body3" "body4" -0.130987 0.495172 0.000000
+
+paw: "paw_0" "body4" 0.000000 -0.060000 0.000000 0.080000
+
+rest_poses: "models/old_used_models/human_hopper_paw_initial_pose_hini/human_hopper_paw_initial_pose_hini_0.rest" "models/old_used_models/human_hopper_paw_initial_pose_hini/human_hopper_paw_initial_pose_hini_1.rest" "models/old_used_models/human_hopper_paw_initial_pose_hini/human_hopper_paw_initial_pose_hini_2.rest"
+realRestPose: "models/old_used_models/human_hopper_paw_initial_pose_hini/human_hopper_paw_initial_pose_hini_-1.rest"
+

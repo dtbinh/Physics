@@ -28,9 +28,9 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
 
         int numcont = 4;
         dContact contact[numcont];
-
+        int i;
         if (int numc = dCollide (o1,o2,numcont,&contact[0].geom,sizeof(dContact))) {
-            for(int i=0;i<numc;i++){
+            for(i=0; i<numcont; i++){
 
                 contact[i].surface.mode = dContactBounce; // | dContactSoftCFM;
                 // friction parameter
@@ -42,9 +42,35 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                 // constraint force mixing parameter
                 //contact.surface.soft_cfm = 0.001;
 
-                dJointID c = dJointCreateContact (scene->getWorld(),scene->getJointGroup(),&contact[i]);
-                dJointAttach (c,b1,b2);
+
             }
+            dMatrix3 RI;
+                dRSetIdentity (RI);
+                //const dReal ss[3] = {0.02,0.02,0.02};
+                for (i=0; i<numc; i++) {
+                  dJointID c = dJointCreateContact (scene->getWorld(),scene->getJointGroup(),&contact[i]);
+                    //if (show_contacts) {
+                      //*
+                      //FeedbackContact fbContact
+                          dReal* contactPos; //dVector3
+                          contactPos = contact[i].geom.pos;
+                          dJointFeedback* jtFb = new dJointFeedback();
+                          int noGroundGeom = 0;
+                          if (dGeomGetClass(o1)==dPlaneClass) noGroundGeom = 2; //ou 0, mas nunca sera 0, pois would return antes
+                          else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
+                          else noGroundGeom = 3;
+                          GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
+                      //put fbContact in vector feedbackContacts
+                        scene->addGroundForce(fbContact);
+                      //set dJointFeedback
+                        dJointSetFeedback(c,jtFb);
+                      //*/
+                    //}
+
+                    //dJointAttach (c,b1,b2);
+                  dJointAttach (c,b1,b2);
+                  //if (show_contacts) dsDrawBoxD (contact[i].geom.pos,RI,ss);
+                }
         }
     }
 }
@@ -56,11 +82,14 @@ void Physics::worldStep(WorldID world, float stepSize){
 
 void Physics::simSingleStep (Scene *scene)
 {
-    // find collisions and add contact joints
+    scene->clearGroundForces();
+    std::vector<Object*> objs = scene->objectsScene();
+    for(unsigned int i=0;i<objs.size();i++)
+        dBodyEnable(objs.at(i)->getBody());
     scn = scene;
     dSpaceCollide (scene->getSpace(),0,&nearCallback);
     // step the simulation
-    dWorldQuickStep (scene->getWorld(),0.0005);
+    dWorldStep (scene->getWorld(),0.0005);
     // remove all contact joints
     dJointGroupEmpty (scene->getJointGroup());
 }
@@ -120,6 +149,61 @@ Quaternion Physics::getRotationJoint(Joint *joint)
       return Quaternion( q[0], Vec4(q[1],q[2],q[3]) );
 }
 
+Quaternion Physics::getRotationJointInit(Joint *joint)
+{
+    const dReal* qAux;
+      dQuaternion q,qPrev,qPrevt,qNext; //qPrevt - qPrev transposto (inverso, conjugado)
+      //qPrev
+        qAux = dBodyGetQuaternion(joint->getParent()->getBody());
+        qPrev[0] = qAux[0]; qPrev[1] = qAux[1]; qPrev[2] = qAux[2]; qPrev[3] = qAux[3];
+            dQuaternion iniQt,q2; //q1t - q1 transposto (inverso, conjugado)
+            //q1
+              dQuaternion inidQ;
+              to_dQuaternion(joint->getParent()->getRotation(),inidQ);
+              //state->iniQs[ junta->prevLoc ].to_dQuaternion(inidQ);
+            //q1t
+              //iniQt[0] = junta->prev->iniQ[0]; iniQt[1] = -junta->prev->iniQ[1]; iniQt[2] = -junta->prev->iniQ[2]; iniQt[3] = -junta->prev->iniQ[3];
+              iniQt[0] = inidQ[0]; iniQt[1] = -inidQ[1]; iniQt[2] = -inidQ[2]; iniQt[3] = -inidQ[3];
+            //q2
+              q2[0] = qPrev[0]; q2[1] = qPrev[1]; q2[2] = qPrev[2]; q2[3] = qPrev[3];
+            //q
+              dQMultiply0 (qPrev, q2, iniQt); //ou o contrario
+      //qPrevt
+        qPrevt[0] = qPrev[0]; qPrevt[1] = -qPrev[1]; qPrevt[2] = -qPrev[2]; qPrevt[3] = -qPrev[3];
+      //qNext
+        qAux = dBodyGetQuaternion(joint->getChild()->getBody());
+        qNext[0] = qAux[0]; qNext[1] = qAux[1]; qNext[2] = qAux[2]; qNext[3] = qAux[3];
+            //dQuaternion iniQt,q2; //q1t - q1 transposto (inverso, conjugado)
+            //q1
+              //dQuaternion inidQ;
+        to_dQuaternion(joint->getChild()->getRotation(),inidQ);
+              //state->iniQs[ junta->nextLoc ].to_dQuaternion(inidQ);
+            //q1t
+              //iniQt[0] = junta->next->iniQ[0]; iniQt[1] = -junta->next->iniQ[1]; iniQt[2] = -junta->next->iniQ[2]; iniQt[3] = -junta->next->iniQ[3];
+              iniQt[0] = inidQ[0]; iniQt[1] = -inidQ[1]; iniQt[2] = -inidQ[2]; iniQt[3] = -inidQ[3];
+            //q2
+              q2[0] = qNext[0]; q2[1] = qNext[1]; q2[2] = qNext[2]; q2[3] = qNext[3];
+            //q
+              dQMultiply0 (qNext, q2, iniQt); //ou o contrario
+      //q
+        //eh assim ao contrario dos outros casos pq esta tratando 2 corpos diferentes
+        //enquanto que os outros casos envolvem: ou o mesmo corpo, ou a mesma junta
+        dQMultiply0 (q, qPrevt, qNext); //ou o contrario
+        //dQMultiply0 (q, qNext, qPrevt); //ou o contrario
+
+      return Quaternion( q[0], Vec4(q[1],q[2],q[3]) );
+}
+
+
+void Physics::setGravity(Scene *scene,Vec4 g)
+{
+    dWorldSetGravity (scene->getWorld(),g.x(),g.y(),g.z());
+}
+void Physics::setSceneInUse(Scene *scene)
+{
+    scn = scene;
+}
+
 void Physics::initScene(Scene *scene){
     dInitODE ();
     // create world
@@ -139,6 +223,7 @@ void Physics::initScene(Scene *scene){
     dWorldSetAutoDisableFlag (scene->getWorld(),1);
     dWorldSetContactMaxCorrectingVel (scene->getWorld(),0.3);
     dWorldSetContactSurfaceLayer (scene->getWorld(),0.00001);
+    scn = scene;
 }
 void Physics::setEnableObject(Object *obj){
     dBodyEnable(obj->getBody());
@@ -154,21 +239,28 @@ void Physics::setDisableJoint(Joint *joint){
     dJointDisable(joint->getJoint());
 }
 
-void Physics::createObject(Object *object, SpaceID space, float density, Vec4 position, Quaternion rotation){
+Vec4 Physics::getAnchorJoint(Joint *joint)
+{
+    dVector3 pos;
+    dJointGetBallAnchor(joint->getJoint(),pos);
+    return Vec4(pos[0],pos[1],pos[2]);
+}
+
+void Physics::createObject(Object *object, SpaceID space, float mass, Vec4 position, Quaternion rotation){
 
 
     switch(object->getType()){
     case TYPE_SPHERE:{
         object->setBody(dBodyCreate (object->getScene()->getWorld()));
         object->setGeometry(dCreateSphere(space,object->getProperties().x()));
-        dMassSetSphereTotal(object->getMass(),1,object->getProperties().x());
+        dMassSetSphereTotal(object->getMass(),mass,object->getProperties().x());
         break;
     }
     case TYPE_CUBE:{
-        object->setBody(dBodyCreate (object->getScene()->getWorld()));
-        object->setGeometry(dCreateBox (space,object->getProperties().x(),object->getProperties().y(),object->getProperties().z()));
-        dMassSetBox ((object->getMass()),density,object->getProperties().x(),object->getProperties().y(),object->getProperties().z());
-        dMassSetBoxTotal(object->getMass(),1,object->getProperties().x(),object->getProperties().y(),object->getProperties().z());
+        object->setBody(dBodyCreate(object->getScene()->getWorld()));
+        object->setGeometry(dCreateBox(space,object->getProperties().x(),object->getProperties().y(),object->getProperties().z()));
+        //dMassSetBox ((object->getMass()),density,object->getProperties().x(),object->getProperties().y(),object->getProperties().z());
+        dMassSetBoxTotal(object->getMass(),mass,object->getProperties().x(),object->getProperties().y(),object->getProperties().z());
         break;
     }
 //    case OBJ_CAPSULE:
@@ -197,18 +289,53 @@ void Physics::createObject(Object *object, SpaceID space, float density, Vec4 po
     dBodySetQuaternion (object->getBody(),rot);
 }
 
-Vec4 Physics::getPositionBody(dGeomID geom){
+Vec4 Physics::getPositionBody(GeomID g){
     const dReal *pos;
-    pos = dGeomGetPosition(geom);
+//    printf("\nIn");
+    pos = dGeomGetPosition(g);
+//    printf("\nOut");
     return Vec4(pos[0],pos[1],pos[2]);
+
+
+//    Matrix4x4 *mat = new Matrix4x4();
+//    getGeomTransform(geom,mat);
+//    return Vec4(mat->get(12),mat->get(13),mat->get(14));
 }
 
-Quaternion Physics::getRotationBody(dGeomID geom){
+Quaternion Physics::getRotationBody(Object *obj){
     dQuaternion quat;
-    dGeomGetQuaternion(geom,quat);
+    dGeomGetQuaternion(obj->getGeometry(),quat);
     return Quaternion(quat[0],quat[1],quat[2],quat[3]);
 }
 
+void Physics::updateObject(Object *obj)
+{
+    //dGeomSetBody (obj->getGeometry(),obj->getBody());
+    //obj->setGeometry(dCreateBox (obj->getScene()->getSpace(),obj->getProperties().x(),obj->getProperties().y(),obj->getProperties().z()));
+    //dBodySetPosition(obj->getBody(),obj->getPosition().x(),obj->getPosition().y(),obj->getPosition().z());
+
+    //dBodySetMass (obj->getBody(),obj->getMass());
+//    dReal rot[] = {obj->getRotation().getScalar(),obj->getRotation().getPosX(),obj->getRotation().getPosY(),obj->getRotation().getPosZ()};
+//    dBodySetQuaternion (obj->getBody(),rot);
+}
+Matrix Physics::getMatrixRotation(Object *obj){
+    const dReal* Rbody; //dMatrix3
+    Rbody = dBodyGetRotation(obj->getBody());
+
+    //deve-se levar em consideracao se a geometria do corpo eh do tipo ccylinder
+    //por hora não estamos trabalhando com cilindros
+    /*--------- a fazer
+    if (dGeomGetClass (b->geom) == dCCylinderClass) {
+        dMatrix3 Rccyl;
+        dRFromEulerAngles (Rccyl,grauToRad(90.0),grauToRad(0.0),grauToRad(0.0));
+        dMatrix3 RccylBody;
+        dMULTIPLY2_333(RccylBody,Rbody,Rccyl); //RccylBody = Rbody.(Rccyl)^-1
+        R = conv_dMatrix3(RccylBody);
+    } else {
+        R = conv_dMatrix3(Rbody);
+    }*/
+    return getMatrix2dMatrix3(Rbody);
+}
 
 void Physics::closeScene(Scene *scene){
     // clean up
@@ -217,7 +344,7 @@ void Physics::closeScene(Scene *scene){
     dWorldDestroy (scene->getWorld());
 
     //!Same with close
-    //dCloseODE();
+    dCloseODE();
 }
 
 void Physics::getGeomTransform(GeomID geom, Matrix4x4 *transform){
@@ -279,7 +406,13 @@ void Physics::closeJoint(Joint* joint){
 }
 
 void Physics::bodyAddTorque(dBodyID body, float x, float y, float z){
-    dBodyAddTorque(body,x,y,z);
+    try{
+        dBodyAddTorque(body,x,y,z);
+    }catch(...){
+        return;
+    }
+
+
 }
 
 void Physics::bodySetTorque(dBodyID body, float x, float y, float z){
@@ -296,265 +429,82 @@ void Physics::bodySetForce(dBodyID body, float x, float y, float z){
 
 }
 
+void Physics::setPositionBody(Object *body,Vec4 pos){
+    dBodySetPosition(body->getBody(),pos.x(),pos.y(),pos.z());
+}
+
+void Physics::setRotationBody(Object *body,Quaternion quat){
+    dQuaternion q;
+    q[0] = quat.getScalar();
+    q[1] = quat.getPosX();
+    q[2] = quat.getPosY();
+    q[3] = quat.getPosZ();
+    dBodySetQuaternion(body->getBody(),q);
+}
+
+
 Vec4 Physics::getAngularVelBody(Object *obj)
 {
     const dReal *vel = dBodyGetAngularVel(obj->getBody());
     return Vec4(vel[0],vel[1],vel[2]);
 }
 
+Vec4 Physics::getLinearVelBody(Object *obj)
+{
+    const dReal *vel = dBodyGetLinearVel(obj->getBody());
+    return Vec4(vel[0],vel[1],vel[2]);
+}
 
-//#define EPSILON 0.01
-//void Physics::ControlPDBallDanilo(dJointID joint,dQuaternion tarQ,double ks,double kd)
-//{
+Vec4 Physics::getAngularMomentumBody(Object *obj){
 
-//    dBodyID parent = dJointGetBody(joint,0);
-//    dBodyID child = dJointGetBody(joint,1);
+    dVector3 angmom;
+    const dReal *angvel;
+    const dReal* R; //dMatrix3
+    dMass massBody;
+    dBodyGetMass(obj->getBody(), &massBody);
+    R = dBodyGetRotation(obj->getBody());
+    angvel = dBodyGetAngularVel(obj->getBody());
+    //rotaciona o massBody->I
+    dMassRotate( &massBody, R );
+    //Iw
+    dMULTIPLY0_331(angmom,massBody.I,angvel); //angmom=massBody.I.angvel
+    return Vec4(angmom[0],angmom[1],angmom[2]);
+}
 
-//    const dReal* childQuaternion = dBodyGetQuaternion(child);
-//    const dReal* parentQuaternion = dBodyGetQuaternion(parent);
-//    const dReal* childAngularVelocity = dBodyGetAngularVel(child);
-//    const dReal* parentAngularVelocity = dBodyGetAngularVel(parent);
+Vec4 Physics::getAngularMomentumMoCap(Object* obj,Vec4 vel, Quaternion q){
+    dVector3 angmom;
+    const dReal *angvel;
+    const dReal * R; //dMatrix3
+    dMatrix3 Rot;
+    dMass massBody;
+    dBodyGetMass(obj->getBody(), &massBody);
+    dQuaternion quat;
+    quat[0] = q.getScalar();
+    quat[1] = q.getPosX();
+    quat[2] = q.getPosY();
+    quat[3] = q.getPosZ();
+    dRfromQ(Rot,quat);
+    angvel = getVec42dReal(vel);
 
+    //rotaciona o massBody->I
+    dMassRotate( &massBody, Rot );
+    //Iw
+    dMULTIPLY0_331(angmom,massBody.I,angvel); //angmom=massBody.I.angvel
+    return Vec4(angmom[0],angmom[1],angmom[2]);
+}
 
-//    dQuaternion tmp;  // Intermediate variable
-//    dQuaternion difQ; // Change to be applied to body 2 in global coords
-//    dQuaternion difGlobalQ;
-//    dVector3 relativeAngularVelocity;    // Relative angular velocity
-//    dVector3 distA;
-//    dVector3 torque = {0};
+Vec4 Physics::getRelVelocityBody(Object *obj){
+    dVector3 res;
+    dMass mass;
+    dBodyGetMass(obj->getBody(),&mass);
+    dBodyGetRelPointVel(obj->getBody(),mass.c[0],mass.c[1],mass.c[2],res);
+    return Vec4(res[0],res[1],res[2]);
+}
 
-//    dQuaternion ident = {1,0,0,0};
-
-//    dQMultiply1(tmp,childQuaternion,parentQuaternion);
-//    //    dQMultiply1(tmp,parentQuaternion,childQuaternion);
-
-//    float prodEsc = ident[0]*tmp[0] + ident[1]*tmp[1] + ident[2]*tmp[2] + ident[3]*tmp[3];
-//    if(prodEsc < 0){
-//        tmp[0]*=-1;
-//        tmp[1]*=-1;
-//        tmp[2]*=-1;
-//        tmp[3]*=-1;
-//    }
-
-//    dQMultiply0(difGlobalQ,tarQ,tmp);
-
-//    //dQMultiply0(difGlobalQ, parentQuaternion, difQ);
-
-//    dReal theta = 2*acos(difGlobalQ[0]);
-//    dReal s = 1-difGlobalQ[0]*difGlobalQ[0];
-//    s = 1/sqrt(s);
-
-//    // Ensure we're not going the long way around
-//    //if (theta>0) theta-=2*M_PI;
-//    distA[0] = difGlobalQ[1]*s;
-//    distA[1] = difGlobalQ[2]*s;
-//    distA[2] = difGlobalQ[3]*s;
-
-//    // Find the proportional component
-//    if (fabs(theta)>EPSILON) {
-//        dNormalize3(distA);
-
-//        dOPC(torque,*,distA,ks);
-//    }
-
-//    dVector3 vel;
-
-//    vel[0] = parentAngularVelocity[0] - childAngularVelocity[0];
-//    vel[1] = parentAngularVelocity[1] - childAngularVelocity[1];
-//    vel[2] = parentAngularVelocity[2] - childAngularVelocity[2];
-//    // Achando a velocidade entre as juntas
-//    dOP(relativeAngularVelocity,-,childAngularVelocity,parentAngularVelocity);
-//    // Aplicando o fator da constante de velocidade
-//    dOPEC(relativeAngularVelocity,*=,kd);
-//    // Adicoionando ao torque
-//    dOPE(torque,-=,relativeAngularVelocity);
-
-
-//    dBodyAddTorque(child,torque[0],torque[1],torque[2]);
-//    dBodyAddTorque(parent,-torque[0],-torque[1],-torque[2]);
-//}
-
-
-//void Physics::ControlPDBallRubens(Joint *joint,dQuaternion qTarget,double ks,double kd){
-//    dQuaternion qIdent = {1,0,0,0};
-
-//    dQuaternion qAux;
-//    const dReal *readQ;
-
-//    //prev
-//    readQ = dBodyGetQuaternion(joint->parent->body);
-//    dQuaternion qPrev = {readQ[0],readQ[1],readQ[2],readQ[3]};
-
-//    Quaternion4f *parentIniQ = joint->parent->initialRotation;
-//    dQuaternion prevIniQ = {parentIniQ->w, -parentIniQ->x, -parentIniQ->y, -parentIniQ->z};
-//    dQMultiply0 (qAux, qPrev, prevIniQ);
-
-//    qPrev[0] = qAux[0];
-//    qPrev[1] = -qAux[1];
-//    qPrev[2] = -qAux[2];
-//    qPrev[3] = -qAux[3];
-
-//    //next
-//    readQ = dBodyGetQuaternion(joint->child->body);
-//    dQuaternion qNext = {readQ[0],readQ[1],readQ[2],readQ[3]};
-
-//    Quaternion4f *childIniQ = joint->child->initialRotation;
-//    dQuaternion nextIniQ = {childIniQ->w, -childIniQ->x, -childIniQ->y, -childIniQ->z};
-//    dQMultiply0 (qAux, qNext, nextIniQ);
-
-//    qNext[0] = qAux[0];
-//    qNext[1] = qAux[1];
-//    qNext[2] = qAux[2];
-//    qNext[3] = qAux[3];
-
-//    //current quaternion
-//    dQuaternion qCurrent;
-//    dQMultiply0 (qCurrent, qPrev, qNext);
-
-//    dReal dotProdQ;
-
-//    //minor arc
-//    dotProdQ = ( qCurrent[0]*qIdent[0] + qCurrent[1]*qIdent[1] + qCurrent[2]*qIdent[2] + qCurrent[3]*qIdent[3] );
-//    if( dotProdQ < -dotProdQ ){
-//        qCurrent[0]*=-1;
-//        qCurrent[1]*=-1;
-//        qCurrent[2]*=-1;
-//        qCurrent[3]*=-1;
-//    }
-
-//    //dQuaternion qTarget = {1,0,0,0};
-
-//    dQuaternion qDelta;
-//    dQuaternion qMinusCurrent = {qCurrent[0],-qCurrent[1],-qCurrent[2],-qCurrent[3]};
-
-//    //delta quat
-//    dQMultiply0(qDelta, qTarget, qMinusCurrent);
-//    //minor arc
-//    dotProdQ = ( qDelta[0]*qIdent[0] + qDelta[1]*qIdent[1] + qDelta[2]*qIdent[2] + qDelta[3]*qIdent[3] );
-//    if( dotProdQ < -dotProdQ ){
-//        qDelta[0]*=-1;
-//        qDelta[1]*=-1;
-//        qDelta[2]*=-1;
-//        qDelta[3]*=-1;
-//    }
-
-//    //to axis angle
-//    dVector3 axis;
-//    dReal angle;
-
-//    angle = 2*acos(qDelta[0]);
-//    dReal s = qDelta[0]*qDelta[0];
-//    if(s > 0.0){
-//        s = dRecipSqrt(s);     //s = 1/sqrt(s)
-//        axis[0] = qDelta[1]*s; //x = qx*s
-//        axis[1] = qDelta[2]*s; //y = qy*s
-//        axis[2] = qDelta[3]*s; //z = qz*s
-//    }else{
-//        //arbitrary axis
-//        s = 0;
-//        axis[0] = 1;
-//        axis[1] = 1;
-//        axis[2] = 1;
-//    }
-
-//    //limited rad angle
-//    dReal limitedRadAngle = angle;
-//    dReal limT = 0.1*10;
-//    if(limitedRadAngle < -limT){
-//        limitedRadAngle = -limT;
-//    }else if(limitedRadAngle > limT){
-//        limitedRadAngle = limT;
-//    }
-
-//    //rad to deg
-//    angle = (angle*180)/M_PI;
-
-//    //truncate 10 decimal digits
-//    angle = trunc( angle * pow(10,10) ) / pow(10,10) ;
-//    axis[0] = trunc( axis[0] * pow(10,10) ) / pow(10,10) ;
-//    axis[1] = trunc( axis[1] * pow(10,10) ) / pow(10,10) ;
-//    axis[2] = trunc( axis[2] * pow(10,10) ) / pow(10,10) ;
-
-//    dVector3 localDelta = {axis[0]*limitedRadAngle, axis[1]*limitedRadAngle, axis[2]*limitedRadAngle, 1.0};
-
-//    const dReal *rotationPrevBody = dBodyGetRotation( dJointGetBody (joint->joint, 0) );
-
-//    dMatrix3 iniRot;
-//    dQuaternion iniQuat;
-
-//    //"set iniQuat";
-
-//    dRfromQ(iniRot, iniQuat);
-
-//    dMatrix3 iniRotPrevBody;
-//    dMultiply2_333(iniRotPrevBody,rotationPrevBody,iniRot);
-
-//    dVector3 globalDelta;
-//    dMultiply0_331(globalDelta,iniRotPrevBody,localDelta);
-
-//    const dReal *prevBodyVel = dBodyGetAngularVel( dJointGetBody (joint->joint, 0) );
-//    const dReal *nextBodyVel = dBodyGetAngularVel( dJointGetBody (joint->joint, 1) );
-//    dVector3 globalVel;
-//    for(int i=0;i<3;i++){
-//        globalVel[i] = nextBodyVel[i] - prevBodyVel[i];
-//    }
-//    dVector3 deltaGlobalVel;
-//    limT = 0.1*1000;
-//    for(int i=0;i<3;i++){
-//        deltaGlobalVel[i] = -globalVel[i];
-
-//        if(deltaGlobalVel[i] < -limT){
-//            deltaGlobalVel[i] = -limT;
-//        }else if(deltaGlobalVel[i] > limT){
-//            deltaGlobalVel[i] = limT;
-//        }
-//    }
-
-//    //ks
-//    dMatrix3 localKS;
-//    for(int i=0;i<12;i++){ localKS[i] = 0; }
-
-//    dVector3 fixedKSI = {ks,ks,ks};// = getJointKsFixediSaved( i, state->compInertia, ksFixedi );
-
-//    localKS[0]  = fixedKSI[0];
-//    localKS[5]  = fixedKSI[1];
-//    localKS[10] = fixedKSI[2];
-
-//    dMatrix3 tempKS;
-//    dMultiply2_333 (tempKS,localKS,iniRotPrevBody);
-//    dMatrix3 globalKS;
-//    dMultiply0_333 (globalKS,iniRotPrevBody,tempKS);
-
-//    //kd
-
-//    //dReal ratioKSKD = 0.2;
-
-//    dMatrix3 localKD;
-//    for (int i=0;i<12;i++) { localKD[i] = 0.0; }
-//    localKD[0] = kd;
-//    localKD[5] = kd;
-//    localKD[10] = kd;
-//    //localKD[0]  = localKS[0] * ratioKSKD;
-//    //localKD[5]  = localKS[5] * ratioKSKD;
-//    //localKD[10] = localKS[10] * ratioKSKD;
-
-
-//    dMatrix3 tempKD;
-//    dMultiply2_333 (tempKD,localKD,iniRotPrevBody);
-//    dMatrix3 globalKD;
-//    dMultiply0_333 (globalKD,iniRotPrevBody,tempKD);
-
-//    dVector3 torque;
-//    dVector3 torqueKS;
-//    dMultiply0_331 (torqueKS,globalKS,globalDelta);
-//    dVector3 torqueKD;
-//    dMultiply0_331 (torqueKD,globalKD,deltaGlobalVel);
-
-//    for(int i=0;i<3;i++){
-//        torque[i] = torqueKS[i] + torqueKD[i];
-//    }
-
-//    dBodyAddTorque(joint->parent->body, -torque[0],-torque[1],-torque[2]);
-//    dBodyAddTorque(joint->child->body,  torque[0], torque[1], torque[2]);
-//}
-
+Vec4 Physics::getRelPositionBody(Object *obj){
+    dVector3 res;
+    dMass mass;
+    dBodyGetMass(obj->getBody(),&mass);
+    dBodyGetRelPointPos(obj->getBody(),mass.c[0],mass.c[1],mass.c[2],res);
+    return Vec4(res[0],res[1],res[2]);
+}

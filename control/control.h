@@ -12,6 +12,8 @@ private:
     Quaternion qwanted;
     Vec4       ks;         //constante linear
     Vec4       kd;         //constante derivada
+    Vec4       propKs;
+    Vec4       propKd;
     bool       enabled;
 
 public:
@@ -27,6 +29,16 @@ public:
     void setEnabled(bool enabled);
     bool isEnabled();
     void evaluate();
+    void updateKsKdCoros(float MassTotal);
+    void setProportionalKs(Vec4 pks);
+    void setProportionalKd(Vec4 pkd);
+    Vec4 getProportionalKs();
+    Vec4 getProportionalKd();
+    Vec4 limitingTorquePD(Vec4 tq);
+    static Vec4 limitingTorquePD(Vec4 tq,Joint* j);
+
+    static Vec4 getTorquePD(Joint* joint,Vec4 ks, Vec4 kd,Quaternion qDesired=Quaternion());
+    static Vec4 getTorquePDCOM(Joint* joint,Vec4 ks, Vec4 kd,Quaternion qDesired=Quaternion(Vec4(0,0,90)),Vec4 velocity=Vec4());
 
 };
 

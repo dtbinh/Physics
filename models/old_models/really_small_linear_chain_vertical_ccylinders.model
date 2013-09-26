@@ -1,0 +1,12 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+upaxis: "z-up"
+offset: 0 0 0
+
+ccylinder part: "body2" 0.0 0.0 0.50 0 1 0 0 10.0 0 0.1 0.8 0 0
+ccylinder part: "body3" 0.0 0.0 1.0 0 1 0 0 10.0 0 0.1 0.8 0 0
+ccylinder part: "body4" 0.0 0.0 1.50 0 1 0 0 10.0 0 0.1 0.8 0 0
+
+ball joint: "joint_2" "body3" "body2" 0.0 0.0 0.75
+ball joint: "joint_3" "body3" "body4" 0.0 0.0 1.25
+

@@ -38,6 +38,27 @@ Vec4 Vec4::operator + (Vec4 v){
     return r;
 }
 
+void Vec4::operator +=(Vec4 v)
+{
+    this->x1 = this->x1+v.x();
+    this->x2 = this->x2+v.y();
+    this->x3 = this->x3+v.z();
+}
+
+void Vec4::operator -=(Vec4 v)
+{
+    this->x1 = this->x1-v.x();
+    this->x2 = this->x2-v.y();
+    this->x3 = this->x3-v.z();
+}
+
+void Vec4::operator /=(float k)
+{
+    this->x1 = this->x1/k;
+    this->x2 = this->x2/k;
+    this->x3 = this->x3/k;
+}
+
 Vec4 Vec4::operator - (Vec4 v){
     Vec4 r;
     r.x1 = this->x1-v.x1;
@@ -66,6 +87,11 @@ Vec4 Vec4::operator * (float k){
 
 float Vec4::operator * (Vec4 v){
     return this->x1*v.x1+this->x2*v.x2+this->x3*v.x3;
+}
+
+Vec4 Vec4::mult(Vec4 v)
+{
+    return Vec4(this->x()*v.x(),this->y()*v.y(),this->z()*v.z());
 }
 
 

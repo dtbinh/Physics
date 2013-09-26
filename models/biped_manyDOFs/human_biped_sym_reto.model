@@ -1,0 +1,73 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+upaxis: "y-up"
+offset: 0 0 0
+
+box part: "pelvis"          0.000000 1.290 0.000000 0.000000 1.000000 0.000000 0.000000 16.000000 0 0.160000 0.22 0.160000 0 0
+box part: "stomach"         0.000000 1.500 0.000000 0.000000 1.000000 0.000000 0.000000 11.000000 0 0.140000 0.20 0.140000 0 0
+box part: "chest"           0.000000 1.730 0.000000 0.000000 1.000000 0.000000 0.000000 14.000000 0 0.180000 0.26 0.180000 0 0
+box part: "neck"            0.000000 1.910 0.000000 0.000000 1.000000 0.000000 0.000000  1.500000 0 0.090000 0.10 0.090000 0 0
+box part: "head"            0.000000 2.050 0.000000 0.000000 1.000000 0.000000 0.000000  4.400000 0 0.140000 0.18 0.140000 0 0
+box part: "thigh_right"     0.000000 0.950 0.000000 0.000000 1.000000 0.000000 0.000000 10.680000 0 0.120000 0.46 0.120000 0 0
+box part: "shank_right"     0.000000 0.545 0.000000 0.000000 1.000000 0.000000 0.000000  6.580000 0 0.100000 0.35 0.100000 0 0
+box part: "foot_right"      0.000000 0.290 0.000000 0.000000 1.000000 0.000000 0.000000  3.520000 0 0.100000 0.16 0.100000 0 0
+box part: "upper_arm_right" 0.000000 1.630 0.000000 0.000000 1.000000 0.000000 0.000000  3.020000 0 0.100000 0.34 0.100000 0 0
+box part: "forearm_right"   0.000000 1.340 0.000000 0.000000 1.000000 0.000000 0.000000  2.020000 0 0.080000 0.24 0.080000 0 0
+box part: "hand_right"      0.000000 1.140 0.000000 0.000000 1.000000 0.000000 0.000000  1.020000 0 0.100000 0.16 0.080000 0 0
+box part: "thigh_left"      0.000000 0.950 0.000000 0.000000 1.000000 0.000000 0.000000 10.680000 0 0.120000 0.46 0.120000 0 0
+box part: "shank_left"      0.000000 0.545 0.000000 0.000000 1.000000 0.000000 0.000000  6.580000 0 0.100000 0.35 0.100000 0 0
+box part: "foot_left"       0.000000 0.290 0.000000 0.000000 1.000000 0.000000 0.000000  3.520000 0 0.100000 0.16 0.100000 0 0
+box part: "upper_arm_left"  0.000000 1.630 0.000000 0.000000 1.000000 0.000000 0.000000  3.020000 0 0.100000 0.34 0.100000 0 0
+box part: "forearm_left"    0.000000 1.340 0.000000 0.000000 1.000000 0.000000 0.000000  2.020000 0 0.080000 0.24 0.080000 0 0
+box part: "hand_left"       0.000000 1.140 0.000000 0.000000 1.000000 0.000000 0.000000  1.020000 0 0.100000 0.16 0.080000 0 0
+
+ball joint: "waist"          "pelvis" "stomach"                0.000000 1.40 0.000000
+ball joint: "back"           "stomach" "chest"                 0.000000 1.60 0.000000
+ball joint: "lower_neck"     "chest" "neck"                    0.000000 1.86 0.000000
+ball joint: "upper_neck"     "neck" "head"                     0.000000 1.96 0.000000
+ball joint: "hip_right"      "pelvis" "thigh_right"            0.000000 1.18 0.000000
+ball joint: "knee_right"     "thigh_right" "shank_right"       0.000000 0.72 0.000000
+ball joint: "ankle_right"    "shank_right" "foot_right"        0.000000 0.37 0.000000
+ball joint: "shoulder_right" "chest" "upper_arm_right"         0.000000 1.80 0.000000
+ball joint: "elbow_right"    "upper_arm_right" "forearm_right" 0.000000 1.46 0.000000
+ball joint: "wrist_right"    "forearm_right" "hand_right"      0.000000 1.22 0.000000
+ball joint: "hip_left"       "pelvis" "thigh_left"             0.000000 1.18 0.000000
+ball joint: "knee_left"      "thigh_left" "shank_left"         0.000000 0.72 0.000000
+ball joint: "ankle_left"     "shank_left" "foot_left"          0.000000 0.37 0.000000
+ball joint: "shoulder_left"  "chest" "upper_arm_left"          0.000000 1.80 0.000000
+ball joint: "elbow_left"     "upper_arm_left" "forearm_left"   0.000000 1.46 0.000000
+ball joint: "wrist_left"     "forearm_left" "hand_left"        0.000000 1.22 0.000000
+
+paw: "paw_right" "foot_right" 0.000000 -0.080000 0.000000 0.100000
+paw: "paw_left"  "foot_left"  0.000000 -0.080000 0.000000 0.100000
+
+symmetric_joints: 4 10
+symmetric_joints: 5 11
+symmetric_joints: 6 12
+symmetric_joints: 7 13
+symmetric_joints: 8 14
+symmetric_joints: 9 15
+
+rest_poses: "models/biped_manyDOFs/human_biped_sym_reto.model" "models/biped_manyDOFs/human_biped_sym_reto.model" "models/biped_manyDOFs/human_biped_sym_reto.model" "models/biped_manyDOFs/human_biped_sym_reto.model" "models/biped_manyDOFs/human_biped_sym_reto.model" "models/biped_manyDOFs/human_biped_sym_reto.model"
+realRestPose: "models/biped_manyDOFs/human_biped_sym_reto.model"
+
+
+
+color: "pelvis" 0.360784 0.301961 0.196078
+color: "stomach" 0.360784 0.301961 0.196078
+color: "chest" 0.360784 0.301961 0.196078
+color: "neck" 0.360784 0.301961 0.196078
+color: "head" 0.360784 0.301961 0.196078
+color: "thigh_right" 0.360784 0.301961 0.196078
+color: "shank_right" 0.360784 0.301961 0.196078
+color: "foot_right" 0.360784 0.301961 0.196078
+color: "upper_arm_right" 0.360784 0.301961 0.196078
+color: "forearm_right" 0.360784 0.301961 0.196078
+color: "hand_right" 0.360784 0.301961 0.196078
+color: "thigh_left" 0.188235 0.243137 0.568627
+color: "shank_left" 0.188235 0.243137 0.568627
+color: "foot_left" 0.188235 0.243137 0.568627
+color: "upper_arm_left" 0.188235 0.243137 0.568627
+color: "forearm_left" 0.188235 0.243137 0.568627
+color: "hand_left" 0.188235 0.243137 0.568627
+

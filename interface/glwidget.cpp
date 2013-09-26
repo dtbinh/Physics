@@ -3,7 +3,9 @@
 #include "scene/object.h"
 #include "graphics/draw.h"
 #include "math/quaternion.h"
-
+#include "extra/utils.h"
+#include <sys/time.h>
+#include <stdio.h>
 int count = 0;
 Quaternion q;
 //bool move = false;
@@ -12,9 +14,9 @@ int last_pox_x,last_pox_y;
 int id_material;
 int state_key;
 //Vec4 eye,at;
-Vec4 cam_eye = Vec4(10,20,0);
-Vec4 cam_at  = Vec4(0,0,0);
-
+Vec4 cam_eye = Vec4(2,2,2);
+Vec4 cam_at  = Vec4(0,1,0);
+int ciclo = 0;
 //variaveis de camera
 //int width,height;
 
@@ -149,11 +151,18 @@ GLWidget::GLWidget(QWidget *parent) :
     scene = new Scene(this);
     updateObjects(scene->objectsScene());
     updateJoints(scene->jointsScene());
-    connect(&simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
-    simTimer.start(1);
+    simTimer = new QTimer(this);
+    connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
+
+    simTimer->start(0);
+
+    simTimer->setInterval(0);
     move = false;
     sim_pause = false;
-
+    capture_pause = true;
+    updateKsProp(scene->getProportionalKsPD());
+    updateKdProp(scene->getProportionalKdPD());
+    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomBalance());
 
 }
 
@@ -238,14 +247,39 @@ void GLWidget::resizeGL(int w, int h)
 void GLWidget::paintGL()
 {
 
+//    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
+//      ti = tf = tempo = 0;
+//      timeval tempo_inicio,tempo_fim;
+//      gettimeofday(&tempo_inicio,NULL);
+//    if(!sim_pause)
+//        scene->simulationStep();
+//    update();
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glPushMatrix();
 
     scene->draw();
-    Draw::drawGround(100);
+    Draw::drawGround(10);
+    if (scene->getExternalForce().module()!=0)
+        ciclo++;
+    if (ciclo>5){
+        scene->setExternalForce(Vec4(0,0,0));
+        ciclo = 0;
+    }
+    if(!capture_pause)
+        if(scene->getSizeCharacter()!=0)
+            if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+                motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
 
     glPopMatrix();
+
+//    gettimeofday(&tempo_fim,NULL);
+//      tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//      ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//      tempo = (tf - ti) / 1000;
+//      printf("Tempo gasto em milissegundos %.3f\n",tempo);
 
 
 
@@ -266,9 +300,18 @@ void GLWidget::updateCamera()
 }
 
 void GLWidget::simStep(){
+//    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
+//      ti = tf = tempo = 0;
+//      timeval tempo_inicio,tempo_fim;
+//      gettimeofday(&tempo_inicio,NULL);
     if(!sim_pause)
         scene->simulationStep();
     update();
+//    gettimeofday(&tempo_fim,NULL);
+//      tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//      ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//      tempo = (tf - ti) / 1000;
+//      printf("Tempo gasto em milissegundos %.3f\n",tempo);
 
 }
 
@@ -341,6 +384,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::simulationPlayPause()
 {
     sim_pause = !sim_pause;
+
 }
 
 void GLWidget::simulationRestart()
@@ -372,6 +416,15 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
     }
+    if(event->key() == Qt::Key_Up){
+        cam_at.x2 +=0.1;
+        updateCamera();
+    }
+    if(event->key() == Qt::Key_Down){
+        cam_at.x2 -=0.1;
+        updateCamera();
+
+    }
     updateObjects(scene->objectsScene());
     updateGL();
 }
@@ -383,7 +436,142 @@ void GLWidget::SimStepsSimulation(int steps)
 
 void GLWidget::applyForce(Vec4 force)
 {
-    scene->applyForce(force);
+    //scene->applyForce(force);
+    scene->setExternalForce(force);
+}
+
+void GLWidget::loadScene(QString file)
+{
+    Utils::readModelRubens(scene,file.toStdString());
+    updateObjects(scene->objectsScene());
+    updateJoints(scene->jointsScene());
+    updateKsProp(scene->getProportionalKsPD());
+    updateKdProp(scene->getProportionalKdPD());
+    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomBalance());
+    if(scene->getSizeCharacter()>0){
+        scene->getCharacter(0)->contructHierarchyBodies();
+
+        //scene->getCharacter(0)->showHierarchies();
+    }
+}
+
+void GLWidget::saveCharacter(QString file)
+{
+    Utils::saveModelRubens(scene->getCharacter(0),file.toStdString());
+ //Functions::saveScene(scene,file);
+}
+
+void GLWidget::loadMotionCapture(QString file)
+{
+    if (scene->getSizeCharacter()==0) return;
+    Utils::loadMotionCapture(scene->getCharacter(0)->getMoCap(),scene->getCharacter(0),file.toStdString());
+    //int frames = scene->getCharacter(0)->getMoCap()->sizeFrames();
+    //printf("\nTamanho de frames: %d",frames);
+    scene->getCharacter(0)->loadMotionFrames();
+    motionTotalFrame(scene->getCharacter(0)->getMoCap()->sizeFrames());
+
+}
+
+void GLWidget::setPlayback(bool val)
+{
+    capture_pause = val;
+    if (scene->getSizeCharacter()==0) return;
+    if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0){
+        scene->getCharacter(0)->getMoCap()->setStatusMotion(!capture_pause);
+        scene->statusMotionCapture(!val);
+    }
+}
+
+void GLWidget::restartMotion()
+{
+    motionCurrentFrame(1);
+    if (scene->getSizeCharacter()==0) return;
+    if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0){
+        scene->restartMotionCapture();
+        scene->getCharacter(0)->getMoCap()->initializePosesModel(1);
+    }
+    //Utils::loadMotionCapture(scene->getCharacter(0)->getMoCap(),scene->getCharacter(0),file.toStdString());
+
+
+}
+
+void GLWidget::stopSimulation()
+{
+    //disconnect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
+    simTimer->stop();
+    sim_pause = true;
+}
+
+void GLWidget::startSimulation()
+{
+    //connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
+    sim_pause = false;
+    simTimer->start(0);
+}
+
+void GLWidget::setGravityParameters(Vec4 g)
+{
+    scene->setGravityParameters(g);
+
+}
+
+void GLWidget::setGravity(bool b)
+{
+    scene->setGravity(b);
+}
+
+void GLWidget::setProportionalKs(Vec4 ks)
+{
+    scene->setProportionalKsPD(ks);
+}
+
+void GLWidget::setProportionalKd(Vec4 kd)
+{
+    scene->setProportionalKdPD(kd);
+}
+
+void GLWidget::setBalanceControl(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 kmom)
+{
+    scene->setKdForceBalance(kdF);
+    scene->setKsForceBalance(ksF);
+    scene->setKdTorqueBalance(kdT);
+    scene->setKsTorqueBalance(ksT);
+    scene->setKMomBalance(kmom);
+}
+
+void GLWidget::setEnableTorqueBalance(bool b)
+{
+    scene->setEnableTorqueBalance(b);
+}
+
+void GLWidget::setEnableForceBalance(bool b)
+{
+    scene->setEnableForceBalance(b);
+}
+
+void GLWidget::setEnableMomentumBalance(bool b)
+{
+    scene->setEnableMomentumBalance(b);
+}
+
+void GLWidget::setAlphaCharacter(int value)
+{
+    scene->setAlphaCharacter((float)value/100.0);
+}
+
+void GLWidget::setWireCharacter(bool wire)
+{
+    scene->setWireCharacter(wire);
+}
+
+void GLWidget::setCompensationBalance(int val)
+{
+    scene->setCompensacao(val);
+}
+
+void GLWidget::setAngleBodyBalance(Vec4 v)
+{
+   scene->setAngleBodyBalance(v);
 }
 
 
@@ -406,6 +594,13 @@ void GLWidget::setObjectSelected(int row)
     if (row<0) return;
     objs.at(row)->setSelected(true);
 
+}
+
+Object *GLWidget::getObject(int row)
+{
+    std::vector<Object*> objs = scene->objectsScene();
+    if (row<0) return NULL;
+    return objs.at(row);
 }
 
 void GLWidget::setJointSelected(int row)

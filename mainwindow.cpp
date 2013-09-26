@@ -1,8 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "stdio.h"
+#include <QFileDialog>
+#include <QString>
+#include <QPalette>
+#include <QColorDialog>
 
 ControlPD *pd_selected;
+Joint*     joint_selected;
+Object*    obj_selected;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,14 +17,96 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->showMaximized();
     ui->widgetPhysics->setObjectSelected(-1);
+    //manipuladores do movimento
+    connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->iframe,SLOT(setNum(int)));
+    connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
+    connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
+
+    //manipuladores de atributos da simulação
     connect(ui->stepSim,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(SimStepsSimulation(int)));
-    connect(ui->widgetPhysics,SIGNAL(updateObjects(std::vector<Object*>)),this,SLOT(updateListObjects(std::vector<Object*>)));
+    connect(ui->gravx,SIGNAL(valueChanged(double)),this,SLOT(setGravity()));
+    connect(ui->gravy,SIGNAL(valueChanged(double)),this,SLOT(setGravity()));
+    connect(ui->gravz,SIGNAL(valueChanged(double)),this,SLOT(setGravity()));
+    connect(ui->enableGravity,SIGNAL(clicked(bool)),this,SLOT(setGravity()));
+
+
+
+
+    //manipuladores de junta
     connect(ui->widgetPhysics,SIGNAL(updateJoints(std::vector<Joint*>)),this,SLOT(updateListJoints(std::vector<Joint*>)));
-    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
     connect(ui->listWidgetJoints,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setJointSelected(int)));
-    connect(ui->applyForce,SIGNAL(clicked()),this,SLOT(applyForce2Object()));
     connect(ui->widgetPhysics,SIGNAL(showJoint(Joint*)),this,SLOT(infoSelectedJoint(Joint*)));
-    //manipuadores controlador PD
+    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
+    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
+
+
+    //manipuladores de Objetos
+    connect(ui->widgetPhysics,SIGNAL(updateObjects(std::vector<Object*>)),this,SLOT(updateListObjects(std::vector<Object*>)));
+    connect(ui->scalex,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->scaley,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->scalez,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->posx,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->posy,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->posz,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->oeulerx,SIGNAL(valueChanged(int)),this,SLOT(updateSelectedObject()));
+    connect(ui->oeulery,SIGNAL(valueChanged(int)),this,SLOT(updateSelectedObject()));
+    connect(ui->oeulerz,SIGNAL(valueChanged(int)),this,SLOT(updateSelectedObject()));
+    connect(ui->mass,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
+    connect(ui->isFoot,SIGNAL(clicked(bool)),this,SLOT(checkFoot(bool)));
+
+    connect(ui->applyForce,SIGNAL(clicked()),this,SLOT(applyForce2Object()));
+
+    //manipuladores do equilíbrio e controladores geral
+        //manipuladores de desenho do personagem
+    connect(ui->checkWireChara,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setWireCharacter(bool)));
+
+        //manipuladores de equilíbrio
+    connect(ui->angleBalBodyx,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
+    connect(ui->angleBalBodyy,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
+    connect(ui->angleBalBodyz,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
+    connect(ui->checkForceBal,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setEnableForceBalance(bool)));
+    connect(ui->checkTorqueBal,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setEnableTorqueBalance(bool)));
+    connect(ui->checkMomentum,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setEnableMomentumBalance(bool)));
+    connect(ui->widgetPhysics,SIGNAL(updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4)),this,SLOT(updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4)));
+
+
+    connect(ui->xkmomBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->ykmomBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zkmomBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+
+    connect(ui->xkdForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->ykdForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zkdForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+
+    connect(ui->xksForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->yksForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zksForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+
+    connect(ui->xksTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->yksTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zksTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+
+    connect(ui->xkdTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->ykdTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zkdTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+
+    connect(ui->sliderComp,SIGNAL(valueChanged(int)),ui->spinComp,SLOT(setValue(int)));
+    connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->sliderComp,SLOT(setValue(int)));
+    connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setCompensationBalance(int)));
+
+        //manipuladores dos controladores PD propocionais do objeto
+    connect(ui->widgetPhysics,SIGNAL(updateKsProp(Vec4)),this,SLOT(updateKsGeral(Vec4)));
+    connect(ui->widgetPhysics,SIGNAL(updateKdProp(Vec4)),this,SLOT(updateKdGeral(Vec4)));
+
+    connect(ui->xkdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->ykdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->zkdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->xksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->yksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->zksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+
+    //manipuladores controlador PD
     connect(ui->ksx,SIGNAL(valueChanged(double)),this,SLOT(updateControlPD()));
     connect(ui->ksy,SIGNAL(valueChanged(double)),this,SLOT(updateControlPD()));
     connect(ui->ksz,SIGNAL(valueChanged(double)),this,SLOT(updateControlPD()));
@@ -33,9 +121,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->enablepd,SIGNAL(clicked(bool)),this,SLOT(updateControlPD()));
 
+
     updateListObjects(ui->widgetPhysics->getObjectsList());
     updateListJoints(ui->widgetPhysics->getJointsList());
     ui->infoPD->setVisible(false);
+    //ui->widgetPhysics->loadScene("/home/danilo/GitHub/ODESys/models/new/biped_3D/biped3D.model");
     pd_selected = NULL;
 
 
@@ -49,7 +139,7 @@ MainWindow::~MainWindow()
 void MainWindow::updateListObjects(std::vector<Object*> objects)
 {
     ui->listWidgetObjects->clear();
-    for(int i=0;i<objects.size();i++){
+    for(unsigned int i=0;i<objects.size();i++){
         QString s;
         s.setNum(i);
         s.push_back(" - ");
@@ -61,7 +151,7 @@ void MainWindow::updateListObjects(std::vector<Object*> objects)
 void MainWindow::updateListJoints(std::vector<Joint*> joints)
 {
     ui->listWidgetJoints->clear();
-    for(int i=0;i<joints.size();i++){
+    for(unsigned int i=0;i<joints.size();i++){
         QString s;
         s.setNum(i);
         s.push_back(" - ");
@@ -72,7 +162,10 @@ void MainWindow::updateListJoints(std::vector<Joint*> joints)
 
 void MainWindow::updateControlPD()
 {
+
+
     if (pd_selected==NULL) return;
+    if(pd_selected->getJoint()!=joint_selected) return;
     Vec4 ks,kd,angle;
     ks.x1 = ui->ksx->value();
     ks.x2 = ui->ksy->value();
@@ -93,14 +186,80 @@ void MainWindow::updateControlPD()
     pd_selected->setEnabled(ui->enablepd->isChecked());
 }
 
+void MainWindow::updateControlPDManipulators()
+{
+    ui->widgetPhysics->setProportionalKs(Vec4(ui->xksPdProp->value(),ui->yksPdProp->value(),ui->zksPdProp->value()));
+    ui->widgetPhysics->setProportionalKd(Vec4(ui->xkdPdProp->value(),ui->ykdPdProp->value(),ui->zkdPdProp->value()));
+}
+
+void MainWindow::updateKsGeral(Vec4 ks)
+{
+    ui->xksPdProp->setValue(ks.x());
+    ui->yksPdProp->setValue(ks.y());
+    ui->zksPdProp->setValue(ks.z());
+}
+
+void MainWindow::updateKdGeral(Vec4 kd)
+{
+    ui->xkdPdProp->setValue(kd.x());
+    ui->ykdPdProp->setValue(kd.y());
+    ui->zkdPdProp->setValue(kd.z());
+}
+
+void MainWindow::updateBalancePD(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 kmom)
+{
+    ui->xkdForBal->setValue(kdF.x());
+    ui->ykdForBal->setValue(kdF.y());
+    ui->zkdForBal->setValue(kdF.z());
+
+    ui->xksForBal->setValue(ksF.x());
+    ui->yksForBal->setValue(ksF.y());
+    ui->zksForBal->setValue(ksF.z());
+
+    ui->xksTqBal->setValue(ksT.x());
+    ui->yksTqBal->setValue(ksT.y());
+    ui->zksTqBal->setValue(ksT.z());
+
+    ui->xkdTqBal->setValue(kdT.x());
+    ui->ykdTqBal->setValue(kdT.y());
+    ui->zkdTqBal->setValue(kdT.z());
+
+    ui->xkmomBal->setValue(kmom.x());
+    ui->ykmomBal->setValue(kmom.y());
+    ui->zkmomBal->setValue(kmom.z());
+
+
+}
+
+void MainWindow::updateAngleAnchor()
+{
+    Vec4 val(ui->angleBalBodyx->value(),ui->angleBalBodyy->value(),ui->angleBalBodyz->value());
+    ui->widgetPhysics->setAngleBodyBalance(val);
+}
+
+void MainWindow::updateControlBalance()
+{
+    Vec4 ksT,kdT,ksF,kdF,kmom;
+    ksT.setVec4(ui->xksTqBal->value(),ui->yksTqBal->value(),ui->zksTqBal->value());
+    kdT.setVec4(ui->xkdTqBal->value(),ui->ykdTqBal->value(),ui->zkdTqBal->value());
+    ksF.setVec4(ui->xksForBal->value(),ui->yksForBal->value(),ui->zksForBal->value());
+    kdF.setVec4(ui->xkdForBal->value(),ui->ykdForBal->value(),ui->zkdForBal->value());
+    kmom.setVec4(ui->xkmomBal->value(),ui->ykmomBal->value(),ui->zkmomBal->value());
+
+    ui->widgetPhysics->setBalanceControl(ksT,kdT,ksF,kdF,kmom);
+
+}
+
 void MainWindow::infoSelectedJoint(Joint * joint)
 {
+
+    joint_selected = joint;
     if(joint==NULL){
         ui->infoPD->setVisible(false);
         return;
     }
     ControlPD *pd = NULL;
-    for(int i=0;i<joint->getCharacter()->getControllersPD().size();i++)
+    for(unsigned int i=0;i<joint->getCharacter()->getControllersPD().size();i++)
         if(joint==joint->getCharacter()->getControllersPD().at(i)->getJoint())
             pd = joint->getCharacter()->getControllersPD().at(i);
 
@@ -111,6 +270,8 @@ void MainWindow::infoSelectedJoint(Joint * joint)
     ui->infoPD->setVisible(true);
     Vec4 ks = pd->getKs();
     Vec4 kd = pd->getKd();
+    Vec4 ksp = pd->getProportionalKs();
+    Vec4 kdp = pd->getProportionalKd();
     Vec4 euler = pd->getQuaternionWanted().toEuler();
     ui->ksx->setValue(ks.x());
     ui->ksy->setValue(ks.y());
@@ -123,12 +284,84 @@ void MainWindow::infoSelectedJoint(Joint * joint)
     ui->eulerz->setValue(euler.z());
     pd_selected = pd;
     ui->enablepd->setChecked(pd->isEnabled());
+    ui->xksPdApply->setText(QString("%1").arg(ks.x()*ksp.x()));
+    ui->yksPdApply->setText(QString("%1").arg(ks.y()*ksp.y()));
+    ui->zksPdApply->setText(QString("%1").arg(ks.z()*ksp.z()));
+    ui->xkdPdApply->setText(QString("%1").arg(kd.x()*kdp.x()));
+    ui->ykdPdApply->setText(QString("%1").arg(kd.y()*kdp.y()));
+    ui->zkdPdApply->setText(QString("%1").arg(kd.z()*kdp.z()));
+}
+
+void MainWindow::updateSelectedObject()
+{
+    if (obj_selected==NULL) return;
+    Vec4 pos(ui->posx->value(),ui->posy->value(),ui->posz->value());
+    Vec4 scale(ui->scalex->value(),ui->scaley->value(),ui->scalez->value());
+    Vec4 euler(ui->oeulerx->value(),ui->oeulery->value(),ui->oeulerz->value());
+    obj_selected->setPosition(pos);
+    obj_selected->setProperties(scale);
+    obj_selected->setRotation(Quaternion(euler));
+    obj_selected->setFMass(ui->mass->value());
+
+
+    obj_selected->updatePhysics();
+    //printf("%s\n",obj_selected->getName().toLocal8Bit().data());
+    Vec4 axis; dReal angle;
+    Quaternion q(euler);
+    q.toAxisAngle(&axis,&angle);
+    //printf("(%.4f %.4f %.4f %.4f)",angle,axis.x(),axis.y(),axis.z());
+
+}
+
+void MainWindow::showSelectedObject(int i)
+{
+    obj_selected = ui->widgetPhysics->getObject(i);
+    if (obj_selected==NULL) return;
+    Vec4 originalPos = obj_selected->getPosition();
+    Vec4 euler       = obj_selected->getRotation().toEuler();
+    Vec4 scale       = obj_selected->getProperties();
+    float mass       = obj_selected->getFMass();
+    ui->posx->setValue(originalPos.x());
+    ui->posy->setValue(originalPos.y());
+    ui->posz->setValue(originalPos.z());
+    ui->oeulerx->setValue(euler.x());
+    ui->oeulery->setValue(euler.y());
+    ui->oeulerz->setValue(euler.z());
+    ui->scalex->setValue(scale.x());
+    ui->scaley->setValue(scale.y());
+    ui->scalez->setValue(scale.z());
+    ui->mass->setValue(mass);
+    ui->isFoot->setChecked(obj_selected->getFoot());
+    ui->isBodyBalance->setChecked(obj_selected->getBodyBalance());
+
+}
+
+void MainWindow::setGravity()
+{
+    Vec4 g(ui->gravx->value(),ui->gravy->value(),ui->gravz->value());
+    ui->widgetPhysics->setGravityParameters(g);
+    ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
+
+}
+
+void MainWindow::checkFoot(bool b)
+{
+    if (obj_selected!=NULL) obj_selected->setFoot(b);
 }
 
 void MainWindow::applyForce2Object()
 {
     Vec4 force = Vec4(ui->forcex->value(),ui->forcey->value(),ui->forcez->value());
     ui->widgetPhysics->applyForce(force);
+//    ui->forcex->setValue(0.0);
+//    ui->forcey->setValue(0.0);
+    //    ui->forcez->setValue(0.0);
+}
+
+void MainWindow::setMaxTimeLine(int v)
+{
+    ui->timeLineMotion->setMaximum(v);
+
 }
 
 
@@ -140,4 +373,52 @@ void MainWindow::on_actionPlay_Pause_Simulation_triggered()
 void MainWindow::on_actionRestart_Simulation_triggered()
 {
     ui->widgetPhysics->simulationRestart();
+}
+
+void MainWindow::on_actionOpen_Model_activated()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getOpenFileName(this,"Open Model","../models/");
+    if(!mfile.isEmpty()){
+        ui->widgetPhysics->loadScene(mfile);
+        ui->enableGravity->setChecked(false);
+        ui->gravx->setValue(0);
+        ui->gravy->setValue(0);
+        ui->gravz->setValue(0);
+    }
+    ui->widgetPhysics->startSimulation();
+}
+
+//abrir arquivo de captura de movimento
+void MainWindow::on_actionOpen_MoCap_triggered()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getOpenFileName(this,"Load Motion Capture","../mot/");
+    if(!mfile.isEmpty()){
+        ui->widgetPhysics->loadMotionCapture(mfile);
+    }
+    ui->widgetPhysics->startSimulation();
+}
+
+void MainWindow::on_actionSave_Model_triggered()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getSaveFileName(this,"Save Scene","../models/");
+    if(!mfile.isEmpty()) ui->widgetPhysics->saveCharacter(mfile);
+     ui->widgetPhysics->startSimulation();
+}
+
+void MainWindow::on_btnStart_clicked()
+{
+    ui->widgetPhysics->setPlayback(false);
+}
+
+void MainWindow::on_btnPause_clicked()
+{
+    ui->widgetPhysics->setPlayback(true);
+}
+
+void MainWindow::on_btnRestart_clicked()
+{
+    ui->widgetPhysics->restartMotion();
 }

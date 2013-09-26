@@ -1,0 +1,34 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+upaxis: "z-up"
+offset: 0 0 0
+
+sphere part: "head" 0.03 0.0 1.65 0 1 0 0 3.66 0 0.1924915 0 1
+ccylinder part: "upper_arm_left" 0.04 0.16 1.325 0 1 0 0 2.16 0 0.12 0.646961 0 1
+ccylinder part: "upper_arm_right" 0.03 -0.16 1.325 0 1 0 0 2.16 0 0.12 0.646961 0 1
+ccylinder part: "forearm_left" 0.04 0.16 0.976 0 1 0 0 1.37 0 0.13 0.452051 0 0
+ccylinder part: "forearm_right" 0.03 -0.16 0.976 0 1 0 0 1.37 0 0.13 0.452051 0 0
+box part: "chest" 0.03 0.0 1.44 0 1 0 0 12.83 0 0.18 0.28 0.18 0 1
+box part: "stomach" 0.015 0.0 1.23 0 1 0 0 8.61 0 0.14 0.22 0.2 0 1
+box part: "pelvis" 0.003 0.0 1.056 0 1 0 0 8.70 0 0.16 0.25 0.2 0 1
+ccylinder part: "thigh_left" 0.0 0.0965 0.75 0 1 0 0 5.17 0 0.15 0.766202 0 1
+ccylinder part: "thigh_right" 0.0 -0.0965 0.75 0 1 0 0 5.17 0 0.15 0.766202 0 1
+ccylinder part: "shank_left" 0.0015 0.103 0.3 0 1 0 0 2.14 0 0.1264663 0.67834435 0 0
+ccylinder part: "shank_right" 0.0015 -0.103 0.3 0 1 0 0 2.14 0 0.1264663 0.67834435 0 0
+box part: "foot_left" 0.048 0.109 0.0425 0 1 0 0 1.88 0 0.24 0.1 0.035 1 0
+box part: "foot_right" 0.048 -0.109 0.0425 0 1 0 0 1.88 0 0.24 0.1 0.035 1 0
+
+ball joint: "neck" "chest" "head" 0.03 0.0 1.55
+ball joint: "shoulder_left" "chest" "upper_arm_left" 0.04 0.16 1.49
+ball joint: "shoulder_right" "chest" "upper_arm_right" 0.03 -0.16 1.49
+ball joint: "elbow_left" "upper_arm_left" "forearm_left" 0.04 0.16 1.16
+ball joint: "elbow_right" "upper_arm_right" "forearm_right" 0.03 -0.16 1.16
+ball joint: "back" "stomach" "chest" 0.03 0.0 1.33
+ball joint: "waist" "pelvis" "stomach" 0.0 0.0 1.13
+ball joint: "hip_left" "pelvis" "thigh_left" 0.0 0.09 0.96
+ball joint: "hip_right" "pelvis" "thigh_right" 0.0 -0.09 0.96
+ball joint: "knee_left" "thigh_left" "shank_left" 0.0 0.103 0.54
+ball joint: "knee_right" "thigh_right" "shank_right" 0.0 -0.103 0.54
+ball joint: "ankle_left" "shank_left" "foot_left" 0.003 0.103 0.06
+ball joint: "ankle_right" "shank_right" "foot_right" 0.003 -0.103 0.06
+

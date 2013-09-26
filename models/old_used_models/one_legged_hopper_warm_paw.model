@@ -1,0 +1,20 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+upaxis: "z-up"
+offset: 0 0 0
+
+box part: "body1" 0.0 0.0 1.5 0 1 0 0 10.0 0 0.1 0.1 0.45 0 0
+box part: "body2" 0.0 0.0 1.13 0 1 0 0 5.0 0 0.08 0.08 0.3 0 0
+box part: "body3" 0.0 0.0 0.83 0 1 0 0 4.0 0 0.08 0.08 0.3 0 0
+box part: "body4" 0.0 0.0 0.58 0 1 0 0 3.0 0 0.08 0.08 0.2 0 0
+box part: "body5" 0.0 0.0 1.4 0 1 0 0 3.0 0 0.08 0.08 0.26 0 0
+box part: "body6" 0.0 0.0 1.17 0 1 0 0 2.0 0 0.08 0.08 0.2 0 0
+
+ball joint: "joint_1" "body1" "body2" 0.0 0.0 1.28
+ball joint: "joint_2" "body2" "body3" 0.0 0.0 0.98
+ball joint: "joint_3" "body3" "body4" 0.0 0.0 0.68
+ball joint: "joint_4" "body1" "body5" 0.0 0.0 1.53
+ball joint: "joint_5" "body5" "body6" 0.0 0.0 1.27
+
+paw: "paw_0" "body4" 0.0 0.0 -0.1 0.08
+

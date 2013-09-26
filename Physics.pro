@@ -26,7 +26,16 @@ SOURCES += main.cpp\
     math/quaternion.cpp \
     graphics/plane.cpp \
     control/control.cpp \
-    physics/functions.cpp
+    physics/functions.cpp \
+    extra/utils.cpp \
+    math/matrix.cpp \
+    control/balance.cpp \
+    math/vecn.cpp \
+    scene/grf.cpp \
+    mocap/frame.cpp \
+    mocap/mocap.cpp \
+    control/sensor.cpp \
+    mocap/framequat.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -42,8 +51,19 @@ HEADERS  += mainwindow.h \
     extra/material.h \
     graphics/plane.h \
     control/control.h \
-    physics/functions.h
+    physics/functions.h \
+    extra/utils.h \
+    math/matrix.h \
+    control/balance.h \
+    math/vecn.h \
+    scene/grf.h \
+    mocap/frame.h \
+    mocap/mocap.h \
+    control/sensor.h \
+    mocap/framequat.h
 
 FORMS    += mainwindow.ui
 
-LIBS += -lode -lGLU -lGL
+LIBS += -lode -lGLU -lGL -lgsl -lgslcblas
+
+CONFIG += release
