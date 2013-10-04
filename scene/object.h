@@ -107,6 +107,10 @@ public:
     Quaternion  getRotationCurrent();                                      //extraí a posição atual do objeto
     void        setFoot(bool b);                                           //seta se o objeto é um pé ou não
     bool        getFoot();                                                 //extraí se o objeto é um pé ou não
+    Vec4        posEffectorForward();
+    Vec4        posEffectorBackward();
+    static Vec4 posEffectorForward(Vec4 pos,Quaternion rot,Object* obj);
+    static Vec4 posEffectorBackward(Vec4 pos,Quaternion rot,Object* obj);
 
 };
 

@@ -357,7 +357,7 @@ MoCap *Character::getMoCap()
 void Character::contructHierarchyBodies()
 {
 
-    for (int i=-3;i<(int)this->getNumBodies()+1;i++) {
+    for (int i=-3;i<(int)this->getNumBodies()+2;i++) {
         bool** aux;
         this->hierarchy.push_back(aux);
         this->setHierarchyMap(i);
@@ -515,23 +515,92 @@ void Character::setHierarchyMap(int pos)
         //fim_for
     }
     if(pos==getNumBodies()){
-        printf("\nIN!");
-        std::vector<Object*> foots = getBodiesFoot();
-        if (foots.size()>1){
-            for (unsigned int i=0;i<this->getNumJoints();i++) {
-                for (unsigned int j=0;j<this->getNumBodies();j++) {
-                    this->hierarchy[pos+3][i][j] = this->hierarchy[getIdObject(foots.at(0))+3][i][j] && this->hierarchy[getIdObject(foots.at(1))+3][i][j];
+        int bg_loc = pos;
+        vector<int> bodies;
+        for (unsigned int i=0;i<this->getNumJoints();i++) {
+            bool in_posGroundPaw_chain = false;
+            //puting the first body in vector bodies
+            int nextBodyLoc = getPositionBody(this->getJoint(i)->getChild());
+            bodies.push_back( nextBodyLoc );
+            this->hierarchy[pos+3][i][nextBodyLoc] = true;
+            //for each nextBody, look for the other next nextBodies
+            while ( !bodies.empty() ) {
+                int body = bodies.front();
+                //verificando se a ground paw eh filha da junta i na hierarquia dos corpos
+                if (body==bg_loc) in_posGroundPaw_chain = true;
+                for (unsigned int j=0;j<this->getNumJoints();j++) {
+                    if (getPositionBody(this->getJoint(j)->getParent()) == body) {
+                        nextBodyLoc = getPositionBody(this->getJoint(j)->getChild());
+                        bodies.push_back( nextBodyLoc );
+                        this->hierarchy[pos+3][i][nextBodyLoc] = true;
+                    }
                 }
+                bodies.erase(bodies.begin());
+            }
+            bodies.clear();
 
+            //invertendo o mapeamento realizado para essa junta
+            if (in_posGroundPaw_chain) {
+                for (unsigned int j=0;j<this->getNumBodies();j++) {
+                    if(i>2)
+                       this->hierarchy[pos+3][i][j] = 0;
+                    else
+                       this->hierarchy[pos+3][i][j] = !this->hierarchy[pos+3][i][j];
+                }
+            }else{
+                for (unsigned int j=0;j<this->getNumBodies();j++)
+                    if(i>2)
+                       this->hierarchy[pos+3][i][j] = 0;
             }
         }
     }
+    if(pos==getNumBodies()+1){
+        int bg_loc = pos;
+        vector<int> bodies;
+        for (unsigned int i=0;i<this->getNumJoints();i++) {
+            bool in_posGroundPaw_chain = false;
+            //puting the first body in vector bodies
+            int nextBodyLoc = getPositionBody(this->getJoint(i)->getChild());
+            bodies.push_back( nextBodyLoc );
+            this->hierarchy[pos+3][i][nextBodyLoc] = true;
+            //for each nextBody, look for the other next nextBodies
+            while ( !bodies.empty() ) {
+                int body = bodies.front();
+                //verificando se a ground paw eh filha da junta i na hierarquia dos corpos
+                if (body==bg_loc) in_posGroundPaw_chain = true;
+                for (unsigned int j=0;j<this->getNumJoints();j++) {
+                    if (getPositionBody(this->getJoint(j)->getParent()) == body) {
+                        nextBodyLoc = getPositionBody(this->getJoint(j)->getChild());
+                        bodies.push_back( nextBodyLoc );
+                        this->hierarchy[pos+3][i][nextBodyLoc] = true;
+                    }
+                }
+                bodies.erase(bodies.begin());
+            }
+            bodies.clear();
+
+            //invertendo o mapeamento realizado para essa junta
+            if (in_posGroundPaw_chain) {
+                for (unsigned int j=0;j<this->getNumBodies();j++) {
+                    if(i>5 && i<3)
+                       this->hierarchy[pos+3][i][j] = 0;
+                    else
+                       this->hierarchy[pos+3][i][j] = !this->hierarchy[pos+3][i][j];
+                }
+            }else{
+                for (unsigned int j=0;j<this->getNumBodies();j++)
+                    if(i>5 || i<3)
+                       this->hierarchy[pos+3][i][j] = 0;
+            }
+        }
+    }
+
 }
 
 void Character::showHierarchies()
 {
     if(hierarchy.size()==0) return;
-    for(int i=-3;i<this->getNumBodies()+1;i++){
+    for(int i=-3;i<this->getNumBodies()+2;i++){
         printf("Corpo (%d):\n",i);
         for(int j=0;j<getNumJoints();j++){
             for(int k=0;k<getNumBodies();k++){

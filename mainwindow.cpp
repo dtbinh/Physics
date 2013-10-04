@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
+    connect(ui->sensorTolerance,SIGNAL(valueChanged(double)),this,SLOT(adjustTolerance(double)));
 
     //manipuladores de atributos da simulação
     connect(ui->stepSim,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(SimStepsSimulation(int)));
@@ -362,6 +363,11 @@ void MainWindow::setMaxTimeLine(int v)
 {
     ui->timeLineMotion->setMaximum(v);
 
+}
+
+void MainWindow::adjustTolerance(double t)
+{
+    Sensor::setTolerance(t);
 }
 
 

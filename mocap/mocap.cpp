@@ -14,13 +14,57 @@ MoCap::MoCap()
 MoCap::MoCap(Character *chara)
 {
     this->chara = chara;
-    frame_current = 0;
+    frame_current = 1;
     status = false;
+}
+
+void MoCap::updateHeightBody(Vec4 h, int id)
+{
+    Vec4 pos = getFrameMotion(0)->getPosition(id);
+    pos.setVec4(0,pos.x2,0);
+    pos = h - pos;
+    float minus = 1000000;
+    //extrai o menor y
+    for(unsigned int i=0;i<capMot.size();i++){
+        for(unsigned int j=0;j<getFrameMotion(i)->getNumFrames();j++){
+            float y = getFrameMotion(i)->getPosition(j).y();
+            if (y<minus) minus = y;
+        }
+    }
+    if (minus>h.y()){
+        for(unsigned int i=0;i<capMot.size();i++){
+            for(unsigned int j=0;j<getFrameMotion(i)->getNumFrames();j++){
+                getFrameMotion(i)->setPosition(j,getFrameMotion(i)->getPosition(j)-h.y());
+            }
+        }
+    }else{
+        for(unsigned int i=0;i<capMot.size();i++){
+            for(unsigned int j=0;j<getFrameMotion(i)->getNumFrames();j++){
+                getFrameMotion(i)->setPosition(j,getFrameMotion(i)->getPosition(j)+Vec4(0,h.y()-minus,0));
+            }
+        }
+    }
+}
+
+void MoCap::copyFootsProperties()
+{
+    foots.clear();
+    idfoots.clear();
+    Vec4 aux;
+    for(unsigned int i=0;i<chara->getBodiesFoot().size();i++){
+        Object *foot = chara->getBodiesFoot().at(i);
+        Object *newObj = new Object(Vec4(),Quaternion(),foot->getProperties(),foot->getType(),foot->getScene());
+        aux.setVec4(0,foot->getProperties().y()/2.0,0);
+        idfoots.push_back(chara->getIdObject(foot));
+        foots.push_back(newObj);
+    }
+//    if(idfoots.size()>0)
+//        updateHeightBody(aux,idfoots.at(0));
 }
 
 void MoCap::appendFrame(Frame* frame)
 {
-    //capMot.push_back(frame);
+
     capMot.push_back(frame);
 }
 
@@ -128,7 +172,7 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
     //velocidade desejada da junta (em coordenadas do corpo prev da junta)
     //velDesejada = deltaVelDesejada/(intervalo*(1/120))
     //(intervalo=1) corresponde a percorrer exatamente um frame no mocap (frameRate do mocap = 120Hz)
-    Vec4 velDesejada = deltaVelDesejada*(120.0);
+    Vec4 velDesejada = deltaVelDesejada*(60.0);
     //              dVector3 velDesejadaLocal;
     //                velDesejadaLocal[0] = velDesejada.x;
     //                velDesejadaLocal[1] = velDesejada.y;
@@ -142,7 +186,7 @@ Vec4 MoCap::velocityLinearBody(int frame, int body)
 {
     Vec4 pos_n = getFrameMotion(frame)->getPosition(body);
     Vec4 pos_n1 = getFrameMotion(frame+1)->getPosition(body);
-    Vec4 veldesejada = (pos_n1-pos_n)*(120);
+    Vec4 veldesejada = (pos_n1-pos_n)*(60);
     return veldesejada;
 }
 
@@ -228,9 +272,15 @@ void MoCap::drawShadow(Vec4 offset, int frame)
         Vec4 position = getFrameMotion(frame)->getPosition(i);
         Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
         if(i==sens-3)
-            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
+            for(unsigned int j=0;j<foots.size();j++){
+                if(i==idfoots.at(j)) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
+            }
+            //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else if(sens==0 && chara->getBody(i)->getFoot())
-            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
+            for(unsigned int j=0;j<foots.size();j++){
+                if(i==idfoots.at(j)) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
+            }
+            //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else
             chara->getBody(i)->draw(position+offset,orientation);
     }

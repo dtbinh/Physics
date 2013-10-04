@@ -1,0 +1,77 @@
+#
+# parameters
+#
+#
+
+# parser to use
+parser: "version 0.1"
+
+# name
+name: "rubens"
+
+# collision category
+category: 1
+
+# offsets
+offset: 3.23 -2.1 0.9
+
+# conv from rvs
+conv from rvs: 0.5
+
+# root node
+root node: "pelvis"
+
+#
+# parts definitions
+#
+# syntax:
+#   sphere part: name x y z mass massadj radius isStriker isStriked
+#   ccylinder part: name x y z mass massadj radius length isStriker isStriked
+#   box part: name x y z mass massadj xlen ylen zlen isStriker isStriked
+#
+
+box part: "head" 0.000000 0.000000 1.650000 5.000000 5.000000 0.150000 0.150000 0.200000 0 0
+box part: "upper_arm_left" 0.000000 0.170000 1.325000 5.000000 5.000000 0.150000 0.150000 0.330000 0 0
+box part: "upper_arm_right" 0.000000 -0.170000 1.325000 5.000000 5.000000 0.150000 0.150000 0.330000 0 0
+box part: "forearm_left" 0.000000 0.170000 1.060000 5.000000 5.000000 0.150000 0.150000 0.200000 0 0
+box part: "forearm_right" 0.000000 -0.170000 1.060000 5.000000 5.000000 0.150000 0.150000 0.200000 0 0
+box part: "chest" 0.000000 0.000000 1.440000 5.000000 5.000000 0.150000 0.150000 0.220000 0 0
+box part: "stomach" 0.000000 0.000000 1.230000 5.000000 5.000000 0.150000 0.150000 0.200000 0 0
+box part: "pelvis" 0.003000 0.000000 1.056000 5.000000 5.000000 0.150000 0.252750 0.150000 0 0
+box part: "thigh_left" 0.000000 0.126500 0.750000 5.000000 5.000000 0.150000 0.150000 0.420000 0 0
+box part: "thigh_right" 0.000000 -0.126500 0.750000 5.000000 5.000000 0.150000 0.150000 0.420000 0 0
+box part: "shank_left" 0.001500 0.133000 0.300000 5.000000 5.000000 0.150000 0.150000 0.480000 0 0
+box part: "shank_right" 0.001500 -0.133000 0.300000 5.000000 5.000000 0.150000 0.150000 0.480000 0 0
+box part: "foot_left" 0.048000 0.139000 0.042500 5.000000 5.000000 0.090000 0.150000 0.150000 0 0
+box part: "foot_right" 0.048000 -0.139000 0.042500 5.000000 5.000000 0.090000 0.150000 0.150000 0 0
+box part: "hand_left" 0.000000 0.170000 0.868000 5.000000 5.000000 0.150000 0.150000 0.184000 0 0
+box part: "hand_right" 0.000000 -0.170000 0.868000 5.000000 5.000000 0.150000 0.150000 0.184000 0 0
+
+#
+# joint definitions
+#
+# syntax:
+#   ball joint: name part1 part2 x y z
+#   fixed joint: name part1 part2
+#
+# note:
+#   part1 is inbound, part2 is outbound, search only go from inbound
+#   to outbound, e.g. not every part can be rootnode unless you modify
+#   joint in-out bound part order.
+#
+
+ball joint: "joint_pelvis_thigh_left" "pelvis" "thigh_left" 0.000000 0.120000 0.960000
+ball joint: "joint_thigh_left_shank_left" "thigh_left" "shank_left" 0.000000 0.133000 0.540000
+ball joint: "joint_shank_left_foot_left" "shank_left" "foot_left" 0.003000 0.133000 0.060000
+ball joint: "joint_pelvis_thigh_right" "pelvis" "thigh_right" 0.000000 -0.120000 0.960000
+ball joint: "joint_thigh_right_shank_right" "thigh_right" "shank_right" 0.000000 -0.133000 0.540000
+ball joint: "joint_shank_right_foot_right" "shank_right" "foot_right" 0.003000 -0.133000 0.060000
+ball joint: "joint_pelvis_stomach" "pelvis" "stomach" 0.000000 0.000000 1.130000
+ball joint: "joint_stomach_chest" "stomach" "chest" 0.000000 0.000000 1.330000
+ball joint: "joint_chest_head" "chest" "head" 0.000000 0.000000 1.550000
+ball joint: "joint_chest_upper_arm_left" "chest" "upper_arm_left" 0.000000 0.170000 1.490000
+ball joint: "joint_upper_arm_left_forearm_left" "upper_arm_left" "forearm_left" 0.000000 0.170000 1.160000
+ball joint: "joint_forearm_left_hand_left" "forearm_left" "hand_left" 0.000000 0.170000 0.960000
+ball joint: "joint_chest_upper_arm_right" "chest" "upper_arm_right" 0.000000 -0.170000 1.490000
+ball joint: "joint_upper_arm_right_forearm_right" "upper_arm_right" "forearm_right" 0.000000 -0.170000 1.160000
+ball joint: "joint_forearm_right_hand_right" "forearm_right" "hand_right" 0.000000 -0.170000 0.960000

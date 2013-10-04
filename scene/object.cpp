@@ -314,7 +314,8 @@ void Object::wireframe()
 void Object::draw(bool wire)
 {
     if (this->geometry==0) return;
-
+//    Draw::drawPoint(posEffectorForward(),0.02,Vec4(0.5,0.5,0.5));
+//    Draw::drawPoint(posEffectorBackward(),0.02,Vec4(0.5,0.0,0.5));
     switch (this->type){
     case TYPE_CUBE:{
             if (wire)
@@ -338,6 +339,7 @@ void Object::draw(bool wire)
 
 void Object::draw(Vec4 position, Quaternion q,int mat)
 {
+   // Draw::drawPoint(posEffectorForward(),0.2,Vec4(0.5,0.5,0.5));
     if (this->geometry==0) return;
     Matrix4x4 *transform = new Matrix4x4();
     Matrix4x4 transformx = q.getMatrix();
@@ -477,4 +479,56 @@ void Object::setFoot(bool b)
 bool Object::getFoot()
 {
     return this->isFoot;
+}
+
+Vec4 Object::posEffectorForward()
+{
+    Vec4 pos = this->getPositionCurrent();
+    Vec4 posf;
+    if(properties.x()>properties.y() && properties.x()>properties.z())
+        posf = pos + Vec4(properties.x()/2.0,0,0);
+    else if(properties.y()>properties.x() && properties.y()>properties.z())
+        posf = pos + Vec4(0,properties.y()/2.0,0);
+    else
+        posf = pos + Vec4(0,0,properties.z()/2.0);
+    return Quaternion::getVecRotation(this->getRotationCurrent(),posf);
+}
+
+Vec4 Object::posEffectorBackward()
+{
+    Vec4 pos = this->getPositionCurrent();
+    Vec4 posf;
+    if(properties.x()>properties.y() && properties.x()>properties.z())
+        posf = pos + Vec4(-properties.x()/2.0,0,0);
+    else if(properties.y()>properties.x() && properties.y()>properties.z())
+        posf = pos + Vec4(0,-properties.y()/2.0,0);
+    else
+        posf = pos + Vec4(0,0,-properties.z()/2.0);
+    return Quaternion::getVecRotation(this->getRotationCurrent(),posf);
+}
+
+Vec4 Object::posEffectorForward(Vec4 pos, Quaternion rot, Object *obj)
+{
+    Vec4 properties = obj->getProperties();
+    Vec4 posf;
+    if(properties.x()>properties.y() && properties.x()>properties.z())
+        posf = pos + Vec4(properties.x()/2.0,0,0);
+    else if(properties.y()>properties.x() && properties.y()>properties.z())
+        posf = pos + Vec4(0,properties.y()/2.0,0);
+    else
+        posf = pos + Vec4(0,0,properties.z()/2.0);
+    return Quaternion::getVecRotation(rot,posf);
+}
+
+Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
+{
+    Vec4 posf;
+    Vec4 properties = obj->getProperties();
+    if(properties.x()>properties.y() && properties.x()>properties.z())
+        posf = pos + Vec4(-properties.x()/2.0,0,0);
+    else if(properties.y()>properties.x() && properties.y()>properties.z())
+        posf = pos + Vec4(0,-properties.y()/2.0,0);
+    else
+        posf = pos + Vec4(0,0,-properties.z()/2.0);
+    return Quaternion::getVecRotation(rot,posf);
 }

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <vector>
 #include "math/vec4.h"
+#include "scene/object.h"
+
 class Character;
 class Frame;
 class FrameQuat;
@@ -18,11 +20,18 @@ private:
     std::vector<FrameQuat*> capMotFrame;
 
 
+
 public:
+    std::vector<Object*> foots;
+    std::vector<int> idfoots;
     int frame_current;
     bool status;
     MoCap();
     MoCap(Character *chara);
+    void updateHeightBody(Vec4 h,int id);
+    void physicsFootStep(Vec4 offset);
+    void enableFoots();
+    void copyFootsProperties();
     void appendFrame(Frame* frame);
     Frame* getFrameMotion(int i);
     std::vector<Frame*> getCapMotion();

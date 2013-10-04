@@ -6,11 +6,11 @@
 //    return (180*angle)/M_PI;
 //}
 
-float grauToRad2(float angle){
+float ControlPD::grauToRad2(float angle){
     return (angle*M_PI)/180;
 
 }
-dReal limitaValor(dReal lim, dReal valor) {
+dReal ControlPD::limitaValor(dReal lim, dReal valor) {
   if (valor >  lim) return  lim;
   if (valor < -lim) return -lim;
   return valor;

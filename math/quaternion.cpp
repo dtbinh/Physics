@@ -573,3 +573,13 @@ void Quaternion::showQuaternion()
 //  v3D = axis*( angle );
 //}
 ////---------------------------------------------------------------------------
+Vec4 Quaternion::getVecRotation(Quaternion q, Vec4 v)
+{
+    Quaternion res;
+    Quaternion pos(0,v.x1,v.x2,v.x3);
+    q.normalize();
+    res = (q)*(pos*((q.conjugate())));
+    Vec4 r(res.getPosX(),res.getPosY(),res.getPosZ());
+    return r;
+
+}

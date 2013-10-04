@@ -1,0 +1,38 @@
+parser: "blender model exporter"
+name: "doesn't matter"
+category: 0
+offset: 0 0 0
+conv from rvs: 0
+root node: "pelvis"
+
+box part: "head" 0.03 0.0 1.65 4.07999975622 0 0.15000000596 0.169999986887 0.159999996424 0 0
+box part: "upper_arm_left" 0.04 0.16 1.325 4.62000007987 0 0.109999999404 0.120000004768 0.34999999404 0 0
+box part: "upper_arm_right" 0.03 -0.16 1.325 4.61999979302 0 0.109999999404 0.119999997318 0.34999999404 0 0
+box part: "forearm_left" 0.04 0.16 0.976 3.31200042772 0 0.0900000035763 0.100000008941 0.368 0 0
+box part: "forearm_right" 0.03 -0.16 0.976 3.31200042772 0 0.0900000035763 0.100000008941 0.368 0 0
+box part: "chest" 0.03 0.0 1.44 9.61399935049 0 0.189999997616 0.230000004172 0.219999983907 0 0
+box part: "stomach" 0.015 0.0 1.23 7.13999973297 0 0.169999986887 0.210000008345 0.2 0 0
+box part: "pelvis" 0.003 0.0 1.056 9.55394998423 0 0.180000007153 0.252749979496 0.210000008345 0 0
+box part: "thigh_left" 0.0 0.0965 0.75 5.714286 0 0.15 0.15 0.42 0 0
+box part: "thigh_right" 0.0 -0.0965 0.75 5.714286 0 0.15 0.15 0.42 0 0
+box part: "shank_left" 0.0015 0.103 0.3 6.86399971104 0 0.129999995232 0.109999999404 0.48 0 0
+box part: "shank_right" 0.0015 -0.103 0.3 6.86399971104 0 0.129999995232 0.109999999404 0.48 0 0
+box part: "foot_left" 0.048 0.109 0.0425 1.92500043213 0 0.250000029802 0.109999999404 0.0700000077486 0 0
+box part: "foot_right" 0.048 -0.109 0.0425 1.92500022724 0 0.250000029802 0.109999999404 0.070000000298 0 0
+
+ball joint: "joint_chest_head" "chest" "head" 0.03 0.0 1.55
+ball joint: "joint_chest_upper_arm_left" "chest" "upper_arm_left" 0.04 0.16 1.49
+ball joint: "joint_chest_upper_arm_right" "chest" "upper_arm_right" 0.03 -0.16 1.49
+ball joint: "joint_upper_arm_left_forearm_left" "upper_arm_left" "forearm_left" 0.04 0.16 1.16
+ball joint: "joint_upper_arm_right_forearm_right" "upper_arm_right" "forearm_right" 0.03 -0.16 1.16
+ball joint: "joint_stomach_chest" "stomach" "chest" 0.03 0.0 1.33
+ball joint: "joint_pelvis_stomach" "pelvis" "stomach" 0.0 0.0 1.13
+ball joint: "joint_pelvis_thigh_left" "pelvis" "thigh_left" 0.0 0.09 0.96
+ball joint: "joint_pelvis_thigh_right" "pelvis" "thigh_right" 0.0 -0.09 0.96
+ball joint: "joint_thigh_left_shank_left" "thigh_left" "shank_left" 0.0 0.103 0.54
+ball joint: "joint_thigh_right_shank_right" "thigh_right" "shank_right" 0.0 -0.103 0.54
+ball joint: "joint_shank_left_foot_left" "shank_left" "foot_left" 0.003 0.103 0.06
+ball joint: "joint_shank_right_foot_right" "shank_right" "foot_right" 0.003 -0.103 0.06
+
+paw: "paw_0" "foot_right" 0.000000 -0.080000 0.000000 0.100000
+paw: "paw_1" "foot_left" 0.000000 -0.080000 0.000000 0.100000

@@ -324,7 +324,10 @@ void Scene::simulationStep()
     if(characters.size()>0)
         if (status_motion)
             if(characters.at(0)->getMoCap()->sizeFrames()>0){
-                if (frame_step>characters.at(0)->getMoCap()->sizeFrames()) frame_step = 1;
+                if (frame_step>characters.at(0)->getMoCap()->sizeFrames()){
+                    frame_step = 1;
+                    characters.at(0)->getMoCap()->initializePosesModel(0);
+                }
                 //float percent = frame_step/(characters.at(0)->getMoCap()->sizeFrames()*1.);
                 characters.at(0)->getMoCap()->stepFrame(frame_step);
                 frame_step+=2;
@@ -332,6 +335,12 @@ void Scene::simulationStep()
     std::vector<Object*> objs = objectsScene();
     std::vector<Joint*> jts = jointsScene();
     for(int i=0;i<this->sim_step;i++){
+        if(characters.size()>0)
+//            if (status_motion)
+//                if(characters.at(0)->getMoCap()->sizeFrames()>0){
+//                    characters.at(0)->getMoCap()->physicsFootStep(Vec4(-1.0,0,0));
+//                    characters.at(0)->getMoCap()->enableFoots();
+//                }
            for(int i=0;i<objs.size();i++){
                Physics::setEnableObject(objs.at(i));
                if ((objs.at(i)->isSelected()) && !apply){

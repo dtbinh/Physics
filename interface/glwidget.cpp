@@ -6,6 +6,36 @@
 #include "extra/utils.h"
 #include <sys/time.h>
 #include <stdio.h>
+#include <GL/gl.h>                        // Header File For The OpenGL32 Library
+#include <GL/glu.h>                       // Header File For The GLu32 Library
+#include <GL/glut.h>
+#include <GL/glext.h>                     // Header File For The GLaux Library
+#include "camera.h"
+
+/************** New Camera *****************/
+static int slices = 16;
+static int stacks = 16;
+
+static float ax = 0.0;
+static float ay = 0.0;
+static float az = 0.0;
+
+static float delta = 5.0;
+
+static bool lbpressed = false;
+//static bool mbpressed = false;
+static bool rbpressed = false;
+
+static float last_x = 0.0;
+static float last_y = 0.0;
+
+Camera* cam = new Camera();
+static float savedCamera[9];
+
+
+
+/************** Fim Camera *****************/
+
 int count = 0;
 Quaternion q;
 //bool move = false;
@@ -168,6 +198,7 @@ GLWidget::GLWidget(QWidget *parent) :
 
 void GLWidget::initializeGL()
 {
+
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
     glEnable(GL_DEPTH_TEST);
@@ -230,15 +261,25 @@ void GLWidget::initializeGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    glViewport(0,0,w,h);
+    const float ar = w>0 ? (float) w / (float) h : 1.0;
+
+    glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(angle,(float)w/h,0.01,12000000.0);
+    //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+    gluPerspective(30.,ar,0.001,1200000.);
+
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
-    height = h;
-    width  = w;
+    glLoadIdentity() ;
+//    glViewport(0,0,w,h);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    gluPerspective(angle,(float)w/h,0.01,12000000.0);
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
+//    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
+//    height = h;
+//    width  = w;
 
 
 
@@ -246,18 +287,23 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::paintGL()
 {
-
-//    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
-//      ti = tf = tempo = 0;
-//      timeval tempo_inicio,tempo_fim;
-//      gettimeofday(&tempo_inicio,NULL);
-//    if(!sim_pause)
-//        scene->simulationStep();
-//    update();
-
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    //determinação da camera
 
+    glColor3f(1,1,0);
+    QString text = QString("Lock Axis: ");
+    if(cam->axis_x)
+        text += "x ";
+    if(cam->axis_y)
+        text += "y ";
+    if(cam->axis_z)
+        text += "z ";
+    if(cam->axis_x || cam->axis_y || cam->axis_z)
+        renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"),2000);
+    gluLookAt(cam->eye.x1,cam->eye.x2,cam->eye.x3, cam->at.x1,cam->at.x2,cam->at.x3, cam->up.x1,cam->up.x2,cam->up.x3);
+
+    //fim de determinação da camera
     glPushMatrix();
 
     scene->draw();
@@ -288,14 +334,13 @@ void GLWidget::paintGL()
 
 void GLWidget::updateCamera()
 {
-
-    glViewport(0,0,width,height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(angle,(float)width/(float)height,0.01,12000000.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
+//    glViewport(0,0,width,height);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    gluPerspective(angle,(float)width/(float)height,0.01,12000000.0);
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
+//    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
 
 }
 
@@ -317,17 +362,17 @@ void GLWidget::simStep(){
 
 void GLWidget::wheelEvent(QWheelEvent *event)
 {
-    int numDegrees = event->delta() / 8;
-    int numSteps = numDegrees / 15;
-    if (numSteps>0 && angle<180.0){
-        angle += 1;
-    }
-    else{
-        if (!(angle<=5)){
-            angle -= 1;
-        }
-    }
-    updateCamera();
+//    int numDegrees = event->delta() / 8;
+//    int numSteps = numDegrees / 15;
+//    if (numSteps>0 && angle<180.0){
+//        angle += 1;
+//    }
+//    else{
+//        if (!(angle<=5)){
+//            angle -= 1;
+//        }
+//    }
+    //updateCamera();
 
 
 }
@@ -335,46 +380,91 @@ void GLWidget::wheelEvent(QWheelEvent *event)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 
-
-    if(event->buttons() & Qt::LeftButton){
-        int y = height-event->pos().y();
-        mouseMotion(event->pos().x(),y,height,width);
-        if (trackingMouse) {
-            Quaternion qnew;
-            qnew.setQuaternion(cos(0.25*angletrack*M_PI/(360.0)),Vec4(axis[0],axis[1],axis[2]).unitary()*sin(0.25*angletrack*M_PI/(360.0)));
-            qnew.normalize();
-            q = qnew*0.5 + q*0.5;
-            cam_eye = q.getMatrix().vector(cam_eye);
-            updateCamera();
-        }
-
+    int y = event->pos().y();
+    int x = event->pos().x();
+    if (lbpressed && !rbpressed) {
+        cam->rotatex(y,last_y);
+        cam->rotatey(x,last_x);
     }
+    if (!lbpressed && rbpressed) {
+        cam->translatex(x,last_x);
+        cam->translatey(y,last_y);
+    }
+    if (lbpressed && rbpressed) {
+        cam->zoom(y,last_y);
+    }
+
+    last_x = x;
+    last_y = y;
+
+//    if(event->buttons() & Qt::LeftButton){
+//        int y = height-event->pos().y();
+//        mouseMotion(event->pos().x(),y,height,width);
+//        if (trackingMouse) {
+//            Quaternion qnew;
+//            qnew.setQuaternion(cos(0.25*angletrack*M_PI/(360.0)),Vec4(axis[0],axis[1],axis[2]).unitary()*sin(0.25*angletrack*M_PI/(360.0)));
+//            qnew.normalize();
+//            q = qnew*0.5 + q*0.5;
+//            cam_eye = q.getMatrix().vector(cam_eye);
+//            updateCamera();
+//        }
+
+//    }
 
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    move = false;
-    trackingMouse = false;
-    int y = height-event->pos().y();
-    stopMotion(event->pos().x(),y);
-    q.setQuaternion(1,0,0,0);
+//    move = false;
+//    trackingMouse = false;
+//    int y = height-event->pos().y();
+//    stopMotion(event->pos().x(),y);
+//    q.setQuaternion(1,0,0,0);
+    // if the left button is pressed
+    int y = event->pos().y();
+    int x = event->pos().x();
+    if (event->button() & Qt::LeftButton) {
+        // when the button is pressed
+        lbpressed = false;
+    }
+    // if the left button is pressed
+    if (event->button() & Qt::RightButton) {
+        // when the button is pressed
+        rbpressed = false;
+    }
+    last_x = x;
+    last_y = y;
 
 }
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-    if(event->buttons() & Qt::LeftButton)
-    {
-        trackingMouse = true;
-        int y = height-event->pos().y();
-        startMotion(event->pos().x(),y,height,width);
-    }else{
-        trackingMouse = false;
-        int y = height-event->pos().y();
-        stopMotion(event->pos().x(),y);
+//    if(event->buttons() & Qt::LeftButton)
+//    {
+//        trackingMouse = true;
+//        int y = height-event->pos().y();
+//        startMotion(event->pos().x(),y,height,width);
+//    }else{
+//        trackingMouse = false;
+//        int y = height-event->pos().y();
+//        stopMotion(event->pos().x(),y);
 
-    }
+//    }
+    int y = event->pos().y();
+    int x = event->pos().x();
+    // if the left button is pressed
+        if (event->button() & Qt::LeftButton) {
+            // when the button is pressed
+                lbpressed = true;
+        }
+        // if the left button is pressed
+        if (event->button() & Qt::RightButton) {
+            // when the button is pressed
+                rbpressed = true;
+        }
+
+        last_x = x;
+        last_y = y;
 
 
 }
@@ -395,16 +485,19 @@ void GLWidget::simulationRestart()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_C ){
-        scene->addObject(Vec4(1,1,1),Vec4(0,30,0),Quaternion(),TYPE_CUBE);
+    if(event->key() == Qt::Key_Z ){
+        //scene->addObject(Vec4(1,1,1),Vec4(0,30,0),Quaternion(),TYPE_CUBE);
         //count++;
+        cam->lockAxisZ(!cam->axis_z);
     }
-    if(event->key() == Qt::Key_S ){
-        scene->addObject(Vec4(0.5,0.5,0.5),Vec4(0,30,0),Quaternion(),TYPE_SPHERE);
+    if(event->key() == Qt::Key_X ){
+        cam->lockAxisX(!cam->axis_x);
+        //scene->addObject(Vec4(0.5,0.5,0.5),Vec4(0,30,0),Quaternion(),TYPE_SPHERE);
         //count++;
     }
     if(event->key() == Qt::Key_Y ){
-        scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
+        cam->lockAxisY(!cam->axis_y);
+        //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
     }
     if(event->key() == Qt::Key_F ){
@@ -425,6 +518,37 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         updateCamera();
 
     }
+
+    if(event->key() == Qt::Key_C){
+        static int posCam = 0;
+        posCam++;
+        if (cam->type == CAMERA_FAR) {
+            delete cam;
+            if (posCam%5==0) cam = new Camera(); //CameraDistante(0,1,5, 0,1,0, 0,1,0);
+            if (posCam%5==1) cam = new Camera(5,1,0, 0,1,0, 0,1,0);
+            if (posCam%5==2) cam = new Camera(0,1,-5, 0,1,0, 0,1,0);
+            if (posCam%5==3) cam = new Camera(-5,1,0, 0,1,0, 0,1,0);
+            if (posCam%5==4) cam = new Camera(savedCamera[0],savedCamera[1],savedCamera[2],savedCamera[3],savedCamera[4],savedCamera[5],savedCamera[6],savedCamera[7],savedCamera[8]);
+        } else if (cam->type == CAMERA_GAME) {
+            delete cam;
+            cam = new Camera();
+        }
+    }
+    if(event->key() == Qt::Key_S){
+        //save current camera location
+        savedCamera[0] = cam->eye.x();
+        savedCamera[1] = cam->eye.y();
+        savedCamera[2] = cam->eye.z();
+        savedCamera[3] = cam->at.x();
+        savedCamera[4] = cam->at.y();
+        savedCamera[5] = cam->at.z();
+        savedCamera[6] = cam->up.x();
+        savedCamera[7] = cam->up.y();
+        savedCamera[8] = cam->up.z();
+    }
+
+
+
     updateObjects(scene->objectsScene());
     updateGL();
 }
@@ -451,7 +575,7 @@ void GLWidget::loadScene(QString file)
     if(scene->getSizeCharacter()>0){
         scene->getCharacter(0)->contructHierarchyBodies();
 
-        //scene->getCharacter(0)->showHierarchies();
+        scene->getCharacter(0)->showHierarchies();
     }
 }
 
@@ -469,6 +593,7 @@ void GLWidget::loadMotionCapture(QString file)
     //printf("\nTamanho de frames: %d",frames);
     scene->getCharacter(0)->loadMotionFrames();
     motionTotalFrame(scene->getCharacter(0)->getMoCap()->sizeFrames());
+    scene->getCharacter(0)->getMoCap()->copyFootsProperties();
 
 }
 

@@ -35,7 +35,8 @@ SOURCES += main.cpp\
     mocap/frame.cpp \
     mocap/mocap.cpp \
     control/sensor.cpp \
-    mocap/framequat.cpp
+    mocap/framequat.cpp \
+    interface/camera.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -60,10 +61,11 @@ HEADERS  += mainwindow.h \
     mocap/frame.h \
     mocap/mocap.h \
     control/sensor.h \
-    mocap/framequat.h
+    mocap/framequat.h \
+    interface/camera.h
 
 FORMS    += mainwindow.ui
 
-LIBS += -lode -lGLU -lGL -lgsl -lgslcblas
+LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas
 
 CONFIG += release

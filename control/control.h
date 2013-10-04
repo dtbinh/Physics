@@ -40,6 +40,9 @@ public:
     static Vec4 getTorquePD(Joint* joint,Vec4 ks, Vec4 kd,Quaternion qDesired=Quaternion());
     static Vec4 getTorquePDCOM(Joint* joint,Vec4 ks, Vec4 kd,Quaternion qDesired=Quaternion(Vec4(0,0,90)),Vec4 velocity=Vec4());
 
+    static float grauToRad2(float angle);
+    static dReal limitaValor(dReal lim, dReal valor);
+
 };
 
 #endif // CONTROL_H

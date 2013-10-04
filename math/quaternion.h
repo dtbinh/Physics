@@ -63,6 +63,7 @@ class Quaternion
       friend Quaternion operator+(Quaternion p,Quaternion q);
       friend Quaternion operator*(Quaternion p,Quaternion q);
       Quaternion conjugate();
+      static Vec4 getVecRotation(Quaternion q, Vec4 v);
 
 
 //      double normal()

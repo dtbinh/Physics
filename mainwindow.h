@@ -33,6 +33,7 @@ public slots:
     //void infoSelectedObject(Object*);
     void applyForce2Object();
     void setMaxTimeLine(int v);
+    void adjustTolerance(double t);
 
 
 private slots:

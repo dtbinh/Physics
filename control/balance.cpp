@@ -7,6 +7,7 @@
 #include "graphics/draw.h"
 #include "sensor.h"
 #include "mocap/frame.h"
+#include "mocap/framequat.h"
 
 Balance::Balance(Character* chara)
 {
@@ -219,28 +220,29 @@ Vec4 Balance::limitingTorque(Vec4 lim_inf, Vec4 lim_sup, Vec4 torque)
 
 void Balance::evaluate()
 {
-    //int se = Sensor::getStateFoots(this->chara);
-    //printf("\nEstado do sensor: %d",se);
 
-    if(!(enable_balance)) return;
-    int frame = chara->getMoCap()->frame_current;
-    //chara->showHierarchies();
+    if(!(enable_balance)) return; //habilita o controle de equilíbrio
+
+    int frame = chara->getMoCap()->frame_current; //se houver captura de movimento extraí-se o frame corrente
+
     if(chara->getMoCap()->sizeFrames()>0)
-        if(chara->getMoCap()->status){
+        if(chara->getMoCap()->status) //caso esteja sendo executada a captura de movimento extrair a hierarquia a ser utilizada pela captura de movimento
             useHierarchy = Sensor::getHierarchy2UseMocap(chara);
-            //if(useHierarchy!=0) printf("\nSensor: pé %d",useHierarchy);
-        }else{
+        else
             useHierarchy = Sensor::getHierarchy2Use(chara);
-        }
+
     else
         useHierarchy = Sensor::getHierarchy2Use(chara);
-    if(useHierarchy==FOOTS_AIR+3 || useHierarchy==FOOTS_AIR_INV+3) return;
+
+    if(useHierarchy==FOOTS_AIR+3 || useHierarchy==FOOTS_AIR_INV+3) return; //caso os pés do modelo estejam fora do contado com o solo
+
+
+
+
+
     //_ significa projetado no chão, ou seja y = 0;
-    //Fcom = ks *(Péapoio_ - COM_) - kd * velCOM_  //calculo da força
-    //Tcom = ks *(qd - qa^-1) - kd*(wa)
     Vec4 Cfoot_ = Vec4(); //centro de apoio projetado no plano xz
-    int count = 0;
-    //if(useHierarchy==0)
+    int count = 0; //quantidade de pés no modelo
     for (unsigned int i=0;i<chara->getNumBodies();i++)
         if (chara->getBody(i)->getFoot()){
             Cfoot_ += chara->getBody(i)->getPositionCurrent();
@@ -248,6 +250,7 @@ void Balance::evaluate()
         }
 
     if (!count) return; //caso o personagem não tenha nenhum pé
+
     Cfoot_ = Cfoot_/count;
     Cfoot_ = Vec4(Cfoot_.x(),0,Cfoot_.z());
     Vec4 COM_   = chara->getPosCOM();
@@ -259,6 +262,7 @@ void Balance::evaluate()
         if(chara->getMoCap()->status){
             velCOM_moCap = chara->getMoCap()->getVelCOM(frame);
         }
+
     Vec momentum;
 
     Vec4 mom_ang_des;
@@ -273,6 +277,9 @@ void Balance::evaluate()
 
     //computando a força no centro de massa
     Vec4 Fcom = ksForce.mult(Cfoot_ - COM_) + kdForce.mult(velCOM_moCap - velCOM_);
+
+
+
 
     //computando o torque no centro de massa
     Joint* jDes = chara->getJointParentBalance();
@@ -296,10 +303,13 @@ void Balance::evaluate()
         wrench = momentum;
 
     Vec wrenchTotal = getTwistWrenchTotal(wrench);
-    //printf("Matrix in use: %d",useHierarchy);
     float factor = 1.0;
+
+    //printf("Matrix in use: %d",useHierarchy);
+
     if(useHierarchy==0) factor = 0.5;
     else factor = 1;
+
     for (unsigned int i=0;i<chara->getNumJoints();i++){
         Joint *joint = chara->getJoint(i);
         Vec4 torque(wrenchTotal[i+i*5],wrenchTotal[i+1+i*5],wrenchTotal[i+2+i*5]);
@@ -325,6 +335,112 @@ void Balance::evaluate()
         }
 
     }
+    factor = 1.0;
+
+        /****************** Teste de SwingFoot *********************/
+        Vec wrenchSwing;
+        bool useSwing = false;
+        int foot_swing = Sensor::getSwingFoot(this->chara);
+        Vec4 c1 = Vec4(350,350,350);
+        Vec4 c2 = Vec4(35,35,35);
+        Vec4 c3 = Vec4(35,35,35);
+        //int aux;
+        if (!(foot_swing<0)){ //caso tenha um pé no ar
+            //distancia do pé stance ao centro de massa projetado
+            Vec4 a = chara->getPosCOM();
+            a.x2 = 0;
+            Vec4 acom_ = chara->getMoCap()->getPosCOM(frame);
+            acom_.x2 = 0;
+            Vec4 bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
+            bcom_.x2 = 0;
+            float distcom_ = (acom_-bcom_).module();
+            Vec4 b = chara->getBody(Sensor::getStanceFoot(this->chara))->getPositionCurrent();
+            b.x2 = 0;
+            float dist_ = (a-b).module();
+            Vec4 vel_  = chara->getVelCOM();
+            vel_.x2 = 0;
+            //Object* torso = chara->getBody(7);
+            Quaternion qdes;
+            Quaternion qAtual;
+            Joint *joint;
+            if(foot_swing==12){
+                qdes = chara->getMoCap()->getFrameSimulation(frame)->quatDes.at(0);
+                qAtual = Physics::getRotationJoint(chara->getJoint(0));
+                joint = chara->getJoint(0);
+            }
+            else{
+                qdes = chara->getMoCap()->getFrameSimulation(frame)->quatDes.at(3);
+                qAtual = Physics::getRotationJoint(chara->getJoint(3));
+                joint = chara->getJoint(3);
+            }
+
+            Quaternion qIdent;
+            Vec4 axis;
+            dReal angle;
+            qdes = qIdent.lessArc(qdes);
+        Quaternion qDelta = Quaternion::deltaQuat( qdes, qAtual );
+          //indo pelo caminho mais curto
+          qDelta = qIdent.lessArc(qDelta);
+        qDelta.toAxisAngle( &axis, &angle );
+        //axis.showVec4();
+          //limT ( na verdade fazendo papel de limA(limAngle) )
+        dReal angleRadLimitado = ControlPD::limitaValor(0.1*10, ControlPD::grauToRad2(angle) );
+        Vec4 delta = axis*( angleRadLimitado );
+        dVector3 deltaLocal,deltaGlobal;
+        deltaLocal[0] = delta.x();
+        deltaLocal[1] = delta.y();
+        deltaLocal[2] = delta.z();
+          deltaLocal[3] = 1.0;
+        const dReal* RCorpoPrev; //dMatrix3
+            RCorpoPrev = dBodyGetRotation(joint->getParent()->getBody());
+          //deve-se levar em consideracao a orientacao inicial dos corpos (iniQ already includes the 90 degrees X rotation for ccylinders)
+          dMatrix3 iniR;
+
+            dQuaternion inidQ;
+            to_dQuaternion(joint->getParent()->getRotation(),inidQ);
+            ////state->iniQs[ this->modelo->juntas[i]->prevLoc ].to_dQuaternion(inidQ);
+            dQtoR( inidQ, iniR );
+          dMatrix3 RiniRCorpoPrev;
+            dMULTIPLY2_333(RiniRCorpoPrev,RCorpoPrev,iniR); //RiniRCorpoPrev = RCorpoPrev.(iniR)^-1
+          dMULTIPLY0_331(deltaGlobal,RiniRCorpoPrev,deltaLocal); //body to global (RiniRCorpoPrev.deltaLocal)
+          Vec4 deltal(deltaGlobal[0],deltaGlobal[1],deltaGlobal[2]);
+            Vec4 Fswing = c1.mult(deltal) + c2.mult(vel_) + c3.mult(dist_);
+            Vec wrench = Vec(Fswing,Vec4());
+            int aux = useHierarchy;
+            useHierarchy = foot_swing+5;
+            //printf("\nhierarquia: %d",useHierarchy);
+            wrenchSwing = getTwistWrenchTotal(wrench);
+            useHierarchy = aux;
+            useSwing = true;
+
+        }
+
+        if(useSwing)
+            for (unsigned int i=0;i<chara->getNumJoints();i++){
+                Joint *joint = chara->getJoint(i);
+                Vec4 torque(wrenchSwing[i+i*5],wrenchSwing[i+1+i*5],wrenchSwing[i+2+i*5]);
+                //torque = limitingTorque(joint->getTorqueMax()*(-1),joint->getTorqueMax(),torque);
+                if(chara->hierarchy[foot_swing+5][i][chara->getPositionBody(joint->getChild())]){
+//                    if (joint->getChild()->getFoot())
+//                        joint->getChild()->addTorque((torque)*(1-compensation)*factor);
+//                    else
+                        joint->getChild()->addTorque((torque)*factor);
+//                    if (joint->getParent()->getFoot())
+//                        joint->getParent()->addTorque((torque)*(-1)*(1-compensation)*factor);
+//                    else
+                        joint->getParent()->addTorque((torque)*(-1)*factor);
+                }else{
+//                    if (joint->getParent()->getFoot())
+//                        joint->getParent()->addTorque((torque)*(1-compensation)*factor);
+//                    else
+                        joint->getParent()->addTorque((torque)*factor);
+//                    if (joint->getChild()->getFoot())
+//                        joint->getChild()->addTorque((torque)*(-1)*(1-compensation)*factor);
+//                    else
+                        joint->getChild()->addTorque((torque)*(-1)*factor);
+
+                }
+            }
 
 
 }
