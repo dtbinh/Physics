@@ -17,6 +17,8 @@ class Balance
     Vec4       kdTorque;
     Vec4       ksForce;
     Vec4       kdForce;
+    Vec4       kDist;    //parâmetros da distância na locomoção
+    Vec4       kVel;     //parâmetros da velocidade de locomoção
     Vec4       kmom;
     Quaternion bdesired;
     float      compensation;
@@ -36,6 +38,7 @@ public:
 
     Matrix getJacobianSum(Object* obj);  //calcula o somatório de todas as jacobianas
     Vec getTwistWrenchTotal(Vec twist); //retorna os valores que serão aplicados no character com forças e torques virtuais
+    Vec getJacobianLocomotion(std::vector<Joint*> joints, Object* effector, Vec twist);
     Vec4 getKsTorque();
     void setKsTorque(Vec4 kst);
     Vec4 getKdTorque();
@@ -44,6 +47,10 @@ public:
     void setKsForce(Vec4 ksf);
     Vec4 getKdForce();
     void setKdForce(Vec4 kdf);
+    Vec4 getKVelocityLocomotion();
+    void setKVelocityLocomotion(Vec4 k);
+    Vec4 getKDistanceLocomotion();
+    void setKDistanceLocomotion(Vec4 k);
     Vec4 getKMomentum();
     Vec4 getDesiredQuaternion();
     void setDeriredQuaternion(Vec4 euler);

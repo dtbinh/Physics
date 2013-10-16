@@ -57,10 +57,13 @@ public:
     Joint*         getParentMoreMass();
     Joint*         getJointParentBalance();
     Joint*         getJoint(int i);
+    Joint*         getJoint(Object *parent, Object *child);
+    Joint*         getJoint2ObjectParent(Object* obj); //retorna a junta cujo o objeto passado como parâmetro seja seu parent
     Object*         getBody(int i);
     int            getPositionBody(Object* obj);
     std::vector<Joint*> getJointChilds(Joint* exclude,Object* obj);
     std::vector<Object*> getBodiesFoot();
+    std::vector<Object*> getChildrens(Object* obj);
     bool           isBodyHierarchy(Joint* joint,Object* obj);
     bool           isJointHierarchy(Joint* joint,Joint *child);
     void           setBalance(Balance *balance); //adicionar controle de equilibrio
@@ -74,6 +77,11 @@ public:
     void           setHierarchyMap(int i);
     void           showHierarchies();
     void           loadMotionFrames();
+    void           clearVectorsGlobais();
+    std::vector<Joint*> getHierarchyJoint(Object* begin, Object* end);
+    bool           checkHierarchy(Joint *joint, Object* at);
+
+
 
 
 
@@ -85,6 +93,9 @@ public:
     void           drawFootProjected();
     void           drawCOMProjected();
     void           drawShadowMotion(int frame);
+
+    //debug
+    void           showHierarchyBodies(Object* begin, Object* end);
 
 
 };

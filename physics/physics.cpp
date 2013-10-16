@@ -26,7 +26,7 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
         dBodyID b1 = dGeomGetBody(o1);
         dBodyID b2 = dGeomGetBody(o2);
 
-        int numcont = 4;
+        int numcont = 6;
         dContact contact[numcont];
         int i;
         if (int numc = dCollide (o1,o2,numcont,&contact[0].geom,sizeof(dContact))) {

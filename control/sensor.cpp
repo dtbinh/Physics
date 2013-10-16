@@ -38,13 +38,16 @@ int Sensor::getSwingFoot(Character *chara)
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int body = -1;
+    int count = 0;
     for(unsigned int i=0;i<foots.size();i++){
         Vec4 prop = foots.at(i)->getProperties();
         float height = prop.y()/2.0;
         if(foots.at(i)->getPositionCurrent().y() > height+0.05){
             body = chara->getIdObject(foots.at(i));
+            count++;
         }
     }
+    if (count>1) return -1;
     return body;
 }
 
@@ -55,13 +58,16 @@ int Sensor::getStanceFoot(Character *chara)
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int body = -1;
+    int count = 0;
     for(unsigned int i=0;i<foots.size();i++){
         Vec4 prop = foots.at(i)->getProperties();
         float height = prop.y()/2.0;
         if(foots.at(i)->getPositionCurrent().y() <= height+0.05){
             body = chara->getIdObject(foots.at(i));
+            count++;
         }
     }
+    if (count>1) return -1;
     return body;
 }
 

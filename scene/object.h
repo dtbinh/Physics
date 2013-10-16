@@ -77,6 +77,7 @@ public:
     // --------Matrix
     Matrix      getAd(); //calcula matriz Adjunta que muda as coordenadas do frame do mundo para o frame do corpo
     Matrix      getAd(Character* chara);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
+    Matrix      getAd(Vec4 pos);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
     Matrix      getIM(); //calcula a matriz 6x6 de inercia com a massa do objeto
     // --------Control
     void        setBodyBalance(bool b);

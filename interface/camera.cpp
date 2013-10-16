@@ -154,79 +154,147 @@ void Camera::translatey(float win_y, float last_y)
 
 void Camera::rotatex(float win_y, float last_y)
 {
-    if(type==CAMERA_FAR){
-        float y = at.y();
-        float x = at.x();
-        float z = at.z();
-        at = at +( up*( (last_y - win_y)/100.0 ) );
+    Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
+      at = at*(2.0)-(eye);
+      eye = aux;//.recebe(aux);
 
-        //Vec normalizado
-        Vec4 N = at - eye;
-        N.normalize();
-        at = eye +(N);
-        if(axis_y){
-            at.x2 = y;
-        }
-        if(axis_x){
-            at.x1 = x;
-        }
-        if(axis_z){
-            at.x3 = z;
-        }
+      //vetor do olho(eye) ao centro(center)
+      Vec4 Vec = at-(eye);
+      GLfloat moduloVecant = Vec.module();
+      at = at+(up*( ((1.0/30.0)*moduloVecant)*(last_y - win_y)/5.0 ));
+      Vec = at-(eye);
+      GLfloat moduloVec = Vec.module();
+        Vec = Vec*(moduloVecant/moduloVec);
+      at = eye+(Vec);
+      Vec = at-(eye);
 
-        //vetor no sentido positivo da direcao x
-        if(!axis_x && !axis_y && !axis_z){
-            Vec4 Xpos = N^(up);
-            up = Xpos^(N);
-            up.normalize();
-        }
+      //vetor no sentido positivo da direcao x
+      Vec4 u;
+      if (up.y()>=0.0) {
+        u = Vec4(0.0,1.0,0.0);
+      } else {
+        u = Vec4(0.0,-1.0,0.0);
+      }
+      Vec4 XposUp = Vec^(u);
+      up = XposUp^(Vec);
+      up.normalize();
+
+//      Vec4 Xpos = Vec^(up);
+//      up = Xpos^(Vec);
+//      up.normalize();
 
 
-    }
+
+      aux = eye;//.recebe(e);
+      eye = eye*(2.0)-(at);
+      at = aux;//.recebe(aux);
+//    if(type==CAMERA_FAR){
+//        float y = at.y();
+//        float x = at.x();
+//        float z = at.z();
+//        at = at +( up*( (last_y - win_y)/100.0 ) );
+
+//        //Vec normalizado
+//        Vec4 N = at - eye;
+//        N.normalize();
+//        at = eye +(N);
+//        if(axis_y){
+//            at.x2 = y;
+//        }
+//        if(axis_x){
+//            at.x1 = x;
+//        }
+//        if(axis_z){
+//            at.x3 = z;
+//        }
+
+//        //vetor no sentido positivo da direcao x
+//        if(!axis_x && !axis_y && !axis_z){
+//            Vec4 Xpos = N^(up);
+//            up = Xpos^(N);
+//            up.normalize();
+//        }
+
+
+//    }
 }
 
 void Camera::rotatey(float win_x, float last_x)
 {
-    if(type==CAMERA_FAR){
-        float y = at.y();
-        float x = at.x();
-        float z = at.z();
-        //vetor do olho(eye) ao centro(center)
-        Vec4 Vec = at -(eye);
+//    if(type==CAMERA_FAR){
+//        float y = at.y();
+//        float x = at.x();
+//        float z = at.z();
+//        //vetor do olho(eye) ao centro(center)
+//        Vec4 Vec = at -(eye);
 
-        //vetor no sentido positivo da direcao x
-        Vec4 Xpos = Vec^(up);
-        at = at - ( Xpos*( (last_x - win_x)/100.0 ) );
-        if(axis_y){
-            at.x2 = y;
-        }
-        if(axis_x){
-            at.x1 = x;
-        }
-        if(axis_z){
-            at.x3 = z;
-        }
-
-
-        //Vec normalizado
-        Vec4 N = at -(eye);
-        N.normalize();
-        at = eye + (N);
-
-        if(axis_y){
-            at.x2 = y;
-        }
-        if(axis_x){
-            at.x1 = x;
-        }
-        if(axis_z){
-            at.x3 = z;
-        }
+//        //vetor no sentido positivo da direcao x
+//        Vec4 Xpos = Vec^(up);
+//        at = at - ( Xpos*( (last_x - win_x)/100.0 ) );
+//        if(axis_y){
+//            at.x2 = y;
+//        }
+//        if(axis_x){
+//            at.x1 = x;
+//        }
+//        if(axis_z){
+//            at.x3 = z;
+//        }
 
 
+//        //Vec normalizado
+//        Vec4 N = at -(eye);
+//        N.normalize();
+//        at = eye + (N);
+
+//        if(axis_y){
+//            at.x2 = y;
+//        }
+//        if(axis_x){
+//            at.x1 = x;
+//        }
+//        if(axis_z){
+//            at.x3 = z;
+//        }
 
 
+
+
+//    }
+    Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
+    at = at*2 - eye;
+    eye = aux;//.recebe(aux);
+
+    //vetor do olho(eye) ao centro(center)
+    Vec4 Vec = at-eye;
+    GLfloat moduloVecant = Vec.module();
+    //vetor no sentido positivo da direcao x
+    Vec4 Xpos = Vec^(up);
+    Xpos.normalize();
+
+    at = at-(Xpos*( ((1.0/30.0)*moduloVecant)*(last_x - win_x)/5.0 ));
+
+    Vec = at -(eye);
+    GLfloat moduloVec = Vec.module();
+      Vec = Vec*( moduloVecant/moduloVec );
+    at = eye+(Vec);
+
+    //novo-----------------------------------
+    //atualizando u
+    Vec4 u;
+    if (up.y()>=0.0) {
+      u = Vec4(0.0,1.0,0.0);
+    } else {
+      u = Vec4(0.0,-1.0,0.0);
     }
+    Vec4 XposUp = Vec^(u);
+    up = XposUp^(Vec);
+    up.normalize();
+    //fim_novo-------------------------------
+
+    aux = eye;//.recebe(e);
+    eye = eye*(2.0)-(at);
+    at = aux;//.recebe(aux);
 }
 
 void Camera::rotatez(float win_x, float last_x)

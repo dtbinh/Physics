@@ -387,6 +387,8 @@ void Scene::draw()
             }
 
     }
+    if (characters.size()>0)
+       GRF::drawGRF(groundForces,getCharacter(0)->getPosCOM());
     //Draw::drawPoint(Vec4(0,7,0));
 
 //    glDisable(GL_DEPTH_TEST);

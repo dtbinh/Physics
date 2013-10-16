@@ -574,7 +574,6 @@ void GLWidget::loadScene(QString file)
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomBalance());
     if(scene->getSizeCharacter()>0){
         scene->getCharacter(0)->contructHierarchyBodies();
-
         scene->getCharacter(0)->showHierarchies();
     }
 }
@@ -582,15 +581,13 @@ void GLWidget::loadScene(QString file)
 void GLWidget::saveCharacter(QString file)
 {
     Utils::saveModelRubens(scene->getCharacter(0),file.toStdString());
- //Functions::saveScene(scene,file);
+
 }
 
 void GLWidget::loadMotionCapture(QString file)
 {
     if (scene->getSizeCharacter()==0) return;
     Utils::loadMotionCapture(scene->getCharacter(0)->getMoCap(),scene->getCharacter(0),file.toStdString());
-    //int frames = scene->getCharacter(0)->getMoCap()->sizeFrames();
-    //printf("\nTamanho de frames: %d",frames);
     scene->getCharacter(0)->loadMotionFrames();
     motionTotalFrame(scene->getCharacter(0)->getMoCap()->sizeFrames());
     scene->getCharacter(0)->getMoCap()->copyFootsProperties();
@@ -677,6 +674,18 @@ void GLWidget::setEnableForceBalance(bool b)
 void GLWidget::setEnableMomentumBalance(bool b)
 {
     scene->setEnableMomentumBalance(b);
+}
+
+void GLWidget::setKVelocityLocomotion(Vec4 k)
+{
+    if(scene->getSizeCharacter()<1) return;
+    scene->getCharacter(0)->getBalance()->setKVelocityLocomotion(k);
+}
+
+void GLWidget::setKDistanceLocomotion(Vec4 k)
+{
+    if(scene->getSizeCharacter()<1) return;
+    scene->getCharacter(0)->getBalance()->setKDistanceLocomotion(k);
 }
 
 void GLWidget::setAlphaCharacter(int value)

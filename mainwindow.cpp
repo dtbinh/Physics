@@ -106,6 +106,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->xksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
     connect(ui->yksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
     connect(ui->zksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+        //manipuladores das constantes de locomoção
+    connect(ui->xLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+    connect(ui->yLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+    connect(ui->zLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+    connect(ui->xLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+    connect(ui->yLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+    connect(ui->zLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+
+
 
     //manipuladores controlador PD
     connect(ui->ksx,SIGNAL(valueChanged(double)),this,SLOT(updateControlPD()));
@@ -229,6 +238,16 @@ void MainWindow::updateBalancePD(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 km
     ui->ykmomBal->setValue(kmom.y());
     ui->zkmomBal->setValue(kmom.z());
 
+
+}
+
+void MainWindow::updateBalanceLocomotion()
+{
+    Vec4 kvel = Vec4(ui->xLocVel->value(),ui->yLocVel->value(),ui->zLocVel->value());
+    Vec4 kdist = Vec4(ui->xLocDist->value(),ui->yLocDist->value(),ui->zLocDist->value());
+
+    ui->widgetPhysics->setKVelocityLocomotion(kvel);
+    ui->widgetPhysics->setKDistanceLocomotion(kdist);
 
 }
 

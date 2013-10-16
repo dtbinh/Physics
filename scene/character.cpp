@@ -4,7 +4,7 @@
 #include "joint.h"
 #include "scene.h"
 #include "graphics/draw.h"
-
+std::vector<Joint*> result;
 Character::Character(Scene *parent)
 {
     this->scene = parent;
@@ -91,6 +91,16 @@ void Character::drawShadowMotion(int frame)
     Vec4 offset(-1,0,0);
     capMotion->drawShadow(offset,frame);
 
+}
+
+void Character::showHierarchyBodies(Object *begin, Object *end)
+{
+    std::vector<Joint*> jointsb = getHierarchyJoint(begin, end);
+    printf("Hierarquia: <");
+    for(unsigned int i=0;i<jointsb.size();i++){
+        printf(" %s",jointsb.at(i)->getName().toLocal8Bit().constData());
+    }
+    printf(">");
 }
 
 void Character::restartPhysics()
@@ -227,6 +237,21 @@ Joint *Character::getJoint(int i)
     return this->joints.at(i);
 }
 
+Joint *Character::getJoint(Object *parent, Object *child)
+{
+    for(unsigned int i=0;i<getNumJoints();i++ )
+        if (getJoint(i)->getParent()==parent && getJoint(i)->getChild()==child)
+            return getJoint(i);
+    return NULL;
+}
+
+Joint *Character::getJoint2ObjectParent(Object *obj)
+{
+    for(unsigned int i=0;i<getNumJoints();i++)
+        if (getJoint(i)->getParent()==obj) return getJoint(i);
+    return NULL;
+}
+
 Object *Character::getBody(int i)
 {
     return this->objects.at(i);
@@ -256,6 +281,15 @@ std::vector<Object*> Character::getBodiesFoot()
         if (getBody(i)->getFoot()) foots.push_back(getBody(i));
     }
     return foots;
+}
+
+std::vector<Object*> Character::getChildrens(Object *obj)
+{
+    std::vector<Object*> bodies;
+    for(unsigned int i = 0; i<this->getNumJoints();i++)
+        if(this->getJoint(i)->getParent()==obj) bodies.push_back(this->getJoint(i)->getChild());
+    return bodies;
+
 }
 
 bool Character::isBodyHierarchy(Joint *joint, Object *obj)
@@ -514,6 +548,7 @@ void Character::setHierarchyMap(int pos)
         }
         //fim_for
     }
+
     if(pos==getNumBodies()){
         int bg_loc = pos;
         vector<int> bodies;
@@ -599,6 +634,7 @@ void Character::setHierarchyMap(int pos)
 
 void Character::showHierarchies()
 {
+
     if(hierarchy.size()==0) return;
     for(int i=-3;i<this->getNumBodies()+2;i++){
         printf("Corpo (%d):\n",i);
@@ -615,6 +651,35 @@ void Character::showHierarchies()
 void Character::loadMotionFrames()
 {
     capMotion->loadFrameSimulation();
+}
+
+void Character::clearVectorsGlobais()
+{
+    result.clear();
+}
+
+std::vector<Joint*> Character::getHierarchyJoint(Object *begin, Object *end)
+{
+    if(begin==end) return result;
+    std::vector<Object*> childs;
+    childs = getChildrens(begin);
+    for (unsigned int i=0;i<childs.size();i++){
+        Joint *j = getJoint(begin,childs.at(i));
+        if (checkHierarchy(j,end)){
+            result.push_back(getJoint(begin,childs.at(i)));
+            getHierarchyJoint(childs.at(i),end);
+        }
+    }
+    return result;
+}
+
+bool Character::checkHierarchy(Joint *joint, Object *at)
+{
+    if (joint==NULL) return false;
+    if (joint->getChild()==at) return true;
+    return checkHierarchy(getJoint2ObjectParent(joint->getChild()),at);
+    return false;
+
 }
 
 void Character::setSpace(SpaceID space)

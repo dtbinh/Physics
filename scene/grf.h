@@ -3,7 +3,7 @@
 #define dDOUBLE
 #include <ode/ode.h>
 #include "math/vec4.h"
-
+#include <vector>
 class GRF{
 public:
   Vec4 position;
@@ -11,6 +11,7 @@ public:
   int noGroundGeom; //0:plane,plane; 1:body,plane; 2:plane,body; 3:body,body
   GRF();
   GRF(Vec4 pos,dJointFeedback* joint,int id);
+  static void drawGRF(std::vector<GRF> grfs,Vec4 target); //usualmente target é o COM
 };
 
 #endif // GRF_H

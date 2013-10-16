@@ -622,7 +622,7 @@ void Draw::drawSelection(Vec4 p,float radius)
     glEnable(GL_LIGHTING);
 }
 
-void Draw::drawArrow(Vec4 origin, Vec4 direction, float size)
+void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
 {
     GLUquadricObj *quad = gluNewQuadric();
     float larg = size;
@@ -632,7 +632,7 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size)
     float tam = from2to.module();
     from2to.normalize();
     Material *mat = new Material();
-    mat->setMaterial(mat,MATERIAL_RUBY);
+    mat->setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);

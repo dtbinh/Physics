@@ -46,6 +46,9 @@ public slots:
     void setAngleBodyBalance(Vec4 v);
     void setEnableMomentumBalance(bool b);
 
+    void setKVelocityLocomotion(Vec4 k);
+    void setKDistanceLocomotion(Vec4 k);
+
     //slots personagens
     std::vector<Object*> getObjectsList();
     std::vector<Joint*> getJointsList();

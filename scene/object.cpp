@@ -246,6 +246,33 @@ Matrix Object::getAd(Character* chara)
     return Ad;
 }
 
+Matrix Object::getAd(Vec4 pos)
+{
+    // | R p |^-1   | R^t  R^t.(-p) |
+    // | 0 1 |    = |  0      1     |
+    Matrix Ad(6,6);
+    //R
+    Matrix R = Physics::getMatrixRotation(this);
+    //matriz inversa de R
+    Matrix invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
+    R = invR;
+    Vec posCOM = pos, //posição do mundo
+        posBody,           //posição do corpo
+        p;                 //deslocamento
+    posBody = Vec(getPositionCurrent());
+    p = posCOM- posBody;
+    p = R*p;
+    //[p]R
+    Matrix pR;
+    Matrix cross_p = Matrix::crossProductMatrix(p);
+    pR = cross_p * R;
+    //Ad
+    Ad.setSubmatrix(0,0,R);
+    Ad.setSubmatrix(3,0,pR);
+    Ad.setSubmatrix(3,3,R);
+    return Ad;
+}
+
 Matrix Object::getIM()
 {
     //tratando o caso da geometria tipo ccylinder
