@@ -27,6 +27,11 @@ class Balance
     bool       enable_momentum;
     bool       enable_balance;
     int        useHierarchy;
+    //estratégia de cone de fricção
+    float angle;
+    float height;
+    float radius;
+    float m;
 
 public:
     Balance(Character* chara);
@@ -57,6 +62,18 @@ public:
     void setKMomentum(Vec4 k);
     float getCompensation();
     void setCompensation(float f);
+    //cone de ficção
+    float getMCone();
+    void setMCone(float val);
+    float getRadiusCone();
+    void setRadiusCone(float val);
+    float getHeightCone();
+    void setHeightCone(float val);
+    float getAngleCone();
+    void setAngleCone(float val);
+
+
+    float getTorqueMaxCompensable(Object* foot,Vec4 torque);
 
     void setEnableTorque(bool b);
     void setEnableForce(bool b);

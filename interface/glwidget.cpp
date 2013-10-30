@@ -318,6 +318,7 @@ void GLWidget::paintGL()
         if(scene->getSizeCharacter()!=0)
             if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
                 motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
+    showCompensableConeFriction();
 
     glPopMatrix();
 
@@ -340,8 +341,27 @@ void GLWidget::updateCamera()
 //    gluPerspective(angle,(float)width/(float)height,0.01,12000000.0);
 //    glMatrixMode(GL_MODELVIEW);
 //    glLoadIdentity();
-//    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
+    //    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
 
+}
+
+void GLWidget::showCompensableConeFriction()
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    std::vector<Object*> foots = scene->getCharacter(0)->getBodiesFoot();
+    if(foots.size()==2){
+        float perc = foots.at(0)->getCompensableFactor();
+        int slide = (int)100*perc;
+        setSliderFoot1(slide);
+        perc = foots.at(1)->getCompensableFactor();
+        slide = (int)100*perc;
+        setSliderFoot2(slide);
+
+    }else if (foots.size()==1){
+        float perc = foots.at(0)->getCompensableFactor();
+        int slide = (int)100*perc;
+        setSliderFoot1(slide);
+    }
 }
 
 void GLWidget::simStep(){
@@ -500,6 +520,14 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
     }
+    if(event->key() == Qt::Key_B ){
+        if((scene->getSizeCharacter()<1)) return;
+        scene->shotBallsCharacterRandom(scene->getCharacter(0),7);
+        //cam->lockAxisY(!cam->axis_y);
+        //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
+        //count++;
+    }
+
     if(event->key() == Qt::Key_F ){
         //Physics::bodySetTorque(scene->select->getBody(),100.0,10.0,10.0);
         //Physics::bodyAddForce(scene->select->getBody(),1,0,1);
@@ -701,6 +729,33 @@ void GLWidget::setWireCharacter(bool wire)
 void GLWidget::setCompensationBalance(int val)
 {
     scene->setCompensacao(val);
+}
+
+void GLWidget::setMCone(double val)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    scene->getCharacter(0)->getBalance()->setMCone(val);
+}
+
+void GLWidget::setRadiusCone(double val)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    scene->getCharacter(0)->getBalance()->setRadiusCone(val);
+
+}
+
+void GLWidget::setHeightCone(double val)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    scene->getCharacter(0)->getBalance()->setHeightCone(val);
+
+}
+
+void GLWidget::setAngleCone(double val)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    scene->getCharacter(0)->getBalance()->setAngleCone(val);
+
 }
 
 void GLWidget::setAngleBodyBalance(Vec4 v)

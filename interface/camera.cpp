@@ -12,6 +12,7 @@ Camera::Camera()
 
     at.x1=0;
     at.x2=1;
+    //at.x3=0;
     //c.z=0 ou e.z-1;
 
     up.x1=0;
@@ -154,6 +155,7 @@ void Camera::translatey(float win_y, float last_y)
 
 void Camera::rotatex(float win_y, float last_y)
 {
+    if(type==CAMERA_FAR){
     Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
       at = at*(2.0)-(eye);
       eye = aux;//.recebe(aux);
@@ -188,79 +190,42 @@ void Camera::rotatex(float win_y, float last_y)
       aux = eye;//.recebe(e);
       eye = eye*(2.0)-(at);
       at = aux;//.recebe(aux);
-//    if(type==CAMERA_FAR){
-//        float y = at.y();
-//        float x = at.x();
-//        float z = at.z();
-//        at = at +( up*( (last_y - win_y)/100.0 ) );
+      }else{
 
-//        //Vec normalizado
-//        Vec4 N = at - eye;
-//        N.normalize();
-//        at = eye +(N);
-//        if(axis_y){
-//            at.x2 = y;
-//        }
-//        if(axis_x){
-//            at.x1 = x;
-//        }
-//        if(axis_z){
-//            at.x3 = z;
-//        }
+        float y = at.y();
+        float x = at.x();
+        float z = at.z();
+        at = at +( up*( (last_y - win_y)/100.0 ) );
 
-//        //vetor no sentido positivo da direcao x
-//        if(!axis_x && !axis_y && !axis_z){
-//            Vec4 Xpos = N^(up);
-//            up = Xpos^(N);
-//            up.normalize();
-//        }
+        //Vec normalizado
+        Vec4 N = at - eye;
+        N.normalize();
+        at = eye +(N);
+        if(axis_y){
+            at.x2 = y;
+        }
+        if(axis_x){
+            at.x1 = x;
+        }
+        if(axis_z){
+            at.x3 = z;
+        }
+
+        //vetor no sentido positivo da direcao x
+        if(!axis_x && !axis_y && !axis_z){
+            Vec4 Xpos = N^(up);
+            up = Xpos^(N);
+            up.normalize();
+        }
 
 
-//    }
+    }
 }
 
 void Camera::rotatey(float win_x, float last_x)
 {
-//    if(type==CAMERA_FAR){
-//        float y = at.y();
-//        float x = at.x();
-//        float z = at.z();
-//        //vetor do olho(eye) ao centro(center)
-//        Vec4 Vec = at -(eye);
 
-//        //vetor no sentido positivo da direcao x
-//        Vec4 Xpos = Vec^(up);
-//        at = at - ( Xpos*( (last_x - win_x)/100.0 ) );
-//        if(axis_y){
-//            at.x2 = y;
-//        }
-//        if(axis_x){
-//            at.x1 = x;
-//        }
-//        if(axis_z){
-//            at.x3 = z;
-//        }
-
-
-//        //Vec normalizado
-//        Vec4 N = at -(eye);
-//        N.normalize();
-//        at = eye + (N);
-
-//        if(axis_y){
-//            at.x2 = y;
-//        }
-//        if(axis_x){
-//            at.x1 = x;
-//        }
-//        if(axis_z){
-//            at.x3 = z;
-//        }
-
-
-
-
-//    }
+    if(type==CAMERA_FAR){
     Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
     at = at*2 - eye;
     eye = aux;//.recebe(aux);
@@ -295,6 +260,32 @@ void Camera::rotatey(float win_x, float last_x)
     aux = eye;//.recebe(e);
     eye = eye*(2.0)-(at);
     at = aux;//.recebe(aux);
+    }else{
+        float y = at.y();
+        float x = at.x();
+        float z = at.z();
+        //vetor do olho(eye) ao centro(center)
+          Vec4 Vec = at-(eye);
+          //vetor no sentido positivo da direcao x
+          Vec4 Xpos = Vec^(up);
+
+          at = at-( Xpos*( (last_x - win_x)/100.0 ) );
+
+          //Vec normalizado
+          Vec4 N = at-(eye);
+          N.normalize();
+          at = eye+(N);
+          if(axis_y){
+              at.x2 = y;
+          }
+          if(axis_x){
+              at.x1 = x;
+          }
+          if(axis_z){
+              at.x3 = z;
+          }
+    }
+
 }
 
 void Camera::rotatez(float win_x, float last_x)
@@ -309,6 +300,47 @@ void Camera::rotatez(float win_x, float last_x)
         //modificando o vetor up
         up = up-( Xpos*( (last_x - win_x)/300.0 ) );
         up.normalize();
+    }else{
+
+                float y = at.y();
+                float x = at.x();
+                float z = at.z();
+                //vetor do olho(eye) ao centro(center)
+                Vec4 Vec = at -(eye);
+
+                //vetor no sentido positivo da direcao x
+                Vec4 Xpos = Vec^(up);
+                at = at - ( Xpos*( (last_x - win_x)/100.0 ) );
+                if(axis_y){
+                    at.x2 = y;
+                }
+                if(axis_x){
+                    at.x1 = x;
+                }
+                if(axis_z){
+                    at.x3 = z;
+                }
+
+
+                //Vec normalizado
+                Vec4 N = at -(eye);
+                N.normalize();
+                at = eye + (N);
+
+                if(axis_y){
+                    at.x2 = y;
+                }
+                if(axis_x){
+                    at.x1 = x;
+                }
+                if(axis_z){
+                    at.x3 = z;
+                }
+
+
+
+
+
     }
 }
 

@@ -187,7 +187,7 @@ void Draw::drawCylinder(Matrix4x4 *transform,Material *mat)
     gluDeleteQuadric(q);
 }
 
-void Draw::drawSphere(Matrix4x4 *transform,Material *mat)
+void Draw::drawSphere(Matrix4x4 *transform,Material *mat,float radius)
 {
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -198,7 +198,7 @@ void Draw::drawSphere(Matrix4x4 *transform,Material *mat)
     //transform->showMatrix4x4();
 
     Vec4 position = Vec4(transform->get(12),transform->get(13),transform->get(14));
-    Vec4 scale    = transform->getScaleSeted();
+    Vec4 scale    = Vec4(radius,radius,radius);
     glPushMatrix();
         gluQuadricNormals(q, GLU_SMOOTH);
         glTranslatef(position.x(),position.y(),position.z());
@@ -209,10 +209,10 @@ void Draw::drawSphere(Matrix4x4 *transform,Material *mat)
     gluDeleteQuadric(q);
 }
 
-void Draw::drawSphere(Vec4 position)
+void Draw::drawSphere(Vec4 position, int material, float size)
 {
     Material *mat = new Material();
-    Material::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+    Material::setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -224,12 +224,27 @@ void Draw::drawSphere(Vec4 position)
     glPushMatrix();
         gluQuadricNormals(q, GLU_SMOOTH);
         glTranslatef(position.x(),position.y(),position.z());
-        gluSphere(q, 0.04, slices, stacks);
+        gluSphere(q, size, slices, stacks);
 
     glPopMatrix();
 
     gluDeleteQuadric(q);
     delete mat;
+}
+
+void Draw::drawLine(Vec4 p1, Vec4 p2, Vec4 color, float width)
+{
+    glDisable(GL_LIGHTING);
+    glPushMatrix();
+    glColor3f(color.x(),color.y(),color.z());
+    glLineWidth(width);
+    glBegin(GL_LINES);
+        glVertex3f(p1.x(),p1.y(),p1.z());
+        glVertex3f(p2.x(),p2.y(),p2.z());
+    glEnd();
+    glLineWidth(1.0);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
 
 void Draw::drawSphereSelected(Vec4 position)

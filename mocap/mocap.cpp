@@ -144,10 +144,22 @@ void MoCap::stepFrame(int value)
 //    printf("\nIndice: %d",indice);
 //    printf("\nControllers: %d",chara->getControllersPD().size());
 //    printf("\nMotions: %d",capMotFrame.size());
-    for(unsigned int i=0; i<chara->getControllersPD().size();i++){
-        chara->getControllersPD().at(i)->setQuaternionWanted(getFrameSimulation(indice)->quatDes.at(i));
-    }
+
     drawShadow(Vec4(-0.5,0,0),value);
+}
+
+Vec4 MoCap::positionRelativeCOM(int frame)
+{
+    if(!(idfoots.size()>1)) return Vec4();
+    Vec4 posMedia = Vec4(); //media da distância entre os pés
+    for(int i=0;i<idfoots.size();i++)
+        posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
+    posMedia /= idfoots.size();
+    Vec4 posCOM = getPosCOM(frame);
+    posCOM.x2 = 0;
+    posMedia.x2 = 0;
+    return posCOM - posMedia;
+
 }
 
 Vec4 MoCap::velocityAngularBody(int frame, int body)
@@ -161,7 +173,9 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
     //indo pelo caminho mais curto
 
     qDesejado = qIdent.lessArc(qDesejado); //ja foi calculado acima
-    Quaternion qDesejadoMaisUm = getFrameMotion(frame+1)->getOrientation(body);
+    int prox = frame+1;
+    if(frame+2>=capMotFrame.size()) prox = frame;
+    Quaternion qDesejadoMaisUm = getFrameMotion(prox)->getOrientation(body);
     //indo pelo caminho mais curto
     qDesejadoMaisUm = qIdent.lessArc(qDesejadoMaisUm);
     Quaternion qDeltaVelDesejada = Quaternion::deltaQuat( qDesejadoMaisUm, qDesejado ); //ou o contrario
@@ -185,7 +199,9 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
 Vec4 MoCap::velocityLinearBody(int frame, int body)
 {
     Vec4 pos_n = getFrameMotion(frame)->getPosition(body);
-    Vec4 pos_n1 = getFrameMotion(frame+1)->getPosition(body);
+    int prox = frame+1;
+    if(frame+2>=capMotFrame.size()) prox = frame;
+    Vec4 pos_n1 = getFrameMotion(prox)->getPosition(body);
     Vec4 veldesejada = (pos_n1-pos_n)*(60);
     return veldesejada;
 }

@@ -40,13 +40,13 @@ private:
     Vec4 externalForce;
     Vec4 propKs;
     Vec4 propKd;
-    std::vector<GRF> groundForces;
+
 
 
 
 
 public:
-
+    std::vector<GRF> groundForces;
     Scene(GLWidget *parent);
     ~Scene();
 
@@ -95,6 +95,7 @@ public:
     Vec4                  getProportionalKdPD();
     Character*            getCharacter(int i);
     int                   getSizeCharacter();
+    Object*               getObject(dBodyID id);
     //extra simulation
     void                  shootObject(Object* obj,int type, Vec4 begin);
     void                  clearObjectShooted();
@@ -122,6 +123,9 @@ public:
     //motion capture
     void                  restartMotionCapture();
     void                  statusMotionCapture(bool b);
+    //testes de robustez
+    void                  shotBallsCharacterRandom(Character *chara, int posPlevis); //atirar objetos no personagem
+
 
 
 

@@ -26,7 +26,7 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
         dBodyID b1 = dGeomGetBody(o1);
         dBodyID b2 = dGeomGetBody(o2);
 
-        int numcont = 6;
+        int numcont = 12;
         dContact contact[numcont];
         int i;
         if (int numc = dCollide (o1,o2,numcont,&contact[0].geom,sizeof(dContact))) {
@@ -60,6 +60,8 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                           else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
                           else noGroundGeom = 3;
                           GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
+                          fbContact.b1 = scene->getObject(b1);
+                          fbContact.b2 = scene->getObject(b2);
                       //put fbContact in vector feedbackContacts
                         scene->addGroundForce(fbContact);
                       //set dJointFeedback
@@ -245,6 +247,50 @@ Vec4 Physics::getAnchorJoint(Joint *joint)
     dJointGetBallAnchor(joint->getJoint(),pos);
     return Vec4(pos[0],pos[1],pos[2]);
 }
+void Physics::createObject(Object *object, dSpaceID space, float mass, Vec4 position, Vec4 Velocity)
+{
+    switch(object->getType()){
+    case TYPE_SPHERE:{
+        object->setBody(dBodyCreate (object->getScene()->getWorld()));
+        object->setGeometry(dCreateSphere(space,object->getProperties().x()));
+        dMassSetSphereTotal(object->getMass(),mass,object->getProperties().x());
+        break;
+    }
+    case TYPE_CUBE:{
+        object->setBody(dBodyCreate(object->getScene()->getWorld()));
+        object->setGeometry(dCreateBox(space,object->getProperties().x(),object->getProperties().y(),object->getProperties().z()));
+        //dMassSetBox ((object->getMass()),density,object->getProperties().x(),object->getProperties().y(),object->getProperties().z());
+        dMassSetBoxTotal(object->getMass(),mass,object->getProperties().x(),object->getProperties().y(),object->getProperties().z());
+        break;
+    }
+//    case OBJ_CAPSULE:
+//        object->body = dBodyCreate (object->scene->world);
+//        object->geometry = dCreateCapsule (space,object->properties[0],object->properties[1]);
+//        dMassSetCapsule (&object->mass,density,1,object->properties[0],object->properties[1]);
+//        break;
+    case TYPE_CYLINDER:{
+        object->setBody(dBodyCreate (object->getScene()->getWorld()));
+        object->setGeometry(dCreateCylinder (space,object->getProperties().x(),object->getProperties().y()));
+        dMassSetCylinder(object->getMass(),1,1,object->getProperties().x(),object->getProperties().y());
+        break;
+    }
+    default:{
+        return;
+        break;
+    }
+    }
+
+    dGeomSetData(object->getGeometry(), (void*)(object));
+    dBodySetMass (object->getBody(),object->getMass());
+    dGeomSetBody (object->getGeometry(),object->getBody());
+    dBodySetPosition (object->getBody(),position.x(),position.y(),position.z());
+    dBodySetLinearVel(object->getBody(), Velocity.x(), Velocity.y(), Velocity.z());
+
+    dReal rot[] = {1,0,0,0};
+    dBodySetQuaternion (object->getBody(),rot);
+}
+
+
 
 void Physics::createObject(Object *object, SpaceID space, float mass, Vec4 position, Quaternion rotation){
 
@@ -310,13 +356,13 @@ Quaternion Physics::getRotationBody(Object *obj){
 
 void Physics::updateObject(Object *obj)
 {
-    //dGeomSetBody (obj->getGeometry(),obj->getBody());
-    //obj->setGeometry(dCreateBox (obj->getScene()->getSpace(),obj->getProperties().x(),obj->getProperties().y(),obj->getProperties().z()));
-    //dBodySetPosition(obj->getBody(),obj->getPosition().x(),obj->getPosition().y(),obj->getPosition().z());
+    dGeomSetBody (obj->getGeometry(),obj->getBody());
+    obj->setGeometry(dCreateBox (obj->getScene()->getSpace(),obj->getProperties().x(),obj->getProperties().y(),obj->getProperties().z()));
+    dBodySetPosition(obj->getBody(),obj->getPosition().x(),obj->getPosition().y(),obj->getPosition().z());
 
-    //dBodySetMass (obj->getBody(),obj->getMass());
-//    dReal rot[] = {obj->getRotation().getScalar(),obj->getRotation().getPosX(),obj->getRotation().getPosY(),obj->getRotation().getPosZ()};
-//    dBodySetQuaternion (obj->getBody(),rot);
+    dBodySetMass (obj->getBody(),obj->getMass());
+    dReal rot[] = {obj->getRotation().getScalar(),obj->getRotation().getPosX(),obj->getRotation().getPosY(),obj->getRotation().getPosZ()};
+    dBodySetQuaternion (obj->getBody(),rot);
 }
 Matrix Physics::getMatrixRotation(Object *obj){
     const dReal* Rbody; //dMatrix3
@@ -421,7 +467,6 @@ void Physics::bodySetTorque(dBodyID body, float x, float y, float z){
 
 void Physics::bodyAddForce(dBodyID body, float x, float y, float z){
     dBodyAddForce(body,x,y,z);
-
 }
 
 void Physics::bodySetForce(dBodyID body, float x, float y, float z){

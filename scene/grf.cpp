@@ -89,3 +89,52 @@ for (unsigned int fc=0;fc<grfs.size();fc++) {
 
       return;
 }
+
+Vec4 GRF::forcesGRF(std::vector<GRF> grfs, Object *obj)
+{
+
+    Vec4 sum = Vec4();
+    //para todos os contatos
+    for (unsigned int fc=0;fc<grfs.size();fc++) {
+        Vec4 groundForce;
+        if( ( grfs[fc].noGroundGeom != 3 )&&(grfs[fc].b1 == obj || grfs[fc].b2 == obj)){
+            //groundForce
+            dReal* groundforce = NULL; //dVector3
+            if ( grfs[fc].noGroundGeom == 1 ) groundforce = grfs[fc].jtFb->f1;
+            if ( grfs[fc].noGroundGeom == 2 ) groundforce = grfs[fc].jtFb->f2;
+            groundForce = Vec4(groundforce[0],groundforce[1],groundforce[2]);
+            sum += groundForce;
+        }
+
+    }
+    return sum;
+}
+
+Vec4 positionGRF(std::vector<GRF> grfs, Object *obj)
+{
+    Vec4 sum = Vec4();
+    int size = 0;
+    //para todos os contatos
+    for (unsigned int fc=0;fc<grfs.size();fc++) {
+        if( ( grfs[fc].noGroundGeom != 3) && (grfs[fc].b1 == obj || grfs[fc].b2 == obj)){
+            sum +=  grfs[fc].position;
+            size++;
+        }
+
+    }
+    sum = sum/size;
+    return sum;
+}
+
+std::vector<GRF> GRF::forcesGRF2Object(std::vector<GRF> grfs, Object *obj)
+{
+    std::vector<GRF> bodyGRF;
+    //para todos os contatos
+    for (unsigned int fc=0;fc<grfs.size();fc++) {
+        if( ( grfs[fc].noGroundGeom != 3) && (grfs[fc].b1 == obj || grfs[fc].b2 == obj)){
+            bodyGRF.push_back(grfs[fc]);
+        }
+
+    }
+    return bodyGRF;
+}

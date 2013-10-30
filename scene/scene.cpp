@@ -278,6 +278,7 @@ void Scene::restartPhysics()
     for (unsigned int i=0;i<objects.size();i++){
         Physics::createObject(objects.at(i), this->space, objects.at(i)->getFMass(), objects.at(i)->getPosition(), objects.at(i)->getRotation());
     }
+    objects_shoot.clear();
     for (unsigned int i=0;i<characters.size();i++){
         characters.at(i)->restartPhysics();
         characters.at(i)->checkContactFoot(true);
@@ -324,13 +325,18 @@ void Scene::simulationStep()
     if(characters.size()>0)
         if (status_motion)
             if(characters.at(0)->getMoCap()->sizeFrames()>0){
-                if (frame_step>characters.at(0)->getMoCap()->sizeFrames()){
+                if (frame_step>=characters.at(0)->getMoCap()->sizeFrames()){
                     frame_step = 1;
                     characters.at(0)->getMoCap()->initializePosesModel(0);
                 }
                 //float percent = frame_step/(characters.at(0)->getMoCap()->sizeFrames()*1.);
-                characters.at(0)->getMoCap()->stepFrame(frame_step);
+
                 frame_step+=2;
+                if (frame_step>=characters.at(0)->getMoCap()->sizeFrames()){
+                    frame_step = 1;
+                    characters.at(0)->getMoCap()->initializePosesModel(0);
+                }
+                characters.at(0)->getMoCap()->stepFrame(frame_step);
             }
     std::vector<Object*> objs = objectsScene();
     std::vector<Joint*> jts = jointsScene();
@@ -346,16 +352,20 @@ void Scene::simulationStep()
                if ((objs.at(i)->isSelected()) && !apply){
                    objs.at(i)->addForce(this->externalForce);
                }
+               objs.at(i)->evaluate(3);
+
            }
            for(unsigned int k=0;k<jts.size();k++) Physics::setEnableJoint(jts.at(k));
            for(unsigned int j=0;j<characters.size();j++){
 
-               for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
-                   (*it)->evaluate();
-               }
+
                if(characters.at(j)->balance!=NULL && enableGravity){
                    characters.at(j)->balance->evaluate();
                    characters.at(j)->checkContactFoot();
+               }else{
+                   for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
+                       (*it)->evaluate();
+                   }
                }
 
            }
@@ -379,6 +389,10 @@ void Scene::draw()
     for(std::vector<Object*>::iterator it = objects.begin(); it!= objects.end(); it++){
         (*it)->draw();
     }
+    for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
+        (*it)->draw();
+    }
+
     if(externalForce.module()!=0){
             std::vector<Object*> objs = objectsScene();
         for(int i=0;i<objs.size();i++)
@@ -502,17 +516,18 @@ Joint *Scene::addJointFixed(Object *parent,Character *chara)
 std::vector<Object*> Scene::objectsScene()
 {
     std::vector<Object*> allobjetcs;
-    for(int i=0;i<characters.size();i++) for(int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
-    for(int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
+    for(unsigned int i=0;i<characters.size();i++) for(int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
+    for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
+    for(unsigned int i=0;i<objects_shoot.size();i++) allobjetcs.push_back(objects_shoot.at(i));
     return allobjetcs;
 }
 
 Object *Scene::selectedObject()
 {
     std::vector<Object*> allobjetcs;
-    for(int i=0;i<characters.size();i++) for(int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
-    for(int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
-    for(int i=0;i<allobjetcs.size();i++) if(allobjetcs.at(i)->isSelected()) return allobjetcs.at(i);
+    for(unsigned int i=0;i<characters.size();i++) for(int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
+    for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
+    for(unsigned int i=0;i<allobjetcs.size();i++) if(allobjetcs.at(i)->isSelected()) return allobjetcs.at(i);
     return NULL;
 }
 
@@ -610,6 +625,14 @@ Character *Scene::getCharacter(int i)
 int Scene::getSizeCharacter()
 {
     return this->characters.size();
+}
+
+Object *Scene::getObject(dBodyID id)
+{
+    std::vector<Object*> objs = objectsScene();
+    for(unsigned int i=0;i<objs.size();i++)
+        if (id == objs.at(i)->getBody()) return objs.at(i);
+    return NULL;
 }
 
 void Scene::shootObject(Object *obj, int type, Vec4 begin)
@@ -751,5 +774,151 @@ void Scene::statusMotionCapture(bool b)
 {
     status_motion = b;
 }
+
+void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
+{
+    //if ( inicio.modulo() == 0.0 ) {
+    //srand(time(NULL));
+    //int r = rand() % chara->getNumBodies();
+    Vec4 posPelvisModel = chara->getBody(posPelvis)->getPositionCurrent();
+    //float mass = chara->getBody(posPelvis)->getFMass();
+    //this->objetos.push_back( new Objeto( Simulation::world, Simulation::space, posPelvisModelo, mass.mass, influExtSimFF, true, SPHERE ) ); //para a geometria do objeto ser aleatoria, basta nao definir o ultimo parametro
+    //inicio
+       Vec4 directionFromCenter = Vec4( dRandReal()*2.0-1.0, dRandReal()*2.0-1.0, dRandReal()*2.0-1.0 );
+         if ( directionFromCenter.module() == 0.0 ) {
+           directionFromCenter = Vec4(0.0,1.0,0.0);
+         } else {
+           directionFromCenter.normalize();
+         }
+       Vec4 inicio = posPelvisModel+(directionFromCenter*(1.0));
+       if ( inicio.y() <= 0.1 ) {
+           directionFromCenter.x2 = 0.0;
+           directionFromCenter.normalize();
+           inicio = posPelvisModel+(directionFromCenter*(1.0));
+         }
+
+     //velInicial
+       Vec4 deltaCenter = Vec4(); //(0.0,0.0,0.0);
+
+         deltaCenter = Vec4( dRandReal()*0.3-0.15, dRandReal()*1.6-0.75, dRandReal()*0.3-0.15 );
+
+       Vec4 directionVelInicial = posPelvisModel+(deltaCenter)-(inicio);
+         //directionVelInicial.normaliza();
+       Vec4 velInicial = directionVelInicial*( 15.0 );//dRandReal()*50.0+10.0 );
+       dReal massTotal;
+       //if ( pelvisIsTheTarget ) {
+       massTotal = 0.75;
+       Object *obj = new Object(this);//position,rotation,properties,type,this);
+       obj->setMaterial(MATERIAL_COPPER);
+       obj->setType(TYPE_SPHERE);
+       obj->setPosition(inicio);
+       obj->setRotation(Quaternion());
+       obj->setProperties(Vec4(0.1,0.1,0.1));
+       obj->setFMass(massTotal);
+
+       Physics::createObject(obj,space,massTotal,inicio,velInicial);
+       objects_shoot.push_back(obj);
+
+
+     //usar a massa total ao inves da densidade
+       //assim pode ficar legal deixando a geometria do objeto aleatoria
+       //definir a massa total proporcional à massa do corpo alvo
+     //considerando cilindro
+         //dReal density = 1000.0;//dRandReal()*6000.0+1000.0; //melhor para varias pancadas de uma vez
+         //dReal density = 2000.0;//dRandReal()*6000.0+1000.0; //melhor para pancadas individuais
+     //massa
+
+//       else {
+//         massTotal = fmin(2.0*massBody,5.0);
+//       }
+
+     //bodyGeom
+//       dBodyID body;
+//       dGeomID geom;
+//       //dMatrix3 R;
+//         //dRFromAxisAndAngle (R,dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,dRandReal()*2.0-1.0,dRandReal()*10.0-5.0);
+//       dReal sides[3];
+//         for (int k=0; k<3; k++) { sides[k] = 0.07; }//dRandReal()*0.02+0.07; }
+//         //dBody
+
+//         body = dBodyCreate(world);
+//           dBodySetPosition(body, this->inicio[0], this->inicio[1], this->inicio[2]);
+//           //dBodySetRotation (body,R);
+
+//         if (tipo == SPHERE) {
+//           //dGeom
+//           geom = dCreateSphere(space,sides[0]);
+//           //dMass
+//           dMass mass;
+//           dMassSetSphereTotal (&mass,massTotal,sides[0]);
+//             dBodySetMass(body, &mass);
+//         }
+//         if (tipo == BOX) {
+//           //dGeom
+//           geom = dCreateBox (space,2.0*sides[0],2.0*sides[1],2.0*sides[2]);
+//           //dMass
+//           dMass mass;
+//           dMassSetBoxTotal (&mass,massTotal,2.0*sides[0],2.0*sides[1],2.0*sides[2]);
+//             dBodySetMass(body, &mass);
+//         }
+//         if (tipo == CCYLINDER) {
+//           //dGeom
+//           geom = dCreateCCylinder (space,sides[0],sides[1]);
+//           //dMass
+//           dMass mass;
+//           dMassSetCappedCylinderTotal (&mass,massTotal,3,sides[0],sides[1]);
+//             dBodySetMass(body, &mass);
+//         }
+//         dGeomSetBody (geom,body);
+//       this->bodyGeom = new BodyGeom(body,geom);
+//       //guardando o ponteiro objetos nessas geometrias para impedir colisoes entre os objetos
+//         dGeomSetData (this->bodyGeom->geom,objetos);
+
+//     //bodyGeomFF
+//       //30% de chance de considerar o impacto na simFF
+//       //if (dRandReal() > 0.7) {
+//       if (influExtSimFF) {
+//         //bodyGeomFF
+//           //dBody
+//           body = dBodyCreate(world);
+//             dBodySetPosition(body, this->inicio[0]+1.0, this->inicio[1], this->inicio[2]-1.0);
+//             //dBodySetRotation (body,R);
+//             dBodySetLinearVel(body, this->velInicial[0], this->velInicial[1], this->velInicial[2]);
+//           if (tipo == SPHERE) {
+//             //dGeom
+//             geom = dCreateSphere(space,sides[0]);
+//             //dMass
+//             dMass mass;
+//             dMassSetSphereTotal (&mass,massTotal,sides[0]);
+//               dBodySetMass(body, &mass);
+//           }
+//           if (tipo == BOX) {
+//             //dGeom
+//             geom = dCreateBox (space,2.0*sides[0],2.0*sides[1],2.0*sides[2]);
+//             //dMass
+//             dMass mass;
+//             dMassSetBoxTotal (&mass,massTotal,2.0*sides[0],2.0*sides[1],2.0*sides[2]);
+//               dBodySetMass(body, &mass);
+//           }
+//           if (tipo == CCYLINDER) {
+//             //dGeom
+//             geom = dCreateCCylinder (space,sides[0],sides[1]);
+//             //dMass
+//             dMass mass;
+//             dMassSetCappedCylinderTotal (&mass,massTotal,3,sides[0],sides[1]);
+//               dBodySetMass(body, &mass);
+//           }
+//           dGeomSetBody (geom,body);
+//         this->bodyGeom->bodyGeomFF = new BodyGeom(body,geom);
+//         //guardando o ponteiro objetosFF nessas geometrias para impedir colisoes entre os objetos
+//           dGeomSetData (this->bodyGeom->bodyGeomFF->geom,objetosFF);
+//       }
+
+//      //enquanto vector objetos tiver mais do que 10 objetos, apaga o primeiro
+      while ( this->objects_shoot.size() > 10 ) {
+        this->objects_shoot.erase(objects_shoot.begin());
+      }
+}
+
 
 

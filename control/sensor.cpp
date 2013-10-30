@@ -3,9 +3,10 @@
 #include "math/vec4.h"
 #include "mocap/frame.h"
 #include "mocap/framequat.h"
+#include "scene/grf.h"
 #include <vector>
 #define ERROR 0.1
-static float tolerance = 0.05;
+static float tolerance = 50;
 Sensor::Sensor()
 {
 }
@@ -21,13 +22,42 @@ int Sensor::getStateFoots(Character *chara)
     for(unsigned int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
-    int state = 0;
+    int count = 0;
     for(unsigned int i=0;i<foots.size();i++){
-        Vec4 prop = foots.at(i)->getProperties();
-        float height = prop.y()/2.0;
-        if(foots.at(i)->getPositionCurrent().y() <= height+0.05) state++;
+        Vec4 value = chara->getGRFSum(foots.at(i));
+        if(value.module()>tolerance){
+            count++;
+        }
     }
-    return state;
+
+    return count;
+
+}
+
+Vec4 Sensor::getSupportProjected(Character *chara)
+{
+    std::vector<Object*> foots;
+    for(unsigned int i=0;i<chara->getNumBodies();i++){
+        if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
+    }
+    int hierarquia = getHierarchy2Use(chara);
+    Vec4 proj = Vec4();
+    if (hierarquia==0){
+        for(unsigned int i=0;i<foots.size();i++){
+                proj += foots.at(i)->getPositionCurrent();
+        }
+        proj = proj/2.0;
+        proj.x2 = 0;
+        return proj;
+    }else{
+        for(unsigned int i=0;i<foots.size();i++){
+            if(chara->getIdObject(foots.at(i))==hierarquia-3){
+                proj = foots.at(i)->getPositionCurrent();
+            }
+        }
+        proj.x2 = 0;
+        return proj;
+    }
 
 }
 
@@ -39,10 +69,11 @@ int Sensor::getSwingFoot(Character *chara)
     }
     int body = -1;
     int count = 0;
+
+
     for(unsigned int i=0;i<foots.size();i++){
-        Vec4 prop = foots.at(i)->getProperties();
-        float height = prop.y()/2.0;
-        if(foots.at(i)->getPositionCurrent().y() > height+0.05){
+        Vec4 value = chara->getGRFSum(foots.at(i));
+        if(value.module()<tolerance){
             body = chara->getIdObject(foots.at(i));
             count++;
         }
@@ -60,9 +91,8 @@ int Sensor::getStanceFoot(Character *chara)
     int body = -1;
     int count = 0;
     for(unsigned int i=0;i<foots.size();i++){
-        Vec4 prop = foots.at(i)->getProperties();
-        float height = prop.y()/2.0;
-        if(foots.at(i)->getPositionCurrent().y() <= height+0.05){
+        Vec4 value = chara->getGRFSum(foots.at(i));
+        if(value.module()>tolerance){
             body = chara->getIdObject(foots.at(i));
             count++;
         }
@@ -80,14 +110,12 @@ int Sensor::getHierarchy2Use(Character *chara)
     }
     int state = 0;
     for(unsigned int i=0;i<foots.size();i++){
-        Vec4 prop = foots.at(i)->getProperties();
-        float height = prop.y()/2.0;
-        if(foots.at(i)->getPositionCurrent().y() <= height+0.05){
+        Vec4 value = chara->getGRFSum(foots.at(i));
+        if(value.module()>tolerance){
             contact = foots.at(i);
             state++;
         }
     }
-    //printf("State %d\n",state);
     if(state==0) return FOOTS_AIR+3;
     else if(state>1) return ALL_FOOTS_GROUND+3;
     else return chara->getPositionBody(contact)+3;

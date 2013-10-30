@@ -7,6 +7,7 @@
 #include <vector>
 #include <QString>
 #include "control/sensor.h"
+#include "scene/grf.h"
 
 class Object;
 class Joint;
@@ -80,6 +81,8 @@ public:
     void           clearVectorsGlobais();
     std::vector<Joint*> getHierarchyJoint(Object* begin, Object* end);
     bool           checkHierarchy(Joint *joint, Object* at);
+    Vec4           getGRFSum(Object *obj);
+    std::vector<GRF> getGRFsObject(Object *obj);
 
 
 

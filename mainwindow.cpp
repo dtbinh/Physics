@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->showMaximized();
+    ui->groupBoxCone->setVisible(false);
     ui->widgetPhysics->setObjectSelected(-1);
     //manipuladores do movimento
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->iframe,SLOT(setNum(int)));
@@ -55,10 +56,33 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->oeulerz,SIGNAL(valueChanged(int)),this,SLOT(updateSelectedObject()));
     connect(ui->mass,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
     connect(ui->isFoot,SIGNAL(clicked(bool)),this,SLOT(checkFoot(bool)));
+    connect(ui->isBodyBalance,SIGNAL(clicked(bool)),this,SLOT(checkBodyBalance(bool)));
 
     connect(ui->applyForce,SIGNAL(clicked()),this,SLOT(applyForce2Object()));
+        //controle PD posicional
+    connect(ui->posx_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posy_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posz_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posx_ks,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posy_ks,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posz_ks,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posx_kd,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posy_kd,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posz_kd,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->enable_cpdp,SIGNAL(clicked(bool)),this,SLOT(checkEnabledCPDP(bool)));
+    connect(ui->show_target,SIGNAL(clicked(bool)),this,SLOT(checkShowTarget(bool)));
+    connect(ui->show_effector,SIGNAL(clicked(bool)),this,SLOT(checkShowEffector(bool)));
 
     //manipuladores do equilíbrio e controladores geral
+        //cone de fricção
+    connect(ui->widgetPhysics,SIGNAL(setSliderFoot1(int)),ui->coneFoot1,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setSliderFoot2(int)),ui->coneFoot2,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setSliderFoot1(int)),ui->conePerc1,SLOT(setNum(int)));
+    connect(ui->widgetPhysics,SIGNAL(setSliderFoot2(int)),ui->conePerc2,SLOT(setNum(int)));
+    connect(ui->coneM,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setMCone(double)));
+    connect(ui->coneRadius,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setRadiusCone(double)));
+    connect(ui->coneHeight,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setHeightCone(double)));
+    connect(ui->coneAngle,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setAngleCone(double)));
         //manipuladores de desenho do personagem
     connect(ui->checkWireChara,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setWireCharacter(bool)));
 
@@ -92,9 +116,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ykdTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
     connect(ui->zkdTqBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
 
-    connect(ui->sliderComp,SIGNAL(valueChanged(int)),ui->spinComp,SLOT(setValue(int)));
-    connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->sliderComp,SLOT(setValue(int)));
-    connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setCompensationBalance(int)));
+    //connect(ui->sliderComp,SIGNAL(valueChanged(int)),ui->spinComp,SLOT(setValue(int)));
+    //connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->sliderComp,SLOT(setValue(int)));
+    //connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setCompensationBalance(int)));
 
         //manipuladores dos controladores PD propocionais do objeto
     connect(ui->widgetPhysics,SIGNAL(updateKsProp(Vec4)),this,SLOT(updateKsGeral(Vec4)));
@@ -324,12 +348,24 @@ void MainWindow::updateSelectedObject()
     obj_selected->setFMass(ui->mass->value());
 
 
-    obj_selected->updatePhysics();
-    //printf("%s\n",obj_selected->getName().toLocal8Bit().data());
-    Vec4 axis; dReal angle;
-    Quaternion q(euler);
-    q.toAxisAngle(&axis,&angle);
+//    obj_selected->updatePhysics();
+//    //printf("%s\n",obj_selected->getName().toLocal8Bit().data());
+//    Vec4 axis; dReal angle;
+//    Quaternion q(euler);
+//    q.toAxisAngle(&axis,&angle);
     //printf("(%.4f %.4f %.4f %.4f)",angle,axis.x(),axis.y(),axis.z());
+
+}
+
+void MainWindow::updateControlPDPositional()
+{
+    if (obj_selected==NULL) return;
+    Vec4 target(ui->posx_target->value(),ui->posy_target->value(),ui->posz_target->value());
+    Vec4 ks(ui->posx_ks->value(),ui->posx_ks->value(),ui->posx_ks->value());
+    Vec4 kd(ui->posx_kd->value(),ui->posx_kd->value(),ui->posx_kd->value());
+    obj_selected->setTarget(target);
+    obj_selected->setKs(ks);
+    obj_selected->setKd(kd);
 
 }
 
@@ -353,6 +389,23 @@ void MainWindow::showSelectedObject(int i)
     ui->mass->setValue(mass);
     ui->isFoot->setChecked(obj_selected->getFoot());
     ui->isBodyBalance->setChecked(obj_selected->getBodyBalance());
+    //controle PD posicional
+    Vec4 target = obj_selected->getTarget();
+    Vec4 ks = obj_selected->getKs();
+    Vec4 kd = obj_selected->getKd();
+    ui->posx_target->setValue(target.x());
+    ui->posy_target->setValue(target.y());
+    ui->posz_target->setValue(target.z());
+    ui->posx_ks->setValue(ks.x());
+    ui->posy_ks->setValue(ks.y());
+    ui->posz_ks->setValue(ks.z());
+    ui->posx_kd->setValue(kd.x());
+    ui->posy_kd->setValue(kd.y());
+    ui->posz_kd->setValue(kd.z());
+    ui->show_effector->setChecked(obj_selected->isShowEffector());
+    ui->show_target->setChecked(obj_selected->isShowTarget());
+    ui->enable_cpdp->setChecked(obj_selected->isEnableCPDP());
+
 
 }
 
@@ -367,6 +420,26 @@ void MainWindow::setGravity()
 void MainWindow::checkFoot(bool b)
 {
     if (obj_selected!=NULL) obj_selected->setFoot(b);
+}
+
+void MainWindow::checkBodyBalance(bool b)
+{
+    if (obj_selected!=NULL) obj_selected->setBodyBalance(b);
+}
+
+void MainWindow::checkShowEffector(bool b)
+{
+    if (obj_selected!=NULL)    obj_selected->setShowEffector(b);
+}
+
+void MainWindow::checkShowTarget(bool b)
+{
+    if (obj_selected!=NULL) obj_selected->setShowTarget(b);
+}
+
+void MainWindow::checkEnabledCPDP(bool b)
+{
+    if (obj_selected!=NULL) obj_selected->setEnableCPDP(b);
 }
 
 void MainWindow::applyForce2Object()
@@ -410,6 +483,7 @@ void MainWindow::on_actionOpen_Model_activated()
         ui->gravx->setValue(0);
         ui->gravy->setValue(0);
         ui->gravz->setValue(0);
+        ui->groupBoxCone->setVisible(true);
     }
     ui->widgetPhysics->startSimulation();
 }

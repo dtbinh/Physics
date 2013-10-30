@@ -20,9 +20,12 @@ signals:
     void showJoint(Joint*);
     void motionCurrentFrame(int);
     void motionTotalFrame(int);
+    void setSliderFoot1(int);
+    void setSliderFoot2(int);
 
 public slots:
     //slots motion capture
+
     void loadMotionCapture(QString file);
     void setPlayback(bool val);
     void restartMotion();
@@ -37,6 +40,7 @@ public slots:
     void setGravity(bool b);
 
     //slots parametros de controle
+
     void setProportionalKs(Vec4 ks);
     void setProportionalKd(Vec4 kd);
     void setBalanceControl(Vec4 ksT,Vec4 kdT,Vec4 ksF, Vec4 kdF,Vec4 kmom);
@@ -45,6 +49,13 @@ public slots:
     void setCompensationBalance(int val);
     void setAngleBodyBalance(Vec4 v);
     void setEnableMomentumBalance(bool b);
+
+    //cone de ficção
+    void setMCone(double val);
+    void setRadiusCone(double val);
+    void setHeightCone(double val);
+    void setAngleCone(double val);
+
 
     void setKVelocityLocomotion(Vec4 k);
     void setKDistanceLocomotion(Vec4 k);
@@ -79,6 +90,7 @@ public:
     void resizeGL(int w, int h);
     void paintGL();
     void updateCamera();
+    void showCompensableConeFriction();
     //funções de câmera
     void wheelEvent(QWheelEvent *event);
     void mouseMoveEvent(QMouseEvent *event);

@@ -20,6 +20,14 @@ Object::Object()
     this->material = new Material();
     this->isFoot = false;
     this->bodyBalance = false;
+    this->compensable = 0.0;
+    this->show_effector = false;
+    this->enabled_cpdp = false;
+    this->show_target = false;
+    this->target = Vec4();
+    this->ks = Vec4();
+    this->kd = Vec4();
+
 }
 
 Object::Object(Scene *scene)
@@ -27,9 +35,17 @@ Object::Object(Scene *scene)
     this->scene = scene;
     this->mass  = new Mass();
     this->material = new Material();
+    this->properties = Vec4();
     this->selected = false;
     this->isFoot = false;
     this->bodyBalance = false;
+    this->compensable = 0.0;
+    this->show_effector = false;
+    this->enabled_cpdp = false;
+    this->show_target = false;
+    this->target = Vec4();
+    this->ks = Vec4();
+    this->kd = Vec4();
 }
 
 Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Scene *scene,QString name)
@@ -46,6 +62,13 @@ Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Sc
     this->name       = name;
     this->isFoot = false;
     this->bodyBalance = false;
+    this->compensable = 0.0;
+    this->show_effector = false;
+    this->enabled_cpdp = false;
+    this->show_target = false;
+    this->target = Vec4();
+    this->ks = Vec4();
+    this->kd = Vec4();
 
 }
 
@@ -328,6 +351,31 @@ Matrix4x4* Object::getMatrixTransformation()
     return transform;
 }
 
+Matrix4x4 Object::getMatrixTransformationODE()
+{
+    Matrix4x4 *transform = new Matrix4x4();
+    //Vec4 currentPos = this->getPositionCurrent();
+    Physics::getGeomTransform(this->geometry,transform);
+    Matrix4x4 returns;
+    returns.set(0,transform->get(0));
+    returns.set(1,transform->get(1));
+    returns.set(2,transform->get(2));
+    returns.set(3,transform->get(3));
+    returns.set(4,transform->get(4));
+    returns.set(5,transform->get(5));
+    returns.set(6,transform->get(6));
+    returns.set(7,transform->get(7));
+    returns.set(8,transform->get(8));
+    returns.set(9,transform->get(9));
+    returns.set(10,transform->get(10));
+    returns.set(11,transform->get(11));
+    returns.set(12,transform->get(12));
+    returns.set(13,transform->get(13));
+    returns.set(14,transform->get(14));
+    returns.set(15,transform->get(15));
+    return returns;
+}
+
 void Object::setMaterial(Vec4 amb, Vec4 diff, Vec4 spe, float shininess)
 {
     Material::setMaterial(this->material,amb,diff,spe,shininess);
@@ -340,6 +388,11 @@ void Object::wireframe()
 
 void Object::draw(bool wire)
 {
+    if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
+    if(show_effector) Draw::drawSphere(getPositionCurrent(),MATERIAL_PEARL,0.02);
+    if (show_effector&&show_target)
+        if(enabled_cpdp) Draw::drawLine(target,getPositionCurrent(),Vec4(0,.9,0),1.4);
+        else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
     if (this->geometry==0) return;
 //    Draw::drawPoint(posEffectorForward(),0.02,Vec4(0.5,0.5,0.5));
 //    Draw::drawPoint(posEffectorBackward(),0.02,Vec4(0.5,0.0,0.5));
@@ -358,7 +411,7 @@ void Object::draw(bool wire)
             break;
         }
     case TYPE_SPHERE:{
-            Draw::drawSphere(getMatrixTransformation(),this->material);
+            Draw::drawSphere(getMatrixTransformation(),this->material,properties.x());
             break;
         }
     }
@@ -559,3 +612,84 @@ Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
         posf = pos + Vec4(0,0,-properties.z()/2.0);
     return Quaternion::getVecRotation(rot,posf);
 }
+
+float Object::getCompensableFactor()
+{
+    return compensable;
+}
+
+void Object::setCompensableFactor(float val)
+{
+    compensable = val;
+}
+
+void Object::setShowEffector(bool b)
+{
+    show_effector = b;
+}
+
+bool Object::isShowEffector()
+{
+    return show_effector;
+}
+
+void Object::setShowTarget(bool b)
+{
+    show_target = b;
+}
+
+bool Object::isShowTarget()
+{
+    return show_target;
+}
+
+void Object::setEnableCPDP(bool b)
+{
+    enabled_cpdp = b;
+}
+
+bool Object::isEnableCPDP()
+{
+    return enabled_cpdp;
+}
+
+void Object::setTarget(Vec4 pos)
+{
+    target = pos;
+}
+
+Vec4 Object::getTarget()
+{
+    return target;
+}
+
+void Object::setKs(Vec4 pos)
+{
+    ks = pos;
+}
+
+Vec4 Object::getKs()
+{
+    return ks;
+}
+
+void Object::setKd(Vec4 pos)
+{
+    kd = pos;
+}
+
+Vec4 Object::getKd()
+{
+    return kd;
+}
+
+void Object::evaluate(int val)
+{
+    if (!(enabled_cpdp)) return;
+    for(int i=0;i<val;i++){
+        Vec4 effector = getPositionCurrent();
+        Vec4 force = ks.mult(target - effector) - kd.mult(getRelVelLinear());
+        Physics::bodyAddForce(this->body,force.x(),force.y(),force.z());
+    }
+}
+

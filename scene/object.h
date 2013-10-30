@@ -24,6 +24,7 @@ private:
     QString      name;
     bool         selected;
     bool         bodyBalance;
+    bool         isFoot;
 
     // --------Physics
     BodyID       body;                                                    //body ODE
@@ -38,7 +39,17 @@ private:
     int          type;                                                    //tipo do objeto em vinculação com o ODE
     Material     *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
     float        fmass;                                                   //massa em float na inicialização
-    bool         isFoot;
+
+    // --------Strategy Equilibrium
+    float        compensable;
+
+    // --------Use Cases: Control PD Positional
+    bool         show_effector;
+    bool         show_target;
+    bool         enabled_cpdp;
+    Vec4         target;
+    Vec4         ks;
+    Vec4         kd;
 
 public:
     Object();
@@ -88,6 +99,7 @@ public:
     void        setMaterial(int);                                          //aplica um determinado material pré-determinado ao objeto
     Mesh*       getMesh();                                                 //extraí a malha do objeto
     Matrix4x4*  getMatrixTransformation();                                 //extraí a matriz de transformação do objeto (corrente)
+    Matrix4x4   getMatrixTransformationODE();                                 //extraí a matriz de transformação do objeto (corrente)
     void        setMaterial(Vec4 amb,Vec4 diff,Vec4 spe,float shininess);  //inclui propriedades de material ao objeto
     void        wireframe();                                               //desenha o objeto como wireframe
     void        draw(bool wire=false);                                                    //desenha o objeto
@@ -113,6 +125,24 @@ public:
     static Vec4 posEffectorForward(Vec4 pos,Quaternion rot,Object* obj);
     static Vec4 posEffectorBackward(Vec4 pos,Quaternion rot,Object* obj);
 
+    // --------Strategy Equilibrium
+    float       getCompensableFactor();
+    void        setCompensableFactor(float val);
+
+    // --------Use Cases: Control PD Positional
+    void        setShowEffector(bool b);
+    bool        isShowEffector();
+    void        setShowTarget(bool b);
+    bool        isShowTarget();
+    void        setEnableCPDP(bool b); //habilitar controle posicional
+    bool        isEnableCPDP();
+    void        setTarget(Vec4 pos);
+    Vec4        getTarget();
+    void        setKs(Vec4 pos);
+    Vec4        getKs();
+    void        setKd(Vec4 pos);
+    Vec4        getKd();
+    void        evaluate(int val=1);
 };
 
 

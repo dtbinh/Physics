@@ -17,8 +17,9 @@ public:
     static void drawCube(Matrix4x4 *transform,Vec4 properties, Material *mat,float alpha=0);
     static void drawCube(Matrix4x4 *transform,Vec4 properties, int material);
     static void drawCylinder(Matrix4x4 *transform,Material *mat);
-    static void drawSphere(Matrix4x4 *transform,Material *mat);
-    static void drawSphere(Vec4 position);
+    static void drawSphere(Matrix4x4 *transform,Material *mat, float radius=0);
+    static void drawSphere(Vec4 position,int material=0,float size=0.04);
+    static void drawLine(Vec4 p1,Vec4 p2,Vec4 color,float width);
     static void drawSphereSelected(Vec4 position);
     static void drawPoint(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
     static void drawGround(int size);

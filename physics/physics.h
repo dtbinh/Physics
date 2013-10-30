@@ -35,6 +35,7 @@ namespace Physics{
     //Body Manipulation
     void                  getGeomTransform(dGeomID geom, Matrix4x4* transform); //extrai a matriz de transformação do objeto (Rotation x Translate)
     void                  createObject(Object *obj, dSpaceID space, float mass, Vec4 position, Quaternion rotation); //cria um objeto físico
+    void                  createObject(Object *obj, dSpaceID space, float mass, Vec4 position, Vec4 Velocity); //cria um objeto físico com velocidade
     Quaternion            getRotationBody(Object *obj);               //extrai o quaternion de rotação do objeto
     Vec4                  getPositionBody(GeomID g);               //extrai a posição do objeto
 

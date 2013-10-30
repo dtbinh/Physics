@@ -28,9 +28,15 @@ public slots:
     void updateControlBalance();
     void infoSelectedJoint(Joint*);
     void updateSelectedObject();
+    void updateControlPDPositional();
     void showSelectedObject(int i);
     void setGravity();
     void checkFoot(bool);
+    void checkBodyBalance(bool);
+    void checkShowEffector(bool);
+    void checkShowTarget(bool);
+    void checkEnabledCPDP(bool);
+
     //void infoSelectedObject(Object*);
     void applyForce2Object();
     void setMaxTimeLine(int v);

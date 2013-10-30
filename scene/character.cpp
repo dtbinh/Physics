@@ -682,6 +682,18 @@ bool Character::checkHierarchy(Joint *joint, Object *at)
 
 }
 
+Vec4 Character::getGRFSum(Object *obj)
+{
+    //std::vector<GRF*> grfs = scene->groundForces;
+    return GRF::forcesGRF(scene->groundForces,obj);
+
+}
+
+std::vector<GRF> Character::getGRFsObject(Object *obj)
+{
+    return GRF::forcesGRF2Object(scene->groundForces,obj);
+}
+
 void Character::setSpace(SpaceID space)
 {
     this->space = space;
