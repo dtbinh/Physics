@@ -195,7 +195,7 @@ GLWidget::GLWidget(QWidget *parent) :
     show_character = true;
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
-    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomBalance());
+    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
 
 }
 
@@ -605,10 +605,10 @@ void GLWidget::loadScene(QString file)
     updateJoints(scene->jointsScene());
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
-    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomBalance());
+    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     if(scene->getSizeCharacter()>0){
         scene->getCharacter(0)->contructHierarchyBodies();
-        scene->getCharacter(0)->showHierarchies();
+        //scene->getCharacter(0)->showHierarchies();
     }
 }
 
@@ -626,6 +626,8 @@ void GLWidget::loadMotionCapture(QString file)
     scene->getCharacter(0)->loadMotionFrames();
     motionTotalFrame(scene->getCharacter(0)->getMoCap()->sizeFrames());
     scene->getCharacter(0)->getMoCap()->copyFootsProperties();
+    scene->getCharacter(0)->getMoCap()->setAddressFile(file);
+
 
 }
 
@@ -634,6 +636,7 @@ void GLWidget::loadFramesConfig(QString file)
     if (scene->getSizeCharacter()==0) return;
     if (scene->getCharacter(0)->getMoCap()==NULL) return;
     Utils::readFramesConfig(scene->getCharacter(0),file.toStdString());
+    scene->getCharacter(0)->getMoCap()->setAddressFileLoad(file);
 
 }
 
@@ -681,6 +684,12 @@ void GLWidget::setEditingFrame(int frame)
             frame_edit = frame;
 }
 
+void GLWidget::saveSimulationParameters(QString file)
+{
+   // if (scene->getSizeCharacter()==0) return;
+    Utils::saveSimulationConfig(scene,file.toStdString());
+}
+
 void GLWidget::stopSimulation()
 {
     //disconnect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
@@ -716,13 +725,14 @@ void GLWidget::setProportionalKd(Vec4 kd)
     scene->setProportionalKdPD(kd);
 }
 
-void GLWidget::setBalanceControl(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 kmom)
+void GLWidget::setBalanceControl(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 kmomlin,Vec4 kmomang)
 {
     scene->setKdForceBalance(kdF);
     scene->setKsForceBalance(ksF);
     scene->setKdTorqueBalance(kdT);
     scene->setKsTorqueBalance(ksT);
-    scene->setKMomBalance(kmom);
+    scene->setKMomLinearBalance(kmomlin);
+    scene->setKMomAngularBalance(kmomang);
 }
 
 void GLWidget::setEnableTorqueBalance(bool b)
@@ -843,4 +853,19 @@ void GLWidget::setJointSelected(int row)
     }
     jts.at(row)->setSelected(true);
     showJoint(jts.at(row));
+}
+
+void GLWidget::loadSimulationParameters(QString file)
+{
+    Utils::loadSimulationConfig(scene,file.toStdString());
+    updateObjects(scene->objectsScene());
+    updateJoints(scene->jointsScene());
+    updateKsProp(scene->getProportionalKsPD());
+    updateKdProp(scene->getProportionalKdPD());
+    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
+    for(int i=0;i<scene->getSizeCharacter();i++){
+        scene->getCharacter(i)->contructHierarchyBodies();
+        //scene->getCharacter(i)->showHierarchies();
+    }
+
 }

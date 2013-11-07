@@ -13,6 +13,8 @@ public:
     Utils();
     static bool readModelRubens(Scene* scene,const std::string &fileName);
     static bool saveModelRubens(Character *chara,const std::string &fileName);
+    static bool saveSimulationConfig(Scene* scene,const std::string &fileName);
+    static bool loadSimulationConfig(Scene* scene,const std::string &fileName);
     static bool readFramesConfig(Character *chara,const std::string &fileName);
     static bool saveFramesConfig(Character *chara,const std::string &fileName);
     static bool loadMotionCapture(MoCap* moCap,Character* chara, const std::string &fileName);

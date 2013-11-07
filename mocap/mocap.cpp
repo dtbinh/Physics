@@ -16,6 +16,28 @@ MoCap::MoCap(Character *chara)
     this->chara = chara;
     frame_current = 1;
     status = false;
+    file = "";
+    file_load = "";
+}
+
+void MoCap::setAddressFile(QString file)
+{
+    this->file = file;
+}
+
+QString MoCap::getAddressFile()
+{
+    return file;
+}
+
+void MoCap::setAddressFileLoad(QString file)
+{
+    this->file_load = file;
+}
+
+QString MoCap::getAddressFileLoad()
+{
+    return file_load;
 }
 
 void MoCap::updateHeightBody(Vec4 h, int id)

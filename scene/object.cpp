@@ -726,3 +726,23 @@ bool Object::hasCoffeeCup()
     return has_cup;
 }
 
+void Object::setKsCup(Vec4 pos)
+{
+    kscup = pos;
+}
+
+Vec4 Object::getKsCup()
+{
+    return kscup;
+}
+
+void Object::setKdCup(Vec4 pos)
+{
+    kdcup = pos;
+}
+
+Vec4 Object::getKdCup()
+{
+    return kdcup;
+}
+

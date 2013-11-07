@@ -71,3 +71,5 @@ FORMS    += mainwindow.ui
 LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas
 
 CONFIG += release
+
+QT += xml

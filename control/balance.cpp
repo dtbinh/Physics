@@ -19,7 +19,8 @@ Balance::Balance(Character* chara)
     kdTorque = Vec4(10,10,10);
     ksForce = Vec4(200,200,200);
     kdForce = Vec4(20,20,20);
-    kmom = Vec4(5,5,5);
+    kmomang = Vec4(5,5,5);
+    kmomlin = Vec4(5,5,5);
     kVel = Vec4(15,15,15);
     kDist = Vec4(15,15,15);
     this->enable_force = true;
@@ -236,14 +237,21 @@ void Balance::setKDistanceLocomotion(Vec4 k)
     this->kDist = k;
 }
 
-Vec4 Balance::getKMomentum()
+Vec4 Balance::getKMomentumLinear()
 {
-    return this->kmom;
+    return this->kmomlin;
 }
 
-Vec4 Balance::getDesiredQuaternion()
+Vec4 Balance::getKMomentumAngular()
 {
-    return bdesired.toEuler();
+    return this->kmomang;
+}
+
+
+
+Quaternion Balance::getDesiredQuaternion()
+{
+    return bdesired;
 }
 
 void Balance::setDeriredQuaternion(Vec4 euler)
@@ -251,9 +259,14 @@ void Balance::setDeriredQuaternion(Vec4 euler)
     bdesired.fromEuler(euler);
 }
 
-void Balance::setKMomentum(Vec4 k)
+void Balance::setKMomentumLinear(Vec4 k)
 {
-    this->kmom = k;
+    this->kmomlin = k;
+}
+
+void Balance::setKMomentumAngular(Vec4 k)
+{
+    this->kmomang = k;
 }
 
 float Balance::getCompensation()
@@ -322,14 +335,29 @@ void Balance::setEnableTorque(bool b)
     this->enable_torque = b;
 }
 
+bool Balance::getEnableTorque()
+{
+    return enable_torque;
+}
+
 void Balance::setEnableForce(bool b)
 {
     this->enable_force = b;
 }
 
+bool Balance::getEnableForce()
+{
+    return enable_force;
+}
+
 void Balance::setEnableMomentum(bool b)
 {
     this->enable_momentum = b;
+}
+
+bool Balance::getEnableMomentum()
+{
+    return this->enable_momentum;
 }
 
 Vec4 Balance::limitingTorque(Vec4 lim_inf, Vec4 lim_sup, Vec4 torque)
@@ -426,7 +454,7 @@ void Balance::evaluate()
         mom_lin_des = (chara->getMoCap()->getMomentumLinear(frame));
     }
     if (enable_momentum)
-        momentum = Vec((mom_ang_des-chara->getAngularMomentum()).mult(kmom),(mom_lin_des-chara->getLinearMomentum()).mult(kmom));
+        momentum = Vec((mom_ang_des-chara->getAngularMomentum()).mult(kmomang),(mom_lin_des-chara->getLinearMomentum()).mult(kmomlin));
     else
         momentum = Vec(Vec4(),Vec4());
 

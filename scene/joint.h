@@ -56,6 +56,7 @@ public:
     JointID       getJoint();
     void          setParent(Object *parent);
     Object*       getParent();
+    int           getType();
     void          setChild(Object *child);
     Object*       getChild();
     Character*    getCharacter();

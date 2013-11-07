@@ -16,7 +16,7 @@ signals:
     void updateJoints(std::vector<Joint*>);
     void updateKsProp(Vec4);
     void updateKdProp(Vec4);
-    void updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4);
+    void updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4);
     void showJoint(Joint*);
     void motionCurrentFrame(int);
     void motionTotalFrame(int);
@@ -27,6 +27,7 @@ signals:
     void setForceCharacter();
 
 public slots:
+
     //slots motion capture
 
     void loadMotionCapture(QString file);
@@ -37,8 +38,9 @@ public slots:
     void showEditingFrame(bool b);
     void setEditingFrame(int frame);
 
-
-
+    //slots scene
+    void saveSimulationParameters(QString file);
+    void loadSimulationParameters(QString file);
 
     //slots parametros físicos
     void SimStepsSimulation(int steps);
@@ -52,7 +54,7 @@ public slots:
 
     void setProportionalKs(Vec4 ks);
     void setProportionalKd(Vec4 kd);
-    void setBalanceControl(Vec4 ksT,Vec4 kdT,Vec4 ksF, Vec4 kdF,Vec4 kmom);
+    void setBalanceControl(Vec4 ksT,Vec4 kdT,Vec4 ksF, Vec4 kdF,Vec4 kmomlin,Vec4 kmomang);
     void setEnableTorqueBalance(bool b);
     void setEnableForceBalance(bool b);
     void setCompensationBalance(int val);

@@ -105,12 +105,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->checkForceBal,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setEnableForceBalance(bool)));
     connect(ui->checkTorqueBal,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setEnableTorqueBalance(bool)));
     connect(ui->checkMomentum,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setEnableMomentumBalance(bool)));
-    connect(ui->widgetPhysics,SIGNAL(updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4)),this,SLOT(updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4)));
+    connect(ui->widgetPhysics,SIGNAL(updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4)),this,SLOT(updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4)));
 
 
-    connect(ui->xkmomBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
-    connect(ui->ykmomBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
-    connect(ui->zkmomBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->xkmomlinBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->ykmomlinBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zkmomlinBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->xkmomangBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->ykmomangBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
+    connect(ui->zkmomangBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
 
     connect(ui->xkdForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
     connect(ui->ykdForBal,SIGNAL(valueChanged(double)),this,SLOT(updateControlBalance()));
@@ -252,7 +255,7 @@ void MainWindow::updateKdGeral(Vec4 kd)
     ui->zkdPdProp->setValue(kd.z());
 }
 
-void MainWindow::updateBalancePD(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 kmom)
+void MainWindow::updateBalancePD(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 kmomlin,Vec4 kmomang)
 {
     ui->xkdForBal->setValue(kdF.x());
     ui->ykdForBal->setValue(kdF.y());
@@ -270,9 +273,13 @@ void MainWindow::updateBalancePD(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 km
     ui->ykdTqBal->setValue(kdT.y());
     ui->zkdTqBal->setValue(kdT.z());
 
-    ui->xkmomBal->setValue(kmom.x());
-    ui->ykmomBal->setValue(kmom.y());
-    ui->zkmomBal->setValue(kmom.z());
+    ui->xkmomlinBal->setValue(kmomlin.x());
+    ui->ykmomlinBal->setValue(kmomlin.y());
+    ui->zkmomlinBal->setValue(kmomlin.z());
+
+    ui->xkmomangBal->setValue(kmomang.x());
+    ui->ykmomangBal->setValue(kmomang.y());
+    ui->zkmomangBal->setValue(kmomang.z());
 
 
 }
@@ -295,14 +302,15 @@ void MainWindow::updateAngleAnchor()
 
 void MainWindow::updateControlBalance()
 {
-    Vec4 ksT,kdT,ksF,kdF,kmom;
+    Vec4 ksT,kdT,ksF,kdF,kmomlin,kmomang;
     ksT.setVec4(ui->xksTqBal->value(),ui->yksTqBal->value(),ui->zksTqBal->value());
     kdT.setVec4(ui->xkdTqBal->value(),ui->ykdTqBal->value(),ui->zkdTqBal->value());
     ksF.setVec4(ui->xksForBal->value(),ui->yksForBal->value(),ui->zksForBal->value());
     kdF.setVec4(ui->xkdForBal->value(),ui->ykdForBal->value(),ui->zkdForBal->value());
-    kmom.setVec4(ui->xkmomBal->value(),ui->ykmomBal->value(),ui->zkmomBal->value());
+    kmomlin.setVec4(ui->xkmomlinBal->value(),ui->ykmomlinBal->value(),ui->zkmomlinBal->value());
+    kmomang.setVec4(ui->xkmomangBal->value(),ui->ykmomangBal->value(),ui->zkmomangBal->value());
 
-    ui->widgetPhysics->setBalanceControl(ksT,kdT,ksF,kdF,kmom);
+    ui->widgetPhysics->setBalanceControl(ksT,kdT,ksF,kdF,kmomlin,kmomang);
 
 }
 
@@ -587,6 +595,25 @@ void MainWindow::on_loadEditedFrames_clicked()
     QString mfile = QFileDialog::getOpenFileName(this,"Load Config Motion Capture","../framesMotCap/");
     if(!mfile.isEmpty()){
         ui->widgetPhysics->loadFramesConfig(mfile);
+        showPropertiesFootFrame(0);
+    }
+    ui->widgetPhysics->startSimulation();
+}
+
+void MainWindow::on_actionSave_Simulation_triggered()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getSaveFileName(this,"Save Simulation Configuration","../simulation/");
+    if(!mfile.isEmpty()) ui->widgetPhysics->saveSimulationParameters(mfile);
+     ui->widgetPhysics->startSimulation();
+}
+
+void MainWindow::on_actionOpen_Simulation_triggered()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getOpenFileName(this,"Load Simulation Physics","../simulation/");
+    if(!mfile.isEmpty()){
+        ui->widgetPhysics->loadSimulationParameters(mfile);
         showPropertiesFootFrame(0);
     }
     ui->widgetPhysics->startSimulation();

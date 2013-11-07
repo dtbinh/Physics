@@ -32,6 +32,7 @@ public:
     void updateKsKdCoros(float MassTotal);
     void setProportionalKs(Vec4 pks);
     void setProportionalKd(Vec4 pkd);
+
     Vec4 getProportionalKs();
     Vec4 getProportionalKd();
     Vec4 limitingTorquePD(Vec4 tq);

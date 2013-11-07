@@ -22,7 +22,7 @@ public slots:
     void updateControlPDManipulators();
     void updateKsGeral(Vec4 ks);
     void updateKdGeral(Vec4 kd);
-    void updateBalancePD(Vec4 ksT,Vec4 kdT,Vec4 ksF,Vec4 kdF,Vec4 kmom);
+    void updateBalancePD(Vec4 ksT,Vec4 kdT,Vec4 ksF,Vec4 kdF,Vec4 kmomlin, Vec4 kmomang);
     void updateBalanceLocomotion();
     void updateAngleAnchor(); //atualiza o angulo do corpo escolhido na interface para o equilibrio
     void updateControlBalance();
@@ -71,6 +71,10 @@ private slots:
     void on_saveEditingFrame_clicked();
 
     void on_loadEditedFrames_clicked();
+
+    void on_actionSave_Simulation_triggered();
+
+    void on_actionOpen_Simulation_triggered();
 
 private:
     Ui::MainWindow *ui;

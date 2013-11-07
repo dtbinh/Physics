@@ -54,7 +54,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -183,7 +183,7 @@
               <x>9</x>
               <y>9</y>
               <width>301</width>
-              <height>251</height>
+              <height>271</height>
              </rect>
             </property>
             <property name="font">
@@ -211,6 +211,12 @@ QGroupBox{
              <string>Balance Control</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_7">
+             <property name="margin">
+              <number>2</number>
+             </property>
+             <property name="spacing">
+              <number>2</number>
+             </property>
              <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_11">
                <item>
@@ -380,12 +386,12 @@ QGroupBox{
                <item>
                 <widget class="QLabel" name="label_18">
                  <property name="text">
-                  <string>Mm k:</string>
+                  <string>Mm L:</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="xkmomBal">
+                <widget class="QDoubleSpinBox" name="xkmomlinBal">
                  <property name="minimum">
                   <double>-500.000000000000000</double>
                  </property>
@@ -395,7 +401,7 @@ QGroupBox{
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="ykmomBal">
+                <widget class="QDoubleSpinBox" name="ykmomlinBal">
                  <property name="minimum">
                   <double>-500.000000000000000</double>
                  </property>
@@ -405,7 +411,7 @@ QGroupBox{
                 </widget>
                </item>
                <item>
-                <widget class="QDoubleSpinBox" name="zkmomBal">
+                <widget class="QDoubleSpinBox" name="zkmomlinBal">
                  <property name="minimum">
                   <double>-500.000000000000000</double>
                  </property>
@@ -417,6 +423,47 @@ QGroupBox{
               </layout>
              </item>
              <item row="5" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_37">
+               <item>
+                <widget class="QLabel" name="label_35">
+                 <property name="text">
+                  <string>Mm A:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="xkmomangBal">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="ykmomangBal">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="zkmomangBal">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="6" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_20">
                <item>
                 <widget class="QCheckBox" name="checkMomentum">
@@ -450,7 +497,7 @@ QGroupBox{
                </item>
               </layout>
              </item>
-             <item row="6" column="0">
+             <item row="8" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_21">
                <item>
                 <widget class="QLabel" name="label_20">
@@ -497,7 +544,7 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>270</y>
+              <y>287</y>
               <width>299</width>
               <height>84</height>
              </rect>
@@ -633,7 +680,7 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>9</x>
-              <y>570</y>
+              <y>582</y>
               <width>301</width>
               <height>42</height>
              </rect>
@@ -675,8 +722,8 @@ QGroupBox{
            <widget class="QGroupBox" name="groupBox_8">
             <property name="geometry">
              <rect>
-              <x>0</x>
-              <y>620</y>
+              <x>10</x>
+              <y>630</y>
               <width>299</width>
               <height>84</height>
              </rect>
@@ -812,7 +859,7 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>9</x>
-              <y>360</y>
+              <y>374</y>
               <width>301</width>
               <height>201</height>
              </rect>
@@ -1244,7 +1291,7 @@ QGroupBox{
              <bool>true</bool>
             </property>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>20</x>
@@ -2116,8 +2163,10 @@ QGroupBox{
      <string>File</string>
     </property>
     <addaction name="actionOpen_Model"/>
-    <addaction name="actionOpen_MoCap"/>
     <addaction name="actionSave_Model"/>
+    <addaction name="actionOpen_MoCap"/>
+    <addaction name="actionOpen_Simulation"/>
+    <addaction name="actionSave_Simulation"/>
    </widget>
    <widget class="QMenu" name="menuControl">
     <property name="title">
@@ -2157,15 +2206,40 @@ QGroupBox{
    <property name="text">
     <string>Open Model</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionOpen_MoCap">
    <property name="text">
     <string>Open MoCap</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
   </action>
   <action name="actionSave_Model">
    <property name="text">
     <string>Save Model</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+M</string>
+   </property>
+  </action>
+  <action name="actionSave_Simulation">
+   <property name="text">
+    <string>Save Simulation</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+S</string>
+   </property>
+  </action>
+  <action name="actionOpen_Simulation">
+   <property name="text">
+    <string>Open Simulation</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

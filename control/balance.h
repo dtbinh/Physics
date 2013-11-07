@@ -19,7 +19,9 @@ class Balance
     Vec4       kdForce;
     Vec4       kDist;    //parâmetros da distância na locomoção
     Vec4       kVel;     //parâmetros da velocidade de locomoção
-    Vec4       kmom;
+
+    Vec4       kmomlin;
+    Vec4       kmomang;
     Quaternion bdesired;
     float      compensation;
     bool       enable_force;
@@ -56,10 +58,13 @@ public:
     void setKVelocityLocomotion(Vec4 k);
     Vec4 getKDistanceLocomotion();
     void setKDistanceLocomotion(Vec4 k);
-    Vec4 getKMomentum();
-    Vec4 getDesiredQuaternion();
+    Vec4 getKMomentumLinear();
+    Vec4 getKMomentumAngular();
+    Quaternion getDesiredQuaternion();
+
     void setDeriredQuaternion(Vec4 euler);
-    void setKMomentum(Vec4 k);
+    void setKMomentumLinear(Vec4 k);
+    void setKMomentumAngular(Vec4 k);
     float getCompensation();
     void setCompensation(float f);
     //cone de ficção
@@ -76,8 +81,11 @@ public:
     float getTorqueMaxCompensable(Object* foot,Vec4 torque);
 
     void setEnableTorque(bool b);
+    bool getEnableTorque();
     void setEnableForce(bool b);
+    bool getEnableForce();
     void setEnableMomentum(bool b);
+    bool getEnableMomentum();
     Vec4 limitingTorque(Vec4 lim_inf,Vec4 lim_sup, Vec4 torque);
     void evaluate(); //executa a rotina de tratamento do equilíbrio
     void setEnableBalance(bool b);

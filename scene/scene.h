@@ -67,6 +67,7 @@ public:
     void           setGravityParameters(Vec4 g);
     Vec4           getGravity();
     void           setGravity(bool b);
+    bool           hasGravity();
     void           setSimStep(int sim_step);                 //adiciona a quantidade de passos da simulação
     int            getSimStep();                             //extrai o valor do passo da simulação
     std::vector<GRF> getGroundForces();
@@ -112,8 +113,10 @@ public:
     void                  setKsTorqueBalance(Vec4 ks);
     Vec4                  getKdTorqueBalance();
     void                  setKdTorqueBalance(Vec4 kd);
-    Vec4                  getKMomBalance();
-    void                  setKMomBalance(Vec4 kmom);
+    Vec4                  getKMomLinearBalance();
+    void                  setKMomLinearBalance(Vec4 kmom);
+    Vec4                  getKMomAngularBalance();
+    void                  setKMomAngularBalance(Vec4 kmom);
     void                  setCompensacao(int value);
 
     void                  setAlphaCharacter(float val); //nao utilizado

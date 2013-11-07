@@ -52,6 +52,8 @@ private:
     Vec4         kd;
     // --------Use Cases: Control Torque Coffee Cup
     bool         has_cup;
+    Vec4         kscup;
+    Vec4         kdcup;
 
 public:
     Object();
@@ -148,6 +150,10 @@ public:
     // -------Use Cases: Control Torque Coffee Cup
     void        setCoffeeCup(bool b);
     bool        hasCoffeeCup();
+    void        setKsCup(Vec4 pos);
+    Vec4        getKsCup();
+    void        setKdCup(Vec4 pos);
+    Vec4        getKdCup();
 };
 
 

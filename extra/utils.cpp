@@ -4,11 +4,14 @@
 #include "scene/character.h"
 #include "mocap/mocap.h"
 #include "mocap/frame.h"
-
+#include <QtXml/QDomDocument>
+#include <QtXml/QDomElement>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <QFileInfo>
+#include <QDebug>
+
 using namespace std;
 
 #define DUMP_WORDS(ss, s, num_words) \
@@ -561,8 +564,334 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
       }
 
       ff << "\n";
-     return true;
+      return true;
 
+}
+
+bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
+{
+    QDomDocument doc( "SimulationPhysics" );
+    QDomElement root = doc.createElement( "SimulationScene" );
+    doc.appendChild( root );
+    for(int i=0;i<scene->getSizeCharacter();i++){
+        Vec4 vec;
+        QDomElement info = doc.createElement( "Character" ); //cabeçalho
+        QDomElement sim = doc.createElement("Simulation");   //simulação
+        sim.setAttribute("Steps",scene->getSimStep());
+
+        QDomElement mocap = doc.createElement("MoCap");   //mocap
+        mocap.setAttribute("FileMocap",scene->getCharacter(i)->getMoCap()->getAddressFile());
+        mocap.setAttribute("FileMocapLoad",scene->getCharacter(i)->getMoCap()->getAddressFileLoad());
+
+        QDomElement cpdprop = doc.createElement("ControlPDProportional");   //Controle PD Proporcional
+        vec = scene->getProportionalKsPD();
+        QDomElement ksprop = doc.createElement("ksPDProporcional");   //Controle PD Proporcional
+        ksprop.setAttribute("x",vec.x());
+        ksprop.setAttribute("y",vec.y());
+        ksprop.setAttribute("z",vec.z());
+        cpdprop.appendChild(ksprop);
+        vec = scene->getProportionalKdPD();
+        QDomElement kdprop = doc.createElement("kdPDProporcional");
+        kdprop.setAttribute("x",vec.x());
+        kdprop.setAttribute("y",vec.y());
+        kdprop.setAttribute("z",vec.z());
+        cpdprop.appendChild(kdprop);
+
+        QDomElement gravity = doc.createElement( "Gravity" ); //gravidade
+        gravity.setAttribute("x",scene->getGravity().x());
+        gravity.setAttribute("y",scene->getGravity().y());
+        gravity.setAttribute("z",scene->getGravity().z());
+        gravity.setAttribute("Enable",(int)scene->hasGravity());
+
+        info.appendChild(sim);
+        info.appendChild(gravity);
+        info.appendChild(mocap);
+        info.appendChild(cpdprop);
+
+        QDomElement body = doc.createElement("Bodies");
+        for(int j=0;j<scene->getCharacter(i)->getNumBodies();j++){
+            QDomElement bodyProperties = doc.createElement("Properties");
+            bodyProperties.setAttribute("Nome",scene->getCharacter(i)->getBody(j)->getName());
+            Vec4 vec;
+            Quaternion q;
+            vec = scene->getCharacter(i)->getBody(j)->getPosition();
+            q = scene->getCharacter(i)->getBody(j)->getRotation();
+            bodyProperties.setAttribute("Mass",scene->getCharacter(i)->getBody(j)->getFMass());
+            bodyProperties.setAttribute("Geometry",scene->getCharacter(i)->getBody(j)->getType());
+            bodyProperties.setAttribute("Foot",(int)scene->getCharacter(i)->getBody(j)->getFoot());
+            bodyProperties.setAttribute("BodyBalance",(int)scene->getCharacter(i)->getBody(j)->getBodyBalance());
+            QDomElement posChara = doc.createElement("Position");
+            posChara.setAttribute("x",vec.x());
+            posChara.setAttribute("y",vec.y());
+            posChara.setAttribute("z",vec.z());
+            bodyProperties.appendChild(posChara);
+            QDomElement rotChara = doc.createElement("Quaternion");
+            rotChara.setAttribute("w",q.getScalar());
+            rotChara.setAttribute("x",q.getPosX());
+            rotChara.setAttribute("y",q.getPosY());
+            rotChara.setAttribute("z",q.getPosZ());
+            bodyProperties.appendChild(rotChara);
+            vec = scene->getCharacter(i)->getBody(j)->getProperties();
+            QDomElement dimChara = doc.createElement("Dimension");
+            dimChara.setAttribute("x",vec.x());
+            dimChara.setAttribute("y",vec.y());
+            dimChara.setAttribute("z",vec.z());
+            bodyProperties.appendChild(dimChara);
+            QDomElement tagPosPD = doc.createElement("ControlPDPositional");
+            tagPosPD.setAttribute("Enabled",(int)scene->getCharacter(i)->getBody(j)->isEnableCPDP());
+            tagPosPD.setAttribute("Effector",(int)scene->getCharacter(i)->getBody(j)->isShowEffector());
+            tagPosPD.setAttribute("Target",(int)scene->getCharacter(i)->getBody(j)->isShowTarget());
+            QDomElement targetPos = doc.createElement("PositionTarget");
+            vec = scene->getCharacter(i)->getBody(j)->getTarget();
+            targetPos.setAttribute("x",vec.x());
+            targetPos.setAttribute("y",vec.y());
+            targetPos.setAttribute("z",vec.z());
+            tagPosPD.appendChild(targetPos);
+            QDomElement ksPD = doc.createElement("KsPositionalPD");
+            vec = scene->getCharacter(i)->getBody(j)->getKs();
+            ksPD.setAttribute("x",vec.x());
+            ksPD.setAttribute("y",vec.y());
+            ksPD.setAttribute("z",vec.z());
+            tagPosPD.appendChild(ksPD);
+            QDomElement kdPD = doc.createElement("KdPositionalPD");
+            vec = scene->getCharacter(i)->getBody(j)->getKd();
+            kdPD.setAttribute("x",vec.x());
+            kdPD.setAttribute("y",vec.y());
+            kdPD.setAttribute("z",vec.z());
+            tagPosPD.appendChild(kdPD);
+            bodyProperties.appendChild(tagPosPD);
+            QDomElement tagTorPD = doc.createElement("ControlPDCup");
+            QDomElement ksPDcup = doc.createElement("KsCupPD");
+            tagTorPD.setAttribute("enabled",(int)scene->getCharacter(i)->getBody(j)->hasCoffeeCup());
+            vec = scene->getCharacter(i)->getBody(j)->getKsCup();
+            ksPDcup.setAttribute("x",vec.x());
+            ksPDcup.setAttribute("y",vec.y());
+            ksPDcup.setAttribute("z",vec.z());
+            tagTorPD.appendChild(ksPDcup);
+            QDomElement kdPDcup = doc.createElement("KdCupPD");
+            vec = scene->getCharacter(i)->getBody(j)->getKdCup();
+            kdPDcup.setAttribute("x",vec.x());
+            kdPDcup.setAttribute("y",vec.y());
+            kdPDcup.setAttribute("z",vec.z());
+            tagTorPD.appendChild(kdPDcup);
+            bodyProperties.appendChild(tagTorPD);
+            body.appendChild(bodyProperties);
+        }
+        info.appendChild(body);
+        QDomElement joint = doc.createElement("Joints");
+        for(int j=0;j<scene->getCharacter(i)->getNumJoints();j++){
+            Vec4 vec;
+            Quaternion q;
+            Joint *jo = scene->getCharacter(i)->getJoint(j);
+            ControlPD *cpd = scene->getCharacter(i)->getControllersPD().at(j);
+            QDomElement jointProperties = doc.createElement("Joint");
+            jointProperties.setAttribute("Nome",jo->getName());
+            jointProperties.setAttribute("Parent",jo->getParent()->getName());
+            jointProperties.setAttribute("Child",jo->getChild()->getName());
+            jointProperties.setAttribute("Type",jo->getType());
+            jointProperties.setAttribute("Enable",(int)cpd->isEnabled());
+            vec = jo->getPositionAnchor();
+            QDomElement anchor = doc.createElement("Anchor");
+            anchor.setAttribute("x",vec.x());
+            anchor.setAttribute("y",vec.y());
+            anchor.setAttribute("z",vec.z());
+            jointProperties.appendChild(anchor);
+            q = cpd->getQuaternionWanted();
+            QDomElement qpd = doc.createElement("QuaternionPD");
+            qpd.setAttribute("w",q.getScalar());
+            qpd.setAttribute("x",q.getPosX());
+            qpd.setAttribute("y",q.getPosY());
+            qpd.setAttribute("z",q.getPosZ());
+            jointProperties.appendChild(qpd);
+            vec = cpd->getKs();
+            QDomElement kspd = doc.createElement("KsPD");
+            kspd.setAttribute("x",vec.x());
+            kspd.setAttribute("y",vec.y());
+            kspd.setAttribute("z",vec.z());
+            jointProperties.appendChild(kspd);
+            QDomElement kdpd = doc.createElement("KdPD");
+            kdpd.setAttribute("x",vec.x());
+            kdpd.setAttribute("y",vec.y());
+            kdpd.setAttribute("z",vec.z());
+            jointProperties.appendChild(kdpd);
+            joint.appendChild(jointProperties);
+        }
+        info.appendChild(joint);
+        //parametros de equilíbrio
+
+        QDomElement balance = doc.createElement("BalanceEstrategy");
+        QDomElement balanceControl = doc.createElement("BalanceControl");
+        balanceControl.setAttribute("EnableForce",(int)scene->getCharacter(i)->getBalance()->getEnableForce());
+        balanceControl.setAttribute("EnableTorque",(int)scene->getCharacter(i)->getBalance()->getEnableTorque());
+        balanceControl.setAttribute("EnableMomentum",(int)scene->getCharacter(i)->getBalance()->getEnableMomentum());
+        Quaternion q = scene->getCharacter(i)->getBalance()->getDesiredQuaternion();
+        QDomElement quatTq = doc.createElement("QuaternionTorque");
+        quatTq.setAttribute("w",q.getScalar());
+        quatTq.setAttribute("x",q.getPosX());
+        quatTq.setAttribute("y",q.getPosY());
+        quatTq.setAttribute("z",q.getPosZ());
+        balanceControl.appendChild(quatTq);
+        vec = scene->getCharacter(i)->getBalance()->getKsTorque();
+        QDomElement kstqBal = doc.createElement("BalanceksTorque");
+        kstqBal.setAttribute("x",vec.x());
+        kstqBal.setAttribute("y",vec.y());
+        kstqBal.setAttribute("z",vec.z());
+        balanceControl.appendChild(kstqBal);
+        vec = scene->getCharacter(i)->getBalance()->getKdTorque();
+        QDomElement kdtqBal = doc.createElement("BalancekdTorque");
+        kdtqBal.setAttribute("x",vec.x());
+        kdtqBal.setAttribute("y",vec.y());
+        kdtqBal.setAttribute("z",vec.z());
+        balanceControl.appendChild(kdtqBal);
+        vec = scene->getCharacter(i)->getBalance()->getKsForce();
+        QDomElement ksfcBal = doc.createElement("BalanceksForce");
+        ksfcBal.setAttribute("x",vec.x());
+        ksfcBal.setAttribute("y",vec.y());
+        ksfcBal.setAttribute("z",vec.z());
+        balanceControl.appendChild(ksfcBal);
+        vec = scene->getCharacter(i)->getBalance()->getKdForce();
+        QDomElement kdfcBal = doc.createElement("BalancekdForce");
+        kdfcBal.setAttribute("x",vec.x());
+        kdfcBal.setAttribute("y",vec.y());
+        kdfcBal.setAttribute("z",vec.z());
+        balanceControl.appendChild(kdfcBal);
+
+        vec = scene->getCharacter(i)->getBalance()->getKMomentumLinear();
+        QDomElement klinBal = doc.createElement("BalancekMomentumLinear");
+        klinBal.setAttribute("x",vec.x());
+        klinBal.setAttribute("y",vec.y());
+        klinBal.setAttribute("z",vec.z());
+        balanceControl.appendChild(klinBal);
+        vec = scene->getCharacter(i)->getBalance()->getKMomentumAngular();
+        QDomElement kangBal = doc.createElement("BalancekMomentumAngular");
+        kangBal.setAttribute("x",vec.x());
+        kangBal.setAttribute("y",vec.y());
+        kangBal.setAttribute("z",vec.z());
+        balanceControl.appendChild(kangBal);
+
+        QDomElement cone = doc.createElement("FrictionCone");
+        cone.setAttribute("Module",scene->getCharacter(i)->getBalance()->getMCone());
+        cone.setAttribute("Height",scene->getCharacter(i)->getBalance()->getHeightCone());
+        cone.setAttribute("Radius",scene->getCharacter(i)->getBalance()->getRadiusCone());
+        cone.setAttribute("Angle",scene->getCharacter(i)->getBalance()->getAngleCone());
+        balanceControl.appendChild(cone);
+
+        QDomElement locomotion = doc.createElement("LocomotionParameters");
+        vec = scene->getCharacter(i)->getBalance()->getKVelocityLocomotion();
+        QDomElement ksloc = doc.createElement("LocomotionVelocity");
+        ksloc.setAttribute("x",vec.x());
+        ksloc.setAttribute("y",vec.y());
+        ksloc.setAttribute("z",vec.z());
+        locomotion.appendChild(ksloc);
+        vec = scene->getCharacter(i)->getBalance()->getKDistanceLocomotion();
+        QDomElement kdloc = doc.createElement("LocomotionDistance");
+        kdloc.setAttribute("x",vec.x());
+        kdloc.setAttribute("y",vec.y());
+        kdloc.setAttribute("z",vec.z());
+        locomotion.appendChild(kdloc);
+        balanceControl.appendChild(locomotion);
+        balance.appendChild(balanceControl);
+        info.appendChild(balance);
+        root.appendChild(info);
+    }
+
+
+
+
+    QString f = fileName.data();
+    ofstream ff((f+".xml").toLocal8Bit().data());
+    ff << doc.toString().toLocal8Bit().data();
+    return true;
+}
+
+bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
+{
+    QDomDocument doc( "SimulationPhysics" );
+    QFile file( fileName.data() );
+    if( !file.open(QIODevice::ReadOnly) )
+        return false;
+    if( !doc.setContent( &file ) )
+    {
+        file.close();
+        return false;
+    }
+    file.close();
+    QDomElement root = doc.documentElement();
+    if( root.tagName() != "SimulationScene" )
+        return false;
+    scene->clear();
+    scene->initPhysics();
+    QDomNode n = root.firstChild();
+    while( !n.isNull() )
+    {
+        QDomElement e = n.toElement();
+        if( !e.isNull() ){
+            Character *chara = new Character(scene);
+            scene->addCharacter(chara);
+            if(e.tagName()=="Character"){
+                QDomNode sim = e.firstChildElement("Simulation");
+                QDomElement sime = sim.toElement();
+                int steps = sime.attribute("Steps","").toInt();
+                scene->setSimStep(steps);
+                sim = e.firstChildElement("Gravity");
+                sime = sim.toElement();
+                int b = sime.attribute("Enable","").toInt();
+                if(b){
+                    scene->setGravity(true);
+                }else{
+                    scene->setGravity(false);
+                }
+                float w,x,y,z;
+                x = sime.attribute("x","").toFloat();
+                y = sime.attribute("y","").toFloat();
+                z = sime.attribute("z","").toFloat();
+                Vec4 vec;
+                scene->setGravityParameters(vec);
+                sim = e.firstChildElement("MoCap");
+                sime = sim.toElement();
+                QString file = sime.attribute("FileMocap","");
+                if (!file.isEmpty()){
+                    chara->getMoCap()->setAddressFile(file);
+                    file = sime.attribute("FileMocapLoad","");
+                    if(!file.isEmpty()) chara->getMoCap()->setAddressFileLoad(file);
+                }
+                sim = e.firstChildElement("ControlPDProportional");
+                sime = sim.firstChildElement("ksPDProporcional").toElement();
+                x = sime.attribute("x","").toFloat();
+                y = sime.attribute("y","").toFloat();
+                z = sime.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                scene->setProportionalKsPD(vec);
+                sime = sim.firstChildElement("kdPDProporcional").toElement();
+                x = sime.attribute("x","").toFloat();
+                y = sime.attribute("y","").toFloat();
+                z = sime.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                scene->setProportionalKdPD(vec);
+                return true;
+
+            }
+        }
+        n = n.nextSibling();
+    }
+//    {
+//        QDomElement e = n.toElement();
+//        if( !e.isNull() )
+//        {
+//            if( e.tagName() == "contact" )
+//            {
+//                Contact c;
+
+//                c.name = e.attribute( "name", "" );
+//                c.phone = e.attribute( "phone", "" );
+//                c.eMail = e.attribute( "email", "" );
+
+
+//            }
+//        }
+
+//        n = n.nextSibling();
+//    }
 }
 
 bool Utils::readFramesConfig(Character *chara, const string &fileName)

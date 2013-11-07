@@ -18,9 +18,8 @@ private:
     std::vector<Frame*> capMot;
     //guarda a configuração dos quaternios que serão usados na simulação
     std::vector<FrameQuat*> capMotFrame;
-
-
-
+    QString file;
+    QString file_load;
 public:
     std::vector<Object*> foots;
     std::vector<int> idfoots;
@@ -28,6 +27,10 @@ public:
     bool status;
     MoCap();
     MoCap(Character *chara);
+    void setAddressFile(QString file);
+    QString getAddressFile();
+    void setAddressFileLoad(QString file);
+    QString getAddressFileLoad();
     void updateHeightBody(Vec4 h,int id);
     void physicsFootStep(Vec4 offset);
     void enableFoots();

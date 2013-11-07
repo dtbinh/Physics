@@ -182,6 +182,11 @@ Object* Joint::getParent()
     return this->parent;
 }
 
+int Joint::getType()
+{
+    return this->type;
+}
+
 void Joint::setChild(Object *child)
 {
     this->child = child;
