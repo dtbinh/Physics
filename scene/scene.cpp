@@ -347,12 +347,12 @@ void Scene::simulationStep()
 //                    characters.at(0)->getMoCap()->physicsFootStep(Vec4(-1.0,0,0));
 //                    characters.at(0)->getMoCap()->enableFoots();
 //                }
-           for(int i=0;i<objs.size();i++){
+           for(unsigned int i=0;i<objs.size();i++){
                Physics::setEnableObject(objs.at(i));
                if ((objs.at(i)->isSelected()) && !apply){
                    objs.at(i)->addForce(this->externalForce);
                }
-               objs.at(i)->evaluate(3);
+               objs.at(i)->evaluate(1);
 
            }
            for(unsigned int k=0;k<jts.size();k++) Physics::setEnableJoint(jts.at(k));
@@ -395,7 +395,7 @@ void Scene::draw()
 
     if(externalForce.module()!=0){
             std::vector<Object*> objs = objectsScene();
-        for(int i=0;i<objs.size();i++)
+        for(unsigned int i=0;i<objs.size();i++)
             if (objs.at(i)->isSelected()){
                 Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);
             }
@@ -489,7 +489,7 @@ void Scene::clearGroundForces()
     groundForces.clear();
 }
 
-Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara, Vec4 limSup, Vec4 limInf)
+Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara, Vec4 /*limSup*/, Vec4/* limInf*/)
 {
     Joint *joint = NULL;
     if(chara != NULL){
@@ -516,7 +516,7 @@ Joint *Scene::addJointFixed(Object *parent,Character *chara)
 std::vector<Object*> Scene::objectsScene()
 {
     std::vector<Object*> allobjetcs;
-    for(unsigned int i=0;i<characters.size();i++) for(int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
+    for(unsigned int i=0;i<characters.size();i++) for(unsigned int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
     for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
     for(unsigned int i=0;i<objects_shoot.size();i++) allobjetcs.push_back(objects_shoot.at(i));
     return allobjetcs;
@@ -525,7 +525,7 @@ std::vector<Object*> Scene::objectsScene()
 Object *Scene::selectedObject()
 {
     std::vector<Object*> allobjetcs;
-    for(unsigned int i=0;i<characters.size();i++) for(int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
+    for(unsigned int i=0;i<characters.size();i++) for(unsigned int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
     for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
     for(unsigned int i=0;i<allobjetcs.size();i++) if(allobjetcs.at(i)->isSelected()) return allobjetcs.at(i);
     return NULL;
@@ -635,10 +635,6 @@ Object *Scene::getObject(dBodyID id)
     return NULL;
 }
 
-void Scene::shootObject(Object *obj, int type, Vec4 begin)
-{
-
-}
 
 void Scene::setEnableTorqueBalance(bool b)
 {

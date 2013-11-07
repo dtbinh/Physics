@@ -35,12 +35,20 @@ public slots:
     void checkBodyBalance(bool);
     void checkShowEffector(bool);
     void checkShowTarget(bool);
+    void checkFrameFootLeft(bool);
+    void checkFrameFootRight(bool);
+    void showPropertiesFootFrame(int i);
     void checkEnabledCPDP(bool);
+    void checkHasCoffeeCup(bool);
 
     //void infoSelectedObject(Object*);
     void applyForce2Object();
     void setMaxTimeLine(int v);
     void adjustTolerance(double t);
+
+    //manipuladores via keyboard
+    void plusFrameEdition();
+    void minusFrameEdition();
 
 
 private slots:
@@ -59,6 +67,10 @@ private slots:
     void on_btnPause_clicked();
 
     void on_btnRestart_clicked();
+
+    void on_saveEditingFrame_clicked();
+
+    void on_loadEditedFrames_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -5,6 +5,8 @@
 #include "GL/glut.h"
 #include "math/quaternion.h"
 #include "physics/physics.h"
+#include "extra/ObjMesh.h"
+
 bool idraw_ground = false;
 int idrawGround;
 int idrawGround2;
@@ -16,7 +18,7 @@ Draw::Draw()
 {
 }
 
-void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float alpha)
+void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
 {
     Vec4 vertexs[8];
     Vec4 normals[6];
@@ -165,6 +167,7 @@ void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
         glVertex3f(vertexs[3].x(),vertexs[3].y(),vertexs[3].z());
     glEnd();
     glPopMatrix();
+    delete mat;
 }
 
 void Draw::drawCylinder(Matrix4x4 *transform,Material *mat)
@@ -354,6 +357,24 @@ void Draw::drawGround(int size)
 
 }
 
+void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
+{
+    Material *mat = new Material();
+    mat->setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    static ObjMesh obj("../objs/Kop.obj");
+    Matrix4x4 m = q.getMatrix();
+    glPushMatrix();
+    glTranslatef(position.x(),position.y(),position.z());
+    glMultMatrixf(m.matrix);
+    obj.draw();
+    glPopMatrix();
+    delete mat;
+}
+
 void Draw::drawSelection(Matrix4x4 *transform,Vec4 p,Vec4 color)
 {
     Vec4 vertexs[8];
@@ -534,7 +555,7 @@ void Draw::drawWireframe(Matrix4x4 *transform, Vec4 p,Vec4 color)
 
 }
 
-void Draw::drawSelection(Vec4 p,float radius)
+void Draw::drawSelection(Vec4 p,float )
 {
     Vec4 vertexs[8];
     vertexs[0] = (Vec4(-p.x()/2,-p.y()/2,-p.z()/2));
@@ -680,6 +701,7 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     glPopMatrix();
 
     gluDeleteQuadric( quad );
+    delete mat;
 }
 
 void Draw::gluClosedCylinder(GLUquadric* quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks)

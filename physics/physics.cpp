@@ -519,7 +519,7 @@ Vec4 Physics::getAngularMomentumBody(Object *obj){
 Vec4 Physics::getAngularMomentumMoCap(Object* obj,Vec4 vel, Quaternion q){
     dVector3 angmom;
     const dReal *angvel;
-    const dReal * R; //dMatrix3
+    //const dReal * R; //dMatrix3
     dMatrix3 Rot;
     dMass massBody;
     dBodyGetMass(obj->getBody(), &massBody);

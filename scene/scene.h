@@ -97,7 +97,6 @@ public:
     int                   getSizeCharacter();
     Object*               getObject(dBodyID id);
     //extra simulation
-    void                  shootObject(Object* obj,int type, Vec4 begin);
     void                  clearObjectShooted();
 
 

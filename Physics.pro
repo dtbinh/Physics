@@ -36,7 +36,8 @@ SOURCES += main.cpp\
     mocap/mocap.cpp \
     control/sensor.cpp \
     mocap/framequat.cpp \
-    interface/camera.cpp
+    interface/camera.cpp \
+    extra/ObjMesh.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -62,7 +63,8 @@ HEADERS  += mainwindow.h \
     mocap/mocap.h \
     control/sensor.h \
     mocap/framequat.h \
-    interface/camera.h
+    interface/camera.h \
+    extra/ObjMesh.h
 
 FORMS    += mainwindow.ui
 

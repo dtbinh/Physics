@@ -36,10 +36,11 @@ public:
     Frame* getFrameMotion(int i);
     std::vector<Frame*> getCapMotion();
     FrameQuat* getFrameSimulation(int i);
+    void showMoCap(Vec4 offset,int i);
     void initializePosesModel(int frame=1); //inicializa o modelo com a pose passada pela captura de movimento
     void loadFrameSimulation();
     void stepFrame(int value);
-    Vec4 positionRelativeCOM(int frame);
+    Vec4 positionRelativeCOM(int frame, int foot);
     Vec4 velocityAngularBody(int frame, int body);
     Vec4 velocityLinearBody(int frame,int body);
     Vec4 getMomentumAngular(int frame);

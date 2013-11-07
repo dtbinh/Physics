@@ -5,7 +5,7 @@
 #include <QString>
 #include <QPalette>
 #include <QColorDialog>
-
+#include "mocap/frame.h"
 ControlPD *pd_selected;
 Joint*     joint_selected;
 Object*    obj_selected;
@@ -24,6 +24,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
     connect(ui->sensorTolerance,SIGNAL(valueChanged(double)),this,SLOT(adjustTolerance(double)));
+    connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
+    connect(ui->checkFrameFootLeft,SIGNAL(clicked(bool)),this,SLOT(checkFrameFootLeft(bool)));
+    connect(ui->checkFrameFootRight,SIGNAL(clicked(bool)),this,SLOT(checkFrameFootRight(bool)));
+    connect(ui->checkShowChara,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(showCharacter(bool)));
+    connect(ui->checkShowEditingFrame,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(showEditingFrame(bool)));
+    connect(ui->frameEdit,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setEditingFrame(int)));
+    connect(ui->frameEdit,SIGNAL(valueChanged(int)),this,SLOT(showPropertiesFootFrame(int)));
+    connect(ui->widgetPhysics,SIGNAL(plusFrameEdition()),this,SLOT(plusFrameEdition()));
+    connect(ui->widgetPhysics,SIGNAL(minusFrameEdition()),this,SLOT(minusFrameEdition()));
 
     //manipuladores de atributos da simulação
     connect(ui->stepSim,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(SimStepsSimulation(int)));
@@ -44,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     //manipuladores de Objetos
+    connect(ui->widgetPhysics,SIGNAL(setForceCharacter()),this,SLOT(applyForce2Object()));
+
     connect(ui->widgetPhysics,SIGNAL(updateObjects(std::vector<Object*>)),this,SLOT(updateListObjects(std::vector<Object*>)));
     connect(ui->scalex,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
     connect(ui->scaley,SIGNAL(valueChanged(double)),this,SLOT(updateSelectedObject()));
@@ -72,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->enable_cpdp,SIGNAL(clicked(bool)),this,SLOT(checkEnabledCPDP(bool)));
     connect(ui->show_target,SIGNAL(clicked(bool)),this,SLOT(checkShowTarget(bool)));
     connect(ui->show_effector,SIGNAL(clicked(bool)),this,SLOT(checkShowEffector(bool)));
+    connect(ui->hasCup,SIGNAL(clicked(bool)),this,SLOT(checkHasCoffeeCup(bool)));
 
     //manipuladores do equilíbrio e controladores geral
         //cone de fricção
@@ -405,6 +417,7 @@ void MainWindow::showSelectedObject(int i)
     ui->show_effector->setChecked(obj_selected->isShowEffector());
     ui->show_target->setChecked(obj_selected->isShowTarget());
     ui->enable_cpdp->setChecked(obj_selected->isEnableCPDP());
+    ui->hasCup->setChecked(obj_selected->hasCoffeeCup());
 
 
 }
@@ -437,9 +450,37 @@ void MainWindow::checkShowTarget(bool b)
     if (obj_selected!=NULL) obj_selected->setShowTarget(b);
 }
 
+void MainWindow::checkFrameFootLeft(bool b)
+{
+    int frame = ui->frameEdit->value();
+    if (ui->widgetPhysics->pushMotionCapture()!=NULL)
+        ui->widgetPhysics->pushMotionCapture()->getFrameMotion(frame)->setFootLeftGround(b);
+}
+
+void MainWindow::checkFrameFootRight(bool b)
+{
+    int frame = ui->frameEdit->value();
+    if (ui->widgetPhysics->pushMotionCapture()!=NULL)
+        ui->widgetPhysics->pushMotionCapture()->getFrameMotion(frame)->setFootRightGround(b);
+}
+
+void MainWindow::showPropertiesFootFrame(int i)
+{
+    if (ui->widgetPhysics->pushMotionCapture()!=NULL){
+        ui->checkFrameFootLeft->setChecked(ui->widgetPhysics->pushMotionCapture()->getFrameMotion(i)->getFootLeftGround());
+        ui->checkFrameFootRight->setChecked(ui->widgetPhysics->pushMotionCapture()->getFrameMotion(i)->getFootRightGround());
+    }
+}
+
 void MainWindow::checkEnabledCPDP(bool b)
 {
+
     if (obj_selected!=NULL) obj_selected->setEnableCPDP(b);
+}
+
+void MainWindow::checkHasCoffeeCup(bool b)
+{
+    if (obj_selected!=NULL) obj_selected->setCoffeeCup(b);
 }
 
 void MainWindow::applyForce2Object()
@@ -454,12 +495,22 @@ void MainWindow::applyForce2Object()
 void MainWindow::setMaxTimeLine(int v)
 {
     ui->timeLineMotion->setMaximum(v);
-
+    ui->frameEdit->setMaximum(v);
 }
 
 void MainWindow::adjustTolerance(double t)
 {
     Sensor::setTolerance(t);
+}
+
+void MainWindow::plusFrameEdition()
+{
+    ui->frameEdit->setValue(ui->frameEdit->value()+1);
+}
+
+void MainWindow::minusFrameEdition()
+{
+    ui->frameEdit->setValue(ui->frameEdit->value()-1);
 }
 
 
@@ -520,4 +571,23 @@ void MainWindow::on_btnPause_clicked()
 void MainWindow::on_btnRestart_clicked()
 {
     ui->widgetPhysics->restartMotion();
+}
+
+void MainWindow::on_saveEditingFrame_clicked()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getSaveFileName(this,"Save Config Frames","../framesMotCap/");
+    if(!mfile.isEmpty()) ui->widgetPhysics->saveFramesConfig(mfile);
+     ui->widgetPhysics->startSimulation();
+}
+
+void MainWindow::on_loadEditedFrames_clicked()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getOpenFileName(this,"Load Config Motion Capture","../framesMotCap/");
+    if(!mfile.isEmpty()){
+        ui->widgetPhysics->loadFramesConfig(mfile);
+        showPropertiesFootFrame(0);
+    }
+    ui->widgetPhysics->startSimulation();
 }

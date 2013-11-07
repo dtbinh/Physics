@@ -26,20 +26,20 @@ void MoCap::updateHeightBody(Vec4 h, int id)
     float minus = 1000000;
     //extrai o menor y
     for(unsigned int i=0;i<capMot.size();i++){
-        for(unsigned int j=0;j<getFrameMotion(i)->getNumFrames();j++){
+        for(int j=0;j<getFrameMotion(i)->getNumFrames();j++){
             float y = getFrameMotion(i)->getPosition(j).y();
             if (y<minus) minus = y;
         }
     }
     if (minus>h.y()){
         for(unsigned int i=0;i<capMot.size();i++){
-            for(unsigned int j=0;j<getFrameMotion(i)->getNumFrames();j++){
+            for(int j=0;j<getFrameMotion(i)->getNumFrames();j++){
                 getFrameMotion(i)->setPosition(j,getFrameMotion(i)->getPosition(j)-h.y());
             }
         }
     }else{
         for(unsigned int i=0;i<capMot.size();i++){
-            for(unsigned int j=0;j<getFrameMotion(i)->getNumFrames();j++){
+            for(int j=0;j<getFrameMotion(i)->getNumFrames();j++){
                 getFrameMotion(i)->setPosition(j,getFrameMotion(i)->getPosition(j)+Vec4(0,h.y()-minus,0));
             }
         }
@@ -83,13 +83,22 @@ FrameQuat *MoCap::getFrameSimulation(int i)
     return capMotFrame.at(i);
 }
 
+void MoCap::showMoCap(Vec4 offset, int frame)
+{
+    for(int i=0;i<chara->getNumBodies();i++){
+        Vec4 position = getFrameMotion(frame)->getPosition(i);
+        Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
+        chara->getBody(i)->draw(position+offset,orientation,MATERIAL_EMERALD);
+    }
+}
+
 void MoCap::initializePosesModel(int frame)
 {
-    if (capMot.size()<frame) return;
+    if (int(capMot.size())<frame) return;
     frame = frame;
     frame_current = frame;
     Frame* pose = this->getFrameMotion(frame);
-    for(unsigned int i=0;i<pose->getNumFrames();i++){
+    for(int i=0;i<pose->getNumFrames();i++){
         chara->getBody(i)->setPositionCurrent(pose->getPosition(i));
         chara->getBody(i)->setRotationCurrent(pose->getOrientation(i));
     }
@@ -129,7 +138,7 @@ void MoCap::loadFrameSimulation()
           capMotFrame.push_back(new FrameQuat(quatDes));
 
         }
-        printf("In load frame: %d",capMotFrame.size());
+        //printf("In load frame: %d",capMotFrame.size());
 
 }
 
@@ -137,9 +146,9 @@ void MoCap::stepFrame(int value)
 {
     //return;
     if (!status) return;
-    if (value>=this->capMotFrame.size()) value = 1;
+    if (value>=int(this->capMotFrame.size())) value = 1;
     frame_current = value;
-    int indice =  value-1;
+    //int indice =  value-1;
 //    printf("\nFrames(%d/%d)",indice,capMot.size());
 //    printf("\nIndice: %d",indice);
 //    printf("\nControllers: %d",chara->getControllersPD().size());
@@ -148,13 +157,23 @@ void MoCap::stepFrame(int value)
     drawShadow(Vec4(-0.5,0,0),value);
 }
 
-Vec4 MoCap::positionRelativeCOM(int frame)
+Vec4 MoCap::positionRelativeCOM(int frame,int foot)
 {
     if(!(idfoots.size()>1)) return Vec4();
     Vec4 posMedia = Vec4(); //media da distância entre os pés
-    for(int i=0;i<idfoots.size();i++)
-        posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
-    posMedia /= idfoots.size();
+
+    if(foot<0) {
+        for(unsigned int i=0;i<idfoots.size();i++)
+            posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
+        posMedia /= idfoots.size();
+    }
+    else{
+        for(unsigned int i=0;i<idfoots.size();i++)
+            if(foot==idfoots.at(i))
+                posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
+
+    }
+
     Vec4 posCOM = getPosCOM(frame);
     posCOM.x2 = 0;
     posMedia.x2 = 0;
@@ -174,7 +193,7 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
 
     qDesejado = qIdent.lessArc(qDesejado); //ja foi calculado acima
     int prox = frame+1;
-    if(frame+2>=capMotFrame.size()) prox = frame;
+    if(frame+2>=int(capMotFrame.size())) prox = frame;
     Quaternion qDesejadoMaisUm = getFrameMotion(prox)->getOrientation(body);
     //indo pelo caminho mais curto
     qDesejadoMaisUm = qIdent.lessArc(qDesejadoMaisUm);
@@ -200,7 +219,7 @@ Vec4 MoCap::velocityLinearBody(int frame, int body)
 {
     Vec4 pos_n = getFrameMotion(frame)->getPosition(body);
     int prox = frame+1;
-    if(frame+2>=capMotFrame.size()) prox = frame;
+    if(frame+2>=int(capMotFrame.size())) prox = frame;
     Vec4 pos_n1 = getFrameMotion(prox)->getPosition(body);
     Vec4 veldesejada = (pos_n1-pos_n)*(60);
     return veldesejada;
@@ -211,13 +230,13 @@ Vec4 MoCap::getMomentumAngular(int frame)
     Vec4 posCOM = getPosCOM(frame);
     Vec4 velCOM = getVelCOM(frame);
     Vec4 pos,linVel,angMom,angMomTotal;
-    for (unsigned int i=0;i<chara->getNumBodies();i++) {
+    for (int i=0;i<chara->getNumBodies();i++) {
         pos = getFrameMotion(frame-1)->getPosition(i);
         linVel = velocityLinearBody(frame-1,i);
         pos = pos - posCOM;
         angMom = Physics::getAngularMomentumMoCap(chara->getBody(i),velocityAngularBody(frame-1,i),getFrameMotion(frame-1)->getOrientation(i));
         //Iw + r x mv
-        angMomTotal += angMom + pos ^ ((linVel-velCOM)*chara->getBody(i)->getFMass());
+        angMomTotal += angMom + (pos ^ ((linVel-velCOM)*chara->getBody(i)->getFMass()));
     }
     return angMomTotal;
 }
@@ -225,7 +244,7 @@ Vec4 MoCap::getMomentumAngular(int frame)
 Vec4 MoCap::getMomentumLinear(int frame)
 {
     Vec4 rm = Vec4();//somatório do produto das massas com a velocidade do objeto
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         rm += velocityLinearBody(frame-1,i)*chara->getBody(i)->getFMass();
     }
     return rm;
@@ -235,7 +254,7 @@ Vec4 MoCap::getPosCOM(int frame)
 {
     float m = 0; //somatório das massas
     Vec4 rm = Vec4();//somatório do produto das massas com a posição do objeto
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         rm += getFrameMotion(frame-1)->getPosition(i)*chara->getBody(i)->getFMass();
         m  += chara->getBody(i)->getFMass();
     }
@@ -246,7 +265,7 @@ Vec4 MoCap::getVelCOM(int frame)
 {
     float m = 0; //somatório das massas
     Vec4 rm = Vec4();//somatório do produto das massas com a velocidade do objeto
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         rm += velocityLinearBody(frame-1,i)*chara->getBody(i)->getFMass();
         m  += chara->getBody(i)->getFMass();
     }
@@ -284,17 +303,17 @@ void MoCap::drawShadow(Vec4 offset, int frame)
 {
     //if (!status) return;
     int sens = Sensor::getHierarchy2UseMocap(chara);
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         Vec4 position = getFrameMotion(frame)->getPosition(i);
         Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
-        if(i==sens-3)
+        if(i==int(sens-3))
             for(unsigned int j=0;j<foots.size();j++){
-                if(i==idfoots.at(j)) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
+                if(i==int(idfoots.at(j))) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
             }
             //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else if(sens==0 && chara->getBody(i)->getFoot())
             for(unsigned int j=0;j<foots.size();j++){
-                if(i==idfoots.at(j)) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
+                if(i==int(idfoots.at(j))) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
             }
             //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else

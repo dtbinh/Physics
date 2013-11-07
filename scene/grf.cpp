@@ -64,11 +64,11 @@ for (unsigned int fc=0;fc<grfs.size();fc++) {
           //COMpos
           //  Vetor3D COMpos = this->modelo->getCOG();
           //fc2COM
-            Vec4 fc2Target = target - ( grfs[fc].position );
+            //Vec4 fc2Target = target - ( grfs[fc].position );
             Vec4 pos = grfs[fc].position;
               //cout<<"feedbackContacts[fc].pos[0]: "<<feedbackContacts[fc].pos.x<<", feedbackContacts[fc].pos[1]: "<<feedbackContacts[fc].pos.y<<", feedbackContacts[fc].pos[2]: "<<feedbackContacts[fc].pos.z<<"\n";
           //torque_fc
-            Vec4 torque_fc = groundForce^(fc2Target);
+            //Vec4 torque_fc = groundForce^(fc2Target);
             //torque_fc.add( groundTorque3D );
           //force_fc
             Vec4 force_fc = groundForce;

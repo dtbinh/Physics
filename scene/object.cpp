@@ -24,6 +24,7 @@ Object::Object()
     this->show_effector = false;
     this->enabled_cpdp = false;
     this->show_target = false;
+    this->has_cup = false;
     this->target = Vec4();
     this->ks = Vec4();
     this->kd = Vec4();
@@ -43,6 +44,7 @@ Object::Object(Scene *scene)
     this->show_effector = false;
     this->enabled_cpdp = false;
     this->show_target = false;
+    this->has_cup = false;
     this->target = Vec4();
     this->ks = Vec4();
     this->kd = Vec4();
@@ -66,6 +68,7 @@ Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Sc
     this->show_effector = false;
     this->enabled_cpdp = false;
     this->show_target = false;
+    this->has_cup = false;
     this->target = Vec4();
     this->ks = Vec4();
     this->kd = Vec4();
@@ -115,6 +118,7 @@ QString Object::saveObject() //função a ser pensada...
 {
     QString out;
     out = ""; //depois configurar formato de saída
+    return out;
 }
 
 //---------------------Physics
@@ -388,11 +392,14 @@ void Object::wireframe()
 
 void Object::draw(bool wire)
 {
+    //Draw::drawSphere(posEffectorBackward(),MATERIAL_CHROME,0.09);
+    if(has_cup) Draw::drawCoffeeCup(posEffectorBackward(),MATERIAL_WHITE_PLASTIC,Quaternion(Vec4(-90,0,0))*getRotationCurrent().conjugate());
     if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
     if(show_effector) Draw::drawSphere(getPositionCurrent(),MATERIAL_PEARL,0.02);
-    if (show_effector&&show_target)
+    if (show_effector&&show_target){
         if(enabled_cpdp) Draw::drawLine(target,getPositionCurrent(),Vec4(0,.9,0),1.4);
         else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
+    }
     if (this->geometry==0) return;
 //    Draw::drawPoint(posEffectorForward(),0.02,Vec4(0.5,0.5,0.5));
 //    Draw::drawPoint(posEffectorBackward(),0.02,Vec4(0.5,0.0,0.5));
@@ -462,6 +469,7 @@ void Object::draw(Vec4 position, Quaternion q,int mat)
             break;
         }
     }
+    delete transform;
 }
 
 Vec4 Object::getProperties()
@@ -566,12 +574,12 @@ Vec4 Object::posEffectorForward()
     Vec4 pos = this->getPositionCurrent();
     Vec4 posf;
     if(properties.x()>properties.y() && properties.x()>properties.z())
-        posf = pos + Vec4(properties.x()/2.0,0,0);
+        posf =  Vec4(properties.x()/2.0,0,0);
     else if(properties.y()>properties.x() && properties.y()>properties.z())
-        posf = pos + Vec4(0,properties.y()/2.0,0);
+        posf =  Vec4(0,properties.y()/2.0,0);
     else
-        posf = pos + Vec4(0,0,properties.z()/2.0);
-    return Quaternion::getVecRotation(this->getRotationCurrent(),posf);
+        posf =  Vec4(0,0,properties.z()/2.0);
+    return pos + Quaternion::getVecRotation(this->getRotationCurrent(),posf);
 }
 
 Vec4 Object::posEffectorBackward()
@@ -579,12 +587,12 @@ Vec4 Object::posEffectorBackward()
     Vec4 pos = this->getPositionCurrent();
     Vec4 posf;
     if(properties.x()>properties.y() && properties.x()>properties.z())
-        posf = pos + Vec4(-properties.x()/2.0,0,0);
+        posf =  Vec4(-properties.x()/2.0,0,0);
     else if(properties.y()>properties.x() && properties.y()>properties.z())
-        posf = pos + Vec4(0,-properties.y()/2.0,0);
+        posf =  Vec4(0,-properties.y()/2.0,0);
     else
-        posf = pos + Vec4(0,0,-properties.z()/2.0);
-    return Quaternion::getVecRotation(this->getRotationCurrent(),posf);
+        posf =  Vec4(0,0,-properties.z()/2.0);
+    return pos + Quaternion::getVecRotation(this->getRotationCurrent(),posf);
 }
 
 Vec4 Object::posEffectorForward(Vec4 pos, Quaternion rot, Object *obj)
@@ -592,12 +600,12 @@ Vec4 Object::posEffectorForward(Vec4 pos, Quaternion rot, Object *obj)
     Vec4 properties = obj->getProperties();
     Vec4 posf;
     if(properties.x()>properties.y() && properties.x()>properties.z())
-        posf = pos + Vec4(properties.x()/2.0,0,0);
+        posf = Vec4(properties.x()/2.0,0,0);
     else if(properties.y()>properties.x() && properties.y()>properties.z())
-        posf = pos + Vec4(0,properties.y()/2.0,0);
+        posf = Vec4(0,properties.y()/2.0,0);
     else
-        posf = pos + Vec4(0,0,properties.z()/2.0);
-    return Quaternion::getVecRotation(rot,posf);
+        posf = Vec4(0,0,properties.z()/2.0);
+    return pos+Quaternion::getVecRotation(rot,posf);
 }
 
 Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
@@ -605,12 +613,12 @@ Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
     Vec4 posf;
     Vec4 properties = obj->getProperties();
     if(properties.x()>properties.y() && properties.x()>properties.z())
-        posf = pos + Vec4(-properties.x()/2.0,0,0);
+        posf = Vec4(-properties.x()/2.0,0,0);
     else if(properties.y()>properties.x() && properties.y()>properties.z())
-        posf = pos + Vec4(0,-properties.y()/2.0,0);
+        posf = Vec4(0,-properties.y()/2.0,0);
     else
-        posf = pos + Vec4(0,0,-properties.z()/2.0);
-    return Quaternion::getVecRotation(rot,posf);
+        posf = Vec4(0,0,-properties.z()/2.0);
+    return pos + Quaternion::getVecRotation(rot,posf);
 }
 
 float Object::getCompensableFactor()
@@ -685,11 +693,36 @@ Vec4 Object::getKd()
 
 void Object::evaluate(int val)
 {
+    if(has_cup){
+        Vec4 v = Quaternion::getVecRotation(getRotationCurrent()*getRotation().conjugate(),Vec4(0,0,1));
+        //Vec4 axis = q.getVector();
+        Vec4 newaxis = Vec4(0,0,1)^v;
+        float angle = Vec4(0,0,1)*v;
+        Vec4 ax;
+        dReal ang;
+        Quaternion ql = Quaternion(angle,newaxis);
+        Quaternion qDelta = Quaternion::deltaQuat(Quaternion(Vec4(-180,0,0)), ql );
+          //indo pelo caminho mais curto
+        //qDelta = Quaternion().lessArc(qDelta);
+        qDelta.toAxisAngle( &ax, &ang );
+        Vec4 torque = ks.mult(ax*ang) - kd.mult(getRelVelAngular());
+        Physics::bodyAddTorque(this->body,torque.x(),torque.y(),torque.z());
+    }
     if (!(enabled_cpdp)) return;
     for(int i=0;i<val;i++){
         Vec4 effector = getPositionCurrent();
         Vec4 force = ks.mult(target - effector) - kd.mult(getRelVelLinear());
         Physics::bodyAddForce(this->body,force.x(),force.y(),force.z());
     }
+}
+
+void Object::setCoffeeCup(bool b)
+{
+    has_cup = b;
+}
+
+bool Object::hasCoffeeCup()
+{
+    return has_cup;
 }
 

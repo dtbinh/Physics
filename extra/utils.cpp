@@ -417,7 +417,7 @@ bool Utils::readModelRubens(Scene *scene, const std::string &fileName)
 
       }
     //printf("\nSaiu!");
-    printf("\nQtde foot: %d",chara->getBodiesFoot().size());
+    //printf("\nQtde foot: %d",chara->getBodiesFoot().size());
     Joint* joint = chara->getParentMoreMass();
     joint->getParent()->setBodyBalance(true);
     Balance* balance = new Balance(chara);
@@ -437,7 +437,7 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
       ff << "offset: 0 0 0" << "\n";
       ff << "\n";
 
-      for (unsigned int i=0;i<chara->getNumBodies();i++) {
+      for (int i=0;i<chara->getNumBodies();i++) {
         //obtendo as caracteristicas da geometria//
           //BodyGeom* b;
 //          dGeomID g;
@@ -512,7 +512,7 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
 
       ff << "\n";
 
-      for (unsigned int i=0;i<chara->getNumJoints();i++) {
+      for (int i=0;i<chara->getNumJoints();i++) {
         //type
           ff << "ball joint: ";
 
@@ -561,8 +561,65 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
       }
 
       ff << "\n";
+     return true;
 
+}
 
+bool Utils::readFramesConfig(Character *chara, const string &fileName)
+{
+    ifstream file(fileName.data(), ios::in);
+    if(!file)
+    {
+        cerr << "File \"" << fileName << "\" not found." << endl;
+        return false;
+    }
+    string line;
+    getline(file, line);
+    stringstream line_ss(line);
+    int size;
+    line_ss >> size;
+    if (chara->getMoCap()->sizeFrames()!=size) return false;
+
+    int i = 0;
+    while (!file.eof() && i<size)
+      {
+        string line;
+        getline(file, line);
+        stringstream line_ss(line);
+        char c;
+        line_ss >> c;
+        if (c=='t')
+            chara->getMoCap()->getFrameMotion(i)->setFootLeftGround(true);
+        else
+            chara->getMoCap()->getFrameMotion(i)->setFootLeftGround(false);
+        line_ss >> c;
+        if (c=='t')
+            chara->getMoCap()->getFrameMotion(i)->setFootRightGround(true);
+        else
+            chara->getMoCap()->getFrameMotion(i)->setFootRightGround(false);
+        i++;
+    }
+    return true;
+}
+
+bool Utils::saveFramesConfig(Character *chara, const string &fileName)
+{
+    ofstream ff(fileName.data());
+    ff <<  chara->getMoCap()->sizeFrames();
+    ff << "\n";
+    for (int i=0;i<chara->getMoCap()->sizeFrames();i++) {
+        if (chara->getMoCap()->getFrameMotion(i)->getFootLeftGround())
+            ff << "t ";
+        else
+            ff << "f ";
+        if (chara->getMoCap()->getFrameMotion(i)->getFootRightGround())
+            ff << "t ";
+        else
+            ff << "f ";
+        ff << "\n";
+    }
+    ff.close();
+    return true;
 }
 
 bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileName)
@@ -572,7 +629,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
         ifstream file(fileName.data(), ios::in);
         stringstream ss;
         std::string stmp;
-        int itmp;
+        //int itmp;
         int num_frames = 0;
         double dtmp = 0.0;
         std::istream& istr = * (istream*) &file;
@@ -635,5 +692,6 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
           //pula uma linha
             getline(istr, stmp);
         }
+        return true;
 }
 

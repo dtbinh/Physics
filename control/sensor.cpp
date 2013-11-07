@@ -19,7 +19,7 @@ void Sensor::setTolerance(float val)
 int Sensor::getStateFoots(Character *chara)
 {
     std::vector<Object*> foots;
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int count = 0;
@@ -34,14 +34,23 @@ int Sensor::getStateFoots(Character *chara)
 
 }
 
-Vec4 Sensor::getSupportProjected(Character *chara)
+Vec4 Sensor::getSupportProjected(Character *chara,bool capture)
 {
     std::vector<Object*> foots;
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
+     Vec4 proj = Vec4();
+    if (capture) {
+        for(unsigned int i=0;i<foots.size();i++){
+                proj += foots.at(i)->getPositionCurrent();
+        }
+        proj = proj/2.0;
+        proj.x2 = 0;
+        return proj;
+    }
     int hierarquia = getHierarchy2Use(chara);
-    Vec4 proj = Vec4();
+
     if (hierarquia==0){
         for(unsigned int i=0;i<foots.size();i++){
                 proj += foots.at(i)->getPositionCurrent();
@@ -64,7 +73,7 @@ Vec4 Sensor::getSupportProjected(Character *chara)
 int Sensor::getSwingFoot(Character *chara)
 {
     std::vector<Object*> foots;
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int body = -1;
@@ -85,7 +94,7 @@ int Sensor::getSwingFoot(Character *chara)
 int Sensor::getStanceFoot(Character *chara)
 {
     std::vector<Object*> foots;
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int body = -1;
@@ -105,7 +114,7 @@ int Sensor::getHierarchy2Use(Character *chara)
 {
     std::vector<Object*> foots;
     Object* contact=NULL;
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int state = 0;
@@ -127,19 +136,43 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
     int frame = chara->getMoCap()->frame_current;
     std::vector<Object*> foots;
     Object* contact=NULL;
-    for(unsigned int i=0;i<chara->getNumBodies();i++){
+    for(int i=0;i<chara->getNumBodies();i++){
         if(chara->getBody(i)->getFoot()) foots.push_back(chara->getBody(i));
     }
     int state = 0;
-    for(unsigned int i=0;i<foots.size();i++){
-        Vec4 prop = foots.at(i)->getProperties();
-        float height = prop.y()/2.0;
-        Vec4 pos = chara->getMoCap()->getFrameMotion(frame)->getPosition(chara->getIdObject(foots.at(i)));
-        Vec4 posf = chara->getMoCap()->getFrameMotion(frame-1)->getPosition(chara->getIdObject(foots.at(i)));
-        if((pos.y() <= height+tolerance)){
-            contact = foots.at(i);
-            state++;
-        }
+    bool foot_l,foot_r;
+    bool close_enought_l = true;
+    bool close_enought_r = true;
+    Vec4 prop = foots.at(0)->getProperties();
+    float height = prop.y()/2.0;
+    if (foots.at(0)->posEffectorBackward().y()<height+0.001 || foots.at(0)->posEffectorForward().y()<height+0.001){
+        close_enought_l = true;
+    }
+    if (foots.at(1)->posEffectorBackward().y()<height+0.001 || foots.at(1)->posEffectorForward().y()<height+0.001){
+        close_enought_r = true;
+    }
+    foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
+    foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
+    if (foot_l && foot_r && close_enought_l && close_enought_r)
+        state = 2;
+    else if (foot_l && close_enought_l){
+        state = 1;
+        contact = foots.at(0);
+    }
+    else if (foot_r && close_enought_r){
+        state = 1;
+        contact = foots.at(1);
+    }
+
+//    for(unsigned int i=0;i<foots.size();i++){
+//        Vec4 prop = foots.at(i)->getProperties();
+//        float height = prop.y()/2.0;
+//        Vec4 pos = chara->getMoCap()->getFrameMotion(frame)->getPosition(chara->getIdObject(foots.at(i)));
+//        //Vec4 posf = chara->getMoCap()->getFrameMotion(frame-1)->getPosition(chara->getIdObject(foots.at(i)));
+//        if((pos.y() <= height+tolerance)){
+//            contact = foots.at(i);
+//            state++;
+//        }
         /**************** Sensor de teste
         Vec4 prop = foots.at(i)->getProperties();
         float height = prop.y()/2.0;
@@ -164,7 +197,7 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
             state++;
         }
         ********************/
-    }
+//    }
     //printf("State %d\n",state);
     if(state==0) return FOOTS_AIR+3;
     else if(state>1) return ALL_FOOTS_GROUND+3;

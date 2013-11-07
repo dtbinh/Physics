@@ -45,12 +45,12 @@ public:
     //void draw();
     //void drawSelected();
     void draw();
-    void aplyTransform(Matrix4x4 t){};
+    void aplyTransform(Matrix4x4){return;};
     void refreshNormals();
     void setIdentityTransform();
     void setMaterial(int material);
     void wireframe();
-    void changeCoords(Matrix4x4 matrix){};
+    void changeCoords(Matrix4x4){return;};
     Mesh* getMesh();
     void setName(QString nm);
     QString getName();

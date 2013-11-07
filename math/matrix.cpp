@@ -235,10 +235,10 @@ Matrix Matrix::crossProductMatrix(Vec u)
     return cross;
 }
 
-void Matrix::print(int n_cols_block)
+void Matrix::print(int /*n_cols_block*/)
 {
-    for(int i=0;i<this->getNumRows();i++){
-        for(int j=0;j<this->getNumColumns();j++) printf(" %.2f",(*this)(i,j));
+    for(unsigned int i=0;i<this->getNumRows();i++){
+        for(unsigned int j=0;j<this->getNumColumns();j++) printf(" %.2f",(*this)(i,j));
         printf("\n");
     }
 

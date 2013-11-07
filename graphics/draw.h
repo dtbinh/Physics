@@ -2,7 +2,7 @@
 #define DRAW_H
 #define dDOUBLE
 #include <ode/common.h>
-
+#include <math/quaternion.h>
 #include <math.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -23,6 +23,7 @@ public:
     static void drawSphereSelected(Vec4 position);
     static void drawPoint(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
     static void drawGround(int size);
+    static void drawCoffeeCup(Vec4 position, int material,Quaternion q=Quaternion());
     static void drawSelection(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,1,1));                        //desenha um cubo selecionado o objeto
     static void drawWireframe(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,0,0));
     static void drawSelection(Vec4 properties,float radius);                        //desenha um cubo selecionado o objeto

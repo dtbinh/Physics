@@ -20,7 +20,7 @@ public:
     Sensor();
     static void setTolerance(float val);
     static int getStateFoots(Character *chara);
-    static Vec4 getSupportProjected(Character *chara);
+    static Vec4 getSupportProjected(Character *chara,bool capture);
     static int getSwingFoot(Character *chara);
     static int getStanceFoot(Character *chara);
     static int getHierarchy2Use(Character *chara); //esta função determina qual matriz deverá ser usada no cálculo da

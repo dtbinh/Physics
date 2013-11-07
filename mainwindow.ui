@@ -54,7 +54,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -1137,40 +1137,147 @@ QGroupBox{
              </item>
             </layout>
            </widget>
-           <widget class="QLabel" name="label_22">
+           <widget class="QGroupBox" name="groupBox_11">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>200</y>
+              <width>301</width>
+              <height>221</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Editing Frames</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_36">
+               <item>
+                <widget class="QLabel" name="label_34">
+                 <property name="text">
+                  <string>Frame</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="frameEdit"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkShowEditingFrame">
+               <property name="text">
+                <string>Show Editing</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkFrameFootLeft">
+               <property name="text">
+                <string>Foot Left in Ground</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkFrameFootRight">
+               <property name="text">
+                <string>Foot Right in Ground</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="saveEditingFrame">
+               <property name="text">
+                <string>Save Editing Frames</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="loadEditedFrames">
+               <property name="text">
+                <string>Load Edited Frames</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QCheckBox" name="checkShowChara">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>170</y>
+              <width>161</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Show Character</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QWidget" name="">
             <property name="geometry">
              <rect>
               <x>20</x>
               <y>140</y>
-              <width>171</width>
-              <height>17</height>
+              <width>251</width>
+              <height>29</height>
              </rect>
             </property>
-            <property name="text">
-             <string>Adjust Sensor Tollerance:</string>
-            </property>
-           </widget>
-           <widget class="QDoubleSpinBox" name="sensorTolerance">
-            <property name="geometry">
-             <rect>
-              <x>190</x>
-              <y>140</y>
-              <width>81</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="decimals">
-             <number>2</number>
-            </property>
-            <property name="maximum">
-             <double>999.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.010000000000000</double>
-            </property>
-            <property name="value">
-             <double>50.000000000000000</double>
-            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_35">
+             <item>
+              <widget class="QLabel" name="label_22">
+               <property name="text">
+                <string>Adjust Sensor Tollerance:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="sensorTolerance">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <double>999.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="value">
+                <double>50.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="tabManipulatorSim">
@@ -1181,7 +1288,7 @@ QGroupBox{
             <item row="0" column="0">
              <widget class="QListWidget" name="listWidgetObjects"/>
             </item>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QGroupBox" name="groupBox_9">
               <property name="font">
                <font>
@@ -1386,7 +1493,7 @@ QGroupBox{
               </layout>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="3" column="0">
              <widget class="QGroupBox" name="groupBox_2">
               <property name="font">
                <font>
@@ -1561,7 +1668,7 @@ QGroupBox{
               </layout>
              </widget>
             </item>
-            <item row="3" column="0">
+            <item row="4" column="0">
              <widget class="QGroupBox" name="groupBox">
               <property name="font">
                <font>
@@ -1662,6 +1769,43 @@ QGroupBox{
                   </widget>
                  </item>
                 </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QGroupBox" name="groupBox_10">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+              </property>
+              <property name="title">
+               <string>Coffee Cup</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_13">
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="hasCup">
+                 <property name="text">
+                  <string>has Coffee Cup</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

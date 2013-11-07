@@ -66,7 +66,7 @@ public:
     std::vector<Object*> getBodiesFoot();
     std::vector<Object*> getChildrens(Object* obj);
     bool           isBodyHierarchy(Joint* joint,Object* obj);
-    bool           isJointHierarchy(Joint* joint,Joint *child);
+    //bool           isJointHierarchy(Joint* joint,Joint *child);
     void           setBalance(Balance *balance); //adicionar controle de equilibrio
     void           updateKsKdControlPDCoros();
     Balance*       getBalance();

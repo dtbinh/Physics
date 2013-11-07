@@ -13,14 +13,14 @@
 #include "camera.h"
 
 /************** New Camera *****************/
-static int slices = 16;
-static int stacks = 16;
+//static int slices = 16;
+//static int stacks = 16;
 
-static float ax = 0.0;
-static float ay = 0.0;
-static float az = 0.0;
+//static float ax = 0.0;
+//static float ay = 0.0;
+//static float az = 0.0;
 
-static float delta = 5.0;
+//static float delta = 5.0;
 
 static bool lbpressed = false;
 //static bool mbpressed = false;
@@ -190,6 +190,9 @@ GLWidget::GLWidget(QWidget *parent) :
     move = false;
     sim_pause = false;
     capture_pause = true;
+    editing_frame = false;
+    frame_edit = 0;
+    show_character = true;
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomBalance());
@@ -306,20 +309,27 @@ void GLWidget::paintGL()
     //fim de determinação da camera
     glPushMatrix();
 
-    scene->draw();
-    Draw::drawGround(10);
-    if (scene->getExternalForce().module()!=0)
-        ciclo++;
-    if (ciclo>5){
-        scene->setExternalForce(Vec4(0,0,0));
-        ciclo = 0;
+    if (show_character){
+        scene->draw();
+        if(!capture_pause)
+            if(scene->getSizeCharacter()!=0)
+                if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+                    motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
+        if (scene->getExternalForce().module()!=0)
+            ciclo++;
+        if (ciclo>5){
+            scene->setExternalForce(Vec4(0,0,0));
+            ciclo = 0;
+        }
+
+        showCompensableConeFriction();
     }
-    if(!capture_pause)
+    Draw::drawGround(10);
+
+    if (editing_frame)
         if(scene->getSizeCharacter()!=0)
             if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
-                motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
-    showCompensableConeFriction();
-
+                scene->getCharacter(0)->getMoCap()->showMoCap(Vec4(0,0,-2.0),frame_edit);
     glPopMatrix();
 
 //    gettimeofday(&tempo_fim,NULL);
@@ -380,22 +390,7 @@ void GLWidget::simStep(){
 
 }
 
-void GLWidget::wheelEvent(QWheelEvent *event)
-{
-//    int numDegrees = event->delta() / 8;
-//    int numSteps = numDegrees / 15;
-//    if (numSteps>0 && angle<180.0){
-//        angle += 1;
-//    }
-//    else{
-//        if (!(angle<=5)){
-//            angle -= 1;
-//        }
-//    }
-    //updateCamera();
 
-
-}
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
@@ -527,15 +522,21 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
     }
-
-    if(event->key() == Qt::Key_F ){
+    if(event->key() == Qt::Key_Plus ){
+        plusFrameEdition();
         //Physics::bodySetTorque(scene->select->getBody(),100.0,10.0,10.0);
         //Physics::bodyAddForce(scene->select->getBody(),1,0,1);
-        Vec4 *n = new Vec4(2,2,2);
+        //Vec4 *n = new Vec4(2,2,2);
         //scene->select->appTorque(n);
         //Physics::bodyAddForce(scene->select->getBody(),100.0,10.0,10.0);
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
+    }
+    if(event->key() == Qt::Key_Minus ){
+        minusFrameEdition();
+    }
+    if(event->key() == Qt::Key_F ){
+        setForceCharacter();
     }
     if(event->key() == Qt::Key_Up){
         cam_at.x2 +=0.1;
@@ -546,7 +547,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         updateCamera();
 
     }
-
     if(event->key() == Qt::Key_C){
         static int posCam = 0;
         posCam++;
@@ -581,6 +581,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     updateGL();
 }
 
+MoCap *GLWidget::pushMotionCapture()
+{
+    if (scene->getSizeCharacter()<1) return NULL;
+    return scene->getCharacter(0)->getMoCap();
+}
+
 void GLWidget::SimStepsSimulation(int steps)
 {
     scene->setSimStep(steps);
@@ -608,6 +614,7 @@ void GLWidget::loadScene(QString file)
 
 void GLWidget::saveCharacter(QString file)
 {
+    if (scene->getSizeCharacter()==0) return;
     Utils::saveModelRubens(scene->getCharacter(0),file.toStdString());
 
 }
@@ -620,6 +627,21 @@ void GLWidget::loadMotionCapture(QString file)
     motionTotalFrame(scene->getCharacter(0)->getMoCap()->sizeFrames());
     scene->getCharacter(0)->getMoCap()->copyFootsProperties();
 
+}
+
+void GLWidget::loadFramesConfig(QString file)
+{
+    if (scene->getSizeCharacter()==0) return;
+    if (scene->getCharacter(0)->getMoCap()==NULL) return;
+    Utils::readFramesConfig(scene->getCharacter(0),file.toStdString());
+
+}
+
+void GLWidget::saveFramesConfig(QString file)
+{
+    if (scene->getSizeCharacter()==0) return;
+    if (scene->getCharacter(0)->getMoCap()==NULL) return;
+    Utils::saveFramesConfig(scene->getCharacter(0),file.toStdString());
 }
 
 void GLWidget::setPlayback(bool val)
@@ -643,6 +665,20 @@ void GLWidget::restartMotion()
     //Utils::loadMotionCapture(scene->getCharacter(0)->getMoCap(),scene->getCharacter(0),file.toStdString());
 
 
+}
+
+void GLWidget::showEditingFrame(bool b)
+{
+    if(scene->getSizeCharacter()!=0)
+        if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+            editing_frame = b;
+}
+
+void GLWidget::setEditingFrame(int frame)
+{
+    if(scene->getSizeCharacter()!=0)
+        if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+            frame_edit = frame;
 }
 
 void GLWidget::stopSimulation()
@@ -779,8 +815,8 @@ void GLWidget::setObjectSelected(int row)
 {
 
     std::vector<Object*> objs = scene->objectsScene();
-    for (int i=0;i<objs.size();i++) objs.at(i)->setSelected(false);
     if (row<0) return;
+    for (unsigned int i=0;i<objs.size();i++) objs.at(i)->setSelected(false);
     objs.at(row)->setSelected(true);
 
 }
@@ -792,10 +828,15 @@ Object *GLWidget::getObject(int row)
     return objs.at(row);
 }
 
+void GLWidget::showCharacter(bool b)
+{
+    show_character = b;
+}
+
 void GLWidget::setJointSelected(int row)
 {
     std::vector<Joint*> jts = scene->jointsScene();
-    for (int i=0;i<jts.size();i++) jts.at(i)->setSelected(false);
+    for (unsigned int i=0;i<jts.size();i++) jts.at(i)->setSelected(false);
     if (row<0){
         showJoint(NULL);
         return;

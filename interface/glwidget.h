@@ -22,13 +22,22 @@ signals:
     void motionTotalFrame(int);
     void setSliderFoot1(int);
     void setSliderFoot2(int);
+    void plusFrameEdition();
+    void minusFrameEdition();
+    void setForceCharacter();
 
 public slots:
     //slots motion capture
 
     void loadMotionCapture(QString file);
+    void loadFramesConfig(QString file);
+    void saveFramesConfig(QString file);
     void setPlayback(bool val);
     void restartMotion();
+    void showEditingFrame(bool b);
+    void setEditingFrame(int frame);
+
+
 
 
     //slots parametros físicos
@@ -65,6 +74,7 @@ public slots:
     std::vector<Joint*> getJointsList();
     void setObjectSelected(int row);
     Object* getObject(int row);
+    void showCharacter(bool b);
     void setJointSelected(int row);
     void loadScene(QString file);
     void saveCharacter(QString file);
@@ -84,6 +94,9 @@ public:
     bool move;
     bool sim_pause;
     bool capture_pause;
+    bool editing_frame;
+    bool show_character;
+    int  frame_edit;
     //Plane *plane;
     explicit GLWidget(QWidget *parent = 0);
     void initializeGL();
@@ -92,11 +105,13 @@ public:
     void updateCamera();
     void showCompensableConeFriction();
     //funções de câmera
-    void wheelEvent(QWheelEvent *event);
+//    void wheelEvent(QWheelEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    //funções extras
+    MoCap* pushMotionCapture();
 
 
 
