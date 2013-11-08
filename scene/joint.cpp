@@ -248,6 +248,20 @@ Vec4 Joint::getPositionCurrent()
     return Physics::getJointBallAnchor(this);
 }
 
+QString Joint::showInfo()
+{
+    QString jo;
+    QString aux;
+    jo += "Properties Joint------\n";
+    jo += "Name: "+getName()+"\n";
+    jo += "Parent: "+parent->getName()+"\n";
+    jo += "Child: "+child->getName()+"\n";
+    Vec4 p = getPositionAnchor();
+    jo += aux.sprintf("Anchor: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    return jo;
+
+}
+
 void Joint::draw()
 {
     //if(this->initialAnchor==Vec4()) return;

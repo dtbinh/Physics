@@ -38,6 +38,7 @@ private:
     Vec4         properties;                                              //propriedades de dimensão do objeto
     int          type;                                                    //tipo do objeto em vinculação com o ODE
     Material     *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
+    int          id_material;
     float        fmass;                                                   //massa em float na inicialização
 
     // --------Strategy Equilibrium
@@ -101,6 +102,7 @@ public:
 
     // --------Geometry
     void        setMaterial(int);                                          //aplica um determinado material pré-determinado ao objeto
+    int         getIntMaterial();
     Mesh*       getMesh();                                                 //extraí a malha do objeto
     Matrix4x4*  getMatrixTransformation();                                 //extraí a matriz de transformação do objeto (corrente)
     Matrix4x4   getMatrixTransformationODE();                                 //extraí a matriz de transformação do objeto (corrente)
@@ -128,6 +130,7 @@ public:
     Vec4        posEffectorBackward();
     static Vec4 posEffectorForward(Vec4 pos,Quaternion rot,Object* obj);
     static Vec4 posEffectorBackward(Vec4 pos,Quaternion rot,Object* obj);
+    QString     showInfo();
 
     // --------Strategy Equilibrium
     float       getCompensableFactor();

@@ -63,6 +63,7 @@ public:
     Quaternion getDesiredQuaternion();
 
     void setDeriredQuaternion(Vec4 euler);
+    void setDeriredQuaternion(Quaternion quat);
     void setKMomentumLinear(Vec4 k);
     void setKMomentumAngular(Vec4 k);
     float getCompensation();

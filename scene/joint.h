@@ -66,6 +66,7 @@ public:
     void          setName(QString name);
     QString       getName();
     Vec4          getPositionCurrent();
+    QString       showInfo();
 
 
 

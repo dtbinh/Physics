@@ -331,16 +331,6 @@ void GLWidget::paintGL()
             if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
                 scene->getCharacter(0)->getMoCap()->showMoCap(Vec4(0,0,-2.0),frame_edit);
     glPopMatrix();
-
-//    gettimeofday(&tempo_fim,NULL);
-//      tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-//      ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-//      tempo = (tf - ti) / 1000;
-//      printf("Tempo gasto em milissegundos %.3f\n",tempo);
-
-
-
-
 }
 
 void GLWidget::updateCamera()
@@ -608,7 +598,6 @@ void GLWidget::loadScene(QString file)
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     if(scene->getSizeCharacter()>0){
         scene->getCharacter(0)->contructHierarchyBodies();
-        //scene->getCharacter(0)->showHierarchies();
     }
 }
 
@@ -858,14 +847,20 @@ void GLWidget::setJointSelected(int row)
 void GLWidget::loadSimulationParameters(QString file)
 {
     Utils::loadSimulationConfig(scene,file.toStdString());
-    updateObjects(scene->objectsScene());
-    updateJoints(scene->jointsScene());
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
+    updateObjects(scene->objectsScene());
+    updateJoints(scene->jointsScene());
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
+
     for(int i=0;i<scene->getSizeCharacter();i++){
         scene->getCharacter(i)->contructHierarchyBodies();
-        //scene->getCharacter(i)->showHierarchies();
+        if(scene->getCharacter(i)->getMoCap()->sizeFrames()>0){
+            motionTotalFrame(scene->getCharacter(i)->getMoCap()->sizeFrames());
+        }
+        updateBalanceCone(scene->getCharacter(i)->getBalance()->getMCone(),scene->getCharacter(i)->getBalance()->getAngleCone(),scene->getCharacter(i)->getBalance()->getRadiusCone(),scene->getCharacter(i)->getBalance()->getHeightCone());
     }
+
+
 
 }

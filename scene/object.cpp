@@ -16,6 +16,7 @@ Object::Object()
     this->properties = Vec4();
     this->type       = -1;
     Material::setMaterial(this->material,0);
+    this->id_material = -1;
     this->mass  = new Mass();
     this->material = new Material();
     this->isFoot = false;
@@ -33,6 +34,7 @@ Object::Object()
 
 Object::Object(Scene *scene)
 {
+    this->id_material = -1;
     this->scene = scene;
     this->mass  = new Mass();
     this->material = new Material();
@@ -335,6 +337,12 @@ bool Object::getBodyBalance()
 void Object::setMaterial(int m)
 {
     Material::setMaterial(this->material,m);
+    id_material = m;
+}
+
+int Object::getIntMaterial()
+{
+    return id_material;
 }
 
 Mesh *Object::getMesh() //função a ser pensada, se será necessária...
@@ -619,6 +627,61 @@ Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
     else
         posf = Vec4(0,0,-properties.z()/2.0);
     return pos + Quaternion::getVecRotation(rot,posf);
+}
+
+QString Object::showInfo()
+{
+    QString obj;
+    QString aux;
+    obj += "Info Properties Body---------\n";
+    obj += aux.sprintf("Geometry: %d\n",getType());
+    obj += "Name: "+getName()+"\n";
+    obj += aux.sprintf("Mass: %.3f\n",getMass());
+    Vec4 p = getPosition();
+    obj += aux.sprintf("Position: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    p = getProperties();
+    obj += aux.sprintf("Properties: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    Quaternion q = getRotation();
+    obj += aux.sprintf("Quaternion: %.3f %.3f %.3f %.3f \n",q.getScalar(),q.getPosX(),q.getPosY(),q.getPosZ());
+    if(getFoot())
+        obj +="Is Foot: true\n";
+    else
+        obj +="Is Foot: false\n";
+    if(getBodyBalance())
+        obj +="Is Body Balance: true\n";
+    else
+        obj +="Is Body Balance: false\n";
+    obj += "Info Cases Use Body---------\n";
+    obj += "Positional Control PD\n";
+    if (enabled_cpdp)
+        obj +="Enabled: true\n";
+    else
+        obj +="Enabled: false\n";
+    if (show_target)
+        obj +="Show Target: true\n";
+    else
+        obj +="Show Target: false\n";
+    if (show_effector)
+        obj +="Show Effector: true\n";
+    else
+        obj +="Show Effector: false\n";
+    p = getTarget();
+    obj += aux.sprintf("Target: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    p = getKs();
+    obj += aux.sprintf("Ks: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    p = getKd();
+    obj += aux.sprintf("Kd: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    obj += "Cup Coffee Control PD\n";
+    if (has_cup)
+        obj +="Enabled: true\n";
+    else
+        obj +="Enabled: false\n";
+    p = getKsCup();
+    obj += aux.sprintf("Ks: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    p = getKdCup();
+    obj += aux.sprintf("Kd: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
+    return obj;
+
 }
 
 float Object::getCompensableFactor()

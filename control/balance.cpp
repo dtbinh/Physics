@@ -12,7 +12,7 @@
 Balance::Balance(Character* chara)
 {
     this->chara = chara;
-    contructRelationJointsBodies();
+    //contructRelationJointsBodies();
     //ks.setVec4(chara->getMassTotal(),chara->getMassTotal(),chara->getMassTotal());
     //kd.setVec4(2*sqrt(chara->getMassTotal()),2*sqrt(chara->getMassTotal()),2*sqrt(chara->getMassTotal()));
     ksTorque = Vec4(100,100,100);
@@ -257,6 +257,11 @@ Quaternion Balance::getDesiredQuaternion()
 void Balance::setDeriredQuaternion(Vec4 euler)
 {
     bdesired.fromEuler(euler);
+}
+
+void Balance::setDeriredQuaternion(Quaternion quat)
+{
+    this->bdesired = quat;
 }
 
 void Balance::setKMomentumLinear(Vec4 k)

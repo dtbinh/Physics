@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //manipuladores do equilíbrio e controladores geral
         //cone de fricção
+    connect(ui->widgetPhysics,SIGNAL(updateBalanceCone(float,float,float,float)),this,SLOT(updateBalanceConeFriction(float,float,float,float)));
     connect(ui->widgetPhysics,SIGNAL(setSliderFoot1(int)),ui->coneFoot1,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(setSliderFoot2(int)),ui->coneFoot2,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(setSliderFoot1(int)),ui->conePerc1,SLOT(setNum(int)));
@@ -136,15 +137,17 @@ MainWindow::MainWindow(QWidget *parent) :
     //connect(ui->spinComp,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setCompensationBalance(int)));
 
         //manipuladores dos controladores PD propocionais do objeto
+
+    connect(ui->xksPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+    connect(ui->yksPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+    connect(ui->zksPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+    connect(ui->xkdPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+    connect(ui->ykdPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+    connect(ui->zkdPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+
     connect(ui->widgetPhysics,SIGNAL(updateKsProp(Vec4)),this,SLOT(updateKsGeral(Vec4)));
     connect(ui->widgetPhysics,SIGNAL(updateKdProp(Vec4)),this,SLOT(updateKdGeral(Vec4)));
 
-    connect(ui->xkdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
-    connect(ui->ykdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
-    connect(ui->zkdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
-    connect(ui->xksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
-    connect(ui->yksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
-    connect(ui->zksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
         //manipuladores das constantes de locomoção
     connect(ui->xLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
     connect(ui->yLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
@@ -176,6 +179,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->infoPD->setVisible(false);
     //ui->widgetPhysics->loadScene("/home/danilo/GitHub/ODESys/models/new/biped_3D/biped3D.model");
     pd_selected = NULL;
+    joint_selected = NULL;
+    obj_selected = NULL;
 
 
 }
@@ -250,6 +255,7 @@ void MainWindow::updateKsGeral(Vec4 ks)
 
 void MainWindow::updateKdGeral(Vec4 kd)
 {
+    printf("\nInside: %.3f %.3f %.3f",kd.x(),kd.y(),kd.z());
     ui->xkdPdProp->setValue(kd.x());
     ui->ykdPdProp->setValue(kd.y());
     ui->zkdPdProp->setValue(kd.z());
@@ -282,6 +288,14 @@ void MainWindow::updateBalancePD(Vec4 ksT, Vec4 kdT, Vec4 ksF, Vec4 kdF, Vec4 km
     ui->zkmomangBal->setValue(kmomang.z());
 
 
+}
+
+void MainWindow::updateBalanceConeFriction(float m, float angle, float radius, float height)
+{
+    ui->coneM->setValue(m);
+    ui->coneAngle->setValue((int)angle);
+    ui->coneHeight->setValue(height);
+    ui->coneRadius->setValue(radius);
 }
 
 void MainWindow::updateBalanceLocomotion()
@@ -614,7 +628,7 @@ void MainWindow::on_actionOpen_Simulation_triggered()
     QString mfile = QFileDialog::getOpenFileName(this,"Load Simulation Physics","../simulation/");
     if(!mfile.isEmpty()){
         ui->widgetPhysics->loadSimulationParameters(mfile);
-        showPropertiesFootFrame(0);
+        ui->groupBoxCone->setVisible(true);
     }
     ui->widgetPhysics->startSimulation();
 }

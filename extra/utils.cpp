@@ -335,7 +335,6 @@ bool Utils::readModelRubens(Scene *scene, const std::string &fileName)
             //printf("(joint: %s, parent: %s , child: %s)\n",joint->getName().toLocal8Bit().constData(),father->getName().toLocal8Bit().constData(),son->getName().toLocal8Bit().constData());
             ControlPD *pd = new ControlPD(joint,Physics::getRotationJoint(joint),Vec4(5,5,5),Vec4(0.5,0.5,0.5));
             chara->controllers.push_back(pd);
-
           }
           else if (s == "fixed")
           {
@@ -611,13 +610,14 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         QDomElement body = doc.createElement("Bodies");
         for(int j=0;j<scene->getCharacter(i)->getNumBodies();j++){
             QDomElement bodyProperties = doc.createElement("Properties");
-            bodyProperties.setAttribute("Nome",scene->getCharacter(i)->getBody(j)->getName());
+            bodyProperties.setAttribute("Name",scene->getCharacter(i)->getBody(j)->getName());
             Vec4 vec;
             Quaternion q;
             vec = scene->getCharacter(i)->getBody(j)->getPosition();
             q = scene->getCharacter(i)->getBody(j)->getRotation();
             bodyProperties.setAttribute("Mass",scene->getCharacter(i)->getBody(j)->getFMass());
             bodyProperties.setAttribute("Geometry",scene->getCharacter(i)->getBody(j)->getType());
+            bodyProperties.setAttribute("Material",scene->getCharacter(i)->getBody(j)->getIntMaterial());
             bodyProperties.setAttribute("Foot",(int)scene->getCharacter(i)->getBody(j)->getFoot());
             bodyProperties.setAttribute("BodyBalance",(int)scene->getCharacter(i)->getBody(j)->getBodyBalance());
             QDomElement posChara = doc.createElement("Position");
@@ -662,7 +662,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             bodyProperties.appendChild(tagPosPD);
             QDomElement tagTorPD = doc.createElement("ControlPDCup");
             QDomElement ksPDcup = doc.createElement("KsCupPD");
-            tagTorPD.setAttribute("enabled",(int)scene->getCharacter(i)->getBody(j)->hasCoffeeCup());
+            tagTorPD.setAttribute("Enabled",(int)scene->getCharacter(i)->getBody(j)->hasCoffeeCup());
             vec = scene->getCharacter(i)->getBody(j)->getKsCup();
             ksPDcup.setAttribute("x",vec.x());
             ksPDcup.setAttribute("y",vec.y());
@@ -685,7 +685,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             Joint *jo = scene->getCharacter(i)->getJoint(j);
             ControlPD *cpd = scene->getCharacter(i)->getControllersPD().at(j);
             QDomElement jointProperties = doc.createElement("Joint");
-            jointProperties.setAttribute("Nome",jo->getName());
+            jointProperties.setAttribute("Name",jo->getName());
             jointProperties.setAttribute("Parent",jo->getParent()->getName());
             jointProperties.setAttribute("Child",jo->getChild()->getName());
             jointProperties.setAttribute("Type",jo->getType());
@@ -806,6 +806,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
 
 bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
 {
+
     QDomDocument doc( "SimulationPhysics" );
     QFile file( fileName.data() );
     if( !file.open(QIODevice::ReadOnly) )
@@ -853,7 +854,9 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 if (!file.isEmpty()){
                     chara->getMoCap()->setAddressFile(file);
                     file = sime.attribute("FileMocapLoad","");
-                    if(!file.isEmpty()) chara->getMoCap()->setAddressFileLoad(file);
+                    if(!file.isEmpty()){
+                        chara->getMoCap()->setAddressFileLoad(file);
+                    }
                 }
                 sim = e.firstChildElement("ControlPDProportional");
                 sime = sim.firstChildElement("ksPDProporcional").toElement();
@@ -868,30 +871,217 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 z = sime.attribute("z","").toFloat();
                 vec.setVec4(x,y,z);
                 scene->setProportionalKdPD(vec);
-                return true;
+                sim = e.firstChildElement("Bodies");
+                sim = sim.firstChildElement("Properties");
+                while(!sim.isNull()){ //leitura das propriedades do corpo
+                    QDomNode body = sim;
+                    sime = body.toElement();
+                    int mat = sime.attribute("Material","").toInt();
+                    QString name = sime.attribute("Name","");
+                    float mass = sime.attribute("Mass","").toFloat();
+                    int type = sime.attribute("Geometry","").toInt();
+                    bool foot = (bool)sime.attribute("Foot","").toInt();
+                    bool bodybalance =  (bool)sime.attribute("BodyBalance","").toInt();
+                    Vec4 scale,pos;
+                    Quaternion quat;
+                    sime = body.firstChildElement("Position").toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    pos.setVec4(x,y,z);
+                    sime = body.firstChildElement("Quaternion").toElement();
+                    w = sime.attribute("w","").toFloat();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    quat = Quaternion(w,x,y,z);
+                    sime = body.firstChildElement("Dimension").toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    scale.setVec4(x,y,z);
+                    Object* obj = scene->addObject(scale,pos,quat,type,mass,chara,mat);
+                    obj->setName(name);
+                    obj->setFoot(foot);
+                    obj->setBodyBalance(bodybalance);
+                    //propriedades de testes
+                    sime = body.firstChildElement("ControlPDPositional").toElement();
+                    bool target = (bool)sime.attribute("Target","").toInt();
+                    bool enable = (bool)sime.attribute("Enabled","").toInt();
+                    bool effector = (bool)sime.attribute("Effector","").toInt();
+                    obj->setShowTarget(target);
+                    obj->setEnableCPDP(enable);
+                    obj->setShowEffector(effector);
+                    QDomElement prop = sime.firstChildElement("PositionTarget").toElement();
+                    x = prop.attribute("x","").toFloat();
+                    y = prop.attribute("y","").toFloat();
+                    z = prop.attribute("z","").toFloat();
+                    vec.setVec4(x,y,z);
+                    obj->setTarget(vec);
+                    prop = sime.firstChildElement("KsPositionalPD").toElement();
+                    x = prop.attribute("x","").toFloat();
+                    y = prop.attribute("y","").toFloat();
+                    z = prop.attribute("z","").toFloat();
+                    vec.setVec4(x,y,z);
+                    obj->setKs(vec);
+                    prop = sime.firstChildElement("KdPositionalPD").toElement();
+                    x = prop.attribute("x","").toFloat();
+                    y = prop.attribute("y","").toFloat();
+                    z = prop.attribute("z","").toFloat();
+                    vec.setVec4(x,y,z);
+                    obj->setKd(vec);
+                    sime = body.firstChildElement("ControlPDCup").toElement();
+                    enable = (bool)sime.attribute("Enabled","").toInt();
+                    obj->setCoffeeCup(enable);
+                    prop = sime.firstChildElement("KsCupPD").toElement();
+                    x = prop.attribute("x","").toFloat();
+                    y = prop.attribute("y","").toFloat();
+                    z = prop.attribute("z","").toFloat();
+                    vec.setVec4(x,y,z);
+                    obj->setKsCup(vec);
+                    prop = sime.firstChildElement("KdCupPD").toElement();
+                    x = prop.attribute("x","").toFloat();
+                    y = prop.attribute("y","").toFloat();
+                    z = prop.attribute("z","").toFloat();
+                    vec.setVec4(x,y,z);
+                    obj->setKdCup(vec);
+                    //qDebug() << obj->showInfo();
 
+                    sim = sim.nextSibling();
+                }
+                sim = e.firstChildElement("Joints");
+                sim = sim.firstChildElement("Joint");
+                while(!sim.isNull()){
+                    QDomNode joint = sim;
+                    sime = joint.toElement();
+                    QString name = sime.attribute("Name","");
+                    QString parent = sime.attribute("Parent","");
+                    QString child = sime.attribute("Child","");
+                    bool enable = (bool)sime.attribute("Enable","").toInt();
+                    int type = sime.attribute("Type","").toInt();
+                    QDomElement prop = sime.firstChildElement("Anchor").toElement();
+                    x = prop.attribute("x","").toFloat();
+                    y = prop.attribute("y","").toFloat();
+                    z = prop.attribute("z","").toFloat();
+                    vec.setVec4(x,y,z);
+                    if(type==JOINT_BALL){
+                       Joint* joint = scene->addJointBall(vec,chara->getObject(parent),chara->getObject(child),chara);
+                       joint->setName(name);
+                       prop = sime.firstChildElement("QuaternionPD").toElement();
+                       w = prop.attribute("w","").toFloat();
+                       x = prop.attribute("x","").toFloat();
+                       y = prop.attribute("y","").toFloat();
+                       z = prop.attribute("z","").toFloat();
+                       Quaternion quat(w,x,y,z);
+                       prop = sime.firstChildElement("KsPD").toElement();
+                       x = prop.attribute("x","").toFloat();
+                       y = prop.attribute("y","").toFloat();
+                       z = prop.attribute("z","").toFloat();
+                       Vec4 ks(x,y,z);
+                       prop = sime.firstChildElement("KdPD").toElement();
+                       x = prop.attribute("x","").toFloat();
+                       y = prop.attribute("y","").toFloat();
+                       z = prop.attribute("z","").toFloat();
+                       Vec4 kd(x,y,z);
+                       ControlPD *pd = new ControlPD(joint,quat,ks,kd);
+                       pd->setEnabled(enable);
+                       chara->controllers.push_back(pd);
+                       //qDebug() << joint->showInfo();
+                    }
+
+                    sim = sim.nextSibling();
+                }
+
+
+                sim = e.firstChildElement("BalanceEstrategy");
+                sim = sim.firstChildElement("BalanceControl");
+                sime = sim.toElement();
+                Balance* balance = new Balance(chara);
+                chara->setBalance(balance);
+                bool enablet = (bool)sime.attribute("EnableTorque","").toInt();
+                bool enablef = (bool)sime.attribute("EnableForce","").toInt();
+                bool enablem = (bool)sime.attribute("EnableMomentum","").toInt();
+
+                chara->getBalance()->setEnableForce(enablef);
+                chara->getBalance()->setEnableTorque(enablet);
+                chara->getBalance()->setEnableMomentum(enablem);
+
+                QDomElement prop = sime.firstChildElement("QuaternionTorque").toElement();
+                w = prop.attribute("w","").toFloat();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                Quaternion quat(w,x,y,z);
+                chara->getBalance()->setDeriredQuaternion(quat);
+                prop = sime.firstChildElement("BalanceksTorque").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKsTorque(vec);
+                prop = sime.firstChildElement("BalancekdTorque").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKdTorque(vec);
+                prop = sime.firstChildElement("BalanceksForce").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKsForce(vec);
+                prop = sime.firstChildElement("BalancekdForce").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKdForce(vec);
+                prop = sime.firstChildElement("BalancekMomentumLinear").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKMomentumLinear(vec);
+                prop = sime.firstChildElement("BalancekMomentumAngular").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKMomentumAngular(vec);
+                prop = sime.firstChildElement("FrictionCone").toElement();
+                chara->getBalance()->setAngleCone(prop.attribute("Angle","").toFloat());
+                chara->getBalance()->setHeightCone(prop.attribute("Height","").toFloat());
+                chara->getBalance()->setRadiusCone(prop.attribute("Radius","").toFloat());
+                chara->getBalance()->setMCone(prop.attribute("Module","").toFloat());
+                QDomElement propinfo = sime.firstChildElement("LocomotionParameters").toElement();
+                prop = propinfo.firstChildElement("LocomotionVelocity").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKVelocityLocomotion(vec);
+                prop = propinfo.firstChildElement("LocomotionDistance").toElement();
+                x = prop.attribute("x","").toFloat();
+                y = prop.attribute("y","").toFloat();
+                z = prop.attribute("z","").toFloat();
+                vec.setVec4(x,y,z);
+                chara->getBalance()->setKDistanceLocomotion(vec);
+            }
+            QString file = chara->getMoCap()->getAddressFile();
+            if (!file.isEmpty()){
+                Utils::loadMotionCapture(chara->getMoCap(),chara,file.toStdString());
+                chara->loadMotionFrames();
+                chara->getMoCap()->copyFootsProperties();
+                file = chara->getMoCap()->getAddressFileLoad();
+                if(!file.isEmpty()){
+                    readFramesConfig(chara,file.toStdString());
+                }
             }
         }
         n = n.nextSibling();
     }
-//    {
-//        QDomElement e = n.toElement();
-//        if( !e.isNull() )
-//        {
-//            if( e.tagName() == "contact" )
-//            {
-//                Contact c;
-
-//                c.name = e.attribute( "name", "" );
-//                c.phone = e.attribute( "phone", "" );
-//                c.eMail = e.attribute( "email", "" );
-
-
-//            }
-//        }
-
-//        n = n.nextSibling();
-//    }
+    return true;
 }
 
 bool Utils::readFramesConfig(Character *chara, const string &fileName)

@@ -2,7 +2,7 @@
 #include "object.h"
 #include "cube.h"
 #include "interface/glwidget.h"
-#include "extra/material.h"
+
 #include "character.h"
 #include "joint.h"
 #include <time.h>
@@ -29,12 +29,12 @@ Scene::~Scene(){
     Physics::closeScene(this);
 }
 
-Object* Scene::addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass,Character *character)
+Object* Scene::addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass,Character *character,int material)
 {
-    srand(time(NULL));
+    //srand(time(NULL));
     //int r = rand() %22;
     Object *obj = new Object(this);//position,rotation,properties,type,this);
-    obj->setMaterial(MATERIAL_ZINN);
+    obj->setMaterial(material);
     obj->setType(type);
     obj->setPosition(position);
     obj->setRotation(rotation);
@@ -182,7 +182,8 @@ void Scene::draw()
     }
 
     if(externalForce.module()!=0){
-            std::vector<Object*> objs = objectsScene();
+        std::vector<Object*> objs = objectsScene();
+
         for(unsigned int i=0;i<objs.size();i++)
             if (objs.at(i)->isSelected()){
                 Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);

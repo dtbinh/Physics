@@ -23,6 +23,7 @@ public slots:
     void updateKsGeral(Vec4 ks);
     void updateKdGeral(Vec4 kd);
     void updateBalancePD(Vec4 ksT,Vec4 kdT,Vec4 ksF,Vec4 kdF,Vec4 kmomlin, Vec4 kmomang);
+    void updateBalanceConeFriction(float m,float angle,float radius,float height);
     void updateBalanceLocomotion();
     void updateAngleAnchor(); //atualiza o angulo do corpo escolhido na interface para o equilibrio
     void updateControlBalance();

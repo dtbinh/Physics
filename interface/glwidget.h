@@ -17,6 +17,7 @@ signals:
     void updateKsProp(Vec4);
     void updateKdProp(Vec4);
     void updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4);
+    void updateBalanceCone(float,float,float,float);
     void showJoint(Joint*);
     void motionCurrentFrame(int);
     void motionTotalFrame(int);
