@@ -21,6 +21,7 @@ class Object
 private:
     // --------Scene
     Scene        *scene;
+    Character    *chara;
     QString      name;
     bool         selected;
     bool         bodyBalance;
@@ -60,6 +61,8 @@ public:
     Object();
     Object(Scene *scene);
     Object(Vec4 position,Quaternion rotation,Vec4 properties,int type,Scene *scene,QString name="");
+    void setCharacter(Character *chara);
+    Character* getCharacter();
     ~Object();
     // --------Scene
     void        setSelected(bool b);                                       //seta o objeto como selecionado para possíveis alterações
@@ -109,6 +112,7 @@ public:
     void        setMaterial(Vec4 amb,Vec4 diff,Vec4 spe,float shininess);  //inclui propriedades de material ao objeto
     void        wireframe();                                               //desenha o objeto como wireframe
     void        draw(bool wire=false);                                                    //desenha o objeto
+    void        drawShadow();                                                    //desenha o objeto
     void        draw(Vec4 position,Quaternion q,int mat=-1);
     Vec4        getProperties();                                           //extraí propriedades de escala do objeto
     void        setProperties(Vec4 properties);                            //seta propriedades de escala do objeto

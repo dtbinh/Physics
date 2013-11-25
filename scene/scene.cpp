@@ -2,7 +2,7 @@
 #include "object.h"
 #include "cube.h"
 #include "interface/glwidget.h"
-
+#include "control/sensor.h"
 #include "character.h"
 #include "joint.h"
 #include <time.h>
@@ -23,6 +23,7 @@ Scene::Scene(GLWidget *parent)
     this->externalForce = Vec4();
     this->propKs = Vec4(1,1,1);
     this->propKd = Vec4(1,1,1);
+    this->show_grf = true;
 }
 
 Scene::~Scene(){
@@ -45,8 +46,10 @@ Object* Scene::addObject(Vec4 properties, Vec4 position, Quaternion rotation,int
     if(character == 0){
         objects.push_back(obj);
         Physics::createObject(obj,this->getSpace(), mass, position, rotation);
+        obj->setScene(this);
     }else{
         character->objects.push_back(obj);
+        obj->setCharacter(character);
         Physics::createObject(obj, character->getSpace(), mass, position, rotation);
     }
 
@@ -93,36 +96,25 @@ void Scene::startPhysics()
 
 void Scene::simulationStep()
 {
-  //  dBodyEnable(asdfg->body);
-//    for(int i=0;i<50;i++){
-//        for(std::vector<Object*>::iterator it = objects.begin(); it!=objects.end(); it++){
-//            dBodyEnable((*it)->getBody());
-//            //(*it)->appForce(externalForce);
-//            //(*it)->appTorque(externalTorque);
-//        }
-
-////        if(interestJoint!=NULL){
-////            Physics::ControlPDBallRubens(interestJoint,tarQ,ks,kd);
-////        }
-
-//        Physics::simSingleStep(this);
-//    }
-//Physics::simSingleStep(this);
-    //Physics::simSingleStep(this);
     if(!sim_status) return;
     if(characters.size()>0)
         if (status_motion)
-            if(characters.at(0)->getMoCap()->sizeFrames()>0){
-                if (frame_step>=characters.at(0)->getMoCap()->sizeFrames()){
-                    frame_step = 1;
-                    characters.at(0)->getMoCap()->initializePosesModel(0);
+            if(characters.at(0)->getMoCap()->sizeFrames()>0 && getCharacter(0)->getMoCap()->status){
+                if (frame_step<characters.at(0)->getMoCap()->getBeginClycle()) frame_step = characters.at(0)->getMoCap()->getBeginClycle();
+                if (frame_step>=characters.at(0)->getMoCap()->getEndClycle()){
+                    frame_step = 1+characters.at(0)->getMoCap()->getBeginClycle();
+                    if(frame_step == 1){
+                        if(this->getCharacter(0)->offset.module()==0) characters.at(0)->getMoCap()->initializePosesModel(0);
+                        this->getCharacter(0)->getBalance()->setEnableBalance(true);
+                    }
                 }
-                //float percent = frame_step/(characters.at(0)->getMoCap()->sizeFrames()*1.);
-
                 frame_step+=2;
-                if (frame_step>=characters.at(0)->getMoCap()->sizeFrames()){
-                    frame_step = 1;
-                    characters.at(0)->getMoCap()->initializePosesModel(0);
+                if (frame_step>=characters.at(0)->getMoCap()->getEndClycle()){
+                    frame_step = 1+characters.at(0)->getMoCap()->getBeginClycle();
+                    if(frame_step == 1){
+                        if(this->getCharacter(0)->offset.module()==0) characters.at(0)->getMoCap()->initializePosesModel(0);
+                        this->getCharacter(0)->getBalance()->setEnableBalance(true);
+                    }
                 }
                 characters.at(0)->getMoCap()->stepFrame(frame_step);
             }
@@ -130,11 +122,6 @@ void Scene::simulationStep()
     std::vector<Joint*> jts = jointsScene();
     for(int i=0;i<this->sim_step;i++){
         if(characters.size()>0)
-//            if (status_motion)
-//                if(characters.at(0)->getMoCap()->sizeFrames()>0){
-//                    characters.at(0)->getMoCap()->physicsFootStep(Vec4(-1.0,0,0));
-//                    characters.at(0)->getMoCap()->enableFoots();
-//                }
            for(unsigned int i=0;i<objs.size();i++){
                Physics::setEnableObject(objs.at(i));
                if ((objs.at(i)->isSelected()) && !apply){
@@ -145,11 +132,8 @@ void Scene::simulationStep()
            }
            for(unsigned int k=0;k<jts.size();k++) Physics::setEnableJoint(jts.at(k));
            for(unsigned int j=0;j<characters.size();j++){
-
-
                if(characters.at(j)->balance!=NULL && enableGravity){
                    characters.at(j)->balance->evaluate();
-                   characters.at(j)->checkContactFoot();
                }else{
                    for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
                        (*it)->evaluate();
@@ -183,23 +167,234 @@ void Scene::draw()
 
     if(externalForce.module()!=0){
         std::vector<Object*> objs = objectsScene();
-
         for(unsigned int i=0;i<objs.size();i++)
             if (objs.at(i)->isSelected()){
                 Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);
             }
-
     }
     if (characters.size()>0)
-       GRF::drawGRF(groundForces,getCharacter(0)->getPosCOM());
+       if (show_grf) GRF::drawGRF(groundForces,getCharacter(0)->getPosCOM());
     //Draw::drawPoint(Vec4(0,7,0));
 
 //    glDisable(GL_DEPTH_TEST);
 //    for(std::list<Object*>::iterator it = selectedObjects.begin(); it!=selectedObjects.end(); it++){
 //        (*it)->drawSelected();
 //    }
-//    glEnable(GL_DEPTH_TEST);
+    //    glEnable(GL_DEPTH_TEST);
 }
+
+void Scene::drawGRF(bool b)
+{
+    show_grf = b;
+}
+
+void Scene::drawShadows()
+{
+    for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
+        (*it)->draw();
+    }
+    for(std::vector<Character*>::iterator it = characters.begin(); it!= characters.end(); it++){
+        (*it)->drawShadows();
+    }
+
+
+
+}
+
+void Scene::loadSceneObjects()
+{                                    //x   y    z
+
+    //srand(time(NULL));
+    addObject(Vec4(0.02,0.02,0.02),Vec4(0,0.020,0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(0.2,0.020,0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(0,0.020,-0.2),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(-0.5,0.020,0.5),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(1.0,0.020,-2.0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(1.70,0.020,-0.70),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(-1.30,0.020,0.20),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+    addObject(Vec4(0.02,0.02,0.02),Vec4(-2.0,0.020,-1.20),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+
+    float z = -5;
+    float y = 0.35;
+    float x = 0;
+
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(2.34+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(2.87+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(3.38+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(3.91+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-2.34+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-2.87+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-3.38+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-3.91+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+
+    z = -4.49;
+    y = 0.35;
+    x = 0.05;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -3.94;
+
+    x = -0.05;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -3.38;
+
+    x = -0.02;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -2.85;
+
+    x = -0.02;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -2.31;
+
+    x = -0.05;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -1.79;
+
+    x = 0.02;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -1.25;
+
+    x = 0.05;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = -0.74;
+
+    x = -0.01;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+
+
+    z = -0.2;
+
+    x = 0.02;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = 0.34;
+
+    x = 0.03;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = 0.85;
+
+    x = -0.07;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = 1.37;
+
+    x = 0.01;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = 1.88;
+
+    x = 0.05;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    z = 2.4;
+
+    x = -0.02;
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+
+
+}
+
 
 SpaceID Scene::getSpace()
 {
@@ -311,7 +506,7 @@ std::vector<Object*> Scene::objectsScene()
 {
     std::vector<Object*> allobjetcs;
     for(unsigned int i=0;i<characters.size();i++) for(unsigned int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
-    for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
+    //for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
     for(unsigned int i=0;i<objects_shoot.size();i++) allobjetcs.push_back(objects_shoot.at(i));
     return allobjetcs;
 }
@@ -723,6 +918,15 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
       while ( this->objects_shoot.size() > 10 ) {
         this->objects_shoot.erase(objects_shoot.begin());
       }
+}
+
+bool Scene::isGeometryFootSwing(dGeomID geom)
+{
+    std::vector<Object*> obj = objectsScene();
+    for(unsigned int i=0;i<obj.size();i++){
+        if (obj.at(i)->getGeometry()==geom) return Sensor::isSwingFoot(obj.at(i));
+    }
+    return false;
 }
 
 

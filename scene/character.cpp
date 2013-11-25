@@ -41,16 +41,33 @@ void Character::draw()
     for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
         (*it)->draw();
     }
-    if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
 
     drawCOM();
     drawFootProjected();
     drawCOMProjected();
 }
 
+void Character::drawShadows()
+{
+    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+    for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
+        (*it)->drawShadow();
+    }
+    for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
+        (*it)->draw();
+    }
+
+}
+
 void Character::drawCOM()
 {
     Draw::drawPoint(getPosCOM(),0.05,Vec4(0,1,0));
+}
+
+void Character::drawMoCap(bool b)
+{
+    shadow_motion = b;
 }
 
 void Character::setAlpha(float v)
@@ -208,6 +225,13 @@ int Character::getIdObject(Object *obj)
 {
     for (unsigned int i=0;i<objects.size();i++)
         if (objects.at(i)==obj) return i;
+    return -1;
+}
+
+int Character::getIdJoint(Joint *joint)
+{
+    for (unsigned int i=0;i<joints.size();i++)
+        if (joints.at(i)==joint) return i;
     return -1;
 }
 
@@ -378,8 +402,9 @@ Vec4 Character::getSumForceGRF2COM()
 
 void Character::checkContactFoot(bool/* b*/)
 {
-    if (!this->getScene()->getGroundForces().size()) balance->setEnableBalance(false);
-    else balance->setEnableBalance(true);
+    //if (!this->getScene()->getGroundForces().size()) balance->setEnableBalance(false);
+    //else
+    balance->setEnableBalance(true);
     //if (b) balance->setEnableBalance(true);
 }
 
@@ -692,6 +717,23 @@ Vec4 Character::getGRFSum(Object *obj)
 std::vector<GRF> Character::getGRFsObject(Object *obj)
 {
     return GRF::forcesGRF2Object(scene->groundForces,obj);
+}
+
+void Character::setKsRetaionshipKd()
+{
+    for(unsigned int i=0;i<controllers.size();i++){
+        controllers.at(i)->setKd(controllers.at(i)->getKs()*0.1);
+    }
+}
+
+void Character::setOffset(Vec4 offset)
+{
+    this->offset = offset;
+}
+
+Vec4 Character::getOffset()
+{
+    return offset;
 }
 
 void Character::setSpace(SpaceID space)

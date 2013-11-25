@@ -9,6 +9,7 @@
 ControlPD *pd_selected;
 Joint*     joint_selected;
 Object*    obj_selected;
+bool       updateSimut = false;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,13 +34,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->frameEdit,SIGNAL(valueChanged(int)),this,SLOT(showPropertiesFootFrame(int)));
     connect(ui->widgetPhysics,SIGNAL(plusFrameEdition()),this,SLOT(plusFrameEdition()));
     connect(ui->widgetPhysics,SIGNAL(minusFrameEdition()),this,SLOT(minusFrameEdition()));
+    connect(ui->endClycle,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setEndClycle(int)));
+    connect(ui->beginClycle,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setBeginClycle(int)));
 
     //manipuladores de atributos da simulação
     connect(ui->stepSim,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(SimStepsSimulation(int)));
+    connect(ui->widgetPhysics,SIGNAL(setGravity(Vec4)),this,SLOT(setGravity(Vec4)));
     connect(ui->gravx,SIGNAL(valueChanged(double)),this,SLOT(setGravity()));
     connect(ui->gravy,SIGNAL(valueChanged(double)),this,SLOT(setGravity()));
     connect(ui->gravz,SIGNAL(valueChanged(double)),this,SLOT(setGravity()));
-    connect(ui->enableGravity,SIGNAL(clicked(bool)),this,SLOT(setGravity()));
+    connect(ui->enableGravity,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setGravity(bool)));
+    connect(ui->widgetPhysics,SIGNAL(setEnableGravity(bool)),ui->enableGravity,SLOT(setChecked(bool)));
+    connect(ui->kdtoks,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setKsRelationshipKs(bool)));
+
 
 
 
@@ -96,10 +103,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->coneRadius,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setRadiusCone(double)));
     connect(ui->coneHeight,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setHeightCone(double)));
     connect(ui->coneAngle,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setAngleCone(double)));
+    connect(ui->coneLimit,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setLimitCone(int)));
         //manipuladores de desenho do personagem
     connect(ui->checkWireChara,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setWireCharacter(bool)));
+    connect(ui->checkShadow,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowShadow(bool)));
+    connect(ui->checkShowMocap,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowMoCap(bool)));
+    connect(ui->checkGRF,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowGRF(bool)));
 
         //manipuladores de equilíbrio
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirection(int)),ui->angleBalBodyy,SLOT(setValue(int)));
+
     connect(ui->angleBalBodyx,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
     connect(ui->angleBalBodyy,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
     connect(ui->angleBalBodyz,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
@@ -138,23 +151,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
         //manipuladores dos controladores PD propocionais do objeto
 
-    connect(ui->xksPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
-    connect(ui->yksPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
-    connect(ui->zksPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
-    connect(ui->xkdPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
-    connect(ui->ykdPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
-    connect(ui->zkdPdProp,SIGNAL(editingFinished()),this,SLOT(updateControlPDManipulators()));
+    connect(ui->xksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->yksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->zksPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators()));
+    connect(ui->xkdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators2()));
+    connect(ui->ykdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators2()));
+    connect(ui->zkdPdProp,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDManipulators2()));
 
     connect(ui->widgetPhysics,SIGNAL(updateKsProp(Vec4)),this,SLOT(updateKsGeral(Vec4)));
     connect(ui->widgetPhysics,SIGNAL(updateKdProp(Vec4)),this,SLOT(updateKdGeral(Vec4)));
 
         //manipuladores das constantes de locomoção
-    connect(ui->xLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
-    connect(ui->yLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
-    connect(ui->zLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
-    connect(ui->xLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
-    connect(ui->yLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
-    connect(ui->zLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+//    connect(ui->xLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+//    connect(ui->yLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+//    connect(ui->zLocDist,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+//    connect(ui->xLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+//    connect(ui->yLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
+//    connect(ui->zLocVel,SIGNAL(valueChanged(double)),this,SLOT(updateBalanceLocomotion()));
 
 
 
@@ -243,6 +256,11 @@ void MainWindow::updateControlPD()
 void MainWindow::updateControlPDManipulators()
 {
     ui->widgetPhysics->setProportionalKs(Vec4(ui->xksPdProp->value(),ui->yksPdProp->value(),ui->zksPdProp->value()));
+
+}
+
+void MainWindow::updateControlPDManipulators2()
+{
     ui->widgetPhysics->setProportionalKd(Vec4(ui->xkdPdProp->value(),ui->ykdPdProp->value(),ui->zkdPdProp->value()));
 }
 
@@ -255,7 +273,6 @@ void MainWindow::updateKsGeral(Vec4 ks)
 
 void MainWindow::updateKdGeral(Vec4 kd)
 {
-    printf("\nInside: %.3f %.3f %.3f",kd.x(),kd.y(),kd.z());
     ui->xkdPdProp->setValue(kd.x());
     ui->ykdPdProp->setValue(kd.y());
     ui->zkdPdProp->setValue(kd.z());
@@ -300,11 +317,11 @@ void MainWindow::updateBalanceConeFriction(float m, float angle, float radius, f
 
 void MainWindow::updateBalanceLocomotion()
 {
-    Vec4 kvel = Vec4(ui->xLocVel->value(),ui->yLocVel->value(),ui->zLocVel->value());
-    Vec4 kdist = Vec4(ui->xLocDist->value(),ui->yLocDist->value(),ui->zLocDist->value());
+//    Vec4 kvel = Vec4(ui->xLocVel->value(),ui->yLocVel->value(),ui->zLocVel->value());
+//    Vec4 kdist = Vec4(ui->xLocDist->value(),ui->yLocDist->value(),ui->zLocDist->value());
 
-    ui->widgetPhysics->setKVelocityLocomotion(kvel);
-    ui->widgetPhysics->setKDistanceLocomotion(kdist);
+//    ui->widgetPhysics->setKVelocityLocomotion(kvel);
+//    ui->widgetPhysics->setKDistanceLocomotion(kdist);
 
 }
 
@@ -448,8 +465,15 @@ void MainWindow::setGravity()
 {
     Vec4 g(ui->gravx->value(),ui->gravy->value(),ui->gravz->value());
     ui->widgetPhysics->setGravityParameters(g);
-    ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
+    //ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
+}
 
+void MainWindow::setGravity(Vec4 v)
+{
+    ui->gravx->setValue(v.x());
+    ui->gravy->setValue(v.y());
+    ui->gravz->setValue(v.z());
+    //ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
 }
 
 void MainWindow::checkFoot(bool b)
@@ -518,6 +542,9 @@ void MainWindow::setMaxTimeLine(int v)
 {
     ui->timeLineMotion->setMaximum(v);
     ui->frameEdit->setMaximum(v);
+    ui->endClycle->setMaximum(v);
+    ui->endClycle->setValue(v);
+    ui->beginClycle->setMaximum(v);
 }
 
 void MainWindow::adjustTolerance(double t)
@@ -629,6 +656,139 @@ void MainWindow::on_actionOpen_Simulation_triggered()
     if(!mfile.isEmpty()){
         ui->widgetPhysics->loadSimulationParameters(mfile);
         ui->groupBoxCone->setVisible(true);
+        this->updateKsGeral(ui->widgetPhysics->scene->getProportionalKsPD());
+        this->updateKdGeral(ui->widgetPhysics->scene->getProportionalKdPD());
+        ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
     }
     ui->widgetPhysics->startSimulation();
+}
+
+void MainWindow::on_checkBox_clicked(bool checked)
+{
+    updateSimut = checked;
+}
+
+void MainWindow::on_xksTqBal_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->yksTqBal->setValue(arg1);
+        ui->zksTqBal->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xkdTqBal_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->ykdTqBal->setValue(arg1);
+        ui->zkdTqBal->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xksForBal_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->yksForBal->setValue(arg1);
+        ui->zksForBal->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xkdForBal_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->ykdForBal->setValue(arg1);
+        ui->zkdForBal->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xkmomlinBal_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->ykmomlinBal->setValue(arg1);
+        ui->zkmomlinBal->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xkmomangBal_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->ykmomangBal->setValue(arg1);
+        ui->zkmomangBal->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xksPdProp_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->yksPdProp->setValue(arg1);
+        ui->zksPdProp->setValue(arg1);
+    }
+}
+
+void MainWindow::on_xkdPdProp_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->ykdPdProp->setValue(arg1);
+        ui->zkdPdProp->setValue(arg1);
+    }
+}
+
+void MainWindow::on_posx_ks_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->posy_ks->setValue(arg1);
+        ui->posz_ks->setValue(arg1);
+    }
+}
+
+void MainWindow::on_posx_kd_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->posy_kd->setValue(arg1);
+        ui->posz_kd->setValue(arg1);
+    }
+}
+
+void MainWindow::on_ksx_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->ksy->setValue(arg1);
+        ui->ksz->setValue(arg1);
+    }
+    if(ui->kdtoks->isChecked()) ui->kdx->setValue(ui->ksx->value()/10);
+}
+
+void MainWindow::on_kdx_valueChanged(double arg1)
+{
+    if(updateSimut){
+        ui->kdy->setValue(arg1);
+        ui->kdz->setValue(arg1);
+    }
+}
+
+void MainWindow::on_ksy_valueChanged(double arg1)
+{
+    if(ui->kdtoks->isChecked()) ui->kdy->setValue(ui->ksy->value()/10);
+}
+
+void MainWindow::on_ksz_valueChanged(double arg1)
+{
+    if(ui->kdtoks->isChecked()) ui->kdz->setValue(ui->ksz->value()/10);
+}
+
+void MainWindow::on_angleBalBodyy_valueChanged(int arg1)
+{
+    if(arg1>360) ui->angleBalBodyy->setValue(0);
+    if(arg1<-360) ui->angleBalBodyy->setValue(0);
+}
+
+void MainWindow::on_angleBalBodyx_valueChanged(int arg1)
+{
+    if(arg1>360) ui->angleBalBodyx->setValue(0);
+    if(arg1<-360) ui->angleBalBodyx->setValue(0);
+}
+
+void MainWindow::on_angleBalBodyz_valueChanged(int arg1)
+{
+    if(arg1>360) ui->angleBalBodyz->setValue(0);
+    if(arg1<-360) ui->angleBalBodyz->setValue(0);
 }

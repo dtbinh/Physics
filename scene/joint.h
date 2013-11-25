@@ -41,6 +41,7 @@ public:
     Vec4 getTorqueMax();
     Vec4 getLimitAngularMax();
     Vec4 getLimitAngularMin();
+    Vec4 getPositionAnchorInit();
     Vec4 getPositionAnchor();
     ~Joint();
     //----Matrix

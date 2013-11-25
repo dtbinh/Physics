@@ -34,7 +34,10 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
 
                 contact[i].surface.mode = dContactBounce; // | dContactSoftCFM;
                 // friction parameter
-                contact[i].surface.mu = dInfinity;
+                if(scene->isGeometryFootSwing(o1)||scene->isGeometryFootSwing(o2))
+                    contact[i].surface.mu = 0;
+                else
+                    contact[i].surface.mu = dInfinity;
                 // bounce is the amount of "bouncyness".
                 contact[i].surface.bounce = 0.1;
                 // bounce_vel is the minimum incoming velocity to cause a bounce
@@ -58,7 +61,7 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                           int noGroundGeom = 0;
                           if (dGeomGetClass(o1)==dPlaneClass) noGroundGeom = 2; //ou 0, mas nunca sera 0, pois would return antes
                           else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
-                          else noGroundGeom = 3;
+                          else noGroundGeom = 2;
                           GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
                           fbContact.b1 = scene->getObject(b1);
                           fbContact.b2 = scene->getObject(b2);

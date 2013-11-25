@@ -24,7 +24,10 @@ public:
     std::vector<Object*> foots;
     std::vector<int> idfoots;
     int frame_current;
+    int beginClycle;
+    int endClycle;
     bool status;
+    bool clyclic;
     MoCap();
     MoCap(Character *chara);
     void setAddressFile(QString file);
@@ -50,6 +53,10 @@ public:
     Vec4 getMomentumLinear(int frame);
     Vec4 getPosCOM(int frame);
     Vec4 getVelCOM(int frame);
+    void setBeginClycle(int begin);
+    int  getBeginClycle();
+    void setEndClycle(int end);
+    int  getEndClycle();
     int sizeFrames();
     void setStatusMotion(bool b);
     void restart();

@@ -601,9 +601,14 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         gravity.setAttribute("y",scene->getGravity().y());
         gravity.setAttribute("z",scene->getGravity().z());
         gravity.setAttribute("Enable",(int)scene->hasGravity());
+        QDomElement offset = doc.createElement( "Offset" ); //gravidade
+        offset.setAttribute("x",scene->getCharacter(i)->getOffset().x());
+        offset.setAttribute("y",scene->getCharacter(i)->getOffset().y());
+        offset.setAttribute("z",scene->getCharacter(i)->getOffset().z());
 
         info.appendChild(sim);
         info.appendChild(gravity);
+        info.appendChild(offset);
         info.appendChild(mocap);
         info.appendChild(cpdprop);
 
@@ -690,7 +695,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             jointProperties.setAttribute("Child",jo->getChild()->getName());
             jointProperties.setAttribute("Type",jo->getType());
             jointProperties.setAttribute("Enable",(int)cpd->isEnabled());
-            vec = jo->getPositionAnchor();
+            vec = jo->getPositionAnchorInit();
             QDomElement anchor = doc.createElement("Anchor");
             anchor.setAttribute("x",vec.x());
             anchor.setAttribute("y",vec.y());
@@ -709,6 +714,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             kspd.setAttribute("y",vec.y());
             kspd.setAttribute("z",vec.z());
             jointProperties.appendChild(kspd);
+            vec = cpd->getKd();
             QDomElement kdpd = doc.createElement("KdPD");
             kdpd.setAttribute("x",vec.x());
             kdpd.setAttribute("y",vec.y());
@@ -829,6 +835,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
         if( !e.isNull() ){
             Character *chara = new Character(scene);
             scene->addCharacter(chara);
+            Vec4 offset;
             if(e.tagName()=="Character"){
                 QDomNode sim = e.firstChildElement("Simulation");
                 QDomElement sime = sim.toElement();
@@ -846,8 +853,17 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 x = sime.attribute("x","").toFloat();
                 y = sime.attribute("y","").toFloat();
                 z = sime.attribute("z","").toFloat();
-                Vec4 vec;
+
+
+                Vec4 vec(x,y,z);
                 scene->setGravityParameters(vec);
+                sim = e.firstChildElement("Offset");
+                sime = sim.toElement();
+                x = sime.attribute("x","").toFloat();
+                y = sime.attribute("y","").toFloat();
+                z = sime.attribute("z","").toFloat();
+                offset.setVec4(x,y,z);
+                chara->setOffset(offset);
                 sim = e.firstChildElement("MoCap");
                 sime = sim.toElement();
                 QString file = sime.attribute("FileMocap","");
@@ -889,6 +905,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     y = sime.attribute("y","").toFloat();
                     z = sime.attribute("z","").toFloat();
                     pos.setVec4(x,y,z);
+                    pos = pos+offset;
                     sime = body.firstChildElement("Quaternion").toElement();
                     w = sime.attribute("w","").toFloat();
                     x = sime.attribute("x","").toFloat();
@@ -964,6 +981,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     y = prop.attribute("y","").toFloat();
                     z = prop.attribute("z","").toFloat();
                     vec.setVec4(x,y,z);
+                    vec+=offset;
                     if(type==JOINT_BALL){
                        Joint* joint = scene->addJointBall(vec,chara->getObject(parent),chara->getObject(child),chara);
                        joint->setName(name);
@@ -1171,8 +1189,21 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
         }
 
 
+
         //para cada corpo
         for (int j=0;j<chara->getNumBodies();j++) {
+            if(j==15){
+                for( int i=0; i<num_frames; i++ ) {
+                  moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(3));
+                }
+            }
+            if(j==16){
+                for( int i=0; i<num_frames; i++ ) {
+                  moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(4));
+                }
+            }
+            else{
+
           //pula uma linha
             getline(istr, stmp);
           //le as n posicoes
@@ -1210,7 +1241,9 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
           }
           //pula uma linha
             getline(istr, stmp);
+            }
         }
+        moCap->setEndClycle(moCap->sizeFrames());
         return true;
 }
 

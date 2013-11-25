@@ -17,6 +17,7 @@ class Quaternion
    //construtores
       Quaternion();
       Quaternion( float w, Vec4 v );
+      Quaternion(float thetaX, float thetaY, float thetaZ);
       Quaternion( Vec4 euler ); //ordem XYZ
       Quaternion(float r,float x, float y, float z);
       //Quaternion(float r, Vec4 v);
@@ -64,6 +65,7 @@ class Quaternion
       friend Quaternion operator*(Quaternion p,Quaternion q);
       Quaternion conjugate();
       static Vec4 getVecRotation(Quaternion q, Vec4 v);
+      float normal();
 
 
 //      double normal()
@@ -88,6 +90,15 @@ class Quaternion
       //converte eixo e angulo em um quaternion e atribui a this
       void fromAxisAngle( Vec4 axis, dReal angle );
       void showQuaternion();
+
+      Quaternion operator /(double k);
+      //Quaternion operator *(Quaternion q);
+      friend bool operator==(Quaternion p,Quaternion q);
+
+      friend Quaternion operator-(Quaternion p,Quaternion q);
+      static float dot(Quaternion p, Quaternion q);
+
+
 
       //converte Quaternion em dQuaternion
 //      void to_dQuaternion( dQuaternion q );

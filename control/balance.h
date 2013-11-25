@@ -34,6 +34,7 @@ class Balance
     float height;
     float radius;
     float m;
+    float limit;
 
 public:
     Balance(Character* chara);
@@ -44,6 +45,7 @@ public:
                                          //hierarquia, Mat(n,n), onde n é o numero de juntas.
 
     Matrix getJacobianSum(Object* obj);  //calcula o somatório de todas as jacobianas
+    Matrix getInertiaFactors(Joint* joint);
     Vec getTwistWrenchTotal(Vec twist); //retorna os valores que serão aplicados no character com forças e torques virtuais
     Vec getJacobianLocomotion(std::vector<Joint*> joints, Object* effector, Vec twist);
     Vec4 getKsTorque();
@@ -69,6 +71,8 @@ public:
     float getCompensation();
     void setCompensation(float f);
     //cone de ficção
+    void setLimitCone(float v);
+    float getLimitCone();
     float getMCone();
     void setMCone(float val);
     float getRadiusCone();

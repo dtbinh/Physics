@@ -26,6 +26,11 @@ signals:
     void plusFrameEdition();
     void minusFrameEdition();
     void setForceCharacter();
+    void setBeginClycleWidget(int);
+    void setEndClycleWidget(int);
+    void setGravity(Vec4 v);
+    void setEnableGravity(bool);
+    void setAngleDirection(int);
 
 public slots:
 
@@ -38,6 +43,8 @@ public slots:
     void restartMotion();
     void showEditingFrame(bool b);
     void setEditingFrame(int frame);
+    void setBeginClycle(int v);
+    void setEndClycle(int v);
 
     //slots scene
     void saveSimulationParameters(QString file);
@@ -51,6 +58,7 @@ public slots:
     void setGravityParameters(Vec4 g);
     void setGravity(bool b);
 
+
     //slots parametros de controle
 
     void setProportionalKs(Vec4 ks);
@@ -61,8 +69,10 @@ public slots:
     void setCompensationBalance(int val);
     void setAngleBodyBalance(Vec4 v);
     void setEnableMomentumBalance(bool b);
+    void setKsRelationshipKs(bool b);
 
     //cone de ficção
+    void setLimitCone(int val);
     void setMCone(double val);
     void setRadiusCone(double val);
     void setHeightCone(double val);
@@ -82,6 +92,10 @@ public slots:
     void loadScene(QString file);
     void saveCharacter(QString file);
     void setWireCharacter(bool wire);
+    void setShowShadow(bool b);
+    void setShowGRF(bool b);
+    void setShowMoCap(bool b);
+
 
 
     //slots não utilizados
@@ -100,6 +114,9 @@ public:
     bool editing_frame;
     bool show_character;
     int  frame_edit;
+    QList<Vec4> curve_quat;
+    QList<int>  curve_quat_time;
+    bool load_exemple_curve;
     //Plane *plane;
     explicit GLWidget(QWidget *parent = 0);
     void initializeGL();
@@ -115,6 +132,9 @@ public:
     void keyPressEvent(QKeyEvent *event);
     //funções extras
     MoCap* pushMotionCapture();
+    void drawShadows();
+    void loadCurveExample();
+    void showCurveExample();
 
 
 

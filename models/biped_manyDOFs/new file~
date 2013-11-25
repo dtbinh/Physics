@@ -1,0 +1,16 @@
+paw: "paw_0" "body4" 0.000000 -0.080000 0.000000 0.100000
+paw: "paw_1" "body9" 0.000000 -0.080000 0.000000 0.100000
+
+symmetric_joints: 0 5
+symmetric_joints: 1 6
+symmetric_joints: 2 7
+symmetric_joints: 3 8
+symmetric_joints: 4 9
+
+rest_poses: "models/biped_manyDOFs/human_biped/human_biped_0.rest" "models/biped_manyDOFs/human_biped/human_biped_1.rest" "models/biped_manyDOFs/human_biped/human_biped_2.rest" "models/biped_manyDOFs/human_biped/human_biped_3.rest" "models/biped_manyDOFs/human_biped/human_biped_4.rest" "models/biped_manyDOFs/human_biped/human_biped_5.rest"
+realRestPose: "models/biped_manyDOFs/human_biped/human_biped_-1.rest"
+
+color: "body" 0.188235 0.243137 0.568627
+color: "body" 0.188235 0.243137 0.568627
+color: "body" 0.188235 0.243137 0.568627
+

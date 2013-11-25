@@ -21,6 +21,7 @@ public:
     Scene *scene;
     SpaceID space;
     JointGroupID jointGroup;
+    Vec4 offset;
     std::vector<Object*> objects;
     std::vector<Joint*> joints;
     //control
@@ -55,6 +56,7 @@ public:
     int            getNumJoints();          //retorna a quantidade de juntas
     int            getNumBodies();          //retorna a quantidade de corpos
     int            getIdObject(Object *obj);
+    int            getIdJoint(Joint *joint);
     Joint*         getParentMoreMass();
     Joint*         getJointParentBalance();
     Joint*         getJoint(int i);
@@ -72,7 +74,7 @@ public:
     Balance*       getBalance();
     Vec4           getSumTorqueGRF2COM();
     Vec4           getSumForceGRF2COM();
-    void           checkContactFoot(bool b=false);
+    void           checkContactFoot(bool b=true);
     MoCap*         getMoCap();
     void           contructHierarchyBodies();
     void           setHierarchyMap(int i);
@@ -83,6 +85,9 @@ public:
     bool           checkHierarchy(Joint *joint, Object* at);
     Vec4           getGRFSum(Object *obj);
     std::vector<GRF> getGRFsObject(Object *obj);
+    void setKsRetaionshipKd();
+    void setOffset(Vec4 offset);
+    Vec4 getOffset();
 
 
 
@@ -90,7 +95,9 @@ public:
 
     //desenho
     void           draw();
+    void           drawShadows();
     void           drawCOM(); //desenha a posição do centro de massa
+    void           drawMoCap(bool b);
     void           setAlpha(float v);
     void           setWireframe(bool b);
     void           drawFootProjected();

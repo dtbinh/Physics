@@ -29,6 +29,7 @@ Object::Object()
     this->target = Vec4();
     this->ks = Vec4();
     this->kd = Vec4();
+    this->chara = NULL;
 
 }
 
@@ -50,6 +51,7 @@ Object::Object(Scene *scene)
     this->target = Vec4();
     this->ks = Vec4();
     this->kd = Vec4();
+    this->chara = NULL;
 }
 
 Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Scene *scene,QString name)
@@ -74,7 +76,18 @@ Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Sc
     this->target = Vec4();
     this->ks = Vec4();
     this->kd = Vec4();
+    this->chara = NULL;
 
+}
+
+void Object::setCharacter(Character *chara)
+{
+    this->chara = chara;
+}
+
+Character* Object::getCharacter()
+{
+    return chara;
 }
 
 Object::~Object()
@@ -403,14 +416,12 @@ void Object::draw(bool wire)
     //Draw::drawSphere(posEffectorBackward(),MATERIAL_CHROME,0.09);
     if(has_cup) Draw::drawCoffeeCup(posEffectorBackward(),MATERIAL_WHITE_PLASTIC,Quaternion(Vec4(-90,0,0))*getRotationCurrent().conjugate());
     if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
-    if(show_effector) Draw::drawSphere(getPositionCurrent(),MATERIAL_PEARL,0.02);
+    if(show_effector) Draw::drawSphere(posEffectorBackward(),MATERIAL_PEARL,0.02);
     if (show_effector&&show_target){
-        if(enabled_cpdp) Draw::drawLine(target,getPositionCurrent(),Vec4(0,.9,0),1.4);
+        if(enabled_cpdp) Draw::drawLine(target,posEffectorBackward(),Vec4(0,.9,0),1.4);
         else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
     }
     if (this->geometry==0) return;
-//    Draw::drawPoint(posEffectorForward(),0.02,Vec4(0.5,0.5,0.5));
-//    Draw::drawPoint(posEffectorBackward(),0.02,Vec4(0.5,0.0,0.5));
     switch (this->type){
     case TYPE_CUBE:{
             if (wire)
@@ -432,10 +443,29 @@ void Object::draw(bool wire)
     }
 }
 
+void Object::drawShadow()
+{
+    if (this->geometry==0) return;
+    switch (this->type){
+    case TYPE_CUBE:{
+            Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+            break;
+        }
+    case TYPE_CYLINDER:{
+            Draw::drawCylinder(getMatrixTransformation(),this->material);
+            break;
+        }
+    case TYPE_SPHERE:{
+            Draw::drawSphere(getMatrixTransformation(),this->material,properties.x());
+            break;
+        }
+    }
+}
+
 void Object::draw(Vec4 position, Quaternion q,int mat)
 {
    // Draw::drawPoint(posEffectorForward(),0.2,Vec4(0.5,0.5,0.5));
-    if (this->geometry==0) return;
+    //if (this->geometry==0) return;
     Matrix4x4 *transform = new Matrix4x4();
     Matrix4x4 transformx = q.getMatrix();
 
@@ -773,7 +803,7 @@ void Object::evaluate(int val)
     }
     if (!(enabled_cpdp)) return;
     for(int i=0;i<val;i++){
-        Vec4 effector = getPositionCurrent();
+        Vec4 effector = posEffectorBackward();
         Vec4 force = ks.mult(target - effector) - kd.mult(getRelVelLinear());
         Physics::bodyAddForce(this->body,force.x(),force.y(),force.z());
     }

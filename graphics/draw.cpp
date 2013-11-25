@@ -223,7 +223,6 @@ void Draw::drawSphere(Vec4 position, int material, float size)
 
     GLUquadric *q = gluNewQuadric();
 
-    //Vec4 scale    = Vec4(0.5,0.5,0.5);
     glPushMatrix();
         gluQuadricNormals(q, GLU_SMOOTH);
         glTranslatef(position.x(),position.y(),position.z());
@@ -295,64 +294,46 @@ void Draw::drawPoint(Vec4 p, float size, Vec4 color)
 
 void Draw::drawGround(int size)
 {
-
-    if(idraw_ground) {
-        glDisable(GL_LIGHTING);
-        glPushMatrix();
-        glColor3f(0.5,0.5,0.5);
-        glCallList(idrawGround);
-        glEnable(GL_LIGHTING);
-        Material *mat = new Material();
-        mat->setMaterial(mat,MATERIAL_SILVER_POLIERT);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
-        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
-        glCallList(idrawGround+1);
-        glPopMatrix();
-        delete mat;
-        return;
-    }
+    Material *mat = new Material();
 
 
-    idrawGround = glGenLists(2);
-    //idrawGround2 = glGenLists(2);
-    //desenha grid na base
-    glDisable(GL_LIGHTING);
     glPushMatrix();
-    glNewList(idrawGround,GL_COMPILE);
 
-    glBegin(GL_LINES);
-    for(int i=-size;i<=size;i+=1){
-        for(int j=size;j>=-size;j-=1){
+    glBegin(GL_QUADS);
+    bool color = true;
+    for(int i=-size;i<=size;i++){
+        if (abs(i)%2==0) color = true;
+        else color = false;
+        for(int j=-size;j<=size;j++){
+            if (color){
+
+                mat->setMaterial(mat,MATERIAL_SILVER_POLIERT);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+                glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+            }
+            else{
+
+                mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+                glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+                glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+            }
+            glNormal3f(0,1,0);
             glVertex3f(i,0,j);
-            glVertex3f(i,0,-j);
-            glVertex3f(i,0,j);
-            glVertex3f(-i,0,j);
+            glVertex3f(i,0,j+1);
+            glVertex3f(i+1,0,j+1);
+            glVertex3f(i+1,0,j);
+            color = !color;
         }
     }
     glEnd();
-    glEndList();
     glPopMatrix();
-    glEnable(GL_LIGHTING);
-
-    //desenha solo
-
-
-
-    glPushMatrix();
-    glNewList(idrawGround+1,GL_COMPILE);
-    glBegin(GL_QUADS);
-    glNormal3f(0,1,0);
-    glVertex3f(size,0,size);
-    glVertex3f(size,0,-size);
-    glVertex3f(-size,0,-size);
-    glVertex3f(-size,0,size);
-    glEnd();
-    glEndList();
-    glPopMatrix();
-    glEndList();
-    if (!idraw_ground) idraw_ground = true;
+    delete mat;
+    //    glEndList();
+//    if (!idraw_ground) idraw_ground = true;
 
 
 }
@@ -704,6 +685,130 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     delete mat;
 }
 
+void Draw::drawArrow2D(float angle, Vec4 anchor)
+{
+    Vec4 pos = anchor;
+    float x,z;
+    //c(0,1)
+    float c1,c2;
+    c1 = 0;
+    c2 = 0.5;
+    x = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+
+    float x1,x2,x3,x4,x5,x6,x7;
+    float z1,z2,z3,z4,z5,z6,z7;
+    c1 = 0.15;
+    c2 = 0;
+    x1 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z1 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+    c1 = -.15;
+    c2 = 0;
+    x2 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z2 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+    c1 = -.15;
+    c2 = .7;
+    x3 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z3 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+    c1 = .15;
+    c2 = .7;
+    x4 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z4 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+    c1 = .0;
+    c2 = 1.1;
+    x5 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z5 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+    c1 = .25;
+    c2 = .7;
+    x6 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z6 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+    c1 = -.25;
+    c2 = .7;
+    x7 = c1*cos(angle*M_PI/180.) + c2*sin(angle*M_PI/180.);
+    z7 = c2*cos(angle*M_PI/180.) - c1*sin(angle*M_PI/180.);
+
+//    z´ = z cos B - x sen B
+//    x´ = x cos B + z sen B
+
+    glPushMatrix();
+    glDisable(GL_LIGHTING);
+    glTranslatef(0,0.05,0);
+    glColor3f(0,0.3,0);
+    glBegin(GL_QUADS);
+        glNormal3f(0,1,0);
+        glVertex3f(pos.x()+x+x1,0,pos.z()+z+z1);
+        glVertex3f(pos.x()+x+x2,0,pos.z()+z+z2);
+        glVertex3f(pos.x()+x+x3,0,pos.z()+z+z3);
+        glVertex3f(pos.x()+x+x4,0,pos.z()+z+z4);
+
+    glEnd();
+    glBegin(GL_TRIANGLES);
+    glNormal3f(0,1,0);
+    glVertex3f(pos.x()+x+x5,0,pos.z()+z+z5);
+    glVertex3f(pos.x()+x+x6,0,pos.z()+z+z6);
+    glVertex3f(pos.x()+x+x7,0,pos.z()+z+z7);
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+    glPopMatrix();
+}
+
+void Draw::drawAxisCameraView(float tam)
+{
+      const GLfloat redMaterial[]={1.,0.,0.,1.};
+      const GLfloat greenMaterial[]={0.,1.,0.,1.};
+      const GLfloat blueMaterial[]={0.,0.,1.,1.};
+      const GLfloat blackMaterial[]={0.,0.,0.,1.};
+
+      glMaterialfv(GL_FRONT, GL_AMBIENT, blackMaterial);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE, blackMaterial);
+      glMaterialfv(GL_FRONT, GL_SPECULAR, blackMaterial);
+
+      GLUquadricObj *quad = gluNewQuadric();
+
+      glLineWidth( 2 ) ;
+
+      //x
+      glMaterialfv(GL_FRONT, GL_AMBIENT, redMaterial);
+
+      glBegin(GL_LINES);
+        glVertex3f(0,0,0);
+        glVertex3f(tam,0,0);
+      glEnd();
+      glPushMatrix();
+        glRotated(90,0,1,0);
+        glTranslated(0,0,tam);
+        Draw::gluClosedCylinder(quad, 0.1*tam, 0, 0.2*tam, 10, 10);
+      glPopMatrix();
+      //y
+      glMaterialfv(GL_FRONT, GL_AMBIENT, greenMaterial);
+
+      glBegin(GL_LINES);
+        glVertex3f(0,0,0);
+        glVertex3f(0,tam,0);
+      glEnd();
+      glPushMatrix();
+        glRotated(90,-1,0,0);
+        glTranslated(0,0,tam);
+        Draw::gluClosedCylinder(quad, 0.1*tam, 0, 0.2*tam, 10, 10);
+      glPopMatrix();
+      //z
+      glMaterialfv(GL_FRONT, GL_AMBIENT, blueMaterial);
+
+      glBegin(GL_LINES);
+        glVertex3f(0,0,0);
+        glVertex3f(0,0,tam);
+      glEnd();
+      glPushMatrix();
+        glTranslated(0,0,tam);
+        Draw::gluClosedCylinder(quad, 0.1*tam, 0, 0.2*tam, 10, 10);
+      glPopMatrix();
+
+      glLineWidth( 1 ) ;
+
+      gluDeleteQuadric( quad );
+}
+
 void Draw::gluClosedCylinder(GLUquadric* quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks)
 {
     gluQuadricNormals(quad, GLU_SMOOTH);			// Create Smooth Normals
@@ -717,6 +822,39 @@ void Draw::gluClosedCylinder(GLUquadric* quad, GLdouble base, GLdouble top, GLdo
     glTranslated(0,0,height);
     gluDisk(quad, 0, base, slices, stacks);
     glPopMatrix();
+}
+
+void Draw::shadowMatrix( GLfloat shadowMat[4][4], GLfloat groundplane[4], GLfloat lightpos[4] )
+{
+
+      GLfloat dot;
+
+      // Find dot product between light position vector and ground plane normal
+      dot = groundplane[0] * lightpos[0] +
+        groundplane[1] * lightpos[1] +
+        groundplane[2] * lightpos[2] +
+        groundplane[3] * lightpos[3];
+
+      shadowMat[0][0] = dot - lightpos[0] * groundplane[0];
+      shadowMat[1][0] = 0.f - lightpos[0] * groundplane[1];
+      shadowMat[2][0] = 0.f - lightpos[0] * groundplane[2];
+      shadowMat[3][0] = 0.f - lightpos[0] * groundplane[3];
+
+      shadowMat[0][1] = 0.f - lightpos[1] * groundplane[0];
+      shadowMat[1][1] = dot - lightpos[1] * groundplane[1];
+      shadowMat[2][1] = 0.f - lightpos[1] * groundplane[2];
+      shadowMat[3][1] = 0.f - lightpos[1] * groundplane[3];
+
+      shadowMat[0][2] = 0.f - lightpos[2] * groundplane[0];
+      shadowMat[1][2] = 0.f - lightpos[2] * groundplane[1];
+      shadowMat[2][2] = dot - lightpos[2] * groundplane[2];
+      shadowMat[3][2] = 0.f - lightpos[2] * groundplane[3];
+
+      shadowMat[0][3] = 0.f - lightpos[3] * groundplane[0];
+      shadowMat[1][3] = 0.f - lightpos[3] * groundplane[1];
+      shadowMat[2][3] = 0.f - lightpos[3] * groundplane[2];
+      shadowMat[3][3] = dot - lightpos[3] * groundplane[3];
+
 }
 
 void Draw::setTransformODE(const dReal *pos, const dReal *R)

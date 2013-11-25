@@ -28,7 +28,10 @@ public:
     static void drawWireframe(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,0,0));
     static void drawSelection(Vec4 properties,float radius);                        //desenha um cubo selecionado o objeto
     static void drawArrow(Vec4 origin, Vec4 direction, float size,int material=MATERIAL_RUBY);
+    static void drawArrow2D(float angle,Vec4 anchor);
+    static void drawAxisCameraView(float size);
     static void gluClosedCylinder(GLUquadric*, GLdouble, GLdouble, GLdouble, GLint, GLint);
+    static void shadowMatrix( GLfloat shadowMat[4][4], GLfloat groundplane[4], GLfloat lightpos[4] );
     static void setTransformODE(const dReal* pos, const dReal* R);
     //static void gluCapsule(GLUquadric*, GLdouble, GLdouble, GLdouble, GLint, GLint);
 };

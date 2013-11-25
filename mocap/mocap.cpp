@@ -9,6 +9,12 @@
 #include "extra/material.h"
 MoCap::MoCap()
 {
+    frame_current = 1;
+    status = false;
+    file = "";
+    file_load = "";
+    beginClycle = 0;
+    clyclic = true;
 }
 
 MoCap::MoCap(Character *chara)
@@ -18,6 +24,8 @@ MoCap::MoCap(Character *chara)
     status = false;
     file = "";
     file_load = "";
+    beginClycle = 0;
+    clyclic = true;
 }
 
 void MoCap::setAddressFile(QString file)
@@ -117,14 +125,12 @@ void MoCap::showMoCap(Vec4 offset, int frame)
 void MoCap::initializePosesModel(int frame)
 {
     if (int(capMot.size())<frame) return;
-    frame = frame;
     frame_current = frame;
     Frame* pose = this->getFrameMotion(frame);
     for(int i=0;i<pose->getNumFrames();i++){
         chara->getBody(i)->setPositionCurrent(pose->getPosition(i));
         chara->getBody(i)->setRotationCurrent(pose->getOrientation(i));
     }
-    //printf("\nAtualizou!");
 }
 
 
@@ -147,19 +153,23 @@ void MoCap::loadFrameSimulation()
             //calcula quaternion relativo entre os dois corpos os quais a junta j liga
               Quaternion q,q1t,q2; //q1t - q1 transposto (inverso, conjugado)
               //q1t
+
               q1t = getFrameMotion(i)->getOrientation(chara->getIdObject(chara->getJoint(j)->getParent()));
               q1t = q1t.conjugate();
               //q2
               q2 = getFrameMotion(i)->getOrientation(chara->getIdObject(chara->getJoint(j)->getChild()));
               //q
               q = q1t*q2; //ou o contrario
+
               quatDes[j] = q;
                 //acho que nao eh mais para fazer isso: quatDes[j].xyz = quatDes[j].xyz.multiplicacao(-1.0); //nao entendi pq deve-se inverter o quaternion, mas deu certo assim
           }
           //inclui o frame no vector moCap
+
           capMotFrame.push_back(new FrameQuat(quatDes));
 
         }
+        frame_current = 1;
         //printf("In load frame: %d",capMotFrame.size());
 
 }
@@ -170,12 +180,6 @@ void MoCap::stepFrame(int value)
     if (!status) return;
     if (value>=int(this->capMotFrame.size())) value = 1;
     frame_current = value;
-    //int indice =  value-1;
-//    printf("\nFrames(%d/%d)",indice,capMot.size());
-//    printf("\nIndice: %d",indice);
-//    printf("\nControllers: %d",chara->getControllersPD().size());
-//    printf("\nMotions: %d",capMotFrame.size());
-
     drawShadow(Vec4(-0.5,0,0),value);
 }
 
@@ -215,6 +219,9 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
 
     qDesejado = qIdent.lessArc(qDesejado); //ja foi calculado acima
     int prox = frame+1;
+    if(frame+1>=endClycle){
+        prox = beginClycle;
+    }
     if(frame+2>=int(capMotFrame.size())) prox = frame;
     Quaternion qDesejadoMaisUm = getFrameMotion(prox)->getOrientation(body);
     //indo pelo caminho mais curto
@@ -241,6 +248,9 @@ Vec4 MoCap::velocityLinearBody(int frame, int body)
 {
     Vec4 pos_n = getFrameMotion(frame)->getPosition(body);
     int prox = frame+1;
+    if(frame+1>=endClycle){
+        prox = beginClycle;
+    }
     if(frame+2>=int(capMotFrame.size())) prox = frame;
     Vec4 pos_n1 = getFrameMotion(prox)->getPosition(body);
     Vec4 veldesejada = (pos_n1-pos_n)*(60);
@@ -294,6 +304,26 @@ Vec4 MoCap::getVelCOM(int frame)
     return rm/m;
 }
 
+void MoCap::setBeginClycle(int begin)
+{
+    beginClycle = begin;
+}
+
+int MoCap::getBeginClycle()
+{
+    return beginClycle;
+}
+
+void MoCap::setEndClycle(int end)
+{
+    endClycle = end;
+}
+
+int MoCap::getEndClycle()
+{
+    return endClycle;
+}
+
 int MoCap::sizeFrames()
 {
     return capMot.size();
@@ -302,7 +332,7 @@ int MoCap::sizeFrames()
 void MoCap::setStatusMotion(bool b)
 {
     status = b;
-    if (status) initializePosesModel(frame_current);
+    if(chara->getOffset().module()==0) if (status) initializePosesModel(frame_current);
 }
 
 void MoCap::restart()

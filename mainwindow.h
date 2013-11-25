@@ -20,6 +20,7 @@ public slots:
     void updateListJoints(std::vector<Joint*> joints);
     void updateControlPD();
     void updateControlPDManipulators();
+    void updateControlPDManipulators2();
     void updateKsGeral(Vec4 ks);
     void updateKdGeral(Vec4 kd);
     void updateBalancePD(Vec4 ksT,Vec4 kdT,Vec4 ksF,Vec4 kdF,Vec4 kmomlin, Vec4 kmomang);
@@ -32,6 +33,7 @@ public slots:
     void updateControlPDPositional();
     void showSelectedObject(int i);
     void setGravity();
+    void setGravity(Vec4);
     void checkFoot(bool);
     void checkBodyBalance(bool);
     void checkShowEffector(bool);
@@ -76,6 +78,42 @@ private slots:
     void on_actionSave_Simulation_triggered();
 
     void on_actionOpen_Simulation_triggered();
+
+    void on_checkBox_clicked(bool checked);
+
+    void on_xksTqBal_valueChanged(double arg1);
+
+    void on_xkdTqBal_valueChanged(double arg1);
+
+    void on_xksForBal_valueChanged(double arg1);
+
+    void on_xkdForBal_valueChanged(double arg1);
+
+    void on_xkmomlinBal_valueChanged(double arg1);
+
+    void on_xkmomangBal_valueChanged(double arg1);
+
+    void on_xksPdProp_valueChanged(double arg1);
+
+    void on_xkdPdProp_valueChanged(double arg1);
+
+    void on_posx_ks_valueChanged(double arg1);
+
+    void on_posx_kd_valueChanged(double arg1);
+
+    void on_ksx_valueChanged(double arg1);
+
+    void on_kdx_valueChanged(double arg1);
+
+    void on_ksy_valueChanged(double arg1);
+
+    void on_ksz_valueChanged(double arg1);
+
+    void on_angleBalBodyy_valueChanged(int arg1);
+
+    void on_angleBalBodyx_valueChanged(int arg1);
+
+    void on_angleBalBodyz_valueChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;

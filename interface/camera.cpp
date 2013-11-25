@@ -156,6 +156,9 @@ void Camera::translatey(float win_y, float last_y)
 void Camera::rotatex(float win_y, float last_y)
 {
     if(type==CAMERA_FAR){
+        float y = at.y();
+        float x = at.x();
+        float z = at.z();
     Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
       at = at*(2.0)-(eye);
       eye = aux;//.recebe(aux);
@@ -168,6 +171,15 @@ void Camera::rotatex(float win_y, float last_y)
       GLfloat moduloVec = Vec.module();
         Vec = Vec*(moduloVecant/moduloVec);
       at = eye+(Vec);
+      if(axis_y){
+          at.x2 = y;
+      }
+      if(axis_x){
+          at.x1 = x;
+      }
+      if(axis_z){
+          at.x3 = z;
+      }
       Vec = at-(eye);
 
       //vetor no sentido positivo da direcao x
@@ -181,15 +193,18 @@ void Camera::rotatex(float win_y, float last_y)
       up = XposUp^(Vec);
       up.normalize();
 
-//      Vec4 Xpos = Vec^(up);
-//      up = Xpos^(Vec);
-//      up.normalize();
-
-
-
       aux = eye;//.recebe(e);
       eye = eye*(2.0)-(at);
       at = aux;//.recebe(aux);
+      if(axis_y){
+          at.x2 = y;
+      }
+      if(axis_x){
+          at.x1 = x;
+      }
+      if(axis_z){
+          at.x3 = z;
+      }
       }else{
 
         float y = at.y();
@@ -226,6 +241,9 @@ void Camera::rotatey(float win_x, float last_x)
 {
 
     if(type==CAMERA_FAR){
+        float y = at.y();
+        float x = at.x();
+        float z = at.z();
     Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
     at = at*2 - eye;
     eye = aux;//.recebe(aux);
@@ -243,7 +261,15 @@ void Camera::rotatey(float win_x, float last_x)
     GLfloat moduloVec = Vec.module();
       Vec = Vec*( moduloVecant/moduloVec );
     at = eye+(Vec);
-
+    if(axis_y){
+        at.x2 = y;
+    }
+    if(axis_x){
+        at.x1 = x;
+    }
+    if(axis_z){
+        at.x3 = z;
+    }
     //novo-----------------------------------
     //atualizando u
     Vec4 u;
@@ -260,6 +286,7 @@ void Camera::rotatey(float win_x, float last_x)
     aux = eye;//.recebe(e);
     eye = eye*(2.0)-(at);
     at = aux;//.recebe(aux);
+
     }else{
         float y = at.y();
         float x = at.x();
@@ -291,6 +318,9 @@ void Camera::rotatey(float win_x, float last_x)
 void Camera::rotatez(float win_x, float last_x)
 {
     if(type==CAMERA_FAR){
+        float y = at.y();
+        float x = at.x();
+        float z = at.z();
         //vetor do olho(eye) ao centro(center)
         Vec4 Vec = at-(eye);
         //vetor no sentido positivo da direcao x
@@ -300,6 +330,15 @@ void Camera::rotatez(float win_x, float last_x)
         //modificando o vetor up
         up = up-( Xpos*( (last_x - win_x)/300.0 ) );
         up.normalize();
+        if(axis_y){
+            at.x2 = y;
+        }
+        if(axis_x){
+            at.x1 = x;
+        }
+        if(axis_z){
+            at.x3 = z;
+        }
     }else{
 
                 float y = at.y();

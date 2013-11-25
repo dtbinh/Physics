@@ -59,6 +59,11 @@ Vec4 Joint::getLimitAngularMin()
     return this->limInfA;
 }
 
+Vec4 Joint::getPositionAnchorInit()
+{
+    return Vec4(initialAnchor->x(),initialAnchor->y(),initialAnchor->z());
+}
+
 Vec4 Joint::getPositionAnchor()
 {
     return Physics::getAnchorJoint(this);

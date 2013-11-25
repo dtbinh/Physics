@@ -551,22 +551,22 @@ void Material::setMaterial(Material *mat, int type)
 
     }
     case MATERIAL_WHITE_PLASTIC:{
-        mat->ambient[0] = 0;
-        mat->ambient[1] = 0;
-        mat->ambient[2] = 0;
+        mat->ambient[0] = 1;
+        mat->ambient[1] = 1;
+        mat->ambient[2] = 1;
         mat->ambient[3] = 1.0;
 
-        mat->specular[0] = 0.7;
-        mat->specular[1] = 0.7;
-        mat->specular[2] = 0.7;
+        mat->specular[0] = 1;
+        mat->specular[1] = 1;
+        mat->specular[2] = 1;
         mat->specular[3] = 1.0;
 
-        mat->diffuse[0] = 0.55;
-        mat->diffuse[1] = 0.55;
-        mat->diffuse[2] = 0.55;
+        mat->diffuse[0] = 1;
+        mat->diffuse[1] = 1;
+        mat->diffuse[2] = 1;
         mat->diffuse[3] = 1.0;
 
-        mat->shininess = 0.25;
+        mat->shininess = 1.;
         break;
 
     }

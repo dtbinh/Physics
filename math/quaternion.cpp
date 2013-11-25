@@ -22,7 +22,25 @@ Quaternion::Quaternion()
 Quaternion::Quaternion( float w, Vec4 v )
 {
   this->w = w;
-  this->setVector(v);
+    this->setVector(v);
+}
+
+Quaternion::Quaternion(float thetaX, float thetaY, float thetaZ)
+{
+    thetaX = (thetaX / 2.0) * (M_PI / 180.0);
+    thetaY = (thetaY / 2.0) * (M_PI / 180.0);
+    thetaZ = (thetaZ / 2.0) * (M_PI / 180.0);
+
+    Quaternion qThetaX(cos(thetaX), sin(thetaX), 0.0, 0.0);
+    Quaternion qThetaY(cos(thetaY), 0.0, sin(thetaY), 0.0);
+    Quaternion qThetaZ(cos(thetaZ), 0.0, 0.0, sin(thetaZ));
+
+    Quaternion q = qThetaZ* qThetaY;
+    q = q*qThetaX;
+    q.normalize();
+    Quaternion norm = q;
+
+    *this = norm;
 }
 //---------------------------------------------------------------------------
 //Construtor
@@ -583,3 +601,84 @@ Vec4 Quaternion::getVecRotation(Quaternion q, Vec4 v)
     return r;
 
 }
+
+float Quaternion::normal()
+{
+    float res;
+    res = sqrt(this->getScalar()*this->getScalar()+
+               this->getPosX()*this->getPosX()+
+               this->getPosY()*this->getPosY()+
+               this->getPosZ()*this->getPosZ());
+    return res;
+}
+
+bool operator==(Quaternion p, Quaternion q)
+{
+    if(p.getScalar()==q.getScalar() && p.getPosX()==q.getPosX() && p.getPosY()==q.getPosX() && p.getPosZ()==q.getPosZ()) return true;
+    return false;
+}
+
+
+
+Quaternion operator-(Quaternion p, Quaternion q)
+{
+    return Quaternion(p.getScalar() - q.getScalar(), p.getPosX() - q.getPosX(), p.getPosY() - q.getPosY(), p.getPosZ() - q.getPosZ());
+}
+
+//Quaternion Quaternion::operator -(Quaternion q)
+//{
+//    Quaternion res;
+//    res.setScalar(this->getScalar()-q.getScalar());
+//    res.setPosX(this->getPosX()-q.getPosX());
+//    res.setPosY(this->getPosY()-q.getPosY());
+//    res.setPosZ(this->getPosZ()-q.getPosZ());
+//    return res;
+//}
+
+
+Quaternion Quaternion::operator /(double k)
+{
+    Quaternion res;
+    res.setScalar(this->getScalar()/k);
+    res.setPosX(this->getPosX()/k);
+    res.setPosY(this->getPosY()/k);
+    res.setPosZ(this->getPosZ()/k);
+    return res;
+}
+
+float Quaternion::dot(Quaternion p, Quaternion q)
+{
+    return sqrt(p.getScalar()*q.getScalar() + p.getPosX()*q.getPosX() + p.getPosY()*q.getPosY() + p.getPosZ()*q.getPosZ());
+}
+
+//Quaternion Quaternion::operator *(Quaternion q)
+//{
+//    //q1q2 = (s1 , v1)(s2 , v2) = (s1*s2 − v1⋅v 2 , s1v2 + s2v1 + v1 × v2 )
+//    Quaternion res;
+//    Vec4 v;
+//    res.setScalar(this->getScalar()*q.getScalar() - this->getVector()*this->getVector());
+//    v.setVec4(q.getVector()*this->getScalar()+this->getVector()*q.getScalar()+Vec4::crossProduct(this->getVector(),q.getVector()));
+//    res.setPosX(v.x1);
+//    res.setPosY(v.x2);
+//    res.setPosZ(v.x3);
+//    return res;
+//}
+
+//Quaternion operator*(Quaternion q1, Quaternion q2) {
+
+//    Quaternion qr;
+//    qr.setScalar(q1.getScalar()*q2.getScalar() - q1.getPosX()*q2.getPosX() - q1.getPosY()*q2.getPosY() - q1.getPosZ()*q2.getPosZ());
+//    qr.setPosX(q1.getScalar()*q2.getPosX() + q2.getScalar()*q1.getPosX() + q1.getPosY()*q2.getPosZ() - q1.getPosZ()*q2.getPosY());
+//    qr.setPosY(q1.getScalar()*q2.getPosY() + q2.getScalar()*q1.getPosY() + q1.getPosZ()*q2.getPosX() - q1.getPosX()*q2.getPosZ());
+//    qr.setPosZ(q1.getScalar()*q2.getPosZ() + q2.getScalar()*q1.getPosZ() + q1.getPosX()*q2.getPosY() - q1.getPosY()*q2.getPosX());
+
+//    return qr;
+////    return Quaternion(p.getScalar()*q.getScalar() - p.getPosX()*q.getPosX() - p.getPosY()*q.getPosY() - p.getPosZ()*q.getPosZ(),
+////                      p.getScalar()*q.getPosX() + p.getPosX()*q.getScalar() + p.getPosY()*q.getPosZ() - p.getPosZ()*q.getPosY(),
+////                      p.getScalar()*q.getPosY() - p.getPosX()*q.getPosZ() + p.getPosY()*q.getScalar() + p.getPosZ()*q.getPosX(),
+////                      p.getScalar()*q.getPosZ() + p.getPosX()*q.getPosY() - p.getPosY()*q.getPosX() + p.getPosZ()*q.getScalar());
+//}
+
+//Quaternion operator/(Quaternion p, Quaternion q) {
+//    return p * q.inverse();
+//}

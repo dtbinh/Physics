@@ -31,6 +31,7 @@ private:
     bool           sim_status;     //retorna se a simulação esta ativa
     int            frame_step;
     bool           status_motion;
+    bool           show_grf;
     //interface
     GLWidget *parent;
     //graphics
@@ -128,6 +129,8 @@ public:
     void                  statusMotionCapture(bool b);
     //testes de robustez
     void                  shotBallsCharacterRandom(Character *chara, int posPlevis); //atirar objetos no personagem
+    //teste de contato
+    bool                  isGeometryFootSwing(dGeomID geom);
 
 
 
@@ -135,6 +138,10 @@ public:
 
     //Graphics
     void           draw(); //desenha os objetos e/ou juntas com OpenGL
+    void           drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
+    void           drawShadows(); //desenha os objetos e/ou juntas com OpenGL
+    void           loadSceneObjects();
+
 
 };
 

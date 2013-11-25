@@ -172,6 +172,32 @@
              </item>
             </layout>
            </widget>
+           <widget class="QCheckBox" name="checkBox">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>100</y>
+              <width>281</width>
+              <height>16</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Update Simultaneously</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="kdtoks">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>130</y>
+              <width>201</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Kd = 1/10ks Automaticaly</string>
+            </property>
+           </widget>
           </widget>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -509,30 +535,30 @@ QGroupBox{
                <item>
                 <widget class="QSpinBox" name="angleBalBodyx">
                  <property name="minimum">
-                  <number>-360</number>
+                  <number>-361</number>
                  </property>
                  <property name="maximum">
-                  <number>360</number>
+                  <number>361</number>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QSpinBox" name="angleBalBodyy">
                  <property name="minimum">
-                  <number>-360</number>
+                  <number>-361</number>
                  </property>
                  <property name="maximum">
-                  <number>360</number>
+                  <number>361</number>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QSpinBox" name="angleBalBodyz">
                  <property name="minimum">
-                  <number>-360</number>
+                  <number>-361</number>
                  </property>
                  <property name="maximum">
-                  <number>360</number>
+                  <number>361</number>
                  </property>
                 </widget>
                </item>
@@ -641,6 +667,9 @@ QGroupBox{
                  <property name="maximum">
                   <double>500.000000000000000</double>
                  </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
                  <property name="value">
                   <double>1.000000000000000</double>
                  </property>
@@ -653,6 +682,9 @@ QGroupBox{
                  </property>
                  <property name="maximum">
                   <double>500.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
                  </property>
                  <property name="value">
                   <double>1.000000000000000</double>
@@ -667,187 +699,11 @@ QGroupBox{
                  <property name="maximum">
                   <double>500.000000000000000</double>
                  </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
                  <property name="value">
                   <double>1.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_7">
-            <property name="geometry">
-             <rect>
-              <x>9</x>
-              <y>582</y>
-              <width>301</width>
-              <height>42</height>
-             </rect>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>9</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QGroupBox::title { 
-   
-     subcontrol-position: top left; /* position at the top left*/ 
-  padding: 2px 13px;
-   margin-top: -5px;
-    
- }
-
-QGroupBox{
-   border: 1px solid rgb(182, 181, 179);
-  border-radius: 5px;
-}</string>
-            </property>
-            <property name="title">
-             <string>Character Draw</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_14">
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="checkWireChara">
-               <property name="text">
-                <string>Draw Wireframe</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_8">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>630</y>
-              <width>299</width>
-              <height>84</height>
-             </rect>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>9</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QGroupBox::title { 
-   
-     subcontrol-position: top left; /* position at the top left*/ 
-  padding: 2px 13px;
-   margin-top: -5px;
-    
- }
-
-QGroupBox{
-   border: 1px solid rgb(182, 181, 179);
-  border-radius: 5px;
-}</string>
-            </property>
-            <property name="title">
-             <string>Locomotion</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_11">
-             <item row="0" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_23">
-               <item>
-                <widget class="QLabel" name="label_24">
-                 <property name="text">
-                  <string>Dist:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="xLocDist">
-                 <property name="minimum">
-                  <double>-999.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>999.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>15.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="yLocDist">
-                 <property name="minimum">
-                  <double>-999.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>999.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>15.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="zLocDist">
-                 <property name="minimum">
-                  <double>-999.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>999.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>15.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_24">
-               <item>
-                <widget class="QLabel" name="label_25">
-                 <property name="text">
-                  <string>Vel:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="xLocVel">
-                 <property name="minimum">
-                  <double>-999.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>999.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>15.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="yLocVel">
-                 <property name="minimum">
-                  <double>-999.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>999.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>15.000000000000000</double>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QDoubleSpinBox" name="zLocVel">
-                 <property name="minimum">
-                  <double>-999.000000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>999.000000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>15.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -858,10 +714,10 @@ QGroupBox{
            <widget class="QGroupBox" name="groupBoxCone">
             <property name="geometry">
              <rect>
-              <x>9</x>
-              <y>374</y>
+              <x>10</x>
+              <y>430</y>
               <width>301</width>
-              <height>201</height>
+              <height>241</height>
              </rect>
             </property>
             <property name="font">
@@ -894,7 +750,7 @@ QGroupBox{
                <x>3</x>
                <y>3</y>
                <width>291</width>
-               <height>201</height>
+               <height>236</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -942,7 +798,7 @@ QGroupBox{
                      <double>500.000000000000000</double>
                     </property>
                     <property name="singleStep">
-                     <double>0.500000000000000</double>
+                     <double>0.010000000000000</double>
                     </property>
                     <property name="value">
                      <double>0.030000000000000</double>
@@ -966,7 +822,7 @@ QGroupBox{
                      <double>500.000000000000000</double>
                     </property>
                     <property name="singleStep">
-                     <double>0.500000000000000</double>
+                     <double>0.010000000000000</double>
                     </property>
                     <property name="value">
                      <double>0.070000000000000</double>
@@ -1001,6 +857,24 @@ QGroupBox{
                    </widget>
                   </item>
                  </layout>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_23">
+                <item>
+                 <widget class="QLabel" name="label_24">
+                  <property name="text">
+                   <string>Limit Percent:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="coneLimit">
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -1090,6 +964,83 @@ QGroupBox{
               </item>
              </layout>
             </widget>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_7">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>380</y>
+              <width>301</width>
+              <height>44</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Character Draw</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_24">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="checkGRF">
+                 <property name="text">
+                  <string>GRF</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkShadow">
+                 <property name="text">
+                  <string>Shadow</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkShowChara">
+                 <property name="text">
+                  <string>Chara</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkWireChara">
+                 <property name="text">
+                  <string> Wire</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="tab_2">
@@ -1275,22 +1226,6 @@ QGroupBox{
              </item>
             </layout>
            </widget>
-           <widget class="QCheckBox" name="checkShowChara">
-            <property name="geometry">
-             <rect>
-              <x>20</x>
-              <y>170</y>
-              <width>161</width>
-              <height>22</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Show Character</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
@@ -1325,6 +1260,96 @@ QGroupBox{
               </widget>
              </item>
             </layout>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_12">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>440</y>
+              <width>301</width>
+              <height>112</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Frame Period</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_15">
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="mocapCyclic">
+               <property name="text">
+                <string>Cyclic</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_38">
+               <item>
+                <widget class="QLabel" name="label_36">
+                 <property name="text">
+                  <string>Begin</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="beginClycle"/>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_39">
+               <item>
+                <widget class="QLabel" name="label_37">
+                 <property name="text">
+                  <string>End</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="endClycle"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QCheckBox" name="checkShowMocap">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>170</y>
+              <width>151</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Show MoCap</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </widget>
           <widget class="QWidget" name="tabManipulatorSim">
@@ -1407,6 +1432,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.050000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1420,6 +1448,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.050000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1432,6 +1463,9 @@ QGroupBox{
                    </property>
                    <property name="maximum">
                     <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.050000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1457,6 +1491,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1470,6 +1507,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1482,6 +1522,9 @@ QGroupBox{
                    </property>
                    <property name="maximum">
                     <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1507,6 +1550,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1520,6 +1566,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1532,6 +1581,9 @@ QGroupBox{
                    </property>
                    <property name="maximum">
                     <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1768,6 +1820,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>10000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>10.000000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1784,6 +1839,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>10000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>10.000000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1799,6 +1857,9 @@ QGroupBox{
                    </property>
                    <property name="maximum">
                     <double>10000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>10.000000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1911,6 +1972,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1921,6 +1985,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1930,6 +1997,9 @@ QGroupBox{
                    </property>
                    <property name="maximum">
                     <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -1952,6 +2022,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1962,6 +2035,9 @@ QGroupBox{
                    <property name="maximum">
                     <double>1000.000000000000000</double>
                    </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -1971,6 +2047,9 @@ QGroupBox{
                    </property>
                    <property name="maximum">
                     <double>1000.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
                    </property>
                   </widget>
                  </item>

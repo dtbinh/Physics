@@ -70,6 +70,45 @@ Vec4 Sensor::getSupportProjected(Character *chara,bool capture)
 
 }
 
+bool Sensor::isSwingFoot(Object *obj)
+{
+    if(obj==NULL) return false;
+    if(!(obj->getFoot())) return false;
+    if((obj->getCharacter()==NULL)) return false;
+    if(obj->getCharacter()->getMoCap()->status && obj->getCharacter()->getMoCap()->sizeFrames()>0){
+        int frame =  obj->getCharacter()->getMoCap()->frame_current;
+        std::vector<Object*> foots;
+        for(int i=0;i< obj->getCharacter()->getNumBodies();i++){
+            if( obj->getCharacter()->getBody(i)->getFoot()) foots.push_back( obj->getCharacter()->getBody(i));
+        }
+        bool foot_l,foot_r;
+        bool close_enought_l = true;
+        bool close_enought_r = true;
+        Vec4 prop = foots.at(0)->getProperties();
+        float height = prop.y()/2.0;
+        if (foots.at(0)->posEffectorBackward().y()<height+0.01 || foots.at(0)->posEffectorForward().y()<height+0.01){
+            close_enought_l = true;
+        }
+        if (foots.at(1)->posEffectorBackward().y()<height+0.01 || foots.at(1)->posEffectorForward().y()<height+0.01){
+            close_enought_r = true;
+        }
+        foot_l =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
+        foot_r =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootRightGround();
+        if (foot_l && foot_r && close_enought_l && close_enought_r)
+            return false;
+        else if (foot_l && close_enought_l){
+            if (obj != foots.at(0)) return true;
+
+        }
+        else if (foot_r && close_enought_r){
+            if (obj != foots.at(1)) return true;
+
+        }
+        return false;
+    }
+    return false;
+}
+
 int Sensor::getSwingFoot(Character *chara)
 {
     std::vector<Object*> foots;
@@ -120,7 +159,7 @@ int Sensor::getHierarchy2Use(Character *chara)
     int state = 0;
     for(unsigned int i=0;i<foots.size();i++){
         Vec4 value = chara->getGRFSum(foots.at(i));
-        if(value.module()>tolerance){
+        if(value.y()>tolerance){
             contact = foots.at(i);
             state++;
         }
@@ -141,18 +180,26 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
     }
     int state = 0;
     bool foot_l,foot_r;
-    bool close_enought_l = true;
-    bool close_enought_r = true;
+    bool close_enought_l = false;
+    bool close_enought_r = false;
     Vec4 prop = foots.at(0)->getProperties();
     float height = prop.y()/2.0;
-    if (foots.at(0)->posEffectorBackward().y()<height+0.001 || foots.at(0)->posEffectorForward().y()<height+0.001){
-        close_enought_l = true;
-    }
-    if (foots.at(1)->posEffectorBackward().y()<height+0.001 || foots.at(1)->posEffectorForward().y()<height+0.001){
-        close_enought_r = true;
-    }
     foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
     foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
+    if (!foot_l){
+        if (foots.at(0)->posEffectorBackward().y()<height+0.01 || foots.at(0)->posEffectorForward().y()<height+0.01){
+            close_enought_l = true;
+        }
+    }else{
+        close_enought_l =true;
+    }
+    if (!foot_r){
+        if (foots.at(1)->posEffectorBackward().y()<height+0.01 || foots.at(1)->posEffectorForward().y()<height+0.01){
+            close_enought_r = true;
+        }
+    }else{
+        close_enought_r = true;
+    }
     if (foot_l && foot_r && close_enought_l && close_enought_r)
         state = 2;
     else if (foot_l && close_enought_l){

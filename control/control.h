@@ -4,6 +4,7 @@
 #include "math/vec4.h"
 #include "math/quaternion.h"
 #include "scene/joint.h"
+#include "math/matrix.h"
 
 class ControlPD
 {
@@ -15,8 +16,11 @@ private:
     Vec4       propKs;
     Vec4       propKd;
     bool       enabled;
+    Matrix     inertia;
 
 public:
+    void setInertiaFactors(Matrix i);
+    void resetInertiaFactors();
     ControlPD(Joint *joint,Quaternion qwanted,Vec4 ks,Vec4 kd);
     void setJoint(Joint *joint);
     Joint* getJoint();

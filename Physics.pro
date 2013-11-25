@@ -37,7 +37,8 @@ SOURCES += main.cpp\
     control/sensor.cpp \
     mocap/framequat.cpp \
     interface/camera.cpp \
-    extra/ObjMesh.cpp
+    extra/ObjMesh.cpp \
+    interpolation/interpolation.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -64,7 +65,8 @@ HEADERS  += mainwindow.h \
     control/sensor.h \
     mocap/framequat.h \
     interface/camera.h \
-    extra/ObjMesh.h
+    extra/ObjMesh.h \
+    interpolation/interpolation.h
 
 FORMS    += mainwindow.ui
 
