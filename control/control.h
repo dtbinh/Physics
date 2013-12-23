@@ -17,6 +17,8 @@ private:
     Vec4       propKd;
     bool       enabled;
     Matrix     inertia;
+    Vec4       velDesired;
+    bool       enable_inertia; //habilita ou não o fator de inercia da junta
 
 public:
     void setInertiaFactors(Matrix i);
@@ -32,11 +34,14 @@ public:
     Vec4 getKd();
     void setEnabled(bool enabled);
     bool isEnabled();
+    void setEnabledInertia(bool enabled_inertia);
+    bool isEnabledInertia();
     void evaluate();
     void updateKsKdCoros(float MassTotal);
     void setProportionalKs(Vec4 pks);
     void setProportionalKd(Vec4 pkd);
-
+    void setVelocityDesired(Vec4 vel);
+    Quaternion getOrientation();
     Vec4 getProportionalKs();
     Vec4 getProportionalKd();
     Vec4 limitingTorquePD(Vec4 tq);

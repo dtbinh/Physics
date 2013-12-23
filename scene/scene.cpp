@@ -8,8 +8,20 @@
 #include <time.h>
 #include <stdlib.h>
 #include "graphics/draw.h"
+#include "omp.h"
+#include <sys/time.h>
+#include <stdio.h>
+#include "mocap/framequat.h"
+#include "mocap/frame.h"
+#include "extra/utils.h"
 bool apply = true;
-
+QList<QList <Vec4> > motion;
+QList<QList <Vec4> > mocap;
+QList<double> tempopass;
+QList<double> sim_dist;
+QList<double> mocap_dist;
+bool initialize=false;
+bool record = false;
 
 Scene::Scene(GLWidget *parent)
 {
@@ -17,13 +29,25 @@ Scene::Scene(GLWidget *parent)
     this->parent = parent;
     Physics::initScene(this);
     this->sim_step = 67;
-    this->frame_step = 1;
+    this->frame_step = -1;
     this->status_motion = false;
     this->enableGravity = false;
     this->externalForce = Vec4();
     this->propKs = Vec4(1,1,1);
     this->propKd = Vec4(1,1,1);
     this->show_grf = true;
+    motion.clear();
+    mocap.clear();
+
+//    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(74,0,0)),TYPE_CUBE,1.2);
+//    Object *cont = addObject(Vec4(1.8,0.20,0.5),Vec4(0.2,0.1,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2);
+//    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,2.68),Quaternion(Vec4(-74,0,0)),TYPE_CUBE,1.2);
+
+//    objects.push_back(ramp);
+//    objects.push_back(cont);
+//    objects.push_back(ramp2);
+
+    //objects.push_back(addObject(Vec4(0.2,0.2,0.2),Vec4(0,0.1,1.3),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2));
 }
 
 Scene::~Scene(){
@@ -82,6 +106,7 @@ void Scene::restartPhysics()
 void Scene::initPhysics()
 {
     Physics::initScene(this);
+
 }
 
 void Scene::stopPhysics()
@@ -94,10 +119,23 @@ void Scene::startPhysics()
     sim_status = true;
 }
 
+bool entrou=true;
+double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
+timeval tempo_inicio;
 void Scene::simulationStep()
 {
     if(!sim_status) return;
-    if(characters.size()>0)
+    Vec4 vel_des= Vec4();
+    Vec4 mom_lin_des= Vec4();
+    Vec4 mom_ang_des= Vec4();
+    Joint* jDes = NULL; //junta que é aplicado o torque virtual
+    float mass_total= 0;
+    Quaternion qd = Quaternion();
+    Vec4 vel_angd = Vec4();
+    //frame_step = -1;
+    if(characters.size()>0){
+        jDes = characters.at(0)->getJointParentBalance();
+        mass_total = this->getCharacter(0)->getMassTotal();
         if (status_motion)
             if(characters.at(0)->getMoCap()->sizeFrames()>0 && getCharacter(0)->getMoCap()->status){
                 if (frame_step<characters.at(0)->getMoCap()->getBeginClycle()) frame_step = characters.at(0)->getMoCap()->getBeginClycle();
@@ -117,9 +155,35 @@ void Scene::simulationStep()
                     }
                 }
                 characters.at(0)->getMoCap()->stepFrame(frame_step);
+                if((characters.at(0)->getMoCap()->sizeFrames()>0)&&(characters.at(0)->getMoCap()->status))
+                    for(unsigned int i=0; i<characters.at(0)->getControllersPD().size();i++){
+                        Quaternion des = characters.at(0)->getMoCap()->getFrameSimulation(frame_step)->quatDes.at(i);
+                        Object* father = this->getCharacter(0)->getControllersPD().at(i)->getJoint()->getParent();
+                        Object* child = this->getCharacter(0)->getControllersPD().at(i)->getJoint()->getChild();
+
+                        Vec4 veldes = characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(child)) - characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(father));
+                        characters.at(0)->getControllersPD().at(i)->setQuaternionWanted(des);
+                        characters.at(0)->getControllersPD().at(i)->setVelocityDesired(veldes);
+                        characters.at(0)->getControllersPD().at(i)->resetInertiaFactors();
+                    }
+                vel_des = characters.at(0)->getMoCap()->getVelCOM(frame_step);
+                mom_lin_des = characters.at(0)->getMoCap()->getMomentumLinear(frame_step);
+                mom_ang_des = characters.at(0)->getMoCap()->getMomentumAngular(frame_step);
+                qd = characters.at(0)->getMoCap()->getFrameMotion(frame_step)->getOrientation(characters.at(0)->getIdObject(jDes->getParent()));
+                vel_angd = characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(jDes->getParent()));
+
             }
+
+    }
     std::vector<Object*> objs = objectsScene();
     std::vector<Joint*> jts = jointsScene();
+    //#pragma omp parallel
+    timeval tempo_fim;
+    if (initialize && entrou){
+          ti = tf = tempo = 0;
+          gettimeofday(&tempo_inicio,NULL);
+          entrou = false;
+    }
     for(int i=0;i<this->sim_step;i++){
         if(characters.size()>0)
            for(unsigned int i=0;i<objs.size();i++){
@@ -133,7 +197,7 @@ void Scene::simulationStep()
            for(unsigned int k=0;k<jts.size();k++) Physics::setEnableJoint(jts.at(k));
            for(unsigned int j=0;j<characters.size();j++){
                if(characters.at(j)->balance!=NULL && enableGravity){
-                   characters.at(j)->balance->evaluate();
+                   this->getCharacter(j)->getBalance()->evaluate(jDes,mass_total,frame_step,qd,vel_angd,vel_des,mom_lin_des,mom_ang_des);
                }else{
                    for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
                        (*it)->evaluate();
@@ -143,6 +207,35 @@ void Scene::simulationStep()
            }
            Physics::simSingleStep(this);
         }
+    if(initialize){
+        gettimeofday(&tempo_fim,NULL);
+        tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+        ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+        tempo = (tf - ti) / 1000000;
+//        for(int i = 0;i<getCharacter(0)->getNumJoints();i++){
+//            Vec4 orient = (getCharacter(0)->getControllersPD().at(i)->getOrientation().toEuler())*(M_PI/180.);
+//            Vec4 orientmocap = getCharacter(0)->getControllersPD().at(i)->getQuaternionWanted().toEuler()*(M_PI/180.);
+//            motion[i].push_back(orient);
+//            mocap[i].push_back(orientmocap);
+//        }
+        sim_dist.push_back(getCharacter(0)->getBalance()->sim_dist);
+        mocap_dist.push_back(getCharacter(0)->getBalance()->mocap_dist);
+        tempopass.push_back(tempo);
+    }
+    if(record){
+        QString endmotion = "/home/danilo/GitHub/ODESys/results/Walking.dist";
+        Utils::saveListDistMotion(sim_dist,mocap_dist,tempopass,endmotion.toStdString());
+//        for(int i=0;i<getCharacter(0)->getNumJoints();i++){
+//            QString endmotion = "/home/danilo/GitHub/ODESys/results/" + getCharacter(0)->getJoint(i)->getName()+".tab";
+//            Utils::saveListMotion(motion.at(i),mocap.at(i),tempopass,endmotion.toStdString());
+
+
+//        }
+        record = false;
+
+    }
+
+//      printf("Tempo gasto em milissegundos %.3f\n",tempo);
         apply = true;
 
 
@@ -491,12 +584,18 @@ Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character
     return joint;
 }
 
-Joint *Scene::addJointFixed(Object *parent,Character *chara)
+Joint *Scene::addJointFixed(Object *parent,Object *child,Character *chara)
 {
     Joint *joint = NULL;
     if(chara != NULL){
         joint = new Joint(chara,JOINT_FIXED);
         joint->setParent(parent);
+        joint->setChild(child);
+        joint->initJoint();
+    }else{
+        joint = new Joint(JOINT_FIXED);
+        joint->setParent(parent);
+        joint->setChild(child);
         joint->initJoint();
     }
     return joint;
@@ -773,6 +872,7 @@ void Scene::restartMotionCapture()
 void Scene::statusMotionCapture(bool b)
 {
     status_motion = b;
+    startRecorder(b);
 }
 
 void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
@@ -803,11 +903,15 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
          deltaCenter = Vec4( dRandReal()*0.3-0.15, dRandReal()*1.6-0.75, dRandReal()*0.3-0.15 );
 
        Vec4 directionVelInicial = posPelvisModel+(deltaCenter)-(inicio);
+
          //directionVelInicial.normaliza();
        Vec4 velInicial = directionVelInicial*( 15.0 );//dRandReal()*50.0+10.0 );
+       Vec4 vell = velInicial;
+       vell.x2=0;
+       printf("\nVelocidade: %.3f",vell.module());
        dReal massTotal;
        //if ( pelvisIsTheTarget ) {
-       massTotal = 0.75;
+       massTotal = 1;
        Object *obj = new Object(this);//position,rotation,properties,type,this);
        obj->setMaterial(MATERIAL_COPPER);
        obj->setType(TYPE_SPHERE);
@@ -927,6 +1031,40 @@ bool Scene::isGeometryFootSwing(dGeomID geom)
         if (obj.at(i)->getGeometry()==geom) return Sensor::isSwingFoot(obj.at(i));
     }
     return false;
+}
+
+void Scene::createRamp()
+{
+    return;
+    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(75,0,0)),TYPE_CUBE,1.2);
+  //  Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),Quaternion(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    Object *cont = addObject(Vec4(1.8,0.18,0.5),Vec4(-0.1,0.05,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.1,2.68),Quaternion(Vec4(-75,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    objects.push_back(ramp);
+    objects.push_back(cont);
+    objects.push_back(ramp2);
+    joints.push_back(addJointFixed(ramp,ramp2,NULL));
+    //joints.push_back(addJointFixed(ramp2,));
+//    joints.push_back(addJointFixed(cont,NULL));
+
+    // objects.push_back(addObject(Vec4(0.8,0.1,0.4),Vec4(0.2,0.05,1.3),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2));
+}
+
+void Scene::startRecorder(bool b)
+{
+    if (b){
+        initialize = b;
+        for (int i=0;i<getCharacter(0)->getNumJoints();i++){
+            QList<Vec4> n;
+            QList<Vec4> n1;
+            motion.append(n);
+            mocap.append(n1);
+        }
+    }
+    if ((initialize) && (!b)){
+        initialize = false;
+        record = true;
+    }
 }
 
 

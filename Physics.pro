@@ -70,8 +70,11 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas
+LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas -fopenmp
 
 CONFIG += release
 
 QT += xml
+
+QMAKE_CXXFLAGS += -fopenmp
+QMAKE_LFLAGS +=  -fopenmp

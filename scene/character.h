@@ -87,6 +87,7 @@ public:
     std::vector<GRF> getGRFsObject(Object *obj);
     void setKsRetaionshipKd();
     void setOffset(Vec4 offset);
+
     Vec4 getOffset();
 
 

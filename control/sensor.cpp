@@ -82,14 +82,14 @@ bool Sensor::isSwingFoot(Object *obj)
             if( obj->getCharacter()->getBody(i)->getFoot()) foots.push_back( obj->getCharacter()->getBody(i));
         }
         bool foot_l,foot_r;
-        bool close_enought_l = true;
-        bool close_enought_r = true;
+        bool close_enought_l = false;
+        bool close_enought_r = false;
         Vec4 prop = foots.at(0)->getProperties();
         float height = prop.y()/2.0;
-        if (foots.at(0)->posEffectorBackward().y()<height+0.01 || foots.at(0)->posEffectorForward().y()<height+0.01){
+        if (foots.at(0)->posEffectorBackward().y()<height+0.005 || foots.at(0)->posEffectorForward().y()<height+0.005){
             close_enought_l = true;
         }
-        if (foots.at(1)->posEffectorBackward().y()<height+0.01 || foots.at(1)->posEffectorForward().y()<height+0.01){
+        if (foots.at(1)->posEffectorBackward().y()<height+0.005 || foots.at(1)->posEffectorForward().y()<height+0.005){
             close_enought_r = true;
         }
         foot_l =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
@@ -97,11 +97,13 @@ bool Sensor::isSwingFoot(Object *obj)
         if (foot_l && foot_r && close_enought_l && close_enought_r)
             return false;
         else if (foot_l && close_enought_l){
-            if (obj != foots.at(0)) return true;
+            if (obj == foots.at(0)) return false;
+            else return true;
 
         }
         else if (foot_r && close_enought_r){
-            if (obj != foots.at(1)) return true;
+            if (obj == foots.at(1)) return false;
+            else return true;
 
         }
         return false;
@@ -187,14 +189,14 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
     foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
     foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     if (!foot_l){
-        if (foots.at(0)->posEffectorBackward().y()<height+0.01 || foots.at(0)->posEffectorForward().y()<height+0.01){
+        if (foots.at(0)->posEffectorBackward().y()<height+0.0005 || foots.at(0)->posEffectorForward().y()<height+0.0005){
             close_enought_l = true;
         }
     }else{
         close_enought_l =true;
     }
     if (!foot_r){
-        if (foots.at(1)->posEffectorBackward().y()<height+0.01 || foots.at(1)->posEffectorForward().y()<height+0.01){
+        if (foots.at(1)->posEffectorBackward().y()<height+0.0005 || foots.at(1)->posEffectorForward().y()<height+0.0005){
             close_enought_r = true;
         }
     }else{

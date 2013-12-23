@@ -26,6 +26,8 @@ ControlPD::ControlPD(Joint *joint, Quaternion qwanted, Vec4 ks, Vec4 kd)
     this->propKs = Vec4(1,1,1);
     this->propKd = Vec4(1,1,1);
     this->enabled = true;
+    this->enable_inertia = true;
+    this->velDesired = Vec4();
     inertia = Matrix(3,3);
     inertia(0,0) = 1;
     inertia(1,1) = 1;
@@ -82,6 +84,16 @@ bool ControlPD::isEnabled()
     return this->enabled;
 }
 
+void ControlPD::setEnabledInertia(bool enabled_inertia)
+{
+    this->enable_inertia = enabled_inertia;
+}
+
+bool ControlPD::isEnabledInertia()
+{
+    return this->enable_inertia;
+}
+
 void ControlPD::evaluate()
 {
     if (!this->enabled) return;
@@ -136,9 +148,12 @@ void ControlPD::evaluate()
               }
 
             dVector3 deltaVelGlobal;
-            for (int j=0;j<3;j++) {
-              deltaVelGlobal[j] = -velGlobal[j]; //desiredVelGlobal[j] - velGlobal[j] = 0.0 - velGlobal[j]
-            }
+            //for (int j=0;j<3;j++) {
+              deltaVelGlobal[0] = velDesired.x()-velGlobal[0]; //desiredVelGlobal[j] - velGlobal[j] = 0.0 - velGlobal[j]
+              deltaVelGlobal[1] = velDesired.y()-velGlobal[1];
+              deltaVelGlobal[2] = velDesired.z()-velGlobal[2];
+            //}
+
 
             //limT ( na verdade fazendo papel de limAV(limAngularVelocity) )
               for (int j=0;j<3;j++) {
@@ -169,9 +184,9 @@ void ControlPD::evaluate()
               dMatrix3 kdLocal;
                 //zera kdLocal
                 for (int j=0;j<12;j++) { kdLocal[j] = 0.0; }
-                kdLocal[0]  = ksLocal[0]*this->kd.x()*propKd.x();
-                kdLocal[5]  = ksLocal[0]*this->kd.y()*propKd.y();
-                kdLocal[10] = ksLocal[0]*this->kd.z()*propKd.z();
+                kdLocal[0]  = this->kd.x()*propKd.x()*inertia(0,0);
+                kdLocal[5]  = this->kd.y()*propKd.y()*inertia(1,1);
+                kdLocal[10] = this->kd.z()*propKd.z()*inertia(2,2);
             //calculando kd em coordenadas globais
               dMatrix3 kdGlobal;
                 //se deltaGlobal = R.deltaLocal, entao kdGlobal = R.kdLocal.R^t
@@ -220,6 +235,19 @@ void ControlPD::setProportionalKs(Vec4 pks)
 void ControlPD::setProportionalKd(Vec4 pkd)
 {
     propKd = pkd;
+}
+
+void ControlPD::setVelocityDesired(Vec4 vel)
+{
+    this->velDesired = vel;
+}
+
+Quaternion ControlPD::getOrientation()
+{
+    Quaternion qIdent;
+    Quaternion qAtual = Physics::getRotationJoint(this->joint);
+    qAtual = qIdent.lessArc(qAtual);
+    return qAtual;
 }
 
 Vec4 ControlPD::getProportionalKs()
@@ -488,7 +516,8 @@ Vec4 ControlPD::getTorquePDCOM(Joint *joint, Vec4 ks, Vec4 kd, Quaternion qDesir
 
 void ControlPD::setInertiaFactors(Matrix i)
 {
-    inertia = i;
+    if(enable_inertia) inertia = i;
+    else resetInertiaFactors();
 }
 
 void ControlPD::resetInertiaFactors()

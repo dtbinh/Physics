@@ -20,6 +20,18 @@ Joint::Joint(Character *chara,int type)
     initialAnchor = new Vec4();
 }
 
+Joint::Joint(int type)
+{
+    this->type = type;
+    material = new Material();
+    this->selected = false;
+    //this->parent = new Object();
+    //this->child = new Object();
+    //transform = new Matrix4f();
+    //transform->setIdentity();
+    initialAnchor = new Vec4();
+}
+
 Joint::Joint(dJointID joint, Character *chara, Object *parent, Object *child, int type, Vec4 limSup, Vec4 limInf)
 {
     this->joint = joint;

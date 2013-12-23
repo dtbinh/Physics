@@ -34,6 +34,7 @@ public:
     Character *character;
 
     Joint(Character* chara,int type);
+    Joint(int type);
     Joint(JointID joint,Character *chara,Object* parent,Object *child,int type,Vec4 limSup, Vec4 limInf);
     void setLimitsAngularSuperior(Vec4 sup);
     void setLimitsAngularInferior(Vec4 inf);

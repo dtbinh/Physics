@@ -7,6 +7,7 @@
 #include "scene/object.h"
 #include "control/sensor.h"
 #include "extra/material.h"
+#include "scene/scene.h"
 MoCap::MoCap()
 {
     frame_current = 1;
@@ -195,8 +196,10 @@ Vec4 MoCap::positionRelativeCOM(int frame,int foot)
     }
     else{
         for(unsigned int i=0;i<idfoots.size();i++)
-            if(foot==idfoots.at(i))
+            if(foot==idfoots.at(i)){
                 posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
+
+            }
 
     }
 
@@ -234,7 +237,7 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
     //velocidade desejada da junta (em coordenadas do corpo prev da junta)
     //velDesejada = deltaVelDesejada/(intervalo*(1/120))
     //(intervalo=1) corresponde a percorrer exatamente um frame no mocap (frameRate do mocap = 120Hz)
-    Vec4 velDesejada = deltaVelDesejada*(60.0);
+    Vec4 velDesejada = deltaVelDesejada*((60./(chara->getScene()->getSimStep()))*60.0);
     //              dVector3 velDesejadaLocal;
     //                velDesejadaLocal[0] = velDesejada.x;
     //                velDesejadaLocal[1] = velDesejada.y;
@@ -253,7 +256,7 @@ Vec4 MoCap::velocityLinearBody(int frame, int body)
     }
     if(frame+2>=int(capMotFrame.size())) prox = frame;
     Vec4 pos_n1 = getFrameMotion(prox)->getPosition(body);
-    Vec4 veldesejada = (pos_n1-pos_n)*(60);
+    Vec4 veldesejada = (pos_n1-pos_n)*((60./(chara->getScene()->getSimStep()))*60);
     return veldesejada;
 }
 
@@ -369,6 +372,6 @@ void MoCap::drawShadow(Vec4 offset, int frame)
             }
             //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else
-            chara->getBody(i)->draw(position+offset,orientation);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_WHITE_RUBBER);
     }
 }

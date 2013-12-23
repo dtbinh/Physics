@@ -23,6 +23,7 @@ class Balance
     Vec4       kmomlin;
     Vec4       kmomang;
     Quaternion bdesired;
+
     float      compensation;
     bool       enable_force;
     bool       enable_torque;
@@ -36,7 +37,10 @@ class Balance
     float m;
     float limit;
 
+
 public:
+    double sim_dist;
+    double mocap_dist;
     Balance(Character* chara);
     void contructRelationJointsBodies(); //esta função constrói uma matrix de relacionamento entre as juntas e os corpos da
                                          //hierarquia, Mat(n,m), onde n é o numero de juntas e m o número de corpos, considerando
@@ -46,7 +50,7 @@ public:
 
     Matrix getJacobianSum(Object* obj);  //calcula o somatório de todas as jacobianas
     Matrix getInertiaFactors(Joint* joint);
-    Vec getTwistWrenchTotal(Vec twist); //retorna os valores que serão aplicados no character com forças e torques virtuais
+    Vec getTwistWrenchTotal(Vec twist,Vec4 com); //retorna os valores que serão aplicados no character com forças e torques virtuais
     Vec getJacobianLocomotion(std::vector<Joint*> joints, Object* effector, Vec twist);
     Vec4 getKsTorque();
     void setKsTorque(Vec4 kst);
@@ -92,7 +96,8 @@ public:
     void setEnableMomentum(bool b);
     bool getEnableMomentum();
     Vec4 limitingTorque(Vec4 lim_inf,Vec4 lim_sup, Vec4 torque);
-    void evaluate(); //executa a rotina de tratamento do equilíbrio
+    Vec4 limitingTorque(float x, Vec4 torque);
+    void evaluate(Joint* jDes,float mass_total,int frame = -1,Quaternion qdesired=Quaternion(),Vec4 vel_ang_des=Vec4(), Vec4 velCOM_moCap=Vec4(),Vec4 mom_lin_des=Vec4(),Vec4 mom_ang_des=Vec4()); //executa a rotina de tratamento do equilíbrio
     void setEnableBalance(bool b);
 };
 

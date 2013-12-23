@@ -51,7 +51,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="2.1" Geometry="1" Name="forearm_l" Foot="0" BodyBalance="0">
+   <Properties Material="13" Mass="1.6" Geometry="1" Name="forearm_l" Foot="0" BodyBalance="0">
     <Position x="0.16" y="1.026" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>
@@ -65,7 +65,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="2.1" Geometry="1" Name="forearm_r" Foot="0" BodyBalance="0">
+   <Properties Material="13" Mass="1.6" Geometry="1" Name="forearm_r" Foot="0" BodyBalance="0">
     <Position x="-0.16" y="1.026" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>
@@ -205,7 +205,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="0.5" Geometry="1" Name="hand_l" Foot="0" BodyBalance="0">
+   <Properties Material="13" Mass="0.8" Geometry="1" Name="hand_l" Foot="0" BodyBalance="0">
     <Position x="0.16" y="0.86" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.08" y="0.1" z="0.07"/>
@@ -219,7 +219,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="0.5" Geometry="1" Name="hand_r" Foot="0" BodyBalance="0">
+   <Properties Material="13" Mass="0.8" Geometry="1" Name="hand_r" Foot="0" BodyBalance="0">
     <Position x="-0.16" y="0.86" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.08" y="0.1" z="0.07"/>

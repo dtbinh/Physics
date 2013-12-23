@@ -209,6 +209,7 @@ float Character::getMassTotal()
         m  += objects.at(i)->getFMass();
     }
     return m;
+
 }
 
 int Character::getNumJoints()
@@ -474,7 +475,7 @@ void Character::setHierarchyMap(int pos)
             //invertendo o mapeamento realizado para essa junta
             if (in_posGroundPaw_chain) {
                 for (int j=0;j<this->getNumBodies();j++) {
-                    //if((!(j>=5 && j<=7 && i>=0 && i<=2))&&(!(j>=0 && j<=2 && i>=5 && i<=7)))
+                    if(!(((j==9 || j==11 || j==13) && (i==0 || i==1 || i==2))||(((j==8 || j==10 || j==12) && (i==3 || i==4 || i==5)))))
                         this->hierarchy[pos+3][i][j] = !this->hierarchy[pos+3][i][j];
 
                 }

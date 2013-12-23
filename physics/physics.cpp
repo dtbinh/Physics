@@ -26,7 +26,7 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
         dBodyID b1 = dGeomGetBody(o1);
         dBodyID b2 = dGeomGetBody(o2);
 
-        int numcont = 12;
+        int numcont = 8;
         dContact contact[numcont];
         int i;
         if (int numc = dCollide (o1,o2,numcont,&contact[0].geom,sizeof(dContact))) {
@@ -39,7 +39,7 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                 else
                     contact[i].surface.mu = dInfinity;
                 // bounce is the amount of "bouncyness".
-                contact[i].surface.bounce = 0.1;
+                contact[i].surface.bounce = 0.5;
                 // bounce_vel is the minimum incoming velocity to cause a bounce
                 contact[i].surface.bounce_vel = 0.0;
                 // constraint force mixing parameter
@@ -439,8 +439,9 @@ void Physics::initJointBall(Joint* joint, Vec4 anchor)
 
 void Physics::initJointFixed(Joint *joint){
     joint->setJoint(dJointCreateFixed(joint->getCharacter()->getScene()->getWorld(),0));
-    dJointAttach(joint->getJoint(),joint->getParent()->getBody(),0);
+    dJointAttach(joint->getJoint(),joint->getParent()->getBody(),joint->getChild()->getBody());
     dJointSetFixed(joint->getJoint());
+
 }
 
 Vec4 Physics::getJointBallAnchor( Joint* joint )

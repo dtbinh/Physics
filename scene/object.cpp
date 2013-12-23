@@ -5,6 +5,7 @@
 #include "extra/material.h"
 #include "scene.h"
 #include "math/matrix.h"
+#include "control/sensor.h"
 
 //----------------------Construtores & Destrutores
 
@@ -419,15 +420,22 @@ void Object::draw(bool wire)
     if(show_effector) Draw::drawSphere(posEffectorBackward(),MATERIAL_PEARL,0.02);
     if (show_effector&&show_target){
         if(enabled_cpdp) Draw::drawLine(target,posEffectorBackward(),Vec4(0,.9,0),1.4);
-        else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
+        else Draw::drawLine(target,posEffectorBackward(),Vec4(0.9,0,0),1.4);
     }
     if (this->geometry==0) return;
     switch (this->type){
     case TYPE_CUBE:{
             if (wire)
                 Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(1,0,0));
-            else
-                Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+            else{
+//                if(isFoot && !Sensor::isSwingFoot(this)){
+//                    Material *mat = new Material();
+//                    mat->setMaterial(mat,MATERIAL_CYAN_PLASTIC);
+//                    Draw::drawCube(getMatrixTransformation(),this->properties,mat);
+//                }else{
+                    Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+//                }
+            }
             if(this->selected) Draw::drawSelection(getMatrixTransformation(),this->properties);
             if(this->isFoot) Draw::drawSelection(getMatrixTransformation(),this->properties,Vec4(0,0,1));
             break;

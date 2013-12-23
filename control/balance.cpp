@@ -9,6 +9,7 @@
 #include "mocap/frame.h"
 #include "mocap/framequat.h"
 #include "physics/physics.h"
+#include <omp.h>
 
 Balance::Balance(Character* chara)
 {
@@ -37,6 +38,8 @@ Balance::Balance(Character* chara)
     this->height = 0.03;
     this->radius = 0.07;
     this->limit = 0.0;
+    sim_dist = 0;
+    mocap_dist = 0;
     //this->TorqueFoot_ = 20;
 }
 
@@ -63,11 +66,13 @@ void Balance::contructRelationJoints()
 
 Matrix Balance::getJacobianSum(Object *obj)
 {
+    omp_set_num_threads(4);
     Matrix Ad_j2w = Matrix(6,6*this->chara->getNumJoints()); // matriz adjunta da junta para o mundo do corpo obj
     int iBody = chara->getPositionBody(obj); //id do objeto
     if (iBody<0) return Ad_j2w;
     //para cada junta que influencia o corpo b (corpo raiz eh a stance paw)
-    for (int i=0;i<this->chara->getNumJoints();i++) {
+    int size = this->chara->getNumJoints();
+    for (int i=0;i<size;i++) {
         Matrix Ad_j2w_i(6,6); //adjunta da junta para corpo obj
         if (chara->hierarchy[useHierarchy][i][iBody]) {
             Ad_j2w_i = chara->getJoint(i)->getAd();
@@ -80,7 +85,7 @@ Matrix Balance::getJacobianSum(Object *obj)
 Matrix Balance::getInertiaFactors(Joint *joint)
 {
 
-    bool** inertiaFactorMap_local = chara->hierarchy[useHierarchy];
+    bool** inertiaFactorMap_local = chara->hierarchy[10];
     dMatrix3 I;
       //zera I
     int jPos = chara->getIdJoint(joint);
@@ -120,42 +125,63 @@ Matrix Balance::getInertiaFactors(Joint *joint)
         }
       }
       Matrix result(3,3);
+      //float fat = 1;
+      //if(useHierarchy==0) fat = 0.5;
       result(0,0) = I[0];
       result(1,1) = I[5];
       result(2,2) = I[10];
+      printf("Use Hierarquia: %d\n",useHierarchy);
+//      printf("(%.3f,%.3f,%.3f)\n",I[0],I[5],I[10]);
       return result;
 }
 
-Vec Balance::getTwistWrenchTotal(Vec twist)
+Vec Balance::getTwistWrenchTotal(Vec twist, Vec4 com)
 {
 
-
+    omp_set_num_threads(4);
     //M_com_com
     Matrix M_com2com(6,6);
-    Matrix M_b2com(6,6);
+
     //Vec gcomTotal = Vec(6);
 
     //matriz jacobiana de 6 linhas e (6*num_juntas) colunas
-    Matrix J = Matrix(6,6*this->chara->getNumJoints());
-      for (int b=0;b<this->chara->getNumBodies();b++) {
+    Matrix J(6,6*this->chara->getNumJoints());
+
+    Matrix Js[omp_get_max_threads()];
+    Matrix M_com2coms[omp_get_max_threads()];
+
+    for (int i=0;i<omp_get_max_threads();i++){
+        Js[i] = Matrix(6,6*this->chara->getNumJoints());
+        M_com2coms[i] = Matrix(6,6);
+    }
+
+    int size = this->chara->getNumBodies();
+    #pragma omp parallel for schedule(dynamic)
+      for (int b=0;b<size;b++) {
         //J = J_com_com = Sum_b( J_com_com_b )
           //J_com_com_b = Ad_w_com^t . M_w_b . Ad_w_j
-            Matrix J_b2com = Matrix(6,6*this->chara->getNumJoints());
+          Matrix M_b2com(6,6);
+            Matrix J_b2com(6,6*this->chara->getNumJoints());
             //Ad_w_com^t . M_w_b = Ad_b_com^t . M_b_b . Ad_b_w
               Matrix Ad_w2b = this->chara->getBody(b)->getAd();
               Matrix M_b2b = this->chara->getBody(b)->getIM();
               //matrix Ad_b_com_t = ModesGen::getAd(this->modelo->bodyGeoms[b],this->modelo).transpose();
-                Matrix Ad_com2b = this->chara->getBody(b)->getAd(this->chara);
+                Matrix Ad_com2b = this->chara->getBody(b)->getAd(com);
               Matrix Ad_com2b_t = Ad_com2b.transpose();
             //Ad_w_j
-              Matrix Ad_j2w = getJacobianSum(this->chara->getBody(b));
+              Matrix Ad_j2w =getJacobianSum(this->chara->getBody(b));
 
             J_b2com = (Ad_com2b_t * M_b2b * Ad_w2b * Ad_j2w);
             //gcomTotal = gcomTotal + Vec(Vec4(0,this->chara->getBody(b)->getFMass()*10,0),Vec4(0,0,0));
-          J = J + (J_b2com);
+            Js[omp_get_thread_num()] = Js[omp_get_thread_num()] + (J_b2com);
         //M_com_com = Sum_b( Ad_b_com^t . M_b_b . Ad_b_com )
             M_b2com = Ad_com2b_t * M_b2b * Ad_com2b;
-          M_com2com = M_com2com + M_b2com;
+            M_com2coms[omp_get_thread_num()] = M_com2coms[omp_get_thread_num()] + M_b2com;
+      }
+
+      for (int i=0;i<omp_get_max_threads();i++){
+          J = J + Js[i];
+          M_com2com = M_com2com + M_com2coms[i];
       }
 
     //M_com_com^-1 * jacobian
@@ -446,101 +472,111 @@ Vec4 Balance::limitingTorque(Vec4 lim_inf, Vec4 lim_sup, Vec4 torque)
 
 }
 
+Vec4 Balance::limitingTorque(float x, Vec4 torque)
+{
+    float mod = torque.module();
+    if (mod>x) torque = torque*(x/mod);
+    return torque;
+}
 
-void Balance::evaluate()
+
+void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesired,Vec4 vel_ang_des, Vec4 velCOM_moCap,Vec4 mom_lin_des,Vec4 mom_ang_des)
 {
     Quaternion quat(Vec4(0,0,0));
-    int frame = -1;
-    if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status))
-       frame = chara->getMoCap()->frame_current; //se houver captura de movimento extraí-se o frame corrente
-    if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status))
-        for(unsigned int i=0; i<chara->getControllersPD().size();i++){
-            Quaternion des = chara->getMoCap()->getFrameSimulation(frame)->quatDes.at(i)*quat;
-            chara->getControllersPD().at(i)->setQuaternionWanted(des);
-        }
+//    if((frame>0)&&(chara->getMoCap()->status))
+//       frame = chara->getMoCap()->frame_current; //se houver captura de movimento extraí-se o frame corrente
+
+
+    //useHierarchy = 0;
     for(std::vector<ControlPD*>::iterator it = chara->controllers.begin(); it!=chara->controllers.end(); it++){
+        //(*it)->setInertiaFactors(getInertiaFactors((*it)->getJoint()));
         (*it)->evaluate();
+        //(*it)->resetInertiaFactors();
     }
 
     if(!(enable_balance)) return; //desabilita o controle de equilíbrio
 
 
-    if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status))
+    if((frame>0)&&(chara->getMoCap()->status))
         useHierarchy = Sensor::getHierarchy2UseMocap(chara);
     else
         useHierarchy = Sensor::getHierarchy2Use(chara);
 
-    if(useHierarchy==FOOTS_AIR+3 || useHierarchy==FOOTS_AIR_INV+3) return; //caso os pés do modelo estejam fora do contado com o solo
+    if(useHierarchy==FOOTS_AIR+3 || useHierarchy==FOOTS_AIR_INV+3){ return; } //caso os pés do modelo estejam fora do contado com o solo
+
+
 
     //definição de SISTEMA LOCAL do personagem
-    Object* pelvis = chara->getBody(7);
-    //Matrix4x4 tranformTotal = pelvis->getMatrixTransformationODE();
-    Matrix4x4 tranformRot = pelvis->getMatrixTransformationODE();
-    tranformRot.setTranslate(Vec4(0,0,0));
 
     bool capture = false;
-    if(chara->getMoCap()->sizeFrames()>0 && chara->getMoCap()->status) capture = true;
+    if(frame>0 && chara->getMoCap()->status) capture = true;
     Vec4 Cfoot_ = Sensor::getSupportProjected(chara,capture);
-    Vec4 COM_   = chara->getPosCOM();
+    Vec4 COM   = chara->getPosCOM();
+    Vec4 COM_   = Vec4(COM.x(),0,COM.z());
     Vec4 velCOM_ = chara->getVelCOM();
-    COM_ = Vec4(COM_.x(),0,COM_.z());
     velCOM_ = Vec4(velCOM_.x(),0,velCOM_.z());
-    Vec4 velCOM_moCap;
-    Vec4 com;
-    if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status)){
-            velCOM_moCap = quat.getVecRotation(bdesired,chara->getMoCap()->getVelCOM(frame));
-            velCOM_moCap.x2 = 0;
-            com = (chara->getMoCap()->getPosCOM(frame));
-            com.x2 = 0;
-        }
-    Vec momentum;
-    Vec4 mom_ang_des;
-    Vec4 mom_lin_des;
+
 
     if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status)){
-        mom_ang_des = quat.getVecRotation(bdesired,chara->getMoCap()->getMomentumAngular(frame));
-        mom_lin_des = quat.getVecRotation(bdesired,chara->getMoCap()->getMomentumLinear(frame));
+            velCOM_moCap = quat.getVecRotation(bdesired,velCOM_moCap);
+            velCOM_moCap.x2 = 0;
+
+        }else{
+        velCOM_moCap = Vec4();
+    }
+    Vec momentum;
+
+    if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status)){
+        mom_ang_des = quat.getVecRotation(bdesired,mom_ang_des);
+        mom_lin_des = quat.getVecRotation(bdesired,mom_lin_des);
+    }else{
+        mom_ang_des = Vec4();
+        mom_lin_des = Vec4();
     }
     if (enable_momentum)
+        //momentum = Vec((VEc-chara->getAngularMomentum()).mult(kmomang),(mom_lin_des-chara->getLinearMomentum()).mult(kmomlin));
         momentum = Vec((mom_ang_des-chara->getAngularMomentum()).mult(kmomang),(mom_lin_des-chara->getLinearMomentum()).mult(kmomlin));
     else
         momentum = Vec(Vec4(),Vec4());
 
     //computando a força no centro de massa
     Vec4 Fcom;
-    if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status)){
-        int val;
+    int val=-1;
+    if((frame>0)&&(chara->getMoCap()->status)){
         if (useHierarchy==0) val = -1;
         else val = useHierarchy-3;
         Fcom = ksForce.mult((chara->getMoCap()->positionRelativeCOM(frame,val)) - (COM_ - Cfoot_) ) + kdForce.mult((velCOM_moCap) - velCOM_);
     }else
-        Fcom = ksForce.mult(Cfoot_ - COM_) + kdForce.mult(velCOM_moCap - velCOM_);
+        Fcom = ksForce.mult(Cfoot_ - COM_) - kdForce.mult(velCOM_);
+
 
 
     //computando o torque no centro de massa
-    Joint* jDes = chara->getJointParentBalance();
     Vec4 Tcom = Vec4(0,0,0);
     if (jDes!=NULL)
-        if((chara->getMoCap()->sizeFrames()>0)&&(chara->getMoCap()->status)){
-            Quaternion q = bdesired*chara->getMoCap()->getFrameMotion(frame)->getOrientation(chara->getIdObject(jDes->getParent()));
-           Tcom = ControlPD::getTorquePDCOM(jDes,ksTorque,kdTorque,q,jDes->getParent()->getRelVelAngular()-(bdesired.getVecRotation(bdesired,chara->getMoCap()->velocityAngularBody(frame,chara->getIdObject(jDes->getParent())))));
+        if((frame>0)&&(chara->getMoCap()->status)){
+            Quaternion q = bdesired*qdesired;
+            Tcom = ControlPD::getTorquePDCOM(jDes,ksTorque,kdTorque,q,jDes->getParent()->getRelVelAngular()-(quat.getVecRotation(bdesired,vel_ang_des)));
         }else
         Tcom = ControlPD::getTorquePDCOM(jDes,ksTorque,kdTorque,bdesired,jDes->getParent()->getRelVelAngular());
     else
         printf("\nSem junta desejada!");
-
     Vec wrench;
-    if (enable_force && enable_torque)
-        wrench = Vec(Tcom,Fcom-chara->getScene()->getGravity()*chara->getMassTotal()) + momentum;
+    if (enable_force && enable_torque && enable_momentum)
+        wrench = Vec(Tcom,Fcom-(chara->getScene()->getGravity()*mass_total)) + momentum;
+    else if(enable_force && enable_torque)
+        wrench = Vec(Tcom,Fcom-(chara->getScene()->getGravity()*mass_total));
     else if (enable_force)
-        wrench = Vec(Vec4(),Fcom-chara->getScene()->getGravity()*chara->getMassTotal()) + momentum;
+        wrench = Vec(Vec4(),Fcom-(chara->getScene()->getGravity()*mass_total)) + momentum;
     else if (enable_torque)
-        wrench = Vec(Tcom,chara->getScene()->getGravity()*chara->getMassTotal()) + momentum;
+        wrench = Vec(Tcom,(chara->getScene()->getGravity()*mass_total)*(-1)) + momentum;
     else
-        wrench = momentum;
+        wrench = Vec(Vec4(),(chara->getScene()->getGravity()*mass_total)*(-1))+ momentum;
 
-    Vec wrenchTotal = getTwistWrenchTotal(wrench);
+    Vec wrenchTotal = getTwistWrenchTotal(wrench,COM);
     float factor = 1.0;
+    //printf("\nGravidade: %.3f",(chara->getScene()->getGravity()*mass_total).y());
+
 
 //    /****************** Teste de SwingFoot *********************/
 
@@ -581,15 +617,18 @@ void Balance::evaluate()
     /**************************************/
 
 
-    if(useHierarchy==0) factor = 0.5;
-    else factor = 1;
+//    if(useHierarchy==0) factor = 0.5;
+//    else factor = 1;
 
     for (int i=0;i<chara->getNumJoints();i++){
         Joint *joint = chara->getJoint(i);
         Vec4 torque(wrenchTotal[i+i*5],wrenchTotal[i+1+i*5],wrenchTotal[i+2+i*5]);
+        torque = limitingTorque(300.,torque);
         int id_parent,id_child;
         id_parent = chara->getIdObject(joint->getParent());
         id_child = chara->getIdObject(joint->getChild());
+//        if(useHierarchy==0 && ((i>=0 && i<=2)||(i>=3 && i<=5))) factor = 0.5;
+//        else factor = 1.0;
         if(chara->hierarchy[useHierarchy][i][chara->getPositionBody(joint->getChild())]){
             if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
                 joint->getChild()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
@@ -610,10 +649,14 @@ void Balance::evaluate()
                 joint->getChild()->addTorque((torque)*(-1)*factor);
         }
     }
-
-
-
-
+    if(frame>0){
+    mocap_dist = (chara->getMoCap()->positionRelativeCOM(frame,val)).module();
+    Cfoot_ = Sensor::getSupportProjected(chara,capture);
+    Cfoot_.x2 = 0;
+    COM_   = chara->getPosCOM();
+    COM_.x2 = 0;
+    sim_dist = (COM_ - Cfoot_).module();
+    }
 
 }
 

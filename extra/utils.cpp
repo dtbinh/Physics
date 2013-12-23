@@ -338,7 +338,7 @@ bool Utils::readModelRubens(Scene *scene, const std::string &fileName)
           }
           else if (s == "fixed")
           {
-              scene->addJointFixed(father,chara);
+              //scene->addJointFixed(father,chara);
           }
         }
         else if (s == "paw:")
@@ -1162,7 +1162,6 @@ bool Utils::saveFramesConfig(Character *chara, const string &fileName)
 bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileName)
 {
         moCap->clear();
-        printf("\nIn load!");
         ifstream file(fileName.data(), ios::in);
         stringstream ss;
         std::string stmp;
@@ -1245,5 +1244,80 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
         }
         moCap->setEndClycle(moCap->sizeFrames());
         return true;
+}
+
+bool Utils::saveListMotion(QList<Vec4> motion, QList<Vec4> mocap, QList<double> y, const string &fileName)
+{
+    ofstream ff(fileName.data());
+    ff << motion.size();
+    ff << "\n\n";
+    for (int i=0;i<mocap.size();i++) {
+        ff << y.at(i);
+        ff << " , ";
+        ff << mocap.at(i).x1;
+        ff << " , ";
+        ff << mocap.at(i).x2;
+        ff << " , ";
+        ff << mocap.at(i).x3;
+        ff << " , ";
+        ff << motion.at(i).x1;
+        ff << " , ";
+        ff << motion.at(i).x2;
+        ff << " , ";
+        ff << motion.at(i).x3;
+        ff << "\n";
+    }
+//    ff << "\n\n" ;
+//    for (int i=0;i<motion.size();i++) {
+
+//        ff << "\n";
+//    }
+//    ff << "\n\n";
+//    for (int i=0;i<mocap.size();i++) {
+//        ff << y.at(i);
+//        ff << " , ";
+//        ff << mocap.at(i).x2;
+//        ff << "\n";
+//    }
+//    ff << "\n\n" ;
+//    for (int i=0;i<motion.size();i++) {
+//        ff << y.at(i);
+//        ff << " , ";
+//        ff << motion.at(i).x2;
+//        ff << "\n";
+//    }
+//    ff << "\n\n";
+//    for (int i=0;i<mocap.size();i++) {
+//        ff << y.at(i);
+//        ff << " , ";
+//        ff << mocap.at(i).x3;
+//        ff << "\n";
+//    }
+//    ff << "\n\n" ;
+//    for (int i=0;i<motion.size();i++) {
+//        ff << y.at(i);
+//        ff << " , ";
+//        ff << motion.at(i).x3;
+//        ff << "\n";
+//    }
+    ff.close();
+    return true;
+}
+
+bool Utils::saveListDistMotion(QList<double> sim, QList<double> mocap, QList<double> tim, const string &fileName)
+{
+    ofstream ff(fileName.data());
+    ff << tim.size();
+    ff << "\n\n";
+    for (int i=0;i<tim.size();i++) {
+        ff << tim.at(i);
+        ff << " , ";
+        ff << mocap.at(i);
+        ff << " , ";
+        ff << sim.at(i);
+        ff << "\n";
+    }
+    ff.close();
+    return true;
 }
 

@@ -67,6 +67,8 @@ bool 	trackingMouse  = false;
 bool 	redrawContinue = false;
 bool    trackballMove  = false;
 
+
+
 /*----------------------------------------------------------------------*/
 /*
 ** These functions implement a simple trackball-like motion control.
@@ -194,8 +196,9 @@ GLWidget::GLWidget(QWidget *parent) :
     connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
 
     simTimer->start(0);
+    simTimer->setInterval(60);
 
-    simTimer->setInterval(0);
+
     move = false;
     sim_pause = false;
     capture_pause = true;
@@ -389,18 +392,19 @@ void GLWidget::showCompensableConeFriction()
 }
 
 void GLWidget::simStep(){
-//    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
-//      ti = tf = tempo = 0;
-//      timeval tempo_inicio,tempo_fim;
-//      gettimeofday(&tempo_inicio,NULL);
     if(!sim_pause)
         scene->simulationStep();
+//        double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
+//          ti = tf = tempo = 0;
+//          timeval tempo_inicio,tempo_fim;
+//          gettimeofday(&tempo_inicio,NULL);
+
     update();
-//    gettimeofday(&tempo_fim,NULL);
-//      tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-//      ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-//      tempo = (tf - ti) / 1000;
-//      printf("Tempo gasto em milissegundos %.3f\n",tempo);
+//        gettimeofday(&tempo_fim,NULL);
+//          tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//          ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//          tempo = (tf - ti) / 1000;
+//          printf("Tempo gasto em milissegundos desenhar %.3f\n",tempo);
 
 }
 
@@ -755,6 +759,7 @@ void GLWidget::loadScene(QString file)
     if(scene->getSizeCharacter()>0){
         scene->getCharacter(0)->contructHierarchyBodies();
     }
+
 }
 
 void GLWidget::saveCharacter(QString file)
@@ -794,12 +799,14 @@ void GLWidget::saveFramesConfig(QString file)
 
 void GLWidget::setPlayback(bool val)
 {
+
     capture_pause = val;
     if (scene->getSizeCharacter()==0) return;
     if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0){
         scene->getCharacter(0)->getMoCap()->setStatusMotion(!capture_pause);
         scene->statusMotionCapture(!val);
     }
+
 }
 
 void GLWidget::restartMotion()
@@ -1067,7 +1074,10 @@ void GLWidget::loadSimulationParameters(QString file)
             motionTotalFrame(scene->getCharacter(i)->getMoCap()->sizeFrames());
         }
         updateBalanceCone(scene->getCharacter(i)->getBalance()->getMCone(),scene->getCharacter(i)->getBalance()->getAngleCone(),scene->getCharacter(i)->getBalance()->getRadiusCone(),scene->getCharacter(i)->getBalance()->getHeightCone());
+
     }
+    //printf("\nMassa total: %.3f",scene->getCharacter(0)->getMassTotal());
+    scene->createRamp();
 
 
 

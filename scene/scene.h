@@ -37,6 +37,7 @@ private:
     //graphics
     std::vector<Object*> objects;
     std::vector<Object*> objects_shoot;
+    std::vector<Joint*> joints;
     std::vector<Character*> characters;
     //manipulators
     Vec4 externalForce;
@@ -81,7 +82,7 @@ public:
     //Manipulação dos objetos do cenário
     Object*               addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
     Joint *               addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara,Vec4 limSup=Vec4(),Vec4 limInf=Vec4());//cria uma junta ball
-    Joint *               addJointFixed(Object *parent,Character *chara); //cria uma junta fixa
+    Joint *               addJointFixed(Object *parent,Object *child, Character *chara); //cria uma junta fixa
     std::vector<Object*>  objectsScene(); //retorna os objetos do cenário e dos characteres
     Object*               selectedObject();
     std::vector<Joint*>   jointsScene(); //retorna as juntas do cenário
@@ -101,6 +102,8 @@ public:
     Object*               getObject(dBodyID id);
     //extra simulation
     void                  clearObjectShooted();
+    void                  createRamp();
+    void                  startRecorder(bool b);
 
 
     //equilibrio do personagem
