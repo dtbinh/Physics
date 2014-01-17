@@ -7,6 +7,7 @@
 
 #include <QFileInfo>
 
+int up = 1;
 using namespace std;
 
 
@@ -103,7 +104,7 @@ ObjMesh::ObjMesh(const string &fileName)
         }
     }
 
-    displayListId = glGenLists(1);
+    displayListId = glGenLists(up);
     glNewList(displayListId, GL_COMPILE);
     if(hasTextureCoord)
     {
@@ -141,6 +142,7 @@ ObjMesh::ObjMesh(const string &fileName)
         glEnd();
     }
     glEndList();
+    up++;
 }
 
 

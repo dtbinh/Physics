@@ -8,6 +8,9 @@ QT       += core gui opengl
 
 TARGET = ODESys
 TEMPLATE = app
+DEFINES += \
+           SHADERS_ENABLED \
+           GL_GLEXT_PROTOTYPES \
 
 
 SOURCES += main.cpp\
@@ -38,7 +41,10 @@ SOURCES += main.cpp\
     mocap/framequat.cpp \
     interface/camera.cpp \
     extra/ObjMesh.cpp \
-    interpolation/interpolation.cpp
+    interpolation/interpolation.cpp \
+    graphics/shadows.cpp \
+    graphics/imageloader.cpp \
+    extra/screenshot.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -66,11 +72,14 @@ HEADERS  += mainwindow.h \
     mocap/framequat.h \
     interface/camera.h \
     extra/ObjMesh.h \
-    interpolation/interpolation.h
+    interpolation/interpolation.h \
+    graphics/shadows.h \
+    graphics/imageloader.h \
+    extra/screenshot.h
 
 FORMS    += mainwindow.ui
 
-LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas -fopenmp
+LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas -fopenmp -lGLEW
 
 CONFIG += release
 

@@ -31,6 +31,9 @@ Object::Object()
     this->ks = Vec4();
     this->kd = Vec4();
     this->chara = NULL;
+    this->objFile = "";
+    this->rendermesh = false;
+
 
 }
 
@@ -53,6 +56,8 @@ Object::Object(Scene *scene)
     this->ks = Vec4();
     this->kd = Vec4();
     this->chara = NULL;
+    this->objFile = "";
+    this->rendermesh = false;
 }
 
 Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Scene *scene,QString name)
@@ -78,7 +83,7 @@ Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Sc
     this->ks = Vec4();
     this->kd = Vec4();
     this->chara = NULL;
-
+    this->rendermesh = false;
 }
 
 void Object::setCharacter(Character *chara)
@@ -96,6 +101,7 @@ Object::~Object()
     delete this->scene;
     delete this->mass;
     delete this->material;
+    delete this->objMesh;
 }
 
 //---------------------Scene
@@ -135,6 +141,17 @@ QString Object::saveObject() //função a ser pensada...
     QString out;
     out = ""; //depois configurar formato de saída
     return out;
+}
+
+void Object::setObjFile(QString obj)
+{
+    this->objFile = obj;
+    objMesh = new ObjMesh(obj.toStdString());
+}
+
+QString Object::getObjFile()
+{
+    return this->objFile;
 }
 
 //---------------------Physics
@@ -399,6 +416,7 @@ Matrix4x4 Object::getMatrixTransformationODE()
     returns.set(13,transform->get(13));
     returns.set(14,transform->get(14));
     returns.set(15,transform->get(15));
+    delete transform;
     return returns;
 }
 
@@ -414,6 +432,7 @@ void Object::wireframe()
 
 void Object::draw(bool wire)
 {
+
     //Draw::drawSphere(posEffectorBackward(),MATERIAL_CHROME,0.09);
     if(has_cup) Draw::drawCoffeeCup(posEffectorBackward(),MATERIAL_WHITE_PLASTIC,Quaternion(Vec4(-90,0,0))*getRotationCurrent().conjugate());
     if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
@@ -433,7 +452,13 @@ void Object::draw(bool wire)
 //                    mat->setMaterial(mat,MATERIAL_CYAN_PLASTIC);
 //                    Draw::drawCube(getMatrixTransformation(),this->properties,mat);
 //                }else{
+
+                if(objFile.isEmpty() || !rendermesh){
                     Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+                }else{
+                    Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+                }
+
 //                }
             }
             if(this->selected) Draw::drawSelection(getMatrixTransformation(),this->properties);
@@ -456,7 +481,11 @@ void Object::drawShadow()
     if (this->geometry==0) return;
     switch (this->type){
     case TYPE_CUBE:{
+        if(objFile.isEmpty() || !rendermesh){
             Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+        }else{
+            Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+        }
             break;
         }
     case TYPE_CYLINDER:{
@@ -498,13 +527,20 @@ void Object::draw(Vec4 position, Quaternion q,int mat)
 
     switch (this->type){
     case TYPE_CUBE:{
-        if(mat==-1)
-              Draw::drawCube(transform,this->properties,this->material);
-        else
-            Draw::drawCube(transform,this->properties,mat);
-//            if(this->selected) Draw::drawSelection(getMatrixTransformation(),this->properties);
-//            if(this->isFoot) Draw::drawSelection(getMatrixTransformation(),this->properties,Vec4(0,0,1));
+        if(mat==-1){
+            if(objFile.isEmpty() || !rendermesh)
+              Draw::drawCube(transform,this->properties,mat);
+            else{
+              Draw::drawObj(transform,this->id_material,objMesh);
+             }
+        }else{
+            if(objFile.isEmpty() || !rendermesh)
+                Draw::drawCube(transform,this->properties,mat);
+            else{
+                Draw::drawObj(transform,mat,objMesh);
+            }
             break;
+        }
         }
     case TYPE_CYLINDER:{
             Draw::drawCylinder(getMatrixTransformation(),this->material);
@@ -720,6 +756,11 @@ QString Object::showInfo()
     obj += aux.sprintf("Kd: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
     return obj;
 
+}
+
+void Object::setRenderMesh(bool b)
+{
+    this->rendermesh = b;
 }
 
 float Object::getCompensableFactor()

@@ -144,6 +144,7 @@ public:
     void           drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
     void           drawShadows(); //desenha os objetos e/ou juntas com OpenGL
     void           loadSceneObjects();
+    void           setRenderMesh(bool b);
 
 
 };

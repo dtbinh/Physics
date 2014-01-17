@@ -54,7 +54,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -196,6 +196,19 @@
             </property>
             <property name="text">
              <string>Kd = 1/10ks Automaticaly</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="checkMesh">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>160</y>
+              <width>181</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Render with Mesh</string>
             </property>
            </widget>
           </widget>
@@ -1349,6 +1362,19 @@ QGroupBox{
             </property>
             <property name="checked">
              <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="checkScreenShot">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>120</y>
+              <width>251</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>ScreenShots</string>
             </property>
            </widget>
           </widget>

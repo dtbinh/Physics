@@ -1,28 +1,24 @@
 #include "glwidget.h"
-#include <GL/glu.h>
 #include "scene/object.h"
 #include "graphics/draw.h"
 #include "math/quaternion.h"
 #include "extra/utils.h"
+#include <stdio.h>
 #include <sys/time.h>
 #include <stdio.h>
 #include <GL/gl.h>                        // Header File For The OpenGL32 Library
+#include <GL/freeglut.h>                        // Header File For The OpenGL32 Library
 #include <GL/glu.h>                       // Header File For The GLu32 Library
 #include <GL/glut.h>
 #include <GL/glext.h>                     // Header File For The GLaux Library
 #include "camera.h"
 #include "interpolation/interpolation.h"
+#include "extra/screenshot.h"
 
+
+//melhor configuração ciclica para caminhar: 398 582
 /************** New Camera *****************/
-//static int slices = 16;
-//static int stacks = 16;
-
-//static float ax = 0.0;
-//static float ay = 0.0;
-//static float az = 0.0;
-
-//static float delta = 5.0;
-
+static int scr_capture_count = 0;
 static bool lbpressed = false;
 //static bool mbpressed = false;
 static bool rbpressed = false;
@@ -189,6 +185,7 @@ GLWidget::GLWidget(QWidget *parent) :
 {
     setFocusPolicy(Qt::StrongFocus);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_STENCIL_FUNC);
     scene = new Scene(this);
     updateObjects(scene->objectsScene());
     updateJoints(scene->jointsScene());
@@ -206,10 +203,12 @@ GLWidget::GLWidget(QWidget *parent) :
     frame_edit = 0;
     show_character = true;
     load_exemple_curve = false;
+    screenshot = false;
     time_current = 0;
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
+
 
 }
 
@@ -218,23 +217,24 @@ void GLWidget::initializeGL()
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    //glShadeModel(GL_SMOOTH);
+
+    glShadeModel(GL_SMOOTH);
     //glEnable(GL_COLOR_MATERIAL);
 
-    static GLfloat light1pos[4] = { -0.892, 0.3, 0.9, 0.0 };
+    static GLfloat light1pos[4] = {  -0.892, 0.3, 0.9, 0.0 };
     static GLfloat light1diffuse[] = { 0.8f, 0.8f, 0.8, 1.0f };
-    static GLfloat light1specular[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    static GLfloat light1specular[] = { 0.5f, 0.5f, 0.5f, 0.0f };
 
-    static GLfloat light2pos[4] = { 0.588, 0.46, 0.248, 0.0 };
+    static GLfloat light2pos[4] = { 9.588, 9.46, 9.248, 0.0 };
     static GLfloat light2diffuse[] = { 0.498f, 0.5f, 0.6, 1.0f };
-    static GLfloat light2specular[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    static GLfloat light2specular[] = { 0.2f, 0.2f, 0.2f, 0.0f };
 
     static GLfloat light3pos[4] = { 0.216, -0.392, -0.216, 0.0 };
     static GLfloat light3diffuse[] = { 0.798f, 0.838f, 1.0, 1.0f };
-    static GLfloat light3specular[] = { 0.06f, 0.0f, 0.0f, 1.0f };
+    static GLfloat light3specular[] = { 0.06f, 0.0f, 0.0f, 0.0f };
 
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -253,25 +253,31 @@ void GLWidget::initializeGL()
     glLightfv(GL_LIGHT2, GL_DIFFUSE, light3diffuse);
     glLightfv(GL_LIGHT2, GL_SPECULAR, light3specular);
 
-//#ifdef SHADERS_ENABLED
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, ":/phong.vert");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/phong.frag");
-//    //shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, ":/toon.vert");
-//    //shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, ":/toon.frag");
-//#endif
+#ifdef SHADERS_ENABLED
+    //shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/VertexShader.c");
+    //shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/FragmentShader.c");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/phong.vert");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/phong.frag");
+#endif
+
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_FUNC);
-    glEnable(GL_POINT_SMOOTH);
-    glEnable(GL_LINE_SMOOTH);
+    glEnable (GL_LINE_SMOOTH);
+    glEnable (GL_POINT_SMOOTH);
+
 
     //glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_NORMALIZE);
     glEnable(GL_RESCALE_NORMAL);
     //glLineWidth(1.2);
     glDepthFunc(1.0);
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+//    glBindTexture(GL_TEXTURE_2D, 1.0);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+
 
 }
 
@@ -287,25 +293,15 @@ void GLWidget::resizeGL(int w, int h)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity() ;
-//    glViewport(0,0,w,h);
-//    glMatrixMode(GL_PROJECTION);
-//    glLoadIdentity();
-//    gluPerspective(angle,(float)w/h,0.01,12000000.0);
-//    glMatrixMode(GL_MODELVIEW);
-//    glLoadIdentity();
-//    gluLookAt(cam_eye.x(),cam_eye.y(),cam_eye.z(),cam_at.x(),cam_at.y(),cam_at.z(),0,1,0);
-//    height = h;
-//    width  = w;
-
-
+    winWidth = w;
+    winHeight = h;
+    //printf("\nW %d H %d\n",w,h);
 
 }
+void GLWidget::drawScene(){
 
-void GLWidget::paintGL()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glLoadIdentity();
     //determinação da camera
+    glPushMatrix();
     glPushMatrix();
         glTranslated(-0.20,-0.135,-0.6);
         gluLookAt(cam->eye.x(),cam->eye.y(),cam->eye.z(), cam->at.x(),cam->at.y(),cam->at.z(), cam->up.x(),cam->up.y(),cam->up.z());
@@ -337,7 +333,7 @@ void GLWidget::paintGL()
                     motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
         if (scene->getExternalForce().module()!=0)
             ciclo++;
-        if (ciclo>5){
+        if (ciclo>20){
             scene->setExternalForce(Vec4(0,0,0));
             ciclo = 0;
         }
@@ -358,6 +354,17 @@ void GLWidget::paintGL()
                 scene->getCharacter(0)->getMoCap()->showMoCap(Vec4(0,0,-2.0),frame_edit);
     glPopMatrix();
     Draw::drawGround(10);
+    //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
+    glPopMatrix();
+}
+
+void GLWidget::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    drawScene();
+    if (screenshot) setScreenShot();
+
 }
 
 void GLWidget::updateCamera()
@@ -737,6 +744,28 @@ void GLWidget::showCurveExample()
     //time_m = total_time;
 }
 
+void GLWidget::setScreenShot()
+{
+    // screen capture
+      if (screenshot) {
+        //screen capture count
+        scr_capture_count++;
+        //capturing images
+        if ( scr_capture_count % 1 == 0 )
+        {
+          std::string temp_str = "";
+          char num[20];
+
+          temp_str += "../screenshot/frames/image";
+          sprintf(num, "%04d", scr_capture_count/1);
+          temp_str += num;
+          temp_str += ".ppm";
+
+          SCREENSHOT_Take(0, 0, winWidth, winHeight, temp_str.c_str(), SCREENSHOT_PPM);
+        }
+      }
+}
+
 void GLWidget::SimStepsSimulation(int steps)
 {
     scene->setSimStep(steps);
@@ -949,6 +978,20 @@ void GLWidget::setAlphaCharacter(int value)
     scene->setAlphaCharacter((float)value/100.0);
 }
 
+void GLWidget::bindShader()
+{
+#ifdef SHADERS_ENABLED
+    shaderProgram.bind();
+#endif
+}
+
+void GLWidget::releaseShader()
+{
+#ifdef SHADERS_ENABLED
+    shaderProgram.release();
+#endif
+}
+
 void GLWidget::setWireCharacter(bool wire)
 {
     scene->setWireCharacter(wire);
@@ -1030,6 +1073,7 @@ void GLWidget::setObjectSelected(int row)
     if (row<0) return;
     for (unsigned int i=0;i<objs.size();i++) objs.at(i)->setSelected(false);
     objs.at(row)->setSelected(true);
+    objs.clear();
 
 }
 
@@ -1055,6 +1099,7 @@ void GLWidget::setJointSelected(int row)
     }
     jts.at(row)->setSelected(true);
     showJoint(jts.at(row));
+    jts.clear();
 }
 
 void GLWidget::loadSimulationParameters(QString file)
@@ -1081,4 +1126,15 @@ void GLWidget::loadSimulationParameters(QString file)
 
 
 
+}
+
+void GLWidget::setScreenShot(bool b)
+{
+    this->screenshot = b;
+}
+
+void GLWidget::setRenderMesh(bool b)
+{
+    this->rendermesh = b;
+    scene->setRenderMesh(this->rendermesh);
 }

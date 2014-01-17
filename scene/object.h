@@ -5,6 +5,7 @@
 #include "physics/physics.h"
 #include "math/vec4.h"
 #include "math/quaternion.h"
+#include "extra/ObjMesh.h"
 
 class Material;
 class Matrix4x4;
@@ -26,6 +27,9 @@ private:
     bool         selected;
     bool         bodyBalance;
     bool         isFoot;
+    QString      objFile;
+    ObjMesh      *objMesh;
+    bool         rendermesh;
 
     // --------Physics
     BodyID       body;                                                    //body ODE
@@ -72,6 +76,8 @@ public:
     QString     getName();                                                 //extraí o nome do objeto
     void        setName(QString name);                                     //seta um nome para o objeto
     QString     saveObject();                                              //adiconar parametros do abjeto ao arquivo
+    void        setObjFile(QString obj);
+    QString     getObjFile();
 
     // --------Physics
     BodyID      getBody();                                                 //esta parametro de corpo do ODE
@@ -135,6 +141,7 @@ public:
     static Vec4 posEffectorForward(Vec4 pos,Quaternion rot,Object* obj);
     static Vec4 posEffectorBackward(Vec4 pos,Quaternion rot,Object* obj);
     QString     showInfo();
+    void        setRenderMesh(bool b);
 
     // --------Strategy Equilibrium
     float       getCompensableFactor();

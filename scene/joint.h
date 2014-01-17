@@ -32,6 +32,7 @@ public:
     Vec4 *initialAnchor;          //posição inicial da ancoragem da junta
 
     Character *character;
+    Scene *scene;
 
     Joint(Character* chara,int type);
     Joint(int type);
@@ -39,6 +40,7 @@ public:
     void setLimitsAngularSuperior(Vec4 sup);
     void setLimitsAngularInferior(Vec4 inf);
     void setTorqueMax(Vec4 tq);
+    void setScene(Scene *scn);
     Vec4 getTorqueMax();
     Vec4 getLimitAngularMax();
     Vec4 getLimitAngularMin();

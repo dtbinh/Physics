@@ -218,6 +218,7 @@ void ControlPD::evaluate()
             //if(this->joint->getChild()->getFoot()) printf("\nControle PD: tq(%.3f,%.3f,%.3f)",tq.x(),tq.y(),tq.z());
                this->joint->getChild()->addTorque(tq.x(),tq.y(),tq.z());
 
+
 }
 
 void ControlPD::updateKsKdCoros(float MassTotal)

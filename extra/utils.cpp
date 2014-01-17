@@ -898,6 +898,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     int type = sime.attribute("Geometry","").toInt();
                     bool foot = (bool)sime.attribute("Foot","").toInt();
                     bool bodybalance =  (bool)sime.attribute("BodyBalance","").toInt();
+                    QString objfile = sime.attribute("ObjFile","");
                     Vec4 scale,pos;
                     Quaternion quat;
                     sime = body.firstChildElement("Position").toElement();
@@ -918,6 +919,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     z = sime.attribute("z","").toFloat();
                     scale.setVec4(x,y,z);
                     Object* obj = scene->addObject(scale,pos,quat,type,mass,chara,mat);
+                    obj->setObjFile(objfile);
                     obj->setName(name);
                     obj->setFoot(foot);
                     obj->setBodyBalance(bodybalance);

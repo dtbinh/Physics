@@ -178,12 +178,12 @@ void Scene::simulationStep()
     std::vector<Object*> objs = objectsScene();
     std::vector<Joint*> jts = jointsScene();
     //#pragma omp parallel
-    timeval tempo_fim;
-    if (initialize && entrou){
-          ti = tf = tempo = 0;
-          gettimeofday(&tempo_inicio,NULL);
-          entrou = false;
-    }
+//    timeval tempo_fim;
+//    if (initialize && entrou){
+//          ti = tf = tempo = 0;
+//          gettimeofday(&tempo_inicio,NULL);
+//          entrou = false;
+//    }
     for(int i=0;i<this->sim_step;i++){
         if(characters.size()>0)
            for(unsigned int i=0;i<objs.size();i++){
@@ -207,37 +207,38 @@ void Scene::simulationStep()
            }
            Physics::simSingleStep(this);
         }
-    if(initialize){
-        gettimeofday(&tempo_fim,NULL);
-        tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-        ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-        tempo = (tf - ti) / 1000000;
-//        for(int i = 0;i<getCharacter(0)->getNumJoints();i++){
-//            Vec4 orient = (getCharacter(0)->getControllersPD().at(i)->getOrientation().toEuler())*(M_PI/180.);
-//            Vec4 orientmocap = getCharacter(0)->getControllersPD().at(i)->getQuaternionWanted().toEuler()*(M_PI/180.);
-//            motion[i].push_back(orient);
-//            mocap[i].push_back(orientmocap);
-//        }
-        sim_dist.push_back(getCharacter(0)->getBalance()->sim_dist);
-        mocap_dist.push_back(getCharacter(0)->getBalance()->mocap_dist);
-        tempopass.push_back(tempo);
-    }
-    if(record){
-        QString endmotion = "/home/danilo/GitHub/ODESys/results/Walking.dist";
-        Utils::saveListDistMotion(sim_dist,mocap_dist,tempopass,endmotion.toStdString());
-//        for(int i=0;i<getCharacter(0)->getNumJoints();i++){
-//            QString endmotion = "/home/danilo/GitHub/ODESys/results/" + getCharacter(0)->getJoint(i)->getName()+".tab";
-//            Utils::saveListMotion(motion.at(i),mocap.at(i),tempopass,endmotion.toStdString());
+//    if(initialize){
+//        gettimeofday(&tempo_fim,NULL);
+//        tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//        ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//        tempo = (tf - ti) / 1000000;
+////        for(int i = 0;i<getCharacter(0)->getNumJoints();i++){
+////            Vec4 orient = (getCharacter(0)->getControllersPD().at(i)->getOrientation().toEuler())*(M_PI/180.);
+////            Vec4 orientmocap = getCharacter(0)->getControllersPD().at(i)->getQuaternionWanted().toEuler()*(M_PI/180.);
+////            motion[i].push_back(orient);
+////            mocap[i].push_back(orientmocap);
+////        }
+//        sim_dist.push_back(getCharacter(0)->getBalance()->sim_dist);
+//        mocap_dist.push_back(getCharacter(0)->getBalance()->mocap_dist);
+//        tempopass.push_back(tempo);
+//    }
+//    if(record){
+//        QString endmotion = "/home/danilo/GitHub/ODESys/results/Walking.dist";
+//        Utils::saveListDistMotion(sim_dist,mocap_dist,tempopass,endmotion.toStdString());
+////        for(int i=0;i<getCharacter(0)->getNumJoints();i++){
+////            QString endmotion = "/home/danilo/GitHub/ODESys/results/" + getCharacter(0)->getJoint(i)->getName()+".tab";
+////            Utils::saveListMotion(motion.at(i),mocap.at(i),tempopass,endmotion.toStdString());
 
 
-//        }
-        record = false;
+////        }
+//        record = false;
 
-    }
+//    }
 
 //      printf("Tempo gasto em milissegundos %.3f\n",tempo);
         apply = true;
-
+ objs.clear();
+ jts.clear();
 
 }
 
@@ -264,9 +265,11 @@ void Scene::draw()
             if (objs.at(i)->isSelected()){
                 Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);
             }
+        objs.clear();
     }
     if (characters.size()>0)
        if (show_grf) GRF::drawGRF(groundForces,getCharacter(0)->getPosCOM());
+
     //Draw::drawPoint(Vec4(0,7,0));
 
 //    glDisable(GL_DEPTH_TEST);
@@ -488,6 +491,13 @@ void Scene::loadSceneObjects()
 
 }
 
+void Scene::setRenderMesh(bool b)
+{
+    std::vector<Object*> objs = objectsScene();
+    for(unsigned int i=0;i<objs.size();i++)
+        objs.at(i)->setRenderMesh(b);
+}
+
 
 SpaceID Scene::getSpace()
 {
@@ -586,6 +596,7 @@ Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character
 
 Joint *Scene::addJointFixed(Object *parent,Object *child,Character *chara)
 {
+
     Joint *joint = NULL;
     if(chara != NULL){
         joint = new Joint(chara,JOINT_FIXED);
@@ -594,10 +605,12 @@ Joint *Scene::addJointFixed(Object *parent,Object *child,Character *chara)
         joint->initJoint();
     }else{
         joint = new Joint(JOINT_FIXED);
+        joint->setScene(this);
         joint->setParent(parent);
         joint->setChild(child);
         joint->initJoint();
     }
+
     return joint;
 }
 
@@ -1028,22 +1041,26 @@ bool Scene::isGeometryFootSwing(dGeomID geom)
 {
     std::vector<Object*> obj = objectsScene();
     for(unsigned int i=0;i<obj.size();i++){
-        if (obj.at(i)->getGeometry()==geom) return Sensor::isSwingFoot(obj.at(i));
+        if (obj.at(i)->getGeometry()==geom) return Sensor::isSwingFoot(obj.at(i),obj.at(i)->getCharacter());
     }
+    obj.clear();
     return false;
 }
 
 void Scene::createRamp()
 {
     return;
-    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(75,0,0)),TYPE_CUBE,1.2);
-  //  Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),Quaternion(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
-    Object *cont = addObject(Vec4(1.8,0.18,0.5),Vec4(-0.1,0.05,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
-    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.1,2.68),Quaternion(Vec4(-75,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+
+
+  //  Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.1,1.5),Quaternion(Vec4(75,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),Quaternion(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),Quaternion(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
     objects.push_back(ramp);
     objects.push_back(cont);
     objects.push_back(ramp2);
     joints.push_back(addJointFixed(ramp,ramp2,NULL));
+    qDebug() << "Criou";
     //joints.push_back(addJointFixed(ramp2,));
 //    joints.push_back(addJointFixed(cont,NULL));
 

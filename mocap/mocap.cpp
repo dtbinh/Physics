@@ -362,16 +362,10 @@ void MoCap::drawShadow(Vec4 offset, int frame)
         Vec4 position = getFrameMotion(frame)->getPosition(i);
         Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
         if(i==int(sens-3))
-            for(unsigned int j=0;j<foots.size();j++){
-                if(i==int(idfoots.at(j))) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
-            }
-            //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else if(sens==0 && chara->getBody(i)->getFoot())
-            for(unsigned int j=0;j<foots.size();j++){
-                if(i==int(idfoots.at(j))) foots.at(j)->draw(position+offset,orientation,MATERIAL_RUBY);
-            }
-            //chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else
-            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_WHITE_RUBBER);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_SILVER_POLIERT);
     }
 }

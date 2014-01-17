@@ -482,6 +482,7 @@ Vec4 Balance::limitingTorque(float x, Vec4 torque)
 
 void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesired,Vec4 vel_ang_des, Vec4 velCOM_moCap,Vec4 mom_lin_des,Vec4 mom_ang_des)
 {
+
     Quaternion quat(Vec4(0,0,0));
 //    if((frame>0)&&(chara->getMoCap()->status))
 //       frame = chara->getMoCap()->frame_current; //se houver captura de movimento extraí-se o frame corrente
@@ -493,8 +494,9 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesire
         (*it)->evaluate();
         //(*it)->resetInertiaFactors();
     }
-
     if(!(enable_balance)) return; //desabilita o controle de equilíbrio
+
+
 
 
     if((frame>0)&&(chara->getMoCap()->status))
@@ -510,7 +512,22 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesire
 
     bool capture = false;
     if(frame>0 && chara->getMoCap()->status) capture = true;
-    Vec4 Cfoot_ = Sensor::getSupportProjected(chara,capture);
+    std::vector<Object*> foots;
+    for (int i=0;i<chara->getNumBodies();i++)
+        if (this->chara->getBody(i)->getFoot()) foots.push_back( chara->getBody(i));
+
+    Vec4 Cfoot_;
+    int count = 0;
+    for(int i=0;i<foots.size();i++){
+        if (!Sensor::isSwingFoot(foots.at(i),chara)){
+            Cfoot_ += foots.at(i)->getPositionCurrent();
+            count++;
+        }
+    }
+    Cfoot_ /= count;
+    Cfoot_.x2 = 0;
+    //Vec4 Cfoot_ = Sensor::getSupportProjected(chara,capture);
+
     Vec4 COM   = chara->getPosCOM();
     Vec4 COM_   = Vec4(COM.x(),0,COM.z());
     Vec4 velCOM_ = chara->getVelCOM();

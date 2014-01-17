@@ -29,7 +29,7 @@ int Sensor::getStateFoots(Character *chara)
             count++;
         }
     }
-
+    foots.clear();
     return count;
 
 }
@@ -47,6 +47,7 @@ Vec4 Sensor::getSupportProjected(Character *chara,bool capture)
         }
         proj = proj/2.0;
         proj.x2 = 0;
+        foots.clear();
         return proj;
     }
     int hierarquia = getHierarchy2Use(chara);
@@ -57,6 +58,7 @@ Vec4 Sensor::getSupportProjected(Character *chara,bool capture)
         }
         proj = proj/2.0;
         proj.x2 = 0;
+        foots.clear();
         return proj;
     }else{
         for(unsigned int i=0;i<foots.size();i++){
@@ -65,12 +67,13 @@ Vec4 Sensor::getSupportProjected(Character *chara,bool capture)
             }
         }
         proj.x2 = 0;
+        foots.clear();
         return proj;
     }
 
 }
 
-bool Sensor::isSwingFoot(Object *obj)
+bool Sensor::isSwingFoot(Object *obj,Character *chara)
 {
     if(obj==NULL) return false;
     if(!(obj->getFoot())) return false;
@@ -82,30 +85,38 @@ bool Sensor::isSwingFoot(Object *obj)
             if( obj->getCharacter()->getBody(i)->getFoot()) foots.push_back( obj->getCharacter()->getBody(i));
         }
         bool foot_l,foot_r;
-        bool close_enought_l = false;
-        bool close_enought_r = false;
+        bool close_enought_l = true;
+        bool close_enought_r = true;
         Vec4 prop = foots.at(0)->getProperties();
         float height = prop.y()/2.0;
         if (foots.at(0)->posEffectorBackward().y()<height+0.005 || foots.at(0)->posEffectorForward().y()<height+0.005){
+        //if (chara->getGRFSum(foots.at(0)).y()>50){
+
             close_enought_l = true;
         }
         if (foots.at(1)->posEffectorBackward().y()<height+0.005 || foots.at(1)->posEffectorForward().y()<height+0.005){
+    //if (chara->getGRFSum(foots.at(1)).y()>50){
             close_enought_r = true;
         }
         foot_l =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
         foot_r =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootRightGround();
-        if (foot_l && foot_r && close_enought_l && close_enought_r)
+        if (foot_l && foot_r && close_enought_l && close_enought_r){
+            foots.clear();
             return false;
+        }
         else if (foot_l && close_enought_l){
+
             if (obj == foots.at(0)) return false;
             else return true;
 
         }
         else if (foot_r && close_enought_r){
+
             if (obj == foots.at(1)) return false;
             else return true;
 
         }
+        foots.clear();
         return false;
     }
     return false;
@@ -128,6 +139,7 @@ int Sensor::getSwingFoot(Character *chara)
             count++;
         }
     }
+    foots.clear();
     if (count>1) return -1;
     return body;
 }
@@ -166,6 +178,7 @@ int Sensor::getHierarchy2Use(Character *chara)
             state++;
         }
     }
+    foots.clear();
     if(state==0) return FOOTS_AIR+3;
     else if(state>1) return ALL_FOOTS_GROUND+3;
     else return chara->getPositionBody(contact)+3;
@@ -189,18 +202,21 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
     foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
     foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     if (!foot_l){
-        if (foots.at(0)->posEffectorBackward().y()<height+0.0005 || foots.at(0)->posEffectorForward().y()<height+0.0005){
+        //if (foots.at(0)->posEffectorBackward().y()<height+0.0005 || foots.at(0)->posEffectorForward().y()<height+0.0005){
+        if (chara->getGRFSum(foots.at(0)).y()>0){
             close_enought_l = true;
         }
     }else{
+
         close_enought_l =true;
     }
     if (!foot_r){
-        if (foots.at(1)->posEffectorBackward().y()<height+0.0005 || foots.at(1)->posEffectorForward().y()<height+0.0005){
+        //if (foots.at(1)->posEffectorBackward().y()<height+0.0005 || foots.at(1)->posEffectorForward().y()<height+0.0005){
+        if (chara->getGRFSum(foots.at(1)).y()>0){
             close_enought_r = true;
         }
     }else{
-        close_enought_r = true;
+        close_enought_r =true;
     }
     if (foot_l && foot_r && close_enought_l && close_enought_r)
         state = 2;

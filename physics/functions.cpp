@@ -25,6 +25,7 @@ Matrix getMatrix2dMatrix3(const dReal* R)
     mat(2,1) = R[9];
     mat(2,2) = R[10];
 
+
     return mat;
 }
 

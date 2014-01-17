@@ -1,11 +1,13 @@
 #ifndef DRAW_H
 #define DRAW_H
 #define dDOUBLE
+
 #include <ode/common.h>
 #include <math/quaternion.h>
 #include <math.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "extra/ObjMesh.h"
 class Matrix4x4;
 #include "extra/material.h"
 #include "math/vec4.h"
@@ -22,8 +24,13 @@ public:
     static void drawLine(Vec4 p1,Vec4 p2,Vec4 color,float width);
     static void drawSphereSelected(Vec4 position);
     static void drawPoint(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
+    static void drawCOM(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
+    static void drawCOMProjected(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
+    static void drawTargetProjected(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
     static void drawGround(int size);
     static void drawCoffeeCup(Vec4 position, int material,Quaternion q=Quaternion());
+    static void drawObj(Vec4 position, int material,Quaternion q, QString file, ObjMesh *n);
+    static void drawObj(Matrix4x4 *transform,int material,ObjMesh *n);
     static void drawSelection(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,1,1));                        //desenha um cubo selecionado o objeto
     static void drawWireframe(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,0,0));
     static void drawSelection(Vec4 properties,float radius);                        //desenha um cubo selecionado o objeto

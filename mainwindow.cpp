@@ -19,6 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     this->showMaximized();
     ui->groupBoxCone->setVisible(false);
     ui->widgetPhysics->setObjectSelected(-1);
+    connect(ui->checkScreenShot,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setScreenShot(bool)));
+    connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
     //manipuladores do movimento
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->iframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));

@@ -1,5 +1,6 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
+#include <QGLShaderProgram>
 #include "scene/scene.h"
 #include <QGLWidget>
 #include <QTimer>
@@ -34,6 +35,9 @@ signals:
 
 public slots:
 
+    //slots edição
+    void setScreenShot(bool b);
+    void setRenderMesh(bool b);
     //slots motion capture
 
     void loadMotionCapture(QString file);
@@ -95,6 +99,7 @@ public slots:
     void setShowShadow(bool b);
     void setShowGRF(bool b);
     void setShowMoCap(bool b);
+    void drawScene();
 
 
 
@@ -117,6 +122,11 @@ public:
     QList<Vec4> curve_quat;
     QList<int>  curve_quat_time;
     bool load_exemple_curve;
+    bool screenshot;
+    bool rendermesh;
+    void bindShader();
+    void releaseShader();
+
     //Plane *plane;
     explicit GLWidget(QWidget *parent = 0);
     void initializeGL();
@@ -135,8 +145,13 @@ public:
     void drawShadows();
     void loadCurveExample();
     void showCurveExample();
+    void setScreenShot();
 
 
+
+#ifdef SHADERS_ENABLED
+    QGLShaderProgram shaderProgram;
+#endif
 
 signals:
 

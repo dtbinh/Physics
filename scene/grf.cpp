@@ -104,6 +104,7 @@ Vec4 GRF::forcesGRF(std::vector<GRF> grfs, Object *obj)
             if ( grfs[fc].noGroundGeom == 2 ) groundforce = grfs[fc].jtFb->f2;
             groundForce = Vec4(groundforce[0],groundforce[1],groundforce[2]);
             sum += groundForce;
+
         }
 
     }

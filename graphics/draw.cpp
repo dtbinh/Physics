@@ -5,17 +5,39 @@
 #include "GL/glut.h"
 #include "math/quaternion.h"
 #include "physics/physics.h"
-#include "extra/ObjMesh.h"
+
+#include "imageloader.h"
 
 bool idraw_ground = false;
 int idrawGround;
 int idrawGround2;
 int slices = 50;
 int stacks = 50;
+GLuint _textureId; //The id of the textur
 
+//Makes the image into a texture, and returns the id of the texture
+GLuint loadTexture(Image* image) {
+    GLuint textureId;
+    glGenTextures(1, &textureId); //Make room for our texture
+    glBindTexture(GL_TEXTURE_2D, textureId); //Tell OpenGL which texture to edit
+    //Map the image to the texture
+    glTexImage2D(GL_TEXTURE_2D,                //Always GL_TEXTURE_2D
+                 0,                            //0 for now
+                 GL_RGB,                       //Format OpenGL uses for image
+                 image->width, image->height,  //Width and height
+                 0,                            //The border of the image
+                 GL_RGB, //GL_RGB, because pixels are stored in RGB format
+                 GL_UNSIGNED_BYTE, //GL_UNSIGNED_BYTE, because pixels are stored
+                                   //as unsigned numbers
+                 image->pixels);               //The actual pixel data
+    return textureId; //Returns the id of the texture
+}
 
 Draw::Draw()
 {
+    Image* image = loadBMP("../texture/checker2.bmp");
+    _textureId = loadTexture(image);
+    delete image;
 }
 
 void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
@@ -90,11 +112,14 @@ void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
         glVertex3f(vertexs[3].x(),vertexs[3].y(),vertexs[3].z());
     glEnd();
     glPopMatrix();
+    delete transform;
+
 
 }
 
 void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
 {
+
     Material *mat = new Material();
     Material::setMaterial(mat,material);
     Vec4 vertexs[8];
@@ -188,10 +213,12 @@ void Draw::drawCylinder(Matrix4x4 *transform,Material *mat)
         gluCylinder(q, scale.x(),scale.x(),scale.y(), slices, stacks);
     glPopMatrix();
     gluDeleteQuadric(q);
+
 }
 
 void Draw::drawSphere(Matrix4x4 *transform,Material *mat,float radius)
 {
+
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -209,7 +236,8 @@ void Draw::drawSphere(Matrix4x4 *transform,Material *mat,float radius)
 
     glPopMatrix();
 
-    gluDeleteQuadric(q);
+    delete q;
+
 }
 
 void Draw::drawSphere(Vec4 position, int material, float size)
@@ -230,7 +258,7 @@ void Draw::drawSphere(Vec4 position, int material, float size)
 
     glPopMatrix();
 
-    gluDeleteQuadric(q);
+    delete q;
     delete mat;
 }
 
@@ -269,7 +297,7 @@ void Draw::drawSphereSelected(Vec4 position)
 
     glPopMatrix();
 
-    gluDeleteQuadric(q);
+    delete q;
     delete mat;
 }
 
@@ -291,9 +319,127 @@ void Draw::drawPoint(Vec4 p, float size, Vec4 color)
     glEnable(GL_LIGHTING);
 
 }
+bool yes = true;
+void Draw::drawCOM(Vec4 position, float size, Vec4 color)
+{
+    //return;
+    Material *mat = new Material();
+        Material::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+
+    GLUquadric *quad =gluNewQuadric();
+
+    //Image* image = loadBMP("../texture/checker2.bmp");
+    if(yes)
+    _textureId = loadTexture(loadBMP("../texture/checker2.bmp"));
+    yes = false;
+
+    //delete image;
+
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+
+    //Bottom
+    glPushMatrix();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_CLAMP_TO_EDGE);
+
+    glPopMatrix();
+    glPushMatrix();
+    //
+
+    gluQuadricNormals(quad, GLU_SMOOTH);
+    gluQuadricTexture(quad,1);
+    glTranslatef(position.x(),position.y(),position.z());
+    glRotatef(90,1.0f,0.0f,0.0f);
+    gluSphere(quad, size, slices, stacks);
+    glPopMatrix();
+    delete quad;
+    delete mat;
+
+    glDisable(GL_TEXTURE_2D);
+}
+
+void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color)
+{
+
+    Material *mat = new Material();
+        Material::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+
+    GLUquadric *quad =gluNewQuadric();
+
+
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+
+    //Bottom
+    glPushMatrix();
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_CLAMP_TO_EDGE);
+
+    glPopMatrix();
+    glPushMatrix();
+    //
+
+    gluQuadricNormals(quad, GLU_SMOOTH);
+    gluQuadricTexture(quad,1);
+    glTranslatef(position.x(),0.005,position.z());
+    glRotatef(90,1.0f,0.0f,0.0f);
+    //gluQuadricDrawStyle(quad, GLU_FILL);
+    gluClosedCylinder(quad,size,size,0.001,25,25);
+    glPopMatrix();
+    delete quad;
+    delete mat;
+    glDisable(GL_TEXTURE_2D);
+}
+
+void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color)
+{
+    Material *mat = new Material();
+        Material::setMaterial(mat,MATERIAL_YELLOW_PLASTIC);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+
+    GLUquadric *quad =gluNewQuadric();
+
+
+    //Bottom
+
+    glPushMatrix();
+
+    glTranslatef(position.x(),0.01,position.z());
+    glRotatef(90,1.0f,0.0f,0.0f);
+    gluClosedCylinder(quad,size,size,0.001,25,25);
+    glPopMatrix();
+    delete quad;
+    delete mat;
+
+}
 
 void Draw::drawGround(int size)
 {
+
+    /*** Anterior
     Material *mat = new Material();
 
 
@@ -301,17 +447,17 @@ void Draw::drawGround(int size)
 
     glBegin(GL_QUADS);
     bool color = true;
-    for(int i=-size;i<=size;i++){
-        if (abs(i)%2==0) color = true;
+    for(int i=-size;i<=size;i+=2){
+        if (abs(i)%4==0) color = true;
         else color = false;
-        for(int j=-size;j<=size;j++){
+        for(int j=-size;j<=size;j+=2){
             if (color){
 
                 mat->setMaterial(mat,MATERIAL_SILVER_POLIERT);
                 glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
                 glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
-                glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+                glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*64);
             }
             else{
 
@@ -323,9 +469,9 @@ void Draw::drawGround(int size)
             }
             glNormal3f(0,1,0);
             glVertex3f(i,0,j);
-            glVertex3f(i,0,j+1);
-            glVertex3f(i+1,0,j+1);
-            glVertex3f(i+1,0,j);
+            glVertex3f(i,0,j+2);
+            glVertex3f(i+2,0,j+2);
+            glVertex3f(i+2,0,j);
             color = !color;
         }
     }
@@ -334,7 +480,83 @@ void Draw::drawGround(int size)
     delete mat;
     //    glEndList();
 //    if (!idraw_ground) idraw_ground = true;
+***/
+    //Novo
 
+
+    glDisable(GL_LIGHTING);
+    glLineWidth(3.0);
+    glColor3f(0,0,0);
+    glBegin(GL_LINES);
+    for(int i=-size;i<=size;i+=2){
+        for(int j=-size;j<=size;j+=2){
+            glVertex3f(i,0.000,j);
+            glVertex3f(i,0.000,j+2);
+
+            glVertex3f(i,0.000,j+2);
+            glVertex3f(i+2,0.000,j+2);
+
+            glVertex3f(i+2,0.000,j+2);
+            glVertex3f(i+2,0.000,j);
+
+            glVertex3f(i+2,0.000,j);
+            glVertex3f(i,0.000,j);
+
+
+        }
+    }
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+    glDisable(GL_LIGHTING);
+    glLineWidth(1.0);
+    glBegin(GL_LINES);
+    for(int i=-size;i<=size;i+=2){
+        for(int j=-size;j<=size;j+=2){
+            for (float k=i;k<i+2;k+=0.5)
+                for(float l=j;l<j+2;l+=0.5){
+                    glVertex3f(k,0.0001,l);
+                    glVertex3f(k,0.0001,l+.5);
+
+                    glVertex3f(k,0.0001,l+.5);
+                    glVertex3f(k+.5,0.0001,l+.5);
+
+                    glVertex3f(k+.5,0.0001,l+.5);
+                    glVertex3f(k+.5,0.0001,l);
+
+                    glVertex3f(k+.5,0.0001,l);
+                    glVertex3f(k,0.0001,l);
+
+                }
+
+        }
+    }
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+    Material *mat = new Material();
+    mat->setMaterial(mat,MATERIAL_BRONZE);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    for(int i=-size;i<=size;i+=2){
+        for(int j=-size;j<=size;j+=2){
+            glNormal3f(0,1,0);
+            glVertex3f(i,0,j);
+            glVertex3f(i,0,j+2);
+            glVertex3f(i+2,0,j+2);
+            glVertex3f(i+2,0,j);
+        }
+    }
+    glEnd();
+    glPopMatrix();
+
+
+   delete mat;
 
 }
 
@@ -352,6 +574,39 @@ void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
     glTranslatef(position.x(),position.y(),position.z());
     glMultMatrixf(m.matrix);
     obj.draw();
+    glPopMatrix();
+    delete mat;
+}
+
+void Draw::drawObj(Vec4 position, int material,Quaternion q, QString file,ObjMesh *n)
+{
+    Material *mat = new Material();
+    mat->setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+    Matrix4x4 m = q.getMatrix();
+    glPushMatrix();
+    glTranslatef(position.x(),position.y(),position.z());
+    glMultMatrixf(m.matrix);
+    n->draw();
+    glPopMatrix();
+    delete mat;
+}
+
+void Draw::drawObj(Matrix4x4 *transform, int material, ObjMesh *n)
+{
+    Material *mat = new Material();
+    mat->setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    glPushMatrix();
+    glMultMatrixf(transform->getMatrix());
+    n->draw();
     glPopMatrix();
     delete mat;
 }
@@ -457,6 +712,7 @@ void Draw::drawSelection(Matrix4x4 *transform,Vec4 p,Vec4 color)
     glEnd();
     glPopMatrix();
     glEnable(GL_LIGHTING);
+    delete transform;
     return;
 
 }
@@ -533,7 +789,7 @@ void Draw::drawWireframe(Matrix4x4 *transform, Vec4 p,Vec4 color)
     glPopMatrix();
     glEnable(GL_LIGHTING);
     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
+    delete transform;
 }
 
 void Draw::drawSelection(Vec4 p,float )
@@ -552,6 +808,7 @@ void Draw::drawSelection(Vec4 p,float )
     //glColor3f(1,1,1);
 
     glDisable(GL_LIGHTING);
+    glLineWidth(0.5);
     glPushMatrix();
     glColor3f(1,0,0);
     glBegin(GL_LINES);

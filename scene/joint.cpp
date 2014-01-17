@@ -8,10 +8,14 @@
 
 Joint::Joint(Character *chara,int type)
 {
-    this->character = chara;
-    chara->joints.push_back(this);
+    if(chara!=NULL){
+        this->character = chara;
+        chara->joints.push_back(this);
+        this->scene =chara->scene;
+    }
     this->type = type;
     material = new Material();
+
     this->selected = false;
     //this->parent = new Object();
     //this->child = new Object();
@@ -290,7 +294,7 @@ void Joint::draw()
         Vec4 position = Physics::getJointBallAnchor(this);
 
         if (selected) Draw::drawSphereSelected(position);
-        else Draw::drawSphere(position,MATERIAL_SILVER);
+        else Draw::drawSphere(position,MATERIAL_SILVER,0.03);
         break;
     }
     case (JOINT_FIXED):{
@@ -302,4 +306,9 @@ void Joint::draw()
 void Joint::setTorqueMax(Vec4 tq)
 {
     this->tqMax = tq;
+}
+
+void Joint::setScene(Scene *scn)
+{
+    scene = scn;
 }

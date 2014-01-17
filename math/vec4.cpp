@@ -155,7 +155,8 @@ float Vec4::w()
 
 void Vec4::normalize()
 {
-    this->x1 = this->x()/this->module();
-    this->x2 = this->y()/this->module();
-    this->x3 = this->z()/this->module();
+    float mod = this->module();
+    this->x1 = this->x()/mod;
+    this->x2 = this->y()/mod;
+    this->x3 = this->z()/mod;
 }

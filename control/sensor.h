@@ -21,7 +21,7 @@ public:
     static void setTolerance(float val);
     static int getStateFoots(Character *chara);
     static Vec4 getSupportProjected(Character *chara,bool capture);
-    static bool isSwingFoot(Object *obj);
+    static bool isSwingFoot(Object *obj, Character *chara=NULL);
     static int getSwingFoot(Character *chara);
     static int getStanceFoot(Character *chara);
     static int getHierarchy2Use(Character *chara); //esta função determina qual matriz deverá ser usada no cálculo da

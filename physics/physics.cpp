@@ -151,6 +151,8 @@ Quaternion Physics::getRotationJoint(Joint *joint)
         dQMultiply0 (q, qPrevt, qNext); //ou o contrario
         //dQMultiply0 (q, qNext, qPrevt); //ou o contrario
 
+
+
       return Quaternion( q[0], Vec4(q[1],q[2],q[3]) );
 }
 
@@ -438,7 +440,7 @@ void Physics::initJointBall(Joint* joint, Vec4 anchor)
 }
 
 void Physics::initJointFixed(Joint *joint){
-    joint->setJoint(dJointCreateFixed(joint->getCharacter()->getScene()->getWorld(),0));
+    joint->setJoint(dJointCreateFixed(joint->scene->getWorld(),0));
     dJointAttach(joint->getJoint(),joint->getParent()->getBody(),joint->getChild()->getBody());
     dJointSetFixed(joint->getJoint());
 

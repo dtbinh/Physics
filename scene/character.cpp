@@ -62,7 +62,7 @@ void Character::drawShadows()
 
 void Character::drawCOM()
 {
-    Draw::drawPoint(getPosCOM(),0.05,Vec4(0,1,0));
+    Draw::drawCOM(getPosCOM(),0.04,Vec4(0,1,0));
 }
 
 void Character::drawMoCap(bool b)
@@ -82,16 +82,34 @@ void Character::setWireframe(bool b)
 
 void Character::drawFootProjected()
 {
+//    std::vector<Object*> foots;
+//    for (int i=0;i<this->getNumBodies();i++)
+//        if (this->getBody(i)->getFoot()) foots.push_back( this->getBody(i));
+//    if(!(foots.size()>0)) return;
+//    for(unsigned int i=0;i<foots.size();i++){
+//        Object* foot = foots[i];
+//        Vec4 Cfoot_ = foot->getPositionCurrent();//centro de apoio projetado no plano xz
+//        Cfoot_ = Vec4(Cfoot_.x(),0,Cfoot_.z());
+//        Draw::drawCOMProjected(Cfoot_,0.05,Vec4(1,1,0));
+//    }
+
+    bool capture = false;
+    if(this->capMotion->frame_current>0 && this->getMoCap()->status) capture = true;
     std::vector<Object*> foots;
     for (int i=0;i<this->getNumBodies();i++)
         if (this->getBody(i)->getFoot()) foots.push_back( this->getBody(i));
-    if(!(foots.size()>0)) return;
-    for(unsigned int i=0;i<foots.size();i++){
-        Object* foot = foots[i];
-        Vec4 Cfoot_ = foot->getPositionCurrent();//centro de apoio projetado no plano xz
-        Cfoot_ = Vec4(Cfoot_.x(),0,Cfoot_.z());
-        Draw::drawPoint(Cfoot_,0.05,Vec4(1,1,0));
+    Vec4 Cfoot_;
+    int count = 0;
+    for(int i=0;i<foots.size();i++){
+        if (!Sensor::isSwingFoot(foots.at(i),this)){
+            Cfoot_ += foots.at(i)->getPositionCurrent();
+            count++;
+        }
     }
+    Cfoot_ /= count;
+    Cfoot_.x2 = 0;
+
+    Draw::drawTargetProjected(Cfoot_,0.05);
 
 }
 
@@ -100,7 +118,7 @@ void Character::drawCOMProjected()
 
     Vec4 COM_   = this->getPosCOM();
     COM_ = Vec4(COM_.x(),0,COM_.z());
-    Draw::drawPoint(COM_,0.05,Vec4(1,1,1));
+    Draw::drawCOMProjected(COM_,0.05,Vec4(1,1,1));
 }
 
 void Character::drawShadowMotion(int frame)
@@ -325,6 +343,7 @@ bool Character::isBodyHierarchy(Joint *joint, Object *obj)
     int size = relation.size();
     for(int i=0;i<size;i++)
          if (isBodyHierarchy(relation.at(i),obj)) return true;
+    relation.clear();
     return false;
 }
 
@@ -376,6 +395,7 @@ Vec4 Character::getSumTorqueGRF2COM()
               Vec4 d = this->getScene()->getGroundForces()[fc].position;
               d = posCOM - d;
               sumTorque += Force3D ^ d;
+              delete groundForce;
           }
       }
     return sumTorque;
@@ -396,6 +416,7 @@ Vec4 Character::getSumForceGRF2COM()
               if ( this->getScene()->getGroundForces()[fc].noGroundGeom == 2 ) groundForce = this->getScene()->getGroundForces()[fc].jtFb->f2;
               Vec4 Force3D(groundForce[0],groundForce[1],groundForce[2]);
               sumForces += Force3D;
+              delete groundForce;
           }
       }
     return sumForces;
@@ -696,6 +717,7 @@ std::vector<Joint*> Character::getHierarchyJoint(Object *begin, Object *end)
             getHierarchyJoint(childs.at(i),end);
         }
     }
+    childs.clear();
     return result;
 }
 

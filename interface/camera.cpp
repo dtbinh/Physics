@@ -12,7 +12,7 @@ Camera::Camera()
 
     at.x1=0;
     at.x2=1;
-    //at.x3=0;
+    at.x3=0;
     //c.z=0 ou e.z-1;
 
     up.x1=0;
