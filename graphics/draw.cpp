@@ -535,7 +535,7 @@ void Draw::drawGround(int size)
     glEnd();
     glEnable(GL_LIGHTING);
     Material *mat = new Material();
-    mat->setMaterial(mat,MATERIAL_BRONZE);
+    mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);

@@ -5,19 +5,25 @@
 #include "math/quaternion.h"
 #include "scene/joint.h"
 #include "math/matrix.h"
+/*
+  Essa classe está anexada a cada junta presente no personagem, ou pode ser
+  chamada externamente. Tem como função fazer com que a configuração de
+  orientação entre dois corpos seja alcançada.
 
+
+  */
 class ControlPD
 {
 private:
     Joint*     joint;
     Quaternion qwanted;
-    Vec4       ks;         //constante linear
-    Vec4       kd;         //constante derivada
-    Vec4       propKs;
-    Vec4       propKd;
-    bool       enabled;
-    Matrix     inertia;
-    Vec4       velDesired;
+    Vec4       ks;             //constante linear
+    Vec4       kd;             //constante derivada
+    Vec4       propKs;         //constante linear proporcional setada via classe Scene
+    Vec4       propKd;         //constante derivada proporcional setada via classe Scene
+    bool       enabled;        //habilita o controle de PD da junta
+    Matrix     inertia;        //matriz de inercia
+    Vec4       velDesired;     //velocidade linear desejada
     bool       enable_inertia; //habilita ou não o fator de inercia da junta
 
 public:

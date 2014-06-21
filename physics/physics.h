@@ -76,6 +76,7 @@ namespace Physics{
     void closeScene(Scene *scene);
     void initCharacter(Character *chara);
     void closeCharacter(Character *chara);
+    void closeObject(Object *obj);
 
 }
 

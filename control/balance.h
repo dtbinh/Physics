@@ -2,6 +2,7 @@
 #define BALANCE_H
 #include "math/matrix.h"
 #include "math/quaternion.h"
+
 class Character;
 class Joint;
 class Object;
@@ -30,12 +31,15 @@ class Balance
     bool       enable_momentum;
     bool       enable_balance;
     int        useHierarchy;
+    int        steps;
     //estratégia de cone de fricção
-    float angle;
-    float height;
-    float radius;
-    float m;
-    float limit;
+
+    float angle;     //angulo do cone
+    float height;    //altura do pé
+    float radius;    //raio do pé
+    float m;         //modulo da força
+    float limit;     //limite de angulo
+
 
 
 public:

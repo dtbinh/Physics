@@ -21,7 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widgetPhysics->setObjectSelected(-1);
     connect(ui->checkScreenShot,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setScreenShot(bool)));
     connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
+    connect(ui->infoShow,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowInfos(bool)));
     //manipuladores do movimento
+    connect(ui->toleranciaCOM,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setToleranceCOM(float)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->iframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));

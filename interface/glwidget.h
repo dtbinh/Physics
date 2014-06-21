@@ -1,9 +1,10 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 #include <QGLShaderProgram>
+#include <QTimer>
 #include "scene/scene.h"
 #include <QGLWidget>
-#include <QTimer>
+
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
@@ -38,6 +39,7 @@ public slots:
     //slots edição
     void setScreenShot(bool b);
     void setRenderMesh(bool b);
+    void setShowInfos(bool b);
     //slots motion capture
 
     void loadMotionCapture(QString file);
@@ -49,6 +51,7 @@ public slots:
     void setEditingFrame(int frame);
     void setBeginClycle(int v);
     void setEndClycle(int v);
+    void setToleranceCOM(float val);
 
     //slots scene
     void saveSimulationParameters(QString file);
@@ -61,6 +64,7 @@ public slots:
     void applyForce(Vec4 force);
     void setGravityParameters(Vec4 g);
     void setGravity(bool b);
+
 
 
     //slots parametros de controle
@@ -100,11 +104,13 @@ public slots:
     void setShowGRF(bool b);
     void setShowMoCap(bool b);
     void drawScene();
+    void drawParameters();
 
 
 
     //slots não utilizados
     void setAlphaCharacter(int value);
+
 
 
 
@@ -118,12 +124,17 @@ public:
     bool capture_pause;
     bool editing_frame;
     bool show_character;
+    bool showInfo;
     int  frame_edit;
     QList<Vec4> curve_quat;
     QList<int>  curve_quat_time;
     bool load_exemple_curve;
     bool screenshot;
     bool rendermesh;
+    int frames;
+    float timeBase;
+    float FPS;
+    QTime m_time;
     void bindShader();
     void releaseShader();
 
@@ -146,6 +157,8 @@ public:
     void loadCurveExample();
     void showCurveExample();
     void setScreenShot();
+    void calculateFPSPaint();
+    void drawFPS();
 
 
 

@@ -100,14 +100,33 @@ void Character::drawFootProjected()
         if (this->getBody(i)->getFoot()) foots.push_back( this->getBody(i));
     Vec4 Cfoot_;
     int count = 0;
-    for(int i=0;i<foots.size();i++){
-        if (!Sensor::isSwingFoot(foots.at(i),this)){
-            Cfoot_ += foots.at(i)->getPositionCurrent();
-            count++;
-        }
+    //Vec4 Cfoot_;
+    //int count = 0;
+    int stance = Sensor::getStanceFoot(this);
+    if (stance<0){
+        Cfoot_ = foots.at(0)->getPositionCurrent()+foots.at(1)->getPositionCurrent();
+        Cfoot_.x2 = 0;
+        count = 2;
+    }else{
+        Cfoot_ = this->getBody(stance)->getPositionCurrent();
+        Cfoot_.x2 = 0;
+        count = 1;
     }
+//    for(int i=0;i<foots.size();i++){
+//        if (!Sensor::isSwingFoot(foots.at(i),chara)){
+//            Cfoot_ += foots.at(i)->getPositionCurrent();
+//            count++;
+//        }
+//    }
     Cfoot_ /= count;
-    Cfoot_.x2 = 0;
+//    for(int i=0;i<foots.size();i++){
+//        if (!Sensor::isSwingFoot(foots.at(i),this)){
+//            Cfoot_ += foots.at(i)->getPositionCurrent();
+//            count++;
+//        }
+//    }
+//    Cfoot_ /= count;
+//    Cfoot_.x2 = 0;
 
     Draw::drawTargetProjected(Cfoot_,0.05);
 
@@ -123,7 +142,7 @@ void Character::drawCOMProjected()
 
 void Character::drawShadowMotion(int frame)
 {
-    Vec4 offset(-1,0,0);
+    Vec4 offset(-2.0,0,0);
     capMotion->drawShadow(offset,frame);
 
 }
@@ -752,6 +771,16 @@ void Character::setKsRetaionshipKd()
 void Character::setOffset(Vec4 offset)
 {
     this->offset = offset;
+}
+
+Object *Character::getObjectSelected()
+{
+    for(int i=0;i<this->getNumBodies();i++){
+        if (this->getBody(i)->isSelected()){
+            return this->getBody(i);
+        }
+    }
+    return NULL;
 }
 
 Vec4 Character::getOffset()

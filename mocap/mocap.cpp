@@ -193,6 +193,7 @@ Vec4 MoCap::positionRelativeCOM(int frame,int foot)
         for(unsigned int i=0;i<idfoots.size();i++)
             posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
         posMedia /= idfoots.size();
+  //      printf("\nMedia dos dois pés");
     }
     else{
         for(unsigned int i=0;i<idfoots.size();i++)
@@ -200,6 +201,7 @@ Vec4 MoCap::positionRelativeCOM(int frame,int foot)
                 posMedia += capMot.at(frame)->getPosition(idfoots.at(i));
 
             }
+     //   printf("\nMedia de um pé");
 
     }
 
@@ -357,15 +359,17 @@ void MoCap::clear()
 void MoCap::drawShadow(Vec4 offset, int frame)
 {
     //if (!status) return;
+    Vec4 neww(-1.4,0,0);
     int sens = Sensor::getHierarchy2UseMocap(chara);
     for(int i=0;i<chara->getNumBodies();i++){
         Vec4 position = getFrameMotion(frame)->getPosition(i);
         Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
         if(i==int(sens-3))
-            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
+            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
         else if(sens==0 && chara->getBody(i)->getFoot())
-            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
+            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
         else
-            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_SILVER_POLIERT);
+            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_SILVER_POLIERT);
+
     }
 }

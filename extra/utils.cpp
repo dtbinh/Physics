@@ -625,6 +625,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             bodyProperties.setAttribute("Material",scene->getCharacter(i)->getBody(j)->getIntMaterial());
             bodyProperties.setAttribute("Foot",(int)scene->getCharacter(i)->getBody(j)->getFoot());
             bodyProperties.setAttribute("BodyBalance",(int)scene->getCharacter(i)->getBody(j)->getBodyBalance());
+            bodyProperties.setAttribute("ObjFile",scene->getCharacter(i)->getBody(j)->getObjFile());
             QDomElement posChara = doc.createElement("Position");
             posChara.setAttribute("x",vec.x());
             posChara.setAttribute("y",vec.y());
@@ -827,10 +828,13 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
     if( root.tagName() != "SimulationScene" )
         return false;
     scene->clear();
+
     scene->initPhysics();
+    Vec4 kss,kdd;
     QDomNode n = root.firstChild();
     while( !n.isNull() )
     {
+
         QDomElement e = n.toElement();
         if( !e.isNull() ){
             Character *chara = new Character(scene);
@@ -881,12 +885,14 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 z = sime.attribute("z","").toFloat();
                 vec.setVec4(x,y,z);
                 scene->setProportionalKsPD(vec);
+                kss = vec;
                 sime = sim.firstChildElement("kdPDProporcional").toElement();
                 x = sime.attribute("x","").toFloat();
                 y = sime.attribute("y","").toFloat();
                 z = sime.attribute("z","").toFloat();
                 vec.setVec4(x,y,z);
                 scene->setProportionalKdPD(vec);
+                kdd = vec;
                 sim = e.firstChildElement("Bodies");
                 sim = sim.firstChildElement("Properties");
                 while(!sim.isNull()){ //leitura das propriedades do corpo
@@ -1101,6 +1107,8 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
         }
         n = n.nextSibling();
     }
+    scene->setProportionalKsPD(kss);
+    scene->setProportionalKdPD(kdd);
     return true;
 }
 

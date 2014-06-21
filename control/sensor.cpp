@@ -89,37 +89,56 @@ bool Sensor::isSwingFoot(Object *obj,Character *chara)
         bool close_enought_r = true;
         Vec4 prop = foots.at(0)->getProperties();
         float height = prop.y()/2.0;
-        if (foots.at(0)->posEffectorBackward().y()<height+0.005 || foots.at(0)->posEffectorForward().y()<height+0.005){
-        //if (chara->getGRFSum(foots.at(0)).y()>50){
-
+        if( (foots.at(0)->posEffectorBackward().y()<height+0.005 || foots.at(0)->posEffectorForward().y()<height+0.005)||((chara->getGRFSum(foots.at(0)).y()>0))){
+        //if (chara->getGRFSum(foots.at(0)).module()>0){
             close_enought_l = true;
         }
-        if (foots.at(1)->posEffectorBackward().y()<height+0.005 || foots.at(1)->posEffectorForward().y()<height+0.005){
-    //if (chara->getGRFSum(foots.at(1)).y()>50){
+        if ((foots.at(1)->posEffectorBackward().y()<height+0.005 || foots.at(1)->posEffectorForward().y()<height+0.005)||(chara->getGRFSum(foots.at(1)).y()>0)){
+        //if (chara->getGRFSum(foots.at(1)).module()>0){
             close_enought_r = true;
         }
         foot_l =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
         foot_r =  obj->getCharacter()->getMoCap()->getFrameMotion(frame)->getFootRightGround();
+//        if (!foot_l){
+//            //if (foots.at(0)->posEffectorBackward().y()<height+0.0005 || foots.at(0)->posEffectorForward().y()<height+0.0005){
+//            if (chara->getGRFSum(foots.at(0)).y()>0){
+//                close_enought_l = true;
+//            }else
+//                close_enought_l = false;
+//        }else if (chara->getGRFSum(foots.at(0)).y()>0){
+
+//            close_enought_l =true;
+//        }
+//        if (!foot_r){
+//    //        if (foots.at(1)->posEffectorBackward().y()<height+0.0005 || foots.at(1)->posEffectorForward().y()<height+0.0005){
+//            if (chara->getGRFSum(foots.at(1)).y()>0){
+//                close_enought_r = true;
+//            }else
+//                close_enought_r = false;
+//        }else if (chara->getGRFSum(foots.at(1)).y()>0){
+//            close_enought_r =true;
+//        }
         if (foot_l && foot_r && close_enought_l && close_enought_r){
             foots.clear();
             return false;
         }
         else if (foot_l && close_enought_l){
-
             if (obj == foots.at(0)) return false;
             else return true;
 
         }
         else if (foot_r && close_enought_r){
-
             if (obj == foots.at(1)) return false;
             else return true;
 
         }
         foots.clear();
         return false;
+    }else{
+        //if (chara->getGRFSum(obj).module()>0) return false;
+        return false;
     }
-    return false;
+
 }
 
 int Sensor::getSwingFoot(Character *chara)
@@ -154,7 +173,7 @@ int Sensor::getStanceFoot(Character *chara)
     int count = 0;
     for(unsigned int i=0;i<foots.size();i++){
         Vec4 value = chara->getGRFSum(foots.at(i));
-        if(value.module()>tolerance){
+        if(value.module()>10){
             body = chara->getIdObject(foots.at(i));
             count++;
         }
@@ -202,20 +221,22 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
     foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
     foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     if (!foot_l){
-        //if (foots.at(0)->posEffectorBackward().y()<height+0.0005 || foots.at(0)->posEffectorForward().y()<height+0.0005){
-        if (chara->getGRFSum(foots.at(0)).y()>0){
+        //if (foots.at(0)->posEffectorBackward().y()<height+0.05 || foots.at(0)->posEffectorForward().y()<height+0.05){
+        if (chara->getGRFSum(foots.at(0)).module()>0){
             close_enought_l = true;
-        }
-    }else{
+        }/*else
+            close_enought_l = false;*/
+    }else if (chara->getGRFSum(foots.at(0)).module()>0){
 
         close_enought_l =true;
     }
     if (!foot_r){
-        //if (foots.at(1)->posEffectorBackward().y()<height+0.0005 || foots.at(1)->posEffectorForward().y()<height+0.0005){
-        if (chara->getGRFSum(foots.at(1)).y()>0){
+        //if (foots.at(1)->posEffectorBackward().y()<height+0.05 || foots.at(1)->posEffectorForward().y()<height+0.05){
+        if (chara->getGRFSum(foots.at(1)).module()>0){
             close_enought_r = true;
-        }
-    }else{
+        }/*else
+            close_enought_r = false;*/
+    }else if (chara->getGRFSum(foots.at(1)).module()>0){
         close_enought_r =true;
     }
     if (foot_l && foot_r && close_enought_l && close_enought_r)
@@ -264,7 +285,21 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
         ********************/
 //    }
     //printf("State %d\n",state);
-    if(state==0) return FOOTS_AIR+3;
-    else if(state>1) return ALL_FOOTS_GROUND+3;
-    else return chara->getPositionBody(contact)+3;
+    switch (state){
+        case 0:{
+            //printf("\nUso da Hierarquia via MotionCap = Nenhum(%d)",FOOTS_AIR+3);
+            return FOOTS_AIR+3;
+            break;
+    }
+    case 1:{
+        //printf("\nUso da Hierarquia via MotionCap = Um (%d)",chara->getPositionBody(contact)+3);
+        return chara->getPositionBody(contact)+3;
+        break;
+    }
+    case 2:{
+        //printf("\nUso da Hierarquia via MotionCap = Dois (%d)",ALL_FOOTS_GROUND+3);
+        return ALL_FOOTS_GROUND+3;
+        break;
+    }
+    }
 }

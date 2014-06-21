@@ -14,8 +14,24 @@
 #include "camera.h"
 #include "interpolation/interpolation.h"
 #include "extra/screenshot.h"
+#include "extra/text.h"
+#include <QPainter>
+#include <vector>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include "math/vector3d.h"
+//  To use functions with variables arguments
+#include <stdarg.h>
 
+//  for malloc
+#include <stdlib.h>
+vector3d lightPosition(-1.93849,11.233,21.9049);
+vector3d lightDirection(-26.4,355.2);
 
+int manipulate = 0;
+float densidade = 100.;
+int numOffBalls = 0;
 //melhor configuração ciclica para caminhar: 398 582
 /************** New Camera *****************/
 static int scr_capture_count = 0;
@@ -25,13 +41,94 @@ static bool rbpressed = false;
 
 static float last_x = 0.0;
 static float last_y = 0.0;
-
+#define SET_CAM 0
+#define SET_OBJECT 1
 Camera* cam = new Camera();
 static float savedCamera[9];
+//variáveis trackball
 
+int 	winWidth, winHeight;
 //
 int time_current;
 int time_m;
+
+
+void DesenhaTexto(void *font, char *string)
+{
+    // Exibe caractere a caractere
+    while(*string)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15,*string++);
+}
+
+void DesenhaTextoStroke(void *font, char *string)
+{
+    // Exibe caractere a caractere
+    while(*string)
+        glutStrokeCharacter(GLUT_STROKE_ROMAN,*string++);
+}
+//  The number of frames
+int frameCount = 0;
+
+//  Number of frames per second
+float fps = 0;
+
+//  currentTime - previousTime is the time elapsed
+//  between every call of the Idle function
+int currentTime = 0, previousTime = 0;
+void calculateFPS()
+{
+    //  Increase frame count
+    frameCount++;
+
+    //  Get the number of milliseconds since glutInit called
+    //  (or first call to glutGet(GLUT ELAPSED TIME)).
+    currentTime = glutGet(GLUT_ELAPSED_TIME);
+
+    //  Calculate time passed
+    int timeInterval = currentTime - previousTime;
+
+    if(timeInterval > 1000)
+    {
+        //  calculate the number of frames per second
+        fps = frameCount / (timeInterval / 1000.0f);
+
+        //  Set time
+        previousTime = currentTime;
+
+        //  Reset frame count
+        frameCount = 0;
+    }
+}
+
+void GLWidget::drawFPS()
+{
+
+    glDisable(GL_LIGHTING);
+    glColor3f(1,1,1);
+    glMatrixMode(GL_PROJECTION);
+      glPushMatrix();
+      glLoadIdentity();
+      gluOrtho2D(0.0, winWidth, 0.0, winHeight);
+      glMatrixMode(GL_MODELVIEW);
+      glPushMatrix();
+      glLoadIdentity();
+      glRasterPos2i(0, 690);
+
+          QString out = QString().sprintf("\nFPS: %4.2f", FPS);
+
+          char* n = (char*)out.toStdString().data();
+          while (*n!='\0'){
+              glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*n++);
+          }
+
+      glMatrixMode(GL_MODELVIEW);
+      glPopMatrix();
+      glMatrixMode(GL_PROJECTION);
+      glPopMatrix();
+      glEnable(GL_LIGHTING);
+
+
+}
 
 /************** Fim Camera *****************/
 
@@ -54,9 +151,7 @@ bool shadow = false;
 //int width,height;
 
 
-//variáveis trackball
 
-int 	winWidth, winHeight;
 
 float 	angletrack = 0.0, axis[3], trans[3];
 bool 	trackingMouse  = false;
@@ -175,7 +270,7 @@ void stopMotion(int x, int y)
 
 GLfloat floorShadow[4][4];
 GLfloat floorPlane[4] = {0,1.,0,0};
-GLfloat lightPosition[4] = {   9.588, 9.46, 9.248, 0.0 };
+GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 0.0 };
 
 //****************
 
@@ -193,7 +288,7 @@ GLWidget::GLWidget(QWidget *parent) :
     connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
 
     simTimer->start(0);
-    simTimer->setInterval(60);
+    simTimer->setInterval(0);
 
 
     move = false;
@@ -203,7 +298,9 @@ GLWidget::GLWidget(QWidget *parent) :
     frame_edit = 0;
     show_character = true;
     load_exemple_curve = false;
+    showInfo = false;
     screenshot = false;
+    frames = 0;
     time_current = 0;
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
@@ -218,7 +315,7 @@ void GLWidget::initializeGL()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
 
     glShadeModel(GL_SMOOTH);
@@ -252,10 +349,20 @@ void GLWidget::initializeGL()
     glLightfv(GL_LIGHT2, GL_POSITION, light3pos);
     glLightfv(GL_LIGHT2, GL_DIFFUSE, light3diffuse);
     glLightfv(GL_LIGHT2, GL_SPECULAR, light3specular);
-
+//    mainShader=new shader("vertex.vs","fragment.frag");
+//        quadRenderShader=new shader("quadRender.vs","quadRender.frag");
+//        simpleShader=new shader("simpleShader.vs","simpleShader.frag");
+//        shadowShader=new shader("shadowShader.vs","shadowShader.frag");
 #ifdef SHADERS_ENABLED
-    //shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/VertexShader.c");
-    //shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/FragmentShader.c");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/vertex.vs");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/fragment.frag");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/quadRender.vs");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/quadRender.frag");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/simpleShader.vs");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/simpleShader.frag");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/shadowShader.vs");
+//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/shadowShader.frag");
+    //printf("In\n");
 //    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/phong.vert");
 //    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/phong.frag");
 #endif
@@ -267,14 +374,15 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_FUNC);
     glEnable (GL_LINE_SMOOTH);
     glEnable (GL_POINT_SMOOTH);
-
+glEnable(GL_TEXTURE_2D);
+glEnable(GL_BLEND);
 
     //glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_NORMALIZE);
-    glEnable(GL_RESCALE_NORMAL);
+//    glEnable(GL_NORMALIZE);
+//    glEnable(GL_RESCALE_NORMAL);
     //glLineWidth(1.2);
     glDepthFunc(1.0);
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+    //    glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
 //    glBindTexture(GL_TEXTURE_2D, 1.0);
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 
@@ -301,7 +409,31 @@ void GLWidget::resizeGL(int w, int h)
 void GLWidget::drawScene(){
 
     //determinação da camera
+     const float ar = winWidth>0 ? (float) winWidth / (float) winHeight : 1.0;
+    glViewport(0, 0, winWidth, winHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+    gluPerspective(30.,ar,0.001,1200000.);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
     glPushMatrix();
+
+//    glPushMatrix();
+//    QPainter novo(this);
+//    //novo.compositionMode();
+//    //glColor3f(1,0,0);
+//    //glScalef(1,1,1);
+//    QPoint p(300,300);
+//    QString t("OpengL");
+//    novo.drawText(p,t);
+//    glPopMatrix();
+//    novo.resetMatrix();
+
+
+
     glPushMatrix();
         glTranslated(-0.20,-0.135,-0.6);
         gluLookAt(cam->eye.x(),cam->eye.y(),cam->eye.z(), cam->at.x(),cam->at.y(),cam->at.z(), cam->up.x(),cam->up.y(),cam->up.z());
@@ -319,6 +451,10 @@ void GLWidget::drawScene(){
         text += "z ";
     if(cam->axis_x || cam->axis_y || cam->axis_z)
         renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"),2000);
+ //   glPushMatrix();
+
+//glPopMatrix();
+
     gluLookAt(cam->eye.x1,cam->eye.x2,cam->eye.x3, cam->at.x1,cam->at.x2,cam->at.x3, cam->up.x1,cam->up.x2,cam->up.x3);
 
     //fim de determinação da camera
@@ -355,15 +491,156 @@ void GLWidget::drawScene(){
     glPopMatrix();
     Draw::drawGround(10);
     //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
+
+    //glRasterPos2d(0.5,0.5);
+    //char* p = (char*) "Pode ser assim?";
+    //while (*p!='\0'){
+    //    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*p++);
+    //}
+    //glPushMatrix();
+
+    //glPopMatrix();
+    //glEnable(GL_LIGHTING);
     glPopMatrix();
+
+
+}
+
+void GLWidget::drawParameters()
+{
+    if (! scene->getSizeCharacter()>0) return;
+    Character *chara = scene->getCharacter(0);
+    QString dados;
+    Vec4 out;
+    glDisable(GL_LIGHTING);
+    glColor3f(1,1,1);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, winWidth, 0.0, winHeight);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    int x = 680;
+    int k = 0;
+    if (chara->getBalance()->getEnableTorque()){
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKsTorque();
+        dados = QString().sprintf("\nTq Ks: %3.2f %3.2f %3.2f", out.x(), out.y(), out.z());
+        //char* n = (char*)dados.toStdString().data();
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKdTorque();
+        dados = QString().sprintf("\nTq Kd: %3.2f %3.2f %3.2f", out.x(), out.y(), out.z());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+    }
+    if (chara->getBalance()->getEnableForce()){
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKsForce();
+        dados = QString().sprintf("\nFc Ks: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKdForce();
+        dados = QString().sprintf("\nFc Kd: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+    }
+    if (chara->getBalance()->getEnableMomentum()){
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKMomentumAngular();
+        dados = QString().sprintf("\nMA Ks: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKMomentumLinear();
+        dados = QString().sprintf("\nML Kd: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+    }
+    glRasterPos2f(750, x);
+    out = scene->getProportionalKsPD();
+    dados = QString().sprintf("\nPp Ks: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+        k++;
+    }
+    x -= 20;
+    glRasterPos2f(750, x);
+    out = scene->getProportionalKdPD();
+    dados = QString().sprintf("\nPp Kd: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+        k++;
+    }
+    x -= 20;
+    glRasterPos2f(750, x);
+    dados = QString().sprintf("\nCone : %3.2f %3.2f %3.2f %3.2f\n", chara->getBalance()->getMCone(),chara->getBalance()->getHeightCone(),chara->getBalance()->getRadiusCone(),chara->getBalance()->getAngleCone());
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+        k++;
+    }
+    x -= 20;
+    glRasterPos2f(750, x);
+    dados = QString().sprintf("\nCLim : %3.2f\n", chara->getBalance()->getLimitCone());
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+        k++;
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+
+
 }
 
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+
     drawScene();
+    if(showInfo){
+        if (!screenshot) drawFPS();
+        drawParameters();
+    }
     if (screenshot) setScreenShot();
+
+    //calculateFPS();
+
 
 }
 
@@ -399,19 +676,27 @@ void GLWidget::showCompensableConeFriction()
 }
 
 void GLWidget::simStep(){
-    if(!sim_pause)
+//    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
+//    ti = tf = tempo = 0;
+//    timeval tempo_inicio,tempo_fim;
+//    gettimeofday(&tempo_inicio,NULL);
+    if(!sim_pause){
         scene->simulationStep();
-//        double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
-//          ti = tf = tempo = 0;
-//          timeval tempo_inicio,tempo_fim;
-//          gettimeofday(&tempo_inicio,NULL);
 
+    }
+
+    calculateFPSPaint();
     update();
-//        gettimeofday(&tempo_fim,NULL);
-//          tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-//          ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-//          tempo = (tf - ti) / 1000;
-//          printf("Tempo gasto em milissegundos desenhar %.3f\n",tempo);
+
+
+    //calculateFPS();
+
+
+//    gettimeofday(&tempo_fim,NULL);
+//    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//    tempo = (tf - ti) / 1000;
+//    printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
 
 }
 
@@ -437,30 +722,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     last_x = x;
     last_y = y;
 
-//    if(event->buttons() & Qt::LeftButton){
-//        int y = height-event->pos().y();
-//        mouseMotion(event->pos().x(),y,height,width);
-//        if (trackingMouse) {
-//            Quaternion qnew;
-//            qnew.setQuaternion(cos(0.25*angletrack*M_PI/(360.0)),Vec4(axis[0],axis[1],axis[2]).unitary()*sin(0.25*angletrack*M_PI/(360.0)));
-//            qnew.normalize();
-//            q = qnew*0.5 + q*0.5;
-//            cam_eye = q.getMatrix().vector(cam_eye);
-//            updateCamera();
-//        }
-
-//    }
 
 }
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-//    move = false;
-//    trackingMouse = false;
-//    int y = height-event->pos().y();
-//    stopMotion(event->pos().x(),y);
-//    q.setQuaternion(1,0,0,0);
-    // if the left button is pressed
+
     int y = event->pos().y();
     int x = event->pos().x();
     if (event->button() & Qt::LeftButton) {
@@ -479,17 +746,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
-//    if(event->buttons() & Qt::LeftButton)
-//    {
-//        trackingMouse = true;
-//        int y = height-event->pos().y();
-//        startMotion(event->pos().x(),y,height,width);
-//    }else{
-//        trackingMouse = false;
-//        int y = height-event->pos().y();
-//        stopMotion(event->pos().x(),y);
 
-//    }
     int y = event->pos().y();
     int x = event->pos().x();
     // if the left button is pressed
@@ -510,6 +767,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 }
 
 
+
 /***********************Signal & Slots*********************************/
 void GLWidget::simulationPlayPause()
 {
@@ -520,11 +778,21 @@ void GLWidget::simulationPlayPause()
 void GLWidget::simulationRestart()
 {
     scene->restartPhysics();
+    numOffBalls = 0;
+    densidade = 100;
+    sim_pause = true;
 }
 
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
+    if(event->key() == Qt::Key_C ){
+        manipulate = SET_CAM;
+    }
+    if(event->key() == Qt::Key_O ){
+        manipulate = SET_OBJECT;
+    }
+
     if(event->key() == Qt::Key_Z ){
         //scene->addObject(Vec4(1,1,1),Vec4(0,30,0),Quaternion(),TYPE_CUBE);
         //count++;
@@ -542,7 +810,16 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     }
     if(event->key() == Qt::Key_B ){
         if((scene->getSizeCharacter()<1)) return;
-        scene->shotBallsCharacterRandom(scene->getCharacter(0),7);
+        srand(time(NULL));
+         int x = ( rand() % 8 );
+         printf("Aleatorio: %d\n",x );
+         numOffBalls++;
+         if (numOffBalls>10){
+             densidade = densidade + 25;
+             numOffBalls = 0;
+
+         }
+        scene->shotBallsCharacterRandom(scene->getCharacter(0),x,densidade);
         //cam->lockAxisY(!cam->axis_y);
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
@@ -577,13 +854,50 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_F ){
         setForceCharacter();
     }
+    if(event->key() == Qt::Key_Up){
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0.05,0,0);
+            obj->setTarget(pos);
+        }
+    }
+    if(event->key() == Qt::Key_Down){
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(-0.05,0,0);
+            obj->setTarget(pos);
+        }
+
+    }
+
+
     if(event->key() == Qt::Key_Left){
-        angle_direction=angle_direction-1;
-        setAngleDirection(angle_direction);
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0,0,0.05);
+            obj->setTarget(pos);
+        }else{
+            angle_direction=angle_direction-1;
+            setAngleDirection(angle_direction);
+        }
     }
     if(event->key() == Qt::Key_Right){
-        angle_direction=angle_direction+1;
-        setAngleDirection(angle_direction);
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0,0,-0.05);
+            obj->setTarget(pos);
+        }else{
+            angle_direction=angle_direction+1;
+            setAngleDirection(angle_direction);
+        }
 
     }
     if(event->key() == Qt::Key_C){
@@ -628,7 +942,7 @@ MoCap *GLWidget::pushMotionCapture()
 
 void GLWidget::drawShadows()
 {
-    Draw::shadowMatrix(floorShadow, floorPlane, lightPosition);
+    Draw::shadowMatrix(floorShadow, floorPlane, lightPosition7);
 
       glPushMatrix();
 
@@ -766,6 +1080,18 @@ void GLWidget::setScreenShot()
       }
 }
 
+void GLWidget::calculateFPSPaint()
+{
+    if (frames == 0) {
+        m_time.start();
+    }
+    frames++;
+    if (m_time.elapsed()>1000.){
+        FPS = float(frames);
+        frames = 0;
+    }
+}
+
 void GLWidget::SimStepsSimulation(int steps)
 {
     scene->setSimStep(steps);
@@ -879,6 +1205,12 @@ void GLWidget::setEndClycle(int v)
     if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0){
         scene->getCharacter(0)->getMoCap()->setEndClycle(v);
     }
+}
+
+void GLWidget::setToleranceCOM(float val)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    scene->getCharacter(0)->getBalance()->setLimitCone(val);
 }
 
 void GLWidget::saveSimulationParameters(QString file)
@@ -1126,11 +1458,13 @@ void GLWidget::loadSimulationParameters(QString file)
 
 
 
+
 }
 
 void GLWidget::setScreenShot(bool b)
 {
     this->screenshot = b;
+    scr_capture_count = 0;
 }
 
 void GLWidget::setRenderMesh(bool b)
@@ -1138,3 +1472,9 @@ void GLWidget::setRenderMesh(bool b)
     this->rendermesh = b;
     scene->setRenderMesh(this->rendermesh);
 }
+
+void GLWidget::setShowInfos(bool b)
+{
+    showInfo = b;
+}
+

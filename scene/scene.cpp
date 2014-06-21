@@ -132,7 +132,6 @@ void Scene::simulationStep()
     float mass_total= 0;
     Quaternion qd = Quaternion();
     Vec4 vel_angd = Vec4();
-    //frame_step = -1;
     if(characters.size()>0){
         jDes = characters.at(0)->getJointParentBalance();
         mass_total = this->getCharacter(0)->getMassTotal();
@@ -184,6 +183,7 @@ void Scene::simulationStep()
 //          gettimeofday(&tempo_inicio,NULL);
 //          entrou = false;
 //    }
+    //#pragma omp parallel
     for(int i=0;i<this->sim_step;i++){
         if(characters.size()>0)
            for(unsigned int i=0;i<objs.size();i++){
@@ -198,6 +198,9 @@ void Scene::simulationStep()
            for(unsigned int j=0;j<characters.size();j++){
                if(characters.at(j)->balance!=NULL && enableGravity){
                    this->getCharacter(j)->getBalance()->evaluate(jDes,mass_total,frame_step,qd,vel_angd,vel_des,mom_lin_des,mom_ang_des);
+                   for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
+                       (*it)->evaluate();
+                   }
                }else{
                    for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
                        (*it)->evaluate();
@@ -888,7 +891,7 @@ void Scene::statusMotionCapture(bool b)
     startRecorder(b);
 }
 
-void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
+void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis,float den)
 {
     //if ( inicio.modulo() == 0.0 ) {
     //srand(time(NULL));
@@ -897,7 +900,7 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
     //float mass = chara->getBody(posPelvis)->getFMass();
     //this->objetos.push_back( new Objeto( Simulation::world, Simulation::space, posPelvisModelo, mass.mass, influExtSimFF, true, SPHERE ) ); //para a geometria do objeto ser aleatoria, basta nao definir o ultimo parametro
     //inicio
-       Vec4 directionFromCenter = Vec4( dRandReal()*2.0-1.0, dRandReal()*2.0-1.0, dRandReal()*2.0-1.0 );
+       Vec4 directionFromCenter = Vec4( dRandReal()*3.0-1.0, dRandReal()*1.2, dRandReal()*3.0-1.0 );
          if ( directionFromCenter.module() == 0.0 ) {
            directionFromCenter = Vec4(0.0,1.0,0.0);
          } else {
@@ -915,22 +918,22 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
 
          deltaCenter = Vec4( dRandReal()*0.3-0.15, dRandReal()*1.6-0.75, dRandReal()*0.3-0.15 );
 
-       Vec4 directionVelInicial = posPelvisModel+(deltaCenter)-(inicio);
+       Vec4 directionVelInicial = posPelvisModel-(inicio);
 
          //directionVelInicial.normaliza();
-       Vec4 velInicial = directionVelInicial*( 15.0 );//dRandReal()*50.0+10.0 );
+       Vec4 velInicial = directionVelInicial*(16);// dRandReal()*30.0+10.0 );
        Vec4 vell = velInicial;
        vell.x2=0;
-       printf("\nVelocidade: %.3f",vell.module());
+       //printf("\nVelocidade: %.3f",vell.module());
        dReal massTotal;
        //if ( pelvisIsTheTarget ) {
-       massTotal = 1;
+       massTotal = (dReal)den;
        Object *obj = new Object(this);//position,rotation,properties,type,this);
-       obj->setMaterial(MATERIAL_COPPER);
+       obj->setMaterial(MATERIAL_EMERALD);
        obj->setType(TYPE_SPHERE);
        obj->setPosition(inicio);
        obj->setRotation(Quaternion());
-       obj->setProperties(Vec4(0.1,0.1,0.1));
+       obj->setProperties(Vec4(massTotal/1000.,massTotal/1000.,massTotal/1000.));
        obj->setFMass(massTotal);
 
        Physics::createObject(obj,space,massTotal,inicio,velInicial);
@@ -1033,6 +1036,7 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis)
 
 //      //enquanto vector objetos tiver mais do que 10 objetos, apaga o primeiro
       while ( this->objects_shoot.size() > 10 ) {
+          this->objects_shoot.at(0)->clearPhysics();
         this->objects_shoot.erase(objects_shoot.begin());
       }
 }

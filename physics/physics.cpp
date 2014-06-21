@@ -109,6 +109,13 @@ void Physics::closeCharacter(Character *chara){
     dSpaceDestroy(chara->getSpace());
 }
 
+void Physics::closeObject(Object *obj){
+    dBodyDestroy(obj->getBody());
+//    dJointGroupDestroy(chara->getJointGroup());
+//    dSpaceDestroy(chara->getSpace());
+}
+
+
 Quaternion Physics::getRotationJoint(Joint *joint)
 {
     const dReal* qAux;
@@ -258,7 +265,8 @@ void Physics::createObject(Object *object, dSpaceID space, float mass, Vec4 posi
     case TYPE_SPHERE:{
         object->setBody(dBodyCreate (object->getScene()->getWorld()));
         object->setGeometry(dCreateSphere(space,object->getProperties().x()));
-        dMassSetSphereTotal(object->getMass(),mass,object->getProperties().x());
+        dMassSetSphere(object->getMass(),mass,object->getProperties().x());
+        //dMassSetSphereTotal(object->getMass(),mass,object->getProperties().x());
         break;
     }
     case TYPE_CUBE:{

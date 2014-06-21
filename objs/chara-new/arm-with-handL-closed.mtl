@@ -1,0 +1,22 @@
+# Blender MTL File: 'arm-with-handL-closed.blend'
+# Material Count: 2
+newmtl goonSkin
+Ns 27.450980
+Ka 0.000000 0.000000 0.000000
+Kd 0.783538 0.361307 0.174647
+Ks 0.116000 0.116000 0.116000
+Ni 1.000000
+d 1.000000
+illum 2
+
+
+newmtl goonSkin.001
+Ns 27.450980
+Ka 0.000000 0.000000 0.000000
+Kd 0.783538 0.361307 0.174647
+Ks 0.116000 0.116000 0.116000
+Ni 1.000000
+d 1.000000
+illum 2
+
+

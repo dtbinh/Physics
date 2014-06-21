@@ -294,7 +294,7 @@ void Joint::draw()
         Vec4 position = Physics::getJointBallAnchor(this);
 
         if (selected) Draw::drawSphereSelected(position);
-        else Draw::drawSphere(position,MATERIAL_SILVER,0.03);
+        else Draw::drawSphere(position,MATERIAL_TURQUOSIE,0.03);
         break;
     }
     case (JOINT_FIXED):{

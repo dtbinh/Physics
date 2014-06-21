@@ -8,9 +8,6 @@ QT       += core gui opengl
 
 TARGET = ODESys
 TEMPLATE = app
-DEFINES += \
-           SHADERS_ENABLED \
-           GL_GLEXT_PROTOTYPES \
 
 
 SOURCES += main.cpp\
@@ -30,21 +27,7 @@ SOURCES += main.cpp\
     graphics/plane.cpp \
     control/control.cpp \
     physics/functions.cpp \
-    extra/utils.cpp \
-    math/matrix.cpp \
-    control/balance.cpp \
-    math/vecn.cpp \
-    scene/grf.cpp \
-    mocap/frame.cpp \
-    mocap/mocap.cpp \
-    control/sensor.cpp \
-    mocap/framequat.cpp \
-    interface/camera.cpp \
-    extra/ObjMesh.cpp \
-    interpolation/interpolation.cpp \
-    graphics/shadows.cpp \
-    graphics/imageloader.cpp \
-    extra/screenshot.cpp
+    extra/utils.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -61,29 +44,8 @@ HEADERS  += mainwindow.h \
     graphics/plane.h \
     control/control.h \
     physics/functions.h \
-    extra/utils.h \
-    math/matrix.h \
-    control/balance.h \
-    math/vecn.h \
-    scene/grf.h \
-    mocap/frame.h \
-    mocap/mocap.h \
-    control/sensor.h \
-    mocap/framequat.h \
-    interface/camera.h \
-    extra/ObjMesh.h \
-    interpolation/interpolation.h \
-    graphics/shadows.h \
-    graphics/imageloader.h \
-    extra/screenshot.h
+    extra/utils.h
 
 FORMS    += mainwindow.ui
 
-LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas -fopenmp -lGLEW
-
-CONFIG += release
-
-QT += xml
-
-QMAKE_CXXFLAGS += -fopenmp
-QMAKE_LFLAGS +=  -fopenmp
+LIBS += -lode -lGLU -lGL

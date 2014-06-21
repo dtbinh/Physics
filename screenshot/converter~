@@ -1,0 +1,2 @@
+//ffmpeg -r framerate -qscale qualidade(1>32) -i imagens saida
+ffmpeg -r 30 -qscale 1 -i images%05d.ppm output.mp4 

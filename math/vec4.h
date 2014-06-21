@@ -35,6 +35,7 @@ public:
     float                  module();                              //retorna o modulo do vetor
     Vec4                   unitary();                             //retorna o vetor unitário
     void                   showVec4();                            //imprime os valores do vetor
+    Vec4                   projXZ();                              //retorna o vetor projetado no plano xz, y=0
     //metódos estáticos
     static Vec4            crossProduct(Vec4 a, Vec4 b);          //retorna o resultado do produto vetorial entre dois vetores
 

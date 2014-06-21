@@ -160,3 +160,9 @@ void Vec4::normalize()
     this->x2 = this->y()/mod;
     this->x3 = this->z()/mod;
 }
+
+Vec4 Vec4::projXZ()
+{
+    Vec4 r(this->x(),0,this->y());
+    return r;
+}

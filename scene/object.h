@@ -99,6 +99,7 @@ public:
     void        updatePhysics();                                           //atualiza os valores físicos do objeto
     Vec4        getRelVelAngular();                                        //retorna a velocidade angular em coordenadas globais
     Vec4        getRelVelLinear();                                         //retorna a velocidade linear em coordenadas globais
+    void        clearPhysics();
     // --------Matrix
     Matrix      getAd(); //calcula matriz Adjunta que muda as coordenadas do frame do mundo para o frame do corpo
     Matrix      getAd(Character* chara);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
@@ -107,6 +108,7 @@ public:
     // --------Control
     void        setBodyBalance(bool b);
     bool        getBodyBalance();
+
 
 
     // --------Geometry

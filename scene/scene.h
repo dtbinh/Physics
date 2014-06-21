@@ -131,7 +131,7 @@ public:
     void                  restartMotionCapture();
     void                  statusMotionCapture(bool b);
     //testes de robustez
-    void                  shotBallsCharacterRandom(Character *chara, int posPlevis); //atirar objetos no personagem
+    void                  shotBallsCharacterRandom(Character *chara, int posPlevis, float den=100.); //atirar objetos no personagem
     //teste de contato
     bool                  isGeometryFootSwing(dGeomID geom);
 

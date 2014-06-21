@@ -251,6 +251,11 @@ Vec4 Object::getRelVelLinear()
     return Physics::getLinearVelBody(this);
 }
 
+void Object::clearPhysics()
+{
+    Physics::closeObject(this);
+}
+
 Matrix Object::getAd()
 {
     // | R p |^-1   | R^t  R^t.(-p) |
@@ -434,18 +439,26 @@ void Object::draw(bool wire)
 {
 
     //Draw::drawSphere(posEffectorBackward(),MATERIAL_CHROME,0.09);
-    if(has_cup) Draw::drawCoffeeCup(posEffectorBackward(),MATERIAL_WHITE_PLASTIC,Quaternion(Vec4(-90,0,0))*getRotationCurrent().conjugate());
+    if(has_cup) Draw::drawCoffeeCup(getPositionCurrent(),MATERIAL_WHITE_PLASTIC,Quaternion(Vec4(-90,0,0))*getRotationCurrent().conjugate());
     if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
-    if(show_effector) Draw::drawSphere(posEffectorBackward(),MATERIAL_PEARL,0.02);
+    if(show_effector) Draw::drawSphere(getPositionCurrent(),MATERIAL_PEARL,0.02);
     if (show_effector&&show_target){
-        if(enabled_cpdp) Draw::drawLine(target,posEffectorBackward(),Vec4(0,.9,0),1.4);
-        else Draw::drawLine(target,posEffectorBackward(),Vec4(0.9,0,0),1.4);
+        if(enabled_cpdp) Draw::drawLine(target,getPositionCurrent(),Vec4(0,.9,0),1.4);
+        else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
     }
     if (this->geometry==0) return;
     switch (this->type){
     case TYPE_CUBE:{
-            if (wire)
+            if (wire){
                 Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(1,0,0));
+                if(objFile.isEmpty() || !rendermesh){
+                    Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+                }else{
+                    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+                    Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+                    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+                }
+            }
             else{
 //                if(isFoot && !Sensor::isSwingFoot(this)){
 //                    Material *mat = new Material();
@@ -461,8 +474,8 @@ void Object::draw(bool wire)
 
 //                }
             }
-            if(this->selected) Draw::drawSelection(getMatrixTransformation(),this->properties);
-            if(this->isFoot) Draw::drawSelection(getMatrixTransformation(),this->properties,Vec4(0,0,1));
+            //if(this->selected) Draw::drawSelection(getMatrixTransformation(),this->properties);
+            //if(this->isFoot) Draw::drawSelection(getMatrixTransformation(),this->properties,Vec4(0,0,1));
             break;
         }
     case TYPE_CYLINDER:{
@@ -852,7 +865,7 @@ void Object::evaluate(int val)
     }
     if (!(enabled_cpdp)) return;
     for(int i=0;i<val;i++){
-        Vec4 effector = posEffectorBackward();
+        Vec4 effector = getPositionCurrent();
         Vec4 force = ks.mult(target - effector) - kd.mult(getRelVelLinear());
         Physics::bodyAddForce(this->body,force.x(),force.y(),force.z());
     }

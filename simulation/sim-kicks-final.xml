@@ -10,7 +10,7 @@
    <kdPDProporcional x="7" y="7" z="7"/>
   </ControlPDProportional>
   <Bodies>
-   <Properties Material="13" Mass="5.644" Geometry="1" Name="head" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="5.644" Geometry="1" Name="head" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/Head.obj">
     <Position x="0" y="1.65" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.17" y="0.2" z="0.166"/>
@@ -24,7 +24,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="3.5" Geometry="1" Name="upper_arm_l" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="3.5" Geometry="1" Name="upper_arm_l" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ShoulderL.obj">
     <Position x="0.16" y="1.325" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.35" z="0.1"/>
@@ -38,7 +38,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="3.5" Geometry="1" Name="upper_arm_r" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="3.5" Geometry="1" Name="upper_arm_r" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ShoulderR.obj">
     <Position x="-0.16" y="1.325" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.35" z="0.1"/>
@@ -52,7 +52,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="2.1" Geometry="1" Name="forearm_l" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="2.1" Geometry="1" Name="forearm_l" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ArmLHand.obj">
     <Position x="0.16" y="1.026" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>
@@ -66,7 +66,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="2.1" Geometry="1" Name="forearm_r" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="2.1" Geometry="1" Name="forearm_r" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ArmRHand.obj">
     <Position x="-0.16" y="1.026" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>
@@ -80,7 +80,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="11.88" Geometry="1" Name="chest" Foot="0" BodyBalance="1">
+   <Properties Material="4" Mass="11.88" Geometry="1" Name="chest" Foot="0" BodyBalance="1" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/Torax.obj">
     <Position x="0" y="1.44" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.27" y="0.22" z="0.2"/>
@@ -94,7 +94,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="10" Geometry="1" Name="stomach" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="10" Geometry="1" Name="stomach" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/Abdomem.obj">
     <Position x="0" y="1.23" z="0.015"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.25" y="0.2" z="0.2"/>
@@ -108,7 +108,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="9.282" Geometry="1" Name="pelvis" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="9.282" Geometry="1" Name="pelvis" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/Pelvis.obj">
     <Position x="0" y="1.056" z="0.003"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.273" y="0.17" z="0.2"/>
@@ -122,7 +122,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="6.864" Geometry="1" Name="thigh_l" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="6.864" Geometry="1" Name="thigh_l" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/LegL.obj">
     <Position x="0.125" y="0.75" z="0"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.12" y="0.44" z="0.13"/>
@@ -136,7 +136,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="6.864" Geometry="1" Name="thigh_r" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="6.864" Geometry="1" Name="thigh_r" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/LegR.obj">
     <Position x="-0.125" y="0.75" z="0"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.12" y="0.44" z="0.13"/>
@@ -150,7 +150,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="4.14" Geometry="1" Name="shank_l" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="4.14" Geometry="1" Name="shank_l" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ShinL.obj">
     <Position x="0.1315" y="0.3" z="0.0015"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.09" y="0.46" z="0.1"/>
@@ -164,7 +164,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="4.14" Geometry="1" Name="shank_r" Foot="0" BodyBalance="0">
+   <Properties Material="4" Mass="4.14" Geometry="1" Name="shank_r" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ShinR.obj">
     <Position x="-0.1315" y="0.3" z="0.0015"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.09" y="0.46" z="0.1"/>
@@ -178,7 +178,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="1.08" Geometry="1" Name="foot_l" Foot="1" BodyBalance="0">
+   <Properties Material="4" Mass="1.08" Geometry="1" Name="foot_l" Foot="1" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/FootL.obj">
     <Position x="0.1375" y="0.0425" z="0.048"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.045" z="0.24"/>
@@ -192,7 +192,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="13" Mass="1.08" Geometry="1" Name="foot_r" Foot="1" BodyBalance="0">
+   <Properties Material="4" Mass="1.08" Geometry="1" Name="foot_r" Foot="1" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/FootR.obj">
     <Position x="-0.1375" y="0.0425" z="0.048"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.045" z="0.24"/>

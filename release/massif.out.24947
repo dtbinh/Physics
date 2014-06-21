@@ -1,0 +1,1093 @@
+desc: (none)
+cmd: optirun ./ODESys
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=238312
+mem_heap_B=1
+mem_heap_extra_B=23
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=244046
+mem_heap_B=232
+mem_heap_extra_B=256
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=251170
+mem_heap_B=276
+mem_heap_extra_B=292
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=260143
+mem_heap_B=528
+mem_heap_extra_B=304
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=263514
+mem_heap_B=3648
+mem_heap_extra_B=376
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=268451
+mem_heap_B=4656
+mem_heap_extra_B=944
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=274962
+mem_heap_B=8656
+mem_heap_extra_B=3312
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=280596
+mem_heap_B=10048
+mem_heap_extra_B=4296
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=284519
+mem_heap_B=10668
+mem_heap_extra_B=4748
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=289272
+mem_heap_B=11828
+mem_heap_extra_B=4900
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=303043
+mem_heap_B=11845
+mem_heap_extra_B=4923
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=309580
+mem_heap_B=12055
+mem_heap_extra_B=5169
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=316799
+mem_heap_B=12655
+mem_heap_extra_B=5385
+mem_stacks_B=0
+heap_tree=detailed
+n7: 12655 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 6976 0x4E470C8: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 4224 0x4E8E0C2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 2496 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1488 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1488 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1488 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1488 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1488 0x534B76B: (below main) (libc-start.c:226)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 720 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 720 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 720 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 720 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 720 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 720 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 720 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 720 0x534B76B: (below main) (libc-start.c:226)
+  n3: 2752 0x4E8E097: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 1504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+    n1: 496 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 496 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 496 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 496 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 496 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 240 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 240 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 240 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 240 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 240 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 240 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 240 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 240 0x534B76B: (below main) (libc-start.c:226)
+ n7: 4044 0x4E7AA9F: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 2032 0x4E46FF9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 2032 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 2032 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 2032 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 2032 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 2032 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 2032 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F1C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F3C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 256 0x4E6422F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n1: 256 0x4E6424C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n1: 252 0x4E46EFC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 252 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 252 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 252 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 252 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 252 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 252 0x534B76B: (below main) (libc-start.c:226)
+  n0: 240 in 4 places, all below massif's threshold (01.00%)
+ n1: 568 0x5399209: __fopen_internal (iofopen.c:76)
+  n1: 568 0x4E52728: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 568 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 568 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 568 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 568 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 568 0x534B76B: (below main) (libc-start.c:226)
+ n2: 384 0x4E7AAF5: g_realloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 256 0x4E915D5: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E91628: g_string_sized_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E6BE26: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n0: 128 in 1 place, below massif's threshold (01.00%)
+ n2: 323 0x4E7AA37: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n2: 307 0x4E8F2AC: g_strdup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 204 0x4E5282C: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 204 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 204 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 204 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 204 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 204 0x534B76B: (below main) (libc-start.c:226)
+   n0: 103 in 3 places, all below massif's threshold (01.00%)
+  n0: 16 in 2 places, all below massif's threshold (01.00%)
+ n1: 232 0x4023AF: ??? (in /usr/bin/optirun)
+  n0: 232 in 15 places, all below massif's threshold (01.00%)
+ n0: 128 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=14
+#-----------
+time=322205
+mem_heap_B=12787
+mem_heap_extra_B=5597
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=326715
+mem_heap_B=12877
+mem_heap_extra_B=5739
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=330377
+mem_heap_B=12951
+mem_heap_extra_B=5841
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=333975
+mem_heap_B=13015
+mem_heap_extra_B=5921
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=338990
+mem_heap_B=13105
+mem_heap_extra_B=6023
+mem_stacks_B=0
+heap_tree=detailed
+n7: 13105 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 6976 0x4E470C8: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 4224 0x4E8E0C2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 2496 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1488 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1488 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1488 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1488 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1488 0x534B76B: (below main) (libc-start.c:226)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 720 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 720 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 720 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 720 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 720 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 720 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 720 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 720 0x534B76B: (below main) (libc-start.c:226)
+  n3: 2752 0x4E8E097: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 1504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+    n1: 496 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 496 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 496 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 496 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 496 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 240 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 240 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 240 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 240 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 240 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 240 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 240 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 240 0x534B76B: (below main) (libc-start.c:226)
+ n7: 4044 0x4E7AA9F: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 2032 0x4E46FF9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 2032 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 2032 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 2032 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 2032 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 2032 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 2032 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F1C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F3C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 256 0x4E6422F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n1: 256 0x4E6424C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n1: 252 0x4E46EFC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 252 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 252 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 252 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 252 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 252 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 252 0x534B76B: (below main) (libc-start.c:226)
+  n0: 240 in 4 places, all below massif's threshold (01.00%)
+ n2: 773 0x4E7AA37: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 757 0x4E8F2AC: g_strdup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 486 0x4E5282C: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 486 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 486 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 486 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 486 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 486 0x534B76B: (below main) (libc-start.c:226)
+   n1: 247 0x4E5283A: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 247 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 247 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 247 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 247 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 247 0x534B76B: (below main) (libc-start.c:226)
+   n0: 24 in 2 places, all below massif's threshold (01.00%)
+  n0: 16 in 2 places, all below massif's threshold (01.00%)
+ n1: 568 0x5399209: __fopen_internal (iofopen.c:76)
+  n1: 568 0x4E52728: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 568 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 568 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 568 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 568 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 568 0x534B76B: (below main) (libc-start.c:226)
+ n2: 384 0x4E7AAF5: g_realloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 256 0x4E915D5: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E91628: g_string_sized_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E6BE26: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n0: 128 in 1 place, below massif's threshold (01.00%)
+ n1: 232 0x4023AF: ??? (in /usr/bin/optirun)
+  n0: 232 in 15 places, all below massif's threshold (01.00%)
+ n0: 128 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=19
+#-----------
+time=342574
+mem_heap_B=13797
+mem_heap_extra_B=6099
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=347506
+mem_heap_B=13906
+mem_heap_extra_B=6262
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=352191
+mem_heap_B=14009
+mem_heap_extra_B=6415
+mem_stacks_B=0
+heap_tree=detailed
+n7: 14009 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n2: 6976 0x4E470C8: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 4224 0x4E8E0C2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 2496 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1488 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1488 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1488 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1488 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1488 0x534B76B: (below main) (libc-start.c:226)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 720 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 720 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 720 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 720 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 720 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 720 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 720 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 720 0x534B76B: (below main) (libc-start.c:226)
+  n3: 2752 0x4E8E097: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 1504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+    n1: 496 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 496 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 496 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 496 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 496 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 240 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 240 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 240 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 240 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 240 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 240 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 240 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 240 0x534B76B: (below main) (libc-start.c:226)
+ n8: 4684 0x4E7AA9F: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 2032 0x4E46FF9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 2032 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 2032 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 2032 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 2032 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 2032 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 2032 0x534B76B: (below main) (libc-start.c:226)
+  n1: 512 0x4E6422F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 512 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 512 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 512 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 512 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 512 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 512 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 512 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 512 0x534B76B: (below main) (libc-start.c:226)
+  n1: 512 0x4E6424C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 512 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 512 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 512 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 512 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 512 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 512 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 512 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 512 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F1C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F3C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 256 0x4E6425C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n1: 252 0x4E46EFC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 252 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 252 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 252 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 252 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 252 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 252 0x534B76B: (below main) (libc-start.c:226)
+  n0: 112 in 3 places, all below massif's threshold (01.00%)
+ n2: 1037 0x4E7AA37: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 1021 0x4E8F2AC: g_strdup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 657 0x4E5282C: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 657 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 657 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 657 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 657 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 657 0x534B76B: (below main) (libc-start.c:226)
+   n1: 340 0x4E5283A: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 340 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 340 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 340 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 340 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 340 0x534B76B: (below main) (libc-start.c:226)
+   n0: 24 in 2 places, all below massif's threshold (01.00%)
+  n0: 16 in 2 places, all below massif's threshold (01.00%)
+ n1: 568 0x5399209: __fopen_internal (iofopen.c:76)
+  n1: 568 0x4E52728: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 568 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 568 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 568 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 568 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 568 0x534B76B: (below main) (libc-start.c:226)
+ n2: 384 0x4E7AAF5: g_realloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 256 0x4E915D5: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 256 0x4E91628: g_string_sized_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 256 0x4E6BE26: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 256 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 256 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 256 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 256 0x534B76B: (below main) (libc-start.c:226)
+  n0: 128 in 1 place, below massif's threshold (01.00%)
+ n1: 232 0x4023AF: ??? (in /usr/bin/optirun)
+  n0: 232 in 15 places, all below massif's threshold (01.00%)
+ n0: 128 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=22
+#-----------
+time=359250
+mem_heap_B=14154
+mem_heap_extra_B=6638
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=365104
+mem_heap_B=13605
+mem_heap_extra_B=6675
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=369012
+mem_heap_B=13676
+mem_heap_extra_B=6796
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=372510
+mem_heap_B=13666
+mem_heap_extra_B=6790
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=377515
+mem_heap_B=13676
+mem_heap_extra_B=6764
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=381240
+mem_heap_B=13689
+mem_heap_extra_B=6799
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=386634
+mem_heap_B=13957
+mem_heap_extra_B=6899
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=390186
+mem_heap_B=13998
+mem_heap_extra_B=6946
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=395094
+mem_heap_B=14037
+mem_heap_extra_B=7019
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=401843
+mem_heap_B=14260
+mem_heap_extra_B=7140
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=407539
+mem_heap_B=14382
+mem_heap_extra_B=7234
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=412240
+mem_heap_B=14403
+mem_heap_extra_B=7261
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=415896
+mem_heap_B=14592
+mem_heap_extra_B=7304
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=420331
+mem_heap_B=14685
+mem_heap_extra_B=7379
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=424130
+mem_heap_B=14798
+mem_heap_extra_B=7442
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=429673
+mem_heap_B=15008
+mem_heap_extra_B=7536
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=434646
+mem_heap_B=15119
+mem_heap_extra_B=7601
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=438147
+mem_heap_B=15167
+mem_heap_extra_B=7609
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=449169
+mem_heap_B=15207
+mem_heap_extra_B=7625
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=454040
+mem_heap_B=31896
+mem_heap_extra_B=7688
+mem_stacks_B=0
+heap_tree=peak
+n4: 31896 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n4: 18702 0x4E7AA37: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 16384 0x4E5AECF: g_quark_from_static_string (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 16384 0x4E6DD02: g_key_file_get_value (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 16384 0x4E6DED2: g_key_file_get_string (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 16384 0x4E6E291: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 16384 0x4E6E791: g_key_file_load_from_file (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 16384 0x402912: ??? (in /usr/bin/optirun)
+        n1: 16384 0x401DAE: ??? (in /usr/bin/optirun)
+         n0: 16384 0x534B76B: (below main) (libc-start.c:226)
+  n2: 1244 0x4E8F2AC: g_strdup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 756 0x4E5282C: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 756 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 756 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 756 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 756 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 756 0x534B76B: (below main) (libc-start.c:226)
+   n0: 488 in 6 places, all below massif's threshold (01.00%)
+  n1: 612 0x4E8F357: g_strndup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n0: 612 in 6 places, all below massif's threshold (01.00%)
+  n0: 462 in 4 places, all below massif's threshold (01.00%)
+ n2: 6976 0x4E470C8: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 4224 0x4E8E0C2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 2496 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1488 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1488 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1488 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1488 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1488 0x534B76B: (below main) (libc-start.c:226)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 720 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 720 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 720 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 720 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 720 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 720 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 720 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 720 0x534B76B: (below main) (libc-start.c:226)
+  n3: 2752 0x4E8E097: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 1504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+    n1: 496 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 496 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 496 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 496 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 496 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n0: 240 in 1 place, below massif's threshold (01.00%)
+ n6: 5164 0x4E7AA9F: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 2032 0x4E46FF9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 2032 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 2032 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 2032 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 2032 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 2032 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 2032 0x534B76B: (below main) (libc-start.c:226)
+  n0: 1100 in 5 places, all below massif's threshold (01.00%)
+  n1: 512 0x4E6422F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 512 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 512 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 512 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 512 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 512 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 512 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 512 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 512 0x534B76B: (below main) (libc-start.c:226)
+  n1: 512 0x4E6424C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 512 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 512 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 512 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 512 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 512 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 512 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 512 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 512 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F1C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F3C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+ n0: 1054 in 10 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=42
+#-----------
+time=459062
+mem_heap_B=31851
+mem_heap_extra_B=7677
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=463894
+mem_heap_B=31756
+mem_heap_extra_B=7676
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=467099
+mem_heap_B=31879
+mem_heap_extra_B=7673
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=471380
+mem_heap_B=31757
+mem_heap_extra_B=7675
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=475012
+mem_heap_B=31752
+mem_heap_extra_B=7680
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=479782
+mem_heap_B=31805
+mem_heap_extra_B=7683
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=486810
+mem_heap_B=30743
+mem_heap_extra_B=7209
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=491395
+mem_heap_B=30290
+mem_heap_extra_B=6830
+mem_stacks_B=0
+heap_tree=detailed
+n4: 30290 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n3: 17900 0x4E7AA37: g_malloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 16384 0x4E5AECF: g_quark_from_static_string (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 16384 0x4E6DD02: g_key_file_get_value (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 16384 0x4E6DED2: g_key_file_get_string (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 16384 0x4E6E291: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 16384 0x4E6E791: g_key_file_load_from_file (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 16384 0x402912: ??? (in /usr/bin/optirun)
+        n1: 16384 0x401DAE: ??? (in /usr/bin/optirun)
+         n0: 16384 0x534B76B: (below main) (libc-start.c:226)
+  n3: 1175 0x4E8F2AC: g_strdup (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 756 0x4E5282C: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 756 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 756 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 756 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 756 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 756 0x534B76B: (below main) (libc-start.c:226)
+   n1: 394 0x4E5283A: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 394 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 394 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 394 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 394 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 394 0x534B76B: (below main) (libc-start.c:226)
+   n0: 25 in 7 places, all below massif's threshold (01.00%)
+  n0: 341 in 6 places, all below massif's threshold (01.00%)
+ n2: 6976 0x4E470C8: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n3: 4224 0x4E8E0C2: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 2496 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1488 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1488 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1488 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1488 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1488 0x534B76B: (below main) (libc-start.c:226)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n1: 720 0x4E8EA8C: g_slist_prepend (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 720 0x4E90A77: g_strsplit (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 720 0x4E52550: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 720 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 720 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 720 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 720 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 720 0x534B76B: (below main) (libc-start.c:226)
+  n3: 2752 0x4E8E097: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n2: 1504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+      n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+       n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+    n1: 496 0x4E6BDEC: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 496 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 496 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 496 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 496 0x534B76B: (below main) (libc-start.c:226)
+   n1: 1008 0x4E649F1: g_hash_table_new_full (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 1008 0x4E6BE10: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 1008 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 1008 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 1008 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 1008 0x534B76B: (below main) (libc-start.c:226)
+   n0: 240 in 1 place, below massif's threshold (01.00%)
+ n6: 4876 0x4E7AA9F: g_malloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+  n1: 2032 0x4E46FF9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 2032 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 2032 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 2032 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 2032 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 2032 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 2032 0x534B76B: (below main) (libc-start.c:226)
+  n0: 812 in 5 places, all below massif's threshold (01.00%)
+  n1: 512 0x4E6422F: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 512 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 512 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 512 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 512 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 512 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 512 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 512 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 512 0x534B76B: (below main) (libc-start.c:226)
+  n1: 512 0x4E6424C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 512 0x4E645D9: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 512 0x4E64978: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 512 0x4E5284D: g_get_language_names (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 512 0x4E6BE3A: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+       n1: 512 0x4E6D5EB: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+        n1: 512 0x4028F9: ??? (in /usr/bin/optirun)
+         n1: 512 0x401DAE: ??? (in /usr/bin/optirun)
+          n0: 512 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F1C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+  n1: 504 0x4E46F3C: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+   n1: 504 0x4E8DE93: g_slice_alloc (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+    n1: 504 0x4E8E1B4: g_slice_alloc0 (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+     n1: 504 0x4E6D5D9: g_key_file_new (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+      n1: 504 0x4028F9: ??? (in /usr/bin/optirun)
+       n1: 504 0x401DAE: ??? (in /usr/bin/optirun)
+        n0: 504 0x534B76B: (below main) (libc-start.c:226)
+ n0: 538 in 10 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=50
+#-----------
+time=497084
+mem_heap_B=30979
+mem_heap_extra_B=6757
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=504186
+mem_heap_B=32002
+mem_heap_extra_B=6742
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=515698
+mem_heap_B=32015
+mem_heap_extra_B=6729
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=519374
+mem_heap_B=32079
+mem_heap_extra_B=6745
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=524344
+mem_heap_B=32439
+mem_heap_extra_B=6761
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=528661
+mem_heap_B=32512
+mem_heap_extra_B=6808
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=534615
+mem_heap_B=32488
+mem_heap_extra_B=6792
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=548013
+mem_heap_B=32402
+mem_heap_extra_B=6750
+mem_stacks_B=0
+heap_tree=empty
