@@ -361,13 +361,18 @@ void MoCap::drawShadow(Vec4 offset, int frame)
     //if (!status) return;
     Vec4 neww(-1.4,0,0);
     int sens = Sensor::getHierarchy2UseMocap(chara);
+//    foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
+//    foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     for(int i=0;i<chara->getNumBodies();i++){
         Vec4 position = getFrameMotion(frame)->getPosition(i);
         Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
-        if(i==int(sens-3))
+        //if(i==int(sens-3))
+        if(i%2==0 && chara->getBody(i)->getFoot() && (chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround()))
             chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
-        else if(sens==0 && chara->getBody(i)->getFoot())
+        else if (i%2==1 && chara->getBody(i)->getFoot() && chara->getMoCap()->getFrameMotion(frame)->getFootRightGround())
             chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
+//        else if(sens==0 && chara->getBody(i)->getFoot())
+//            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
         else
             chara->getBody(i)->draw(position+neww,orientation,MATERIAL_SILVER_POLIERT);
 

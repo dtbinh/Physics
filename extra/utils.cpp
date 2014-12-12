@@ -569,6 +569,7 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
 
 bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
 {
+
     QDomDocument doc( "SimulationPhysics" );
     QDomElement root = doc.createElement( "SimulationScene" );
     doc.appendChild( root );
@@ -901,6 +902,8 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     int mat = sime.attribute("Material","").toInt();
                     QString name = sime.attribute("Name","");
                     float mass = sime.attribute("Mass","").toFloat();
+//                    qDebug() << name;
+//                    qDebug() << mass;
                     int type = sime.attribute("Geometry","").toInt();
                     bool foot = (bool)sime.attribute("Foot","").toInt();
                     bool bodybalance =  (bool)sime.attribute("BodyBalance","").toInt();
@@ -1203,7 +1206,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
         for (int j=0;j<chara->getNumBodies();j++) {
             if(j==15){
                 for( int i=0; i<num_frames; i++ ) {
-                  moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(3));
+                    moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(3));
                 }
             }
             if(j==16){
@@ -1246,7 +1249,10 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             quat.setPosX(dtmp);
             ss >> dtmp;
             quat.setPosY(dtmp);
-            moCap->getFrameMotion(i)->setOrientation(j,quat);
+            //if(j==13) //caso o pé esteja invertido
+            //    moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,0,180));
+            //else
+                moCap->getFrameMotion(i)->setOrientation(j,quat);
           }
           //pula uma linha
             getline(istr, stmp);

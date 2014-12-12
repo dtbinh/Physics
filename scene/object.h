@@ -53,6 +53,7 @@ private:
     bool         show_effector;
     bool         show_target;
     bool         enabled_cpdp;
+    bool         collide_ground;
     Vec4         target;
     Vec4         ks;
     Vec4         kd;
@@ -108,6 +109,8 @@ public:
     // --------Control
     void        setBodyBalance(bool b);
     bool        getBodyBalance();
+    void        setCollideWithGround(bool b);
+    bool        isCollideWithGround();
 
 
 

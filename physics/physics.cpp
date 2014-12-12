@@ -16,6 +16,20 @@ static Scene* scn = NULL;
 
 
 void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
+    //dois corpos ligados por alguma junta nao colidem
+      //if (b1 && b2 && dAreConnectedExcluding (b1,b2,dJointTypeContact)) return;
+      //so ha colisao se uma das geometrias for tipo plano - no caso, soh ha colisao com o chao (nao ha nenhuma colisao entre os corpos)
+//      if (dGeomGetClass(o1)!=dPlaneClass && dGeomGetClass(o2)!=dPlaneClass) return;
+//        //caso a colisao seja entre as geomFixas (chao, paredes e teto), nao tratar a colisao na simulacao
+//        if (dGeomGetClass(o1)==dPlaneClass && dGeomGetClass(o2)==dPlaneClass) return;
+//      //duas geometrias pertencentes ao mesmo modelo nao colidem (nem dois objetos - data==Objeto::objetos(FF)) (nem duas geomFixas - data==NULL)
+//      //if (dGeomGetData(o1)==dGeomGetData(o2)) return;
+//      //duas geometrias pertencentes ao mesmo modelo nao colidem (nem duas geomFixas - data==NULL)
+//      if (dGeomGetData(o1)==dGeomGetData(o2))
+//        //permite colisao entre box e cilindro, mesmo pertencentes ao mesmo modelo
+//        //if ( (dGeomGetClass(o1)==dBoxClass && dGeomGetClass(o2)==dBoxClass)
+//        //  || (dGeomGetClass(o1)==dCCylinderClass && dGeomGetClass(o2)==dCCylinderClass) )
+//          return;
     if (dGeomIsSpace (o1) || dGeomIsSpace (o2)) {
         // Collide a space with everything else
         dSpaceCollide2 (o1, o2, data,&nearCallback);
@@ -25,6 +39,8 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
 
         dBodyID b1 = dGeomGetBody(o1);
         dBodyID b2 = dGeomGetBody(o2);
+
+
 
         int numcont = 8;
         dContact contact[numcont];
@@ -61,8 +77,17 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                           int noGroundGeom = 0;
                           if (dGeomGetClass(o1)==dPlaneClass) noGroundGeom = 2; //ou 0, mas nunca sera 0, pois would return antes
                           else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
-                          else noGroundGeom = 2;
+                          else noGroundGeom = 3;
                           GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
+                          if(noGroundGeom==1||noGroundGeom==2){
+                              if (scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(true);
+                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(true);
+                          }
+
+//                          if(noGroundGeom==3){
+//                              if(scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(false);
+//                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(false);
+//                          }
                           fbContact.b1 = scene->getObject(b1);
                           fbContact.b2 = scene->getObject(b2);
                       //put fbContact in vector feedbackContacts
@@ -89,6 +114,10 @@ void Physics::simSingleStep (Scene *scene)
 {
     scene->clearGroundForces();
     std::vector<Object*> objs = scene->objectsScene();
+//    if (scene->getSizeCharacter()>0){
+//        for(int i=0;i<scene->getSizeCharacter();i++)
+//            scene->getCharacter(i)->restartCollideWithGround();
+//    }
     for(unsigned int i=0;i<objs.size();i++)
         dBodyEnable(objs.at(i)->getBody());
     scn = scene;

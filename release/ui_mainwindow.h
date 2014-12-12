@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Wed Apr 23 11:00:16 2014
+** Created: Tue Dec 9 14:57:01 2014
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -289,6 +289,19 @@ public:
     QLabel *zkdPdApply;
     QFrame *infoPD;
     QVBoxLayout *verticalLayout;
+    QWidget *tab_3;
+    QWidget *layoutWidget_2;
+    QHBoxLayout *horizontalLayout_40;
+    QLabel *label_25;
+    QDoubleSpinBox *xkDis;
+    QDoubleSpinBox *ykDis;
+    QDoubleSpinBox *zkDis;
+    QWidget *layoutWidget_3;
+    QHBoxLayout *horizontalLayout_41;
+    QLabel *label_38;
+    QDoubleSpinBox *xkFor;
+    QDoubleSpinBox *ykFor;
+    QDoubleSpinBox *zkFor;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuControl;
@@ -1121,7 +1134,7 @@ public:
 
         layoutWidget4 = new QWidget(tab_2);
         layoutWidget4->setObjectName(QString::fromUtf8("layoutWidget4"));
-        layoutWidget4->setGeometry(QRect(20, 140, 251, 29));
+        layoutWidget4->setGeometry(QRect(20, 140, 268, 29));
         horizontalLayout_35 = new QHBoxLayout(layoutWidget4);
         horizontalLayout_35->setSpacing(6);
         horizontalLayout_35->setContentsMargins(11, 11, 11, 11);
@@ -1134,10 +1147,10 @@ public:
 
         sensorTolerance = new QDoubleSpinBox(layoutWidget4);
         sensorTolerance->setObjectName(QString::fromUtf8("sensorTolerance"));
-        sensorTolerance->setDecimals(2);
+        sensorTolerance->setDecimals(4);
         sensorTolerance->setMaximum(999);
         sensorTolerance->setSingleStep(0.01);
-        sensorTolerance->setValue(50);
+        sensorTolerance->setValue(0.01);
 
         horizontalLayout_35->addWidget(sensorTolerance);
 
@@ -1844,6 +1857,77 @@ public:
         gridLayout_10->addWidget(infoPD, 3, 0, 1, 1);
 
         Options->addTab(controlpd, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QString::fromUtf8("tab_3"));
+        layoutWidget_2 = new QWidget(tab_3);
+        layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
+        layoutWidget_2->setGeometry(QRect(10, 70, 306, 29));
+        horizontalLayout_40 = new QHBoxLayout(layoutWidget_2);
+        horizontalLayout_40->setSpacing(6);
+        horizontalLayout_40->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_40->setObjectName(QString::fromUtf8("horizontalLayout_40"));
+        horizontalLayout_40->setContentsMargins(0, 0, 0, 0);
+        label_25 = new QLabel(layoutWidget_2);
+        label_25->setObjectName(QString::fromUtf8("label_25"));
+
+        horizontalLayout_40->addWidget(label_25);
+
+        xkDis = new QDoubleSpinBox(layoutWidget_2);
+        xkDis->setObjectName(QString::fromUtf8("xkDis"));
+        xkDis->setMinimum(-500);
+        xkDis->setMaximum(500);
+
+        horizontalLayout_40->addWidget(xkDis);
+
+        ykDis = new QDoubleSpinBox(layoutWidget_2);
+        ykDis->setObjectName(QString::fromUtf8("ykDis"));
+        ykDis->setMinimum(-500);
+        ykDis->setMaximum(500);
+
+        horizontalLayout_40->addWidget(ykDis);
+
+        zkDis = new QDoubleSpinBox(layoutWidget_2);
+        zkDis->setObjectName(QString::fromUtf8("zkDis"));
+        zkDis->setMinimum(-500);
+        zkDis->setMaximum(500);
+
+        horizontalLayout_40->addWidget(zkDis);
+
+        layoutWidget_3 = new QWidget(tab_3);
+        layoutWidget_3->setObjectName(QString::fromUtf8("layoutWidget_3"));
+        layoutWidget_3->setGeometry(QRect(10, 20, 308, 29));
+        horizontalLayout_41 = new QHBoxLayout(layoutWidget_3);
+        horizontalLayout_41->setSpacing(6);
+        horizontalLayout_41->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_41->setObjectName(QString::fromUtf8("horizontalLayout_41"));
+        horizontalLayout_41->setContentsMargins(0, 0, 0, 0);
+        label_38 = new QLabel(layoutWidget_3);
+        label_38->setObjectName(QString::fromUtf8("label_38"));
+
+        horizontalLayout_41->addWidget(label_38);
+
+        xkFor = new QDoubleSpinBox(layoutWidget_3);
+        xkFor->setObjectName(QString::fromUtf8("xkFor"));
+        xkFor->setMinimum(-500);
+        xkFor->setMaximum(500);
+
+        horizontalLayout_41->addWidget(xkFor);
+
+        ykFor = new QDoubleSpinBox(layoutWidget_3);
+        ykFor->setObjectName(QString::fromUtf8("ykFor"));
+        ykFor->setMinimum(-500);
+        ykFor->setMaximum(500);
+
+        horizontalLayout_41->addWidget(ykFor);
+
+        zkFor = new QDoubleSpinBox(layoutWidget_3);
+        zkFor->setObjectName(QString::fromUtf8("zkFor"));
+        zkFor->setMinimum(-500);
+        zkFor->setMaximum(500);
+
+        horizontalLayout_41->addWidget(zkFor);
+
+        Options->addTab(tab_3, QString());
 
         gridLayout_2->addWidget(Options, 0, 0, 1, 1);
 
@@ -1876,7 +1960,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        Options->setCurrentIndex(0);
+        Options->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1993,6 +2077,9 @@ public:
         ykdPdApply->setText(QApplication::translate("MainWindow", "val2", 0, QApplication::UnicodeUTF8));
         zkdPdApply->setText(QApplication::translate("MainWindow", "val3", 0, QApplication::UnicodeUTF8));
         Options->setTabText(Options->indexOf(controlpd), QApplication::translate("MainWindow", "Manipulator Joints", 0, QApplication::UnicodeUTF8));
+        label_25->setText(QApplication::translate("MainWindow", "Dis K:", 0, QApplication::UnicodeUTF8));
+        label_38->setText(QApplication::translate("MainWindow", "Vel K:", 0, QApplication::UnicodeUTF8));
+        Options->setTabText(Options->indexOf(tab_3), QApplication::translate("MainWindow", "Simbicon", 0, QApplication::UnicodeUTF8));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
         menuControl->setTitle(QApplication::translate("MainWindow", "Simulation", 0, QApplication::UnicodeUTF8));
     } // retranslateUi

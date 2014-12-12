@@ -21,8 +21,8 @@ Balance::Balance(Character* chara)
     kdForce = Vec4(20,20,20);
     kmomang = Vec4(5,5,5);
     kmomlin = Vec4(5,5,5);
-    kVel = Vec4(15,15,15);
-    kDist = Vec4(15,15,15);
+    kVel = Vec4(3900.5,3900.5,3900.5);
+    kDist = Vec4(3900.5,3900.5,3900.5);
     this->enable_force = true;
     this->enable_torque = true;
     this->enable_momentum = true;
@@ -39,6 +39,8 @@ Balance::Balance(Character* chara)
     sim_dist = 0;
     mocap_dist = 0;
     this->steps = 1;
+    velAnt = Vec4();
+    this->limitsteps = 3000;
 }
 
 void Balance::contructRelationJointsBodies()
@@ -153,6 +155,8 @@ Vec Balance::getTwistWrenchTotal(Vec twist, Vec4 com)
         M_com2coms[i] = Matrix(6,6);
     }
 
+
+    //if (useHierarchy==0) com = Vec4(com.x()*0.5,com.y()*0.5,com.z()*0.5);
     int size = this->chara->getNumBodies();
     #pragma omp parallel for schedule(dynamic)
     for (int b=0;b<size;b++) {
@@ -172,8 +176,10 @@ Vec Balance::getTwistWrenchTotal(Vec twist, Vec4 com)
         J_b2com = (Ad_com2b_t * M_b2b * Ad_w2b * Ad_j2w);
         //gcomTotal = gcomTotal + Vec(Vec4(0,this->chara->getBody(b)->getFMass()*10,0),Vec4(0,0,0));
         Js[omp_get_thread_num()] = Js[omp_get_thread_num()] + (J_b2com);
+        //J = J + J_b2com;
         //M_com_com = Sum_b( Ad_b_com^t . M_b_b . Ad_b_com )
         M_b2com = Ad_com2b_t * M_b2b * Ad_com2b;
+        //M_com2com =  M_com2com + M_b2com;
         M_com2coms[omp_get_thread_num()] = M_com2coms[omp_get_thread_num()] + M_b2com;
     }
 
@@ -201,48 +207,109 @@ Vec Balance::getTwistWrenchTotal(Vec twist, Vec4 com)
 
 Vec Balance::getJacobianLocomotion(std::vector<Joint*> joints, Object *effector,Vec twist)
 {
+//    Matrix M_com2com(6,6);
+//    Matrix M_b2com(6,6);
+//    //Vec gcomTotal = Vec(6);
+
+//    //matriz jacobiana de 6 linhas e (6*num_juntas) colunas
+//    Matrix J = Matrix(6,6*joints.size());
+//    Matrix Ad_j = Matrix(6,6*joints.size());
+//      for (unsigned int b=0;b<joints.size();b++) {
+//        //J = J_com_com = Sum_b( J_com_com_b )
+//          //J_com_com_b = Ad_w_com^t . M_w_b . Ad_w_j
+//          Object* body = joints.at(b)->getChild();
+//            Matrix J_b2com = Matrix(6,6*joints.size());
+//            //Ad_w_com^t . M_w_b = Ad_b_com^t . M_b_b . Ad_b_w
+//              Matrix Ad_w2b = body->getAd();
+//              Matrix M_b2b = body->getIM();
+//              //matrix Ad_b_com_t = ModesGen::getAd(this->modelo->bodyGeoms[b],this->modelo).transpose();
+//                Matrix Ad_com2b = body->getAd();
+//              Matrix Ad_com2b_t = Ad_com2b.transpose();
+//            //Ad_w_j
+//              Matrix Ad_j2w = joints.at(b)->getAd(effector->getPositionCurrent());
+//            //J_b2com = Ad_j2w;//(Ad_com2b_t * M_b2b * Ad_w2b * Ad_j2w);
+//          Ad_j.setSubmatrix(0,6*b,Ad_j2w);
+
+
+//            //gcomTotal = gcomTotal + Vec(Vec4(0,this->chara->getBody(b)->getFMass()*10,0),Vec4(0,0,0));
+//          //J = J + (J_b2com);
+//        //M_com_com = Sum_b( Ad_b_com^t . M_b_b . Ad_b_com )
+//            //M_b2com = Ad_com2b_t * M_b2b * Ad_com2b;
+//          //M_com2com = M_com2com + M_b2com;
+//      }
+
+//    //M_com_com^-1 * jacobian
+//    //Matrix M_com2com_inv = M_com2com.inverse();
+//    //Matrix M_invJ = M_com2com_inv * J;
+
+//    //jacobian transposta
+//    //matrix J_transp = J.transpose();
+//    Matrix J_transp = Ad_j.transpose();
+
+//    //wrench_com_com
+//    Vec wrench_com2com = twist;
+//      //wrench_com_com.print();
+
+//    //wrench_j_j
+//    Vec wrench_j2j = J_transp * wrench_com2com;
+
+//    return wrench_j2j;
+    omp_set_num_threads(4);
+    //M_com_com
     Matrix M_com2com(6,6);
-    Matrix M_b2com(6,6);
+
     //Vec gcomTotal = Vec(6);
 
     //matriz jacobiana de 6 linhas e (6*num_juntas) colunas
-    Matrix J = Matrix(6,6*joints.size());
-    Matrix Ad_j = Matrix(6,6*joints.size());
-      for (unsigned int b=0;b<joints.size();b++) {
+    Matrix J(6,6*this->chara->getNumJoints());
+
+    Matrix Js[omp_get_max_threads()];
+    Matrix M_com2coms[omp_get_max_threads()];
+
+    for (int i=0;i<omp_get_max_threads();i++){
+        Js[i] = Matrix(6,6*this->chara->getNumJoints());
+        M_com2coms[i] = Matrix(6,6);
+    }
+
+    int size = this->chara->getNumBodies();
+    #pragma omp parallel for schedule(dynamic)
+    for (int b=0;b<size;b++) {
         //J = J_com_com = Sum_b( J_com_com_b )
-          //J_com_com_b = Ad_w_com^t . M_w_b . Ad_w_j
-          Object* body = joints.at(b)->getChild();
-            Matrix J_b2com = Matrix(6,6*joints.size());
-            //Ad_w_com^t . M_w_b = Ad_b_com^t . M_b_b . Ad_b_w
-              Matrix Ad_w2b = body->getAd();
-              Matrix M_b2b = body->getIM();
-              //matrix Ad_b_com_t = ModesGen::getAd(this->modelo->bodyGeoms[b],this->modelo).transpose();
-                Matrix Ad_com2b = body->getAd();
-              Matrix Ad_com2b_t = Ad_com2b.transpose();
-            //Ad_w_j
-              Matrix Ad_j2w = joints.at(b)->getAd(effector->getPositionCurrent());
-            //J_b2com = Ad_j2w;//(Ad_com2b_t * M_b2b * Ad_w2b * Ad_j2w);
-          Ad_j.setSubmatrix(0,6*b,Ad_j2w);
+        //J_com_com_b = Ad_w_com^t . M_w_b . Ad_w_j
+        Matrix M_b2com(6,6);
+        Matrix J_b2com(6,6*this->chara->getNumJoints());
+        //Ad_w_com^t . M_w_b = Ad_b_com^t . M_b_b . Ad_b_w
+        Matrix Ad_w2b = this->chara->getBody(b)->getAd();
+        Matrix M_b2b = this->chara->getBody(b)->getIM();
+        //matrix Ad_b_com_t = ModesGen::getAd(this->modelo->bodyGeoms[b],this->modelo).transpose();
+        Matrix Ad_com2b = this->chara->getBody(b)->getAd(effector->getPositionCurrent());
+        Matrix Ad_com2b_t = Ad_com2b.transpose();
+        //Ad_w_j
+        Matrix Ad_j2w =getJacobianSum(this->chara->getBody(b));
 
-
-            //gcomTotal = gcomTotal + Vec(Vec4(0,this->chara->getBody(b)->getFMass()*10,0),Vec4(0,0,0));
-          //J = J + (J_b2com);
+        J_b2com = (Ad_com2b_t * M_b2b * Ad_w2b * Ad_j2w);
+        //gcomTotal = gcomTotal + Vec(Vec4(0,this->chara->getBody(b)->getFMass()*10,0),Vec4(0,0,0));
+        Js[omp_get_thread_num()] = Js[omp_get_thread_num()] + (J_b2com);
         //M_com_com = Sum_b( Ad_b_com^t . M_b_b . Ad_b_com )
-            //M_b2com = Ad_com2b_t * M_b2b * Ad_com2b;
-          //M_com2com = M_com2com + M_b2com;
+        M_b2com = Ad_com2b_t * M_b2b * Ad_com2b;
+        M_com2coms[omp_get_thread_num()] = M_com2coms[omp_get_thread_num()] + M_b2com;
+    }
+
+      for (int i=0;i<omp_get_max_threads();i++){
+          J = J + Js[i];
+          M_com2com = M_com2com + M_com2coms[i];
       }
 
     //M_com_com^-1 * jacobian
-    //Matrix M_com2com_inv = M_com2com.inverse();
-    //Matrix M_invJ = M_com2com_inv * J;
+    Matrix M_com2com_inv = M_com2com.inverse();
+    Matrix M_invJ = M_com2com_inv * J;
+
 
     //jacobian transposta
-    //matrix J_transp = J.transpose();
-    Matrix J_transp = Ad_j.transpose();
+    Matrix J_transp = M_invJ.transpose();
 
     //wrench_com_com
     Vec wrench_com2com = twist;
-      //wrench_com_com.print();
 
     //wrench_j_j
     Vec wrench_j2j = J_transp * wrench_com2com;
@@ -408,10 +475,22 @@ void Balance::setAngleCone(float val)
     this->angle = val;
 }
 
+void Balance::setLimitSteps(int value)
+{
+    limitsteps = value;
+}
+
+int Balance::getLimitSteps()
+{
+    return limitsteps;
+}
+
 float Balance::getTorqueMaxCompensable(Object *foot, Vec4 torque)
 {
     float ang = this->angle*M_PI/180.;
     Vec4 Tmax = Vec4(m*cos(ang),m*sin(ang),0)^Vec4(-radius,height,0);
+    //if(torque.projXZ().module()>Tmax.module()) return 0;
+    //if(torque.projXZ().module()<0) return 1;
     float ratio = Tmax.module()/torque.projXZ().module();
     if (ratio>=1) ratio = 1.;
     foot->setCompensableFactor(ratio);
@@ -596,7 +675,7 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesire
     if((frame>0)&&(chara->getMoCap()->status)){
         if (useHierarchy==0) val = -1;
         else val = useHierarchy-3;
-        Fcom = ksForce.mult(chara->getMoCap()->positionRelativeCOM(frame,val) - (COM_ - Cfoot_))*(1 - steps/LIMIT) + kdForce.mult((velCOM_moCap) - velCOM_)*(1 - steps/LIMIT);
+        Fcom = ksForce.mult(chara->getMoCap()->positionRelativeCOM(frame,val) - (COM_ - Cfoot_))*(1 - steps/limitsteps) + kdForce.mult((velCOM_moCap) - velCOM_)*(1 - steps/limitsteps);
     }else
         Fcom = ksForce.mult(Cfoot_ - COM_) - kdForce.mult(velCOM_);
 
@@ -614,7 +693,18 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesire
         }
     else
         printf("\nSem junta desejada!");
-    Vec4 gravity = chara->getScene()->getGravity()*mass_total;
+
+
+    //return;
+
+//    float mass_consider = 0;
+//    for(int i=6;i<chara->objects.size();i++){
+//        mass_consider += chara->getBody(i)->getFMass();
+//    }
+
+    //Vec4 gravity = chara->getScene()->getGravity()*mass_total;//*0.8;
+    //printf("\nMassa Total: %.3f; Considerada: %.3f; Aproximada: %.3f",mass_total,mass_consider,mass_total*0.8);
+    Vec4 gravity = chara->getScene()->getGravity()*mass_total;//*0.8;
 //    if (limit>50){
 //        gravity = Vec4();
 //    }
@@ -630,83 +720,111 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesire
         wrench = Vec(Tcom,(gravity)*(-1)) + momentum;
     else
         wrench = Vec(Vec4(),(gravity)*(-1))+ momentum;
+    //Vec renew = Vec(Tcom,(gravity)*(-1)) + momentum;
 
     Vec wrenchTotal = getTwistWrenchTotal(wrench,COM);
+    //Vec wrenchTotal = getTwistWrenchTotal(renew,COM);
     //gravity.showVec4();
     float factor = 1.0;
+
     //printf("\nGravidade: %.3f",(chara->getScene()->getGravity()*mass_total).y());
 
 
-//    /****************** Teste de SwingFoot *********************/
 
-//    Vec wrenchSwing;
-//    int foot_swing = Sensor::getSwingFoot(this->chara);
-//    std::vector<Joint*> hier;
-//    //int aux;
-//    if (!(foot_swing<0)){ //caso tenha um pé no ar
-//        Vec4 acom_;
-//        Vec4 bcom_;
-//        if((chara->getMoCap()->sizeFrames()>0)||(chara->getMoCap()->status)){
-//            acom_ = chara->getMoCap()->getPosCOM(frame);
-//            bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
-//        }
-//        Vec4 a = chara->getPosCOM();
-//        a.x2 = 0;
-//        //Vec4 acom_ = chara->getMoCap()->getPosCOM(frame);
-//        acom_.x2 = 0;
-//        //Vec4 bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
-//        bcom_.x2 = 0;
-//        //Vec4 distcom_ = (acom_-bcom_);
-//        //distcom_.x2 = 0;
-//        Vec4 b = chara->getBody(Sensor::getStanceFoot(this->chara))->getPositionCurrent();
-//        b.x2 = 0;
-//        Vec4 dist_ = (a-b);
-//        dist_.x2 = 0;
-//        Vec4 vel_  = chara->getVelCOM();
-//        vel_.x2 = 0;
-//        velCOM_moCap.x2 = 0;
-//        Object* pelvis = chara->getBody(7);
-//        Quaternion newq(Vec4(0,90,0));
-//        Vec4 Fswing = kVel.mult(vel_) + kDist.mult(dist_);
-//        Vec wrench = Vec(Vec4(),Fswing);
-//        chara->clearVectorsGlobais();
-//        hier = chara->getHierarchyJoint(pelvis,chara->getBody(foot_swing));
-//        wrenchSwing = getJacobianLocomotion(hier,chara->getBody(foot_swing),wrench);
-//    }
-    /**************************************/
 
 
 //    if(useHierarchy==0) factor = 0.5;
 //    else factor = 1;
 
+
+    //Draw::drawText(QString().sprintf("%.3f",180/M_PI),50,50);
     for (int i=0;i<chara->getNumJoints();i++){
+
         Joint *joint = chara->getJoint(i);
         Vec4 torque(wrenchTotal[i+i*5],wrenchTotal[i+1+i*5],wrenchTotal[i+2+i*5]);
+//        if(useHierarchy==0 && (i>=0 && i<=2)){
+//            torque = Vec4(wrenchTotal[i+3+(i+3)*5],wrenchTotal[i+4+(i+3)*5],wrenchTotal[i+5+(i+3)*5]);
+//        }else if(useHierarchy==0 && (i>=3 && i<=5)){
+//            torque = Vec4(wrenchTotal[i-3+(i-3)*5],wrenchTotal[i-2+(i-3)*5],wrenchTotal[i-1+(i-3)*5]);
+//        }
 //        torque = limitingTorque(400.,torque);
         int id_parent,id_child;
         id_parent = chara->getIdObject(joint->getParent());
         id_child = chara->getIdObject(joint->getChild());
 
+        Vec4 ori;
+        dReal anglex;
+
+        float ang = fabs(acos(torque.unitary()*Vec4(0,0,1)));
         if(chara->hierarchy[useHierarchy][i][chara->getPositionBody(joint->getChild())]){
-            if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+            //printf("\n(Cima) Uso da Hierarquia: %d",useHierarchy);
+            if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3|| useHierarchy==id_child+3)){
+                //printf("\nAntes Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+//                joint->getChild()->getRotationCurrent().toAxisAngle(&ori,&anglex);
+//                ori.showVec4();
+//                printf("\nAngulo: %.3f",anglex);
+//                Draw::drawText(QString().sprintf("%.3f",ang*180/M_PI),100,500);
+//                //printf("\n%.3f",ang*180/M_PI);
+//                printf("\n%.3f",ori.z()*anglex);
+//                if(fabs(ori.z()*anglex)<45){
                 joint->getChild()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+                torque = torque*(1-getTorqueMaxCompensable(joint->getChild(),torque));
+                //}
+                //printf("\nDepois Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+            }
             else
                 joint->getChild()->addTorque((torque)*factor);
-            if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3))
+            if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3||useHierarchy==id_parent+3)){
+                //printf("\nAntes Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+                //printf("\n%.3f",ang*180/M_PI);
+//                joint->getParent()->getRotationCurrent().toAxisAngle(&ori,&anglex);
+//                ori.showVec4();
+//                printf("\nAngulo: %.3f",anglex);
+//                printf("\n%.3f",ori.z()*anglex);
+//                Draw::drawText(QString().sprintf("%.3f",ang*180/M_PI),100,500);
+//                if(fabs(ori.z()*anglex)<45){
                 joint->getParent()->addTorque((torque)*(-1)*(1-getTorqueMaxCompensable(joint->getParent(),torque))*factor);
+                torque = torque*(1-getTorqueMaxCompensable(joint->getChild(),torque));
+                //}
+                //printf("\nDepois Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+            }
             else
                 joint->getParent()->addTorque((torque)*(-1)*factor);
         }else{
-            if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3))
+            //printf("\n(Baixo) Uso da Hierarquia: %d",useHierarchy);
+            if (joint->getParent()->getFoot()&&(useHierarchy==0 ||useHierarchy==id_parent+3|| useHierarchy==id_parent+3)){
+                //printf("\nAntes Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+//                joint->getParent()->getRotationCurrent().toAxisAngle(&ori,&anglex);
+//                ori.showVec4();
+//                printf("\nAngulo: %.3f",anglex);
+//                Draw::drawText(QString().sprintf("%.3f",ang*180/M_PI),100,500);
+//                printf("\n%.3f",ori.z()*anglex);
+//                if(fabs(ori.z()*anglex)<45){
                 joint->getParent()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getParent(),torque))*factor);
+                torque = torque*(1-getTorqueMaxCompensable(joint->getChild(),torque));
+                //}
+                //printf("\nDepois Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+            }
             else
                 joint->getParent()->addTorque((torque)*factor);
-            if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+            if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3 || useHierarchy==id_child+3))
+            {
+                //printf("\nAntes Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+//                joint->getChild()->getRotationCurrent().toAxisAngle(&ori,&anglex);
+//                ori.showVec4();
+//                printf("\nAngulo: %.3f",anglex);
+//                printf("\n%.3f",ori.z()*anglex);
+//                if(fabs(ori.z()*anglex)<45){
                 joint->getChild()->addTorque((torque)*(-1)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+                torque = torque*(1-getTorqueMaxCompensable(joint->getChild(),torque));
+                //}
+                //printf("\nDepois Id: %d, Torque(%.3f,%.3f,%.3f);  Modulo: %.3f",i,torque.x(),torque.y(),torque.z(),torque.module());
+            }
             else
                 joint->getChild()->addTorque((torque)*(-1)*factor);
         }
     }
+    printf("\nUse Hierarchy %d",useHierarchy);
     if(frame>0){
     mocap_dist = (chara->getMoCap()->positionRelativeCOM(frame,val)).module();
     Cfoot_ = Sensor::getSupportProjected(chara,capture);
@@ -716,7 +834,215 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,Quaternion qdesire
     sim_dist = (COM_ - Cfoot_).module();
     }
     steps++;
-    if (steps >= LIMIT) steps = LIMIT;
+    if (steps >= limitsteps) steps = limitsteps;
+//    Vec wrenchSwing;
+//    int foot_swing = Sensor::getSwingFoot(this->chara);
+//    std::vector<Joint*> hier;
+////    if (chara->getNumJoints()>0){
+////        for(unsigned int i=0; i<6;i++){
+////            hier.push_back(chara->getJoint(i));
+////        }
+////    }
+////    else{
+////        return;
+////    }
+//    //int aux;
+//    int sta = Sensor::getStanceFoot(this->chara);
+
+//    if (!(foot_swing<0) && sta>0){ //caso tenha um pé no ar
+//        //Vec4 acom_;
+//        //Vec4 bcom_;
+////        if((chara->getMoCap()->sizeFrames()>0)||(chara->getMoCap()->status)){
+////            acom_ = chara->getMoCap()->getPosCOM(frame);
+////            bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
+////        }
+//        Vec4 a = chara->getPosCOM();
+//        a.x2 = 0;
+//        //Vec4 acom_ = chara->getMoCap()->getPosCOM(frame);
+//        //acom_.x2 = 0;
+//        //Vec4 bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
+//        //bcom_.x2 = 0;
+//        //Vec4 distcom_ = (acom_-bcom_);
+//        //distcom_.x2 = 0;
+//        Vec4 b = chara->getBody(sta)->getPositionCurrent();
+//        b.x2 = 0;
+//        Vec4 dist_ = (a-b);
+//        dist_.x2 = 0;
+//        Vec4 vel_  = chara->getVelCOM();
+//        vel_.x2 = 0;
+
+//        //velCOM_moCap.x2 = 0;
+//        //Object* pelvis = chara->getBody(7);
+//        //Quaternion newq(Vec4(0,90,0));
+//        Vec4 Fswing = kVel.mult(vel_) + kDist.mult(dist_);
+//        Vec wrench = Vec(Vec4(),Fswing);
+//        //chara->clearVectorsGlobais();
+//        int l1,l2;
+//        if(foot_swing==2){
+//            l1 = 0;
+//            l2 = 2;
+//        }else{
+//            l1 = 3;
+//            l2 = 5;
+//        }
+
+//        for (unsigned int i=l1;i<l2+1;i++){
+//            hier.push_back(chara->getJoint(i));
+//        }
+//        //hier = chara->getHierarchyJoint(pelvis,chara->getBody(foot_swing));
+//        wrenchSwing = getJacobianLocomotion(hier,chara->getBody(foot_swing),wrench);
+//        //printf("Size vector: %d",wrenchSwing.size());
+
+
+//        float factor = 1.0;
+
+//        int j = 0;
+//        for (int i=l1;i<l2+1;i++){
+//            Joint *joint = chara->getJoint(i);
+//            Vec4 torque(wrenchSwing[j+j*5],wrenchSwing[j+1+j*5],wrenchSwing[j+2+j*5]);
+//    //        torque = limitingTorque(400.,torque);
+//            //int id_parent,id_child;
+//            //id_parent = chara->getIdObject(joint->getParent());
+//            //id_child = chara->getIdObject(joint->getChild());
+//            //if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+//                joint->getChild()->addTorque((torque));//*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+//            //else
+//                joint->getParent()->addTorque((torque)*(-1));//*factor);
+
+////            if(chara->hierarchy[useHierarchy][i][chara->getPositionBody(joint->getChild())]){
+////                if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+////                    joint->getChild()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+////                else
+////                    joint->getChild()->addTorque((torque)*factor);
+////                if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3))
+////                    joint->getParent()->addTorque((torque)*(-1)*(1-getTorqueMaxCompensable(joint->getParent(),torque))*factor);
+////                else
+////                    joint->getParent()->addTorque((torque)*(-1)*factor);
+////            }else{
+////                if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3))
+////                    joint->getParent()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getParent(),torque))*factor);
+////                else
+////                    joint->getParent()->addTorque((torque)*factor);
+////                if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+////                    joint->getChild()->addTorque((torque)*(-1)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+////                else
+////                    joint->getChild()->addTorque((torque)*(-1)*factor);
+////            }
+//        }
+
+//    }
+    //evaluateSIMBICON();
+
+}
+
+void Balance::evaluateSIMBICON()
+{
+    //    /****************** Teste de SwingFoot *********************/
+
+    Vec wrenchSwing;
+    int foot_swing = Sensor::getSwingFoot(this->chara);
+    std::vector<Joint*> hier;
+    if (chara->getNumJoints()>0){
+        for(unsigned int i=0; i<6;i++){
+            hier.push_back(chara->getJoint(i));
+        }
+    }
+    else{
+        return;
+    }
+    //int aux;
+    int sta = Sensor::getStanceFoot(this->chara);
+
+    if (!(foot_swing<0) && sta>0){ //caso tenha um pé no ar
+        //Vec4 acom_;
+        //Vec4 bcom_;
+//        if((chara->getMoCap()->sizeFrames()>0)||(chara->getMoCap()->status)){
+//            acom_ = chara->getMoCap()->getPosCOM(frame);
+//            bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
+//        }
+        Vec4 a = chara->getPosCOM();
+        a.x2 = 0;
+        //Vec4 acom_ = chara->getMoCap()->getPosCOM(frame);
+        //acom_.x2 = 0;
+        //Vec4 bcom_ = chara->getMoCap()->getFrameMotion(frame)->getPosition(Sensor::getStanceFoot(this->chara));
+        //bcom_.x2 = 0;
+        //Vec4 distcom_ = (acom_-bcom_);
+        //distcom_.x2 = 0;
+        Vec4 b = chara->getBody(sta)->getPositionCurrent();
+        b.x2 = 0;
+        Vec4 dist_ = (a-b);
+        dist_.x2 = 0;
+        Vec4 vel_  = chara->getVelCOM();
+        vel_.x2 = 0;
+
+        //velCOM_moCap.x2 = 0;
+        //Object* pelvis = chara->getBody(7);
+        //Quaternion newq(Vec4(0,90,0));
+        Vec4 Fswing = Vec4(120,120,120).mult(dist_) + Vec4(50,50,50).mult(vel_);
+        printf("dist_ (%.3f,%.3f,%.3f)\n",dist_.x(),dist_.y(),dist_.z());
+        printf("vel_ (%.3f,%.3f,%.3f)\n",vel_.x(),vel_.y(),vel_.z());
+        printf("Fswing (%.3f,%.3f,%.3f)\n",Fswing.x(),Fswing.y(),Fswing.z());
+        Vec wrench = Vec(Vec4(),Fswing);
+        int l1,l2;
+//        if(foot_swing==2){
+//            l1 = 0;
+//            l2 = 2;
+//        }else{
+//            l1 = 3;
+//            l2 = 5;
+//        }
+        l1=0;l2=5;
+        //chara->clearVectorsGlobais();
+        for (unsigned int i=l1;i<l2+1;i++){
+            hier.push_back(chara->getJoint(i));
+        }
+        //hier = chara->getHierarchyJoint(pelvis,chara->getBody(foot_swing));
+        wrenchSwing = getJacobianLocomotion(hier,chara->getBody(foot_swing),wrench);
+        //printf("Size vector: %d",wrenchSwing.size());
+
+
+        float factor = 1.0;
+
+        int j = 0;
+        for (int i=l1;i<l2+1;i++){
+            Joint *joint = chara->getJoint(i);
+            Vec4 torque(wrenchSwing[j+j*5],wrenchSwing[j+1+j*5],wrenchSwing[j+2+j*5]);
+
+
+            //printf("Torque Joint %d - (%.3f,%.3f,%.3f)\n",j,torque.x(),torque.y(),torque.z());
+            //joint->getChild()->addTorque((torque));//*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+            //joint->getParent()->addTorque((torque)*(-1));//*factor);
+            int id_parent = chara->getIdObject(joint->getParent());
+            int id_child = chara->getIdObject(joint->getChild());
+            //if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+            //joint->getChild()->addTorque((torque));//*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+            //else
+            //joint->getParent()->addTorque((torque)*(-1));//*factor);
+
+            if(chara->hierarchy[useHierarchy][i][chara->getPositionBody(joint->getChild())]){
+                if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+                    joint->getChild()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+                else
+                    joint->getChild()->addTorque((torque)*factor);
+                if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3))
+                    joint->getParent()->addTorque((torque)*(-1)*(1-getTorqueMaxCompensable(joint->getParent(),torque))*factor);
+                else
+                    joint->getParent()->addTorque((torque)*(-1)*factor);
+            }else{
+                if (joint->getParent()->getFoot()&&(useHierarchy==0 || useHierarchy==id_parent+3))
+                    joint->getParent()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getParent(),torque))*factor);
+                else
+                    joint->getParent()->addTorque((torque)*factor);
+                if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3))
+                    joint->getChild()->addTorque((torque)*(-1)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
+                else
+                    joint->getChild()->addTorque((torque)*(-1)*factor);
+            }
+            j++;
+        }
+    }
+    velAnt = chara->getVelCOM();
+        /**************************************/
 
 }
 

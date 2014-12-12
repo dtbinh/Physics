@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
     connect(ui->infoShow,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowInfos(bool)));
     //manipuladores do movimento
-    connect(ui->toleranciaCOM,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setToleranceCOM(float)));
+    connect(ui->toleranciaCOM,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setToleranceCOM(double)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->iframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
@@ -189,6 +189,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->eulerz,SIGNAL(valueChanged(double)),this,SLOT(updateControlPD()));
 
     connect(ui->enablepd,SIGNAL(clicked(bool)),this,SLOT(updateControlPD()));
+
+    //manipuladores simbicon
+    connect(ui->xkDis,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconDistance()));
+    connect(ui->ykDis,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconDistance()));
+    connect(ui->zkDis,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconDistance()));
+
+    connect(ui->xkFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
+    connect(ui->ykFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
+    connect(ui->zkFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
+
 
 
     updateListObjects(ui->widgetPhysics->getObjectsList());
@@ -478,6 +488,18 @@ void MainWindow::setGravity(Vec4 v)
     ui->gravy->setValue(v.y());
     ui->gravz->setValue(v.z());
     //ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
+}
+
+void MainWindow::setSimbiconDistance()
+{
+    Vec4 g(ui->xkFor->value(),ui->ykFor->value(),ui->zkFor->value());
+    ui->widgetPhysics->setSimbiconForceParameters(g);
+}
+
+void MainWindow::setSimbiconForce()
+{
+    Vec4 g(ui->xkDis->value(),ui->ykDis->value(),ui->zkDis->value());
+    ui->widgetPhysics->setSimbiconDistanceParameters(g);
 }
 
 void MainWindow::checkFoot(bool b)

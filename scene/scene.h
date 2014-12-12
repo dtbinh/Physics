@@ -122,7 +122,15 @@ public:
     void                  setKMomLinearBalance(Vec4 kmom);
     Vec4                  getKMomAngularBalance();
     void                  setKMomAngularBalance(Vec4 kmom);
+    Vec4                  getKVelocityLocomotion();
+    void                  setKVelocityLocomotion(Vec4 k);
+    Vec4                  getKDistanceLocomotion();
+    void                  setKDistanceLocomotion(Vec4 k);
+    void                  setLimitSteps(int value);
+    int                   getLimitSteps();
+
     void                  setCompensacao(int value);
+
 
     void                  setAlphaCharacter(float val); //nao utilizado
     void                  setWireCharacter(bool b); //nao utilizado

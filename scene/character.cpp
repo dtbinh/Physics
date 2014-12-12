@@ -37,10 +37,44 @@ void Character::draw()
 {
     for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
         (*it)->draw(wire);
+        //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
     }
     for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
         (*it)->draw();
     }
+    bool sensor_use = false;
+    if(this->getMoCap()!=NULL){
+        if(this->getMoCap()->status) sensor_use = true;
+    }
+    if(sensor_use){
+    if (Sensor::getHierarchy2UseMocap(this)!=2){
+        if (Sensor::getHierarchy2UseMocap(this)==0){
+            for(int i=0;i<objects.size();i++)
+                if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+        }
+        else{
+            int v = Sensor::getHierarchy2UseMocap(this);
+            v -= 3;
+            if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+        }
+    }
+    }
+    else{
+        if (Sensor::getHierarchy2Use(this)!=2){
+            if (Sensor::getHierarchy2Use(this)==0){
+                for(int i=0;i<objects.size();i++)
+                    if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+            }
+            else{
+                int v = Sensor::getHierarchy2Use(this);
+                v -= 3;
+                if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+            }
+        }
+    }
+
+
+
     if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
 
     drawCOM();
@@ -484,7 +518,7 @@ void Character::setHierarchyMap(int pos)
       nos demais casos será considerado a matriz relativa a cada junta do persongem.
      ****/
 
-    //em todos os casos estamos considerando que a pelves é a raiz do modelo originalmente
+    //em todos os casos estamos considerando que a pelvis é a raiz do modelo originalmente
     //primeiro caso, onde todas os pés descritos no personagem estão em contato com o solo
     //ALL_FOOTS_GROUND
     if ( pos == ALL_FOOTS_GROUND ) {
@@ -515,7 +549,12 @@ void Character::setHierarchyMap(int pos)
             //invertendo o mapeamento realizado para essa junta
             if (in_posGroundPaw_chain) {
                 for (int j=0;j<this->getNumBodies();j++) {
-                    if(!(((j==9 || j==11 || j==13) && (i==0 || i==1 || i==2))||(((j==8 || j==10 || j==12) && (i==3 || i==4 || i==5)))))
+                    if((j==9 || j==11 || j==13) && (i==0 || i==1 || i==2)){
+                        this->hierarchy[pos+3][i][j] = true;
+                    }if((j==8 || j==10 || j==12) && (i==3 || i==4 || i==5)){
+                        this->hierarchy[pos+3][i][j] = true;
+                    }
+                    //if(!(((j==9 || j==11 || j==13) && (i==0 || i==1 || i==2))||(((j==8 || j==10 || j==12) && (i==3 || i==4 || i==5)))))
                         this->hierarchy[pos+3][i][j] = !this->hierarchy[pos+3][i][j];
 
                 }
@@ -523,6 +562,7 @@ void Character::setHierarchyMap(int pos)
         }
         //fim_for
     }
+    //this->hierarchy[0].print();
 
     //segundo caso, onde todas os pés descritos no personagem estão no ar com ordem inversa
     //FOOTS_AIR_INV
@@ -695,6 +735,7 @@ void Character::setHierarchyMap(int pos)
             }
         }
     }
+    //showHierarchies();
 
 }
 
@@ -702,7 +743,7 @@ void Character::showHierarchies()
 {
 
     if(hierarchy.size()==0) return;
-    for(int i=-3;i<this->getNumBodies()+2;i++){
+    for(int i=-3;i<-2;i++){
         printf("Corpo (%d):\n",i);
         for(int j=0;j<getNumJoints();j++){
             for(int k=0;k<getNumBodies();k++){
@@ -711,6 +752,13 @@ void Character::showHierarchies()
             }
             printf("\n");
         }
+    }
+}
+
+void Character::restartCollideWithGround()
+{
+    for(int i=0;i<this->objects.size();i++){
+        getBody(i)->setCollideWithGround(false);
     }
 }
 

@@ -7,14 +7,20 @@
 #include "physics/physics.h"
 
 #include "imageloader.h"
-
+#define SEGMENTS 30
 bool idraw_ground = false;
 int idrawGround;
 int idrawGround2;
 int slices = 50;
 int stacks = 50;
 GLuint _textureId; //The id of the textur
-
+#define SKYFRONT 0						// Give Front ID = 0
+#define SKYBACK  1						// Give Back  ID = 1
+#define SKYLEFT  2						// Give Left  ID = 2
+#define SKYRIGHT 3						// Give Right ID = 3
+#define SKYUP    4						// Give Up    ID = 4
+#define SKYDOWN  5						// Give Down  ID = 5
+GLuint SkyboxTexture[6];		// We need 6 textures for our Skybox
 //Makes the image into a texture, and returns the id of the texture
 GLuint loadTexture(Image* image) {
     GLuint textureId;
@@ -37,6 +43,8 @@ Draw::Draw()
 {
     Image* image = loadBMP("../texture/checker2.bmp");
     _textureId = loadTexture(image);
+
+
     delete image;
 }
 
@@ -334,27 +342,29 @@ void Draw::drawCOM(Vec4 position, float size, Vec4 color)
     GLUquadric *quad =gluNewQuadric();
 
     //Image* image = loadBMP("../texture/checker2.bmp");
-    if(yes)
+    if(yes){
     _textureId = loadTexture(loadBMP("../texture/checker2.bmp"));
     yes = false;
 
     //delete image;
 
 
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, _textureId);
+
 
     //Bottom
-    glPushMatrix();
+    //glPushMatrix();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_CLAMP_TO_EDGE);
 
-    glPopMatrix();
+    //glPopMatrix();
+    }
     glPushMatrix();
     //
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
 
     gluQuadricNormals(quad, GLU_SMOOTH);
     gluQuadricTexture(quad,1);
@@ -482,8 +492,6 @@ void Draw::drawGround(int size)
 //    if (!idraw_ground) idraw_ground = true;
 ***/
     //Novo
-
-
     glDisable(GL_LIGHTING);
     glLineWidth(3.0);
     glColor3f(0,0,0);
@@ -556,8 +564,251 @@ void Draw::drawGround(int size)
     glPopMatrix();
 
 
-   delete mat;
+    delete mat;
 
+}
+
+bool loadedtext = true;
+GLuint texName;
+Image *texture;
+void Draw::drawGroundTexture(int size, int text)
+{
+     glPushMatrix();
+    if (loadedtext){
+
+    QString end = "../texture/wood2.bmp";
+
+    //const char *name = end.toLatin1().constData();
+    //Image *texture = new Image(&name,100,100);
+    texture = loadBMP(end.toStdString().data());
+
+    glGenTextures(1, &texName);
+    glBindTexture(GL_TEXTURE_2D, texName);
+
+    //glBindTexture( GL_TEXTURE_2D, textName );
+
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glActiveTexture( GL_TEXTURE0 );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture->width,
+                texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                texture->pixels);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //glTexImage2D(GL_TEXTURE_2D, 0, texture_c, texture_w, texture_h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+    //              texture);
+
+    //glGenerateMipmap(texName);
+    loadedtext = false;
+    }
+    //texture = loadBMP("../texture/wood.bmp");
+//    if(loadedtext)
+//        texName = loadTexture(loadBMP("../texture/wood.bmp"));
+//    loadedtext = false;
+    //this->loadedtext = true;
+
+//    glDisable(GL_LIGHTING);
+//    glLineWidth(3.0);
+//    glColor3f(0,0,0);
+//    glBegin(GL_LINES);
+//    for(int i=-size;i<=size;i+=2){
+//        for(int j=-size;j<=size;j+=2){
+//            glVertex3f(i,0.000,j);
+//            glVertex3f(i,0.000,j+2);
+
+//            glVertex3f(i,0.000,j+2);
+//            glVertex3f(i+2,0.000,j+2);
+
+//            glVertex3f(i+2,0.000,j+2);
+//            glVertex3f(i+2,0.000,j);
+
+//            glVertex3f(i+2,0.000,j);
+//            glVertex3f(i,0.000,j);
+
+
+//        }
+//    }
+
+//    glEnd();
+//    glEnable(GL_LIGHTING);
+//    glDisable(GL_LIGHTING);
+//    glLineWidth(1.0);
+//    glBegin(GL_LINES);
+//    for(int i=-size;i<=size;i+=2){
+//        for(int j=-size;j<=size;j+=2){
+//            for (float k=i;k<i+2;k+=0.5)
+//                for(float l=j;l<j+2;l+=0.5){
+//                    glVertex3f(k,0.0001,l);
+//                    glVertex3f(k,0.0001,l+.5);
+
+//                    glVertex3f(k,0.0001,l+.5);
+//                    glVertex3f(k+.5,0.0001,l+.5);
+
+//                    glVertex3f(k+.5,0.0001,l+.5);
+//                    glVertex3f(k+.5,0.0001,l);
+
+//                    glVertex3f(k+.5,0.0001,l);
+//                    glVertex3f(k,0.0001,l);
+
+//                }
+
+//        }
+//    }
+
+//    glEnd();
+    glEnable(GL_LIGHTING);
+    Material *mat = new Material();
+    mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+    glPushMatrix();
+
+
+    glEnable(GL_TEXTURE_2D);
+    //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glBindTexture(GL_TEXTURE_2D, texName);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    glBegin(GL_QUADS);
+    for(int i=-size;i<=size;i+=2){
+        for(int j=-size;j<=size;j+=2){
+            glNormal3f(0,1,0);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(i,0,j);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(i,0,j+2);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(i+2,0,j+2);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(i+2,0,j);
+        }
+    }
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+    glPopMatrix();
+
+
+    delete mat;
+    //delete texture;
+    //delete texture;
+
+}
+
+void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size)
+{
+    Vec4 vertexs[SEGMENTS];
+    float alpha = 2*M_PI / SEGMENTS;
+    for (int i = 0;i<SEGMENTS;i++){
+            vertexs[i].setVec4(cos(alpha*i)*radius+center.x(),center.y(),sin(alpha*i)*radius+center.z());
+    }
+    glLineWidth(size);
+    glDisable(GL_LIGHTING);
+    glColor3f(color.x(),color.y(),color.z());
+    glBegin(GL_LINE_STRIP);
+    for (int i = 0;i<SEGMENTS;i++){
+        glVertex3f(vertexs[i].x(),vertexs[i].y(),vertexs[i].z());
+    }
+    glVertex3f(vertexs[0].x(),vertexs[0].y(),vertexs[0].z());
+    glEnd();
+
+    glEnable(GL_LIGHTING);
+}
+
+bool sky = true;
+
+void Draw::drawSkybox(Vec4 min, Vec4 max, int texture)
+{
+    // Center the Skybox around the given x,y,z position
+    if(sky){
+    BMP_Texture(SkyboxTexture,QString("../texture/skybox/Citadella2/front.bmp"),  SKYFRONT);
+    BMP_Texture(SkyboxTexture,QString("../texture/skybox/Citadella2/back.bmp"),   SKYBACK);
+    BMP_Texture(SkyboxTexture,QString("../texture/skybox/Citadella2/left.bmp"),   SKYLEFT);
+    BMP_Texture(SkyboxTexture,QString("../texture/skybox/Citadella2/right.bmp"),  SKYRIGHT);
+    BMP_Texture(SkyboxTexture,QString("../texture/skybox/Citadella2/up.bmp"),     SKYUP);
+    BMP_Texture(SkyboxTexture,QString("../texture/skybox/Citadella2/down.bmp"),   SKYDOWN);
+    }
+    sky = false;
+
+
+    float x = min.x(),y=min.y(),z=min.z();
+    float width=max.x(), height=max.y(), length=max.z();
+    x = x - width  / 2.;
+    y = y - height / 2;
+    z = z - length / 2;
+
+    glEnable(GL_LIGHTING);
+    Material *mat = new Material();
+    mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+        // Draw Front side
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYFRONT]);
+//        glBegin(GL_QUADS);
+//            glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y,		z+length);
+//            glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y+height, z+length);
+//            glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y+height, z+length);
+//            glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y,		z+length);
+//        glEnd();
+
+        // Draw Back side
+        glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYBACK]);
+        glBegin(GL_QUADS);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y,		z);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y+height, z);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y+height,	z);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y,		z);
+        glEnd();
+
+        // Draw Left side
+        glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYLEFT]);
+        glBegin(GL_QUADS);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y+height,	z);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y+height,	z+length);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y,		z+length);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y,		z);
+        glEnd();
+
+        // Draw Right side
+        glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYRIGHT]);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y,		z);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y,		z+length);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y+height,	z+length);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y+height,	z);
+        glEnd();
+
+        // Draw Up side
+        glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYUP]);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(x+width, y+height, z);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(x+width, y+height, z+length);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(x,		  y+height,	z+length);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(x,		  y+height,	z);
+        glEnd();
+
+        // Draw Down side
+        glBindTexture(GL_TEXTURE_2D, SkyboxTexture[SKYDOWN]);
+        glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(x,		  y,		z);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f(x,		  y,		z+length);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f(x+width, y,		z+length);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(x+width, y,		z);
+        glEnd();
+        delete mat;
 }
 
 void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
@@ -1134,5 +1385,33 @@ void Draw::setTransformODE(const dReal *pos, const dReal *R)
       matrix[14]=pos[2];
       matrix[15]=1;
 
-    glMultMatrixf (matrix);
+      glMultMatrixf (matrix);
+}
+
+void Draw::drawText(QString text, int x, int y)
+{
+
+    glDisable(GL_LIGHTING);
+    glColor3f(1,1,1);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, 800, 0.0, 600);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glRasterPos2f(x, y);
+
+    int k = 0;
+    while (k<text.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,text.at(k).toLatin1());
+        k++;
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 }

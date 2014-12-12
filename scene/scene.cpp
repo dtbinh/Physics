@@ -124,6 +124,7 @@ double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
 timeval tempo_inicio;
 void Scene::simulationStep()
 {
+
     if(!sim_status) return;
     Vec4 vel_des= Vec4();
     Vec4 mom_lin_des= Vec4();
@@ -243,6 +244,7 @@ void Scene::simulationStep()
  objs.clear();
  jts.clear();
 
+
 }
 
 void Scene::draw()
@@ -257,6 +259,7 @@ void Scene::draw()
     }
     for(std::vector<Object*>::iterator it = objects.begin(); it!= objects.end(); it++){
         (*it)->draw();
+
     }
     for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
         (*it)->draw();
@@ -270,8 +273,16 @@ void Scene::draw()
             }
         objs.clear();
     }
-    if (characters.size()>0)
-       if (show_grf) GRF::drawGRF(groundForces,getCharacter(0)->getPosCOM());
+    if (show_grf)
+//    if (characters.size()>0){
+//        for(int i=0;i<getCharacter(0)->getNumBodies();i++){
+//            if(getCharacter(0)->getBody(i)->getFoot()){
+//                GRF::drawGRFObject(groundForces,getCharacter(0)->getBody(i));
+//            }
+//        }
+//    }
+        if (show_grf) GRF::drawGRF(groundForces,Vec4());
+
 
     //Draw::drawPoint(Vec4(0,7,0));
 
@@ -852,6 +863,48 @@ void Scene::setKMomAngularBalance(Vec4 kmom)
     if (characters.at(0)->getBalance()==NULL) return;
     characters.at(0)->getBalance()->setKMomentumAngular(kmom);
 
+}
+
+Vec4 Scene::getKVelocityLocomotion()
+{
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKVelocityLocomotion();
+}
+
+void Scene::setKVelocityLocomotion(Vec4 k)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setKVelocityLocomotion(k);
+}
+
+Vec4 Scene::getKDistanceLocomotion()
+{
+    if (characters.size()==0) return Vec4();
+    if (characters.at(0)->getBalance()==NULL) return Vec4();
+    return characters.at(0)->getBalance()->getKDistanceLocomotion();
+}
+
+void Scene::setKDistanceLocomotion(Vec4 k)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setKDistanceLocomotion(k);
+}
+
+void Scene::setLimitSteps(int value)
+{
+    if (characters.size()==0) return;
+    if (characters.at(0)->getBalance()==NULL) return;
+    characters.at(0)->getBalance()->setLimitSteps(value);
+}
+
+int Scene::getLimitSteps()
+{
+    if (characters.size()==0) return 0;
+    if (characters.at(0)->getBalance()==NULL) return 0;
+    return characters.at(0)->getBalance()->getLimitSteps();
 }
 
 void Scene::setCompensacao(int value)

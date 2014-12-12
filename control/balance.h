@@ -20,6 +20,7 @@ class Balance
     Vec4       kdForce;
     Vec4       kDist;    //parâmetros da distância na locomoção
     Vec4       kVel;     //parâmetros da velocidade de locomoção
+    Vec4       velAnt;
 
     Vec4       kmomlin;
     Vec4       kmomang;
@@ -32,6 +33,7 @@ class Balance
     bool       enable_balance;
     int        useHierarchy;
     int        steps;
+    int        limitsteps;
     //estratégia de cone de fricção
 
     float angle;     //angulo do cone
@@ -64,12 +66,10 @@ public:
     void setKsForce(Vec4 ksf);
     Vec4 getKdForce();
     void setKdForce(Vec4 kdf);
-    Vec4 getKVelocityLocomotion();
-    void setKVelocityLocomotion(Vec4 k);
-    Vec4 getKDistanceLocomotion();
-    void setKDistanceLocomotion(Vec4 k);
+
     Vec4 getKMomentumLinear();
     Vec4 getKMomentumAngular();
+
     Quaternion getDesiredQuaternion();
 
     void setDeriredQuaternion(Vec4 euler);
@@ -89,6 +89,14 @@ public:
     void setHeightCone(float val);
     float getAngleCone();
     void setAngleCone(float val);
+    //discretização do deslocamento do com
+    void setLimitSteps(int value);
+    int getLimitSteps();
+    //constantes do Simbicon
+    Vec4 getKVelocityLocomotion();
+    void setKVelocityLocomotion(Vec4 k);
+    Vec4 getKDistanceLocomotion();
+    void setKDistanceLocomotion(Vec4 k);
 
 
     float getTorqueMaxCompensable(Object* foot,Vec4 torque);
@@ -102,6 +110,7 @@ public:
     Vec4 limitingTorque(Vec4 lim_inf,Vec4 lim_sup, Vec4 torque);
     Vec4 limitingTorque(float x, Vec4 torque);
     void evaluate(Joint* jDes,float mass_total,int frame = -1,Quaternion qdesired=Quaternion(),Vec4 vel_ang_des=Vec4(), Vec4 velCOM_moCap=Vec4(),Vec4 mom_lin_des=Vec4(),Vec4 mom_ang_des=Vec4()); //executa a rotina de tratamento do equilíbrio
+    void evaluateSIMBICON();
     void setEnableBalance(bool b);
 };
 

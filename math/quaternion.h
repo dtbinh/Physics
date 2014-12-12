@@ -87,6 +87,7 @@ class Quaternion
       //converte o quaternion em eixo e angulo (passados por referencia)
       void toAxisAngle( Vec4* axis, dReal* angle );
 
+
       //converte eixo e angulo em um quaternion e atribui a this
       void fromAxisAngle( Vec4 axis, dReal angle );
       void showQuaternion();

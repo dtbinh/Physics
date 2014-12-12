@@ -5,6 +5,7 @@
 #include "math/vec4.h"
 #include "scene/object.h"
 
+
 #include <vector>
 class GRF{
 public:
@@ -16,6 +17,7 @@ public:
   GRF();
   GRF(Vec4 pos,dJointFeedback* joint,int id);
   static void drawGRF(std::vector<GRF> grfs,Vec4 target); //usualmente target é o COM
+  static void drawGRFObject(std::vector<GRF> grfs,Object* obj); //usualmente target é o COM
   static Vec4 forcesGRF(std::vector<GRF> grfs,Object* obj);
   static Vec4 positionGRF(std::vector<GRF> grfs,Object* obj);
   static std::vector<GRF> forcesGRF2Object(std::vector<GRF> grfs,Object* obj);

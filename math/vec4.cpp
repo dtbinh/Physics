@@ -163,6 +163,6 @@ void Vec4::normalize()
 
 Vec4 Vec4::projXZ()
 {
-    Vec4 r(this->x(),0,this->y());
+    Vec4 r(this->x(),0,this->z());
     return r;
 }

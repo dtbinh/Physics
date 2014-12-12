@@ -79,6 +79,7 @@ public:
     void           contructHierarchyBodies();
     void           setHierarchyMap(int i);
     void           showHierarchies();
+    void           restartCollideWithGround();
     void           loadMotionFrames();
     void           clearVectorsGlobais();
     std::vector<Joint*> getHierarchyJoint(Object* begin, Object* end);
@@ -90,6 +91,7 @@ public:
     Object*        getObjectSelected();
 
     Vec4 getOffset();
+
 
 
 

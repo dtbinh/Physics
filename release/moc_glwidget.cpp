@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'glwidget.h'
 **
-** Created: Fri Jun 13 13:22:49 2014
+** Created: Tue Dec 9 14:59:45 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_GLWidget[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      74,   14, // methods
+      76,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -65,48 +65,50 @@ static const uint qt_meta_data_GLWidget[] = {
      729,  431,    9,    9, 0x0a,
      749,  431,    9,    9, 0x0a,
      767,  641,    9,    9, 0x0a,
-     790,  557,    9,    9, 0x0a,
-     824,  557,    9,    9, 0x0a,
-     864,  858,    9,    9, 0x0a,
-     888,    9,    9,    9, 0x0a,
-     905,    9,    9,    9, 0x0a,
-     929,  923,    9,    9, 0x0a,
-     948,  946,    9,    9, 0x0a,
-     975,  496,    9,    9, 0x0a,
-     995,  992,    9,    9, 0x0a,
-    1022, 1019,    9,    9, 0x0a,
-    1078, 1046,    9,    9, 0x0a,
-    1127,  496,    9,    9, 0x0a,
-    1156,  496,    9,    9, 0x0a,
-    1184,  641,    9,    9, 0x0a,
-    1212,  431,    9,    9, 0x0a,
-    1238,  496,    9,    9, 0x0a,
-    1269,  496,    9,    9, 0x0a,
-    1295,  641,    9,    9, 0x0a,
-    1313,  641,    9,    9, 0x0a,
-    1330,  641,    9,    9, 0x0a,
-    1352,  641,    9,    9, 0x0a,
-    1374,  641,    9,    9, 0x0a,
-    1397, 1395,    9,    9, 0x0a,
-    1426, 1395,    9,    9, 0x0a,
-    1476,    9, 1455,    9, 0x0a,
-    1513,    9, 1493,    9, 0x0a,
-    1533, 1529,    9,    9, 0x0a,
-    1564, 1529, 1556,    9, 0x0a,
-    1579,  496,    9,    9, 0x0a,
-    1599, 1529,    9,    9, 0x0a,
-    1621,  557,    9,    9, 0x0a,
-    1640,  557,    9,    9, 0x0a,
-    1668, 1663,    9,    9, 0x0a,
-    1691,  496,    9,    9, 0x0a,
-    1711,  496,    9,    9, 0x0a,
-    1728,  496,    9,    9, 0x0a,
-    1747,    9,    9,    9, 0x0a,
-    1759,    9,    9,    9, 0x0a,
-    1782, 1776,    9,    9, 0x0a,
-    1805,    9,    9,    9, 0x0a,
-    1827,    9,    9,    9, 0x0a,
-    1847,    9,    9,    9, 0x08,
+     791,  557,    9,    9, 0x0a,
+     825,  557,    9,    9, 0x0a,
+     865,  859,    9,    9, 0x0a,
+     889,    9,    9,    9, 0x0a,
+     906,    9,    9,    9, 0x0a,
+     930,  924,    9,    9, 0x0a,
+     949,  947,    9,    9, 0x0a,
+     976,  947,    9,    9, 0x0a,
+    1009,  947,    9,    9, 0x0a,
+    1045,  496,    9,    9, 0x0a,
+    1065, 1062,    9,    9, 0x0a,
+    1092, 1089,    9,    9, 0x0a,
+    1148, 1116,    9,    9, 0x0a,
+    1197,  496,    9,    9, 0x0a,
+    1226,  496,    9,    9, 0x0a,
+    1254,  641,    9,    9, 0x0a,
+    1282,  431,    9,    9, 0x0a,
+    1308,  496,    9,    9, 0x0a,
+    1339,  496,    9,    9, 0x0a,
+    1365,  641,    9,    9, 0x0a,
+    1383,  641,    9,    9, 0x0a,
+    1400,  641,    9,    9, 0x0a,
+    1422,  641,    9,    9, 0x0a,
+    1444,  641,    9,    9, 0x0a,
+    1467, 1465,    9,    9, 0x0a,
+    1496, 1465,    9,    9, 0x0a,
+    1546,    9, 1525,    9, 0x0a,
+    1583,    9, 1563,    9, 0x0a,
+    1603, 1599,    9,    9, 0x0a,
+    1634, 1599, 1626,    9, 0x0a,
+    1649,  496,    9,    9, 0x0a,
+    1669, 1599,    9,    9, 0x0a,
+    1691,  557,    9,    9, 0x0a,
+    1710,  557,    9,    9, 0x0a,
+    1738, 1733,    9,    9, 0x0a,
+    1761,  496,    9,    9, 0x0a,
+    1781,  496,    9,    9, 0x0a,
+    1798,  496,    9,    9, 0x0a,
+    1817,    9,    9,    9, 0x0a,
+    1829,    9,    9,    9, 0x0a,
+    1852, 1846,    9,    9, 0x0a,
+    1875,    9,    9,    9, 0x0a,
+    1897,    9,    9,    9, 0x0a,
+    1917,    9,    9,    9, 0x08,
 
        0        // eod
 };
@@ -132,15 +134,17 @@ static const char qt_meta_stringdata_GLWidget[] = {
     "setPlayback(bool)\0restartMotion()\0"
     "showEditingFrame(bool)\0frame\0"
     "setEditingFrame(int)\0setBeginClycle(int)\0"
-    "setEndClycle(int)\0setToleranceCOM(float)\0"
+    "setEndClycle(int)\0setToleranceCOM(double)\0"
     "saveSimulationParameters(QString)\0"
     "loadSimulationParameters(QString)\0"
     "steps\0SimStepsSimulation(int)\0"
     "stopSimulation()\0startSimulation()\0"
     "force\0applyForce(Vec4)\0g\0"
-    "setGravityParameters(Vec4)\0setGravity(bool)\0"
-    "ks\0setProportionalKs(Vec4)\0kd\0"
-    "setProportionalKd(Vec4)\0"
+    "setGravityParameters(Vec4)\0"
+    "setSimbiconForceParameters(Vec4)\0"
+    "setSimbiconDistanceParameters(Vec4)\0"
+    "setGravity(bool)\0ks\0setProportionalKs(Vec4)\0"
+    "kd\0setProportionalKd(Vec4)\0"
     "ksT,kdT,ksF,kdF,kmomlin,kmomang\0"
     "setBalanceControl(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4)\0"
     "setEnableTorqueBalance(bool)\0"
@@ -203,7 +207,7 @@ void GLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 28: _t->setEditingFrame((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 29: _t->setBeginClycle((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 30: _t->setEndClycle((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 31: _t->setToleranceCOM((*reinterpret_cast< float(*)>(_a[1]))); break;
+        case 31: _t->setToleranceCOM((*reinterpret_cast< double(*)>(_a[1]))); break;
         case 32: _t->saveSimulationParameters((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 33: _t->loadSimulationParameters((*reinterpret_cast< QString(*)>(_a[1]))); break;
         case 34: _t->SimStepsSimulation((*reinterpret_cast< int(*)>(_a[1]))); break;
@@ -211,44 +215,46 @@ void GLWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 36: _t->startSimulation(); break;
         case 37: _t->applyForce((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
         case 38: _t->setGravityParameters((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 39: _t->setGravity((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 40: _t->setProportionalKs((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 41: _t->setProportionalKd((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 42: _t->setBalanceControl((*reinterpret_cast< Vec4(*)>(_a[1])),(*reinterpret_cast< Vec4(*)>(_a[2])),(*reinterpret_cast< Vec4(*)>(_a[3])),(*reinterpret_cast< Vec4(*)>(_a[4])),(*reinterpret_cast< Vec4(*)>(_a[5])),(*reinterpret_cast< Vec4(*)>(_a[6]))); break;
-        case 43: _t->setEnableTorqueBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 44: _t->setEnableForceBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 45: _t->setCompensationBalance((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 46: _t->setAngleBodyBalance((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 47: _t->setEnableMomentumBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 48: _t->setKsRelationshipKs((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 49: _t->setLimitCone((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 50: _t->setMCone((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 51: _t->setRadiusCone((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 52: _t->setHeightCone((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 53: _t->setAngleCone((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 54: _t->setKVelocityLocomotion((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 55: _t->setKDistanceLocomotion((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 56: { std::vector<Object*> _r = _t->getObjectsList();
+        case 39: _t->setSimbiconForceParameters((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 40: _t->setSimbiconDistanceParameters((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 41: _t->setGravity((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 42: _t->setProportionalKs((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 43: _t->setProportionalKd((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 44: _t->setBalanceControl((*reinterpret_cast< Vec4(*)>(_a[1])),(*reinterpret_cast< Vec4(*)>(_a[2])),(*reinterpret_cast< Vec4(*)>(_a[3])),(*reinterpret_cast< Vec4(*)>(_a[4])),(*reinterpret_cast< Vec4(*)>(_a[5])),(*reinterpret_cast< Vec4(*)>(_a[6]))); break;
+        case 45: _t->setEnableTorqueBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 46: _t->setEnableForceBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 47: _t->setCompensationBalance((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 48: _t->setAngleBodyBalance((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 49: _t->setEnableMomentumBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 50: _t->setKsRelationshipKs((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 51: _t->setLimitCone((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 52: _t->setMCone((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 53: _t->setRadiusCone((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 54: _t->setHeightCone((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 55: _t->setAngleCone((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 56: _t->setKVelocityLocomotion((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 57: _t->setKDistanceLocomotion((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
+        case 58: { std::vector<Object*> _r = _t->getObjectsList();
             if (_a[0]) *reinterpret_cast< std::vector<Object*>*>(_a[0]) = _r; }  break;
-        case 57: { std::vector<Joint*> _r = _t->getJointsList();
+        case 59: { std::vector<Joint*> _r = _t->getJointsList();
             if (_a[0]) *reinterpret_cast< std::vector<Joint*>*>(_a[0]) = _r; }  break;
-        case 58: _t->setObjectSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 59: { Object* _r = _t->getObject((*reinterpret_cast< int(*)>(_a[1])));
+        case 60: _t->setObjectSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 61: { Object* _r = _t->getObject((*reinterpret_cast< int(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< Object**>(_a[0]) = _r; }  break;
-        case 60: _t->showCharacter((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 61: _t->setJointSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 62: _t->loadScene((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 63: _t->saveCharacter((*reinterpret_cast< QString(*)>(_a[1]))); break;
-        case 64: _t->setWireCharacter((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 65: _t->setShowShadow((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 66: _t->setShowGRF((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 67: _t->setShowMoCap((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 68: _t->drawScene(); break;
-        case 69: _t->drawParameters(); break;
-        case 70: _t->setAlphaCharacter((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 71: _t->simulationPlayPause(); break;
-        case 72: _t->simulationRestart(); break;
-        case 73: _t->simStep(); break;
+        case 62: _t->showCharacter((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 63: _t->setJointSelected((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 64: _t->loadScene((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 65: _t->saveCharacter((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 66: _t->setWireCharacter((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 67: _t->setShowShadow((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 68: _t->setShowGRF((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 69: _t->setShowMoCap((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 70: _t->drawScene(); break;
+        case 71: _t->drawParameters(); break;
+        case 72: _t->setAlphaCharacter((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 73: _t->simulationPlayPause(); break;
+        case 74: _t->simulationRestart(); break;
+        case 75: _t->simStep(); break;
         default: ;
         }
     }
@@ -286,9 +292,9 @@ int GLWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 74)
+        if (_id < 76)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 74;
+        _id -= 76;
     }
     return _id;
 }

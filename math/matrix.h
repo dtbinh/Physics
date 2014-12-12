@@ -32,6 +32,7 @@ class Matrix
 
         void print(int n_cols_block = 10);
 
+
         Matrix operator=(Matrix N) { set(N); return *this; }
         Matrix operator*(Matrix& N);
         Matrix operator*(double s);

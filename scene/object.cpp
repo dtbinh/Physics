@@ -368,6 +368,16 @@ bool Object::getBodyBalance()
     return bodyBalance;
 }
 
+void Object::setCollideWithGround(bool b)
+{
+    collide_ground = b;
+}
+
+bool Object::isCollideWithGround()
+{
+    return collide_ground;
+}
+
 //---------------------Geometry
 
 void Object::setMaterial(int m)

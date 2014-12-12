@@ -51,7 +51,7 @@ public slots:
     void setEditingFrame(int frame);
     void setBeginClycle(int v);
     void setEndClycle(int v);
-    void setToleranceCOM(float val);
+    void setToleranceCOM(double val);
 
     //slots scene
     void saveSimulationParameters(QString file);
@@ -63,6 +63,8 @@ public slots:
     void startSimulation();
     void applyForce(Vec4 force);
     void setGravityParameters(Vec4 g);
+    void setSimbiconForceParameters(Vec4 g);
+    void setSimbiconDistanceParameters(Vec4 g);
     void setGravity(bool b);
 
 

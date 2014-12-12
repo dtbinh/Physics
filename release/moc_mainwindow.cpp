@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Fri Mar 21 15:12:31 2014
+** Created: Tue Dec 9 14:59:44 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      62,   14, // methods
+      64,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -50,49 +50,51 @@ static const uint qt_meta_data_MainWindow[] = {
      554,   11,   11,   11, 0x0a,
      567,   11,   11,   11, 0x0a,
      584,   11,   11,   11, 0x0a,
-     600,   11,   11,   11, 0x0a,
-     623,   11,   11,   11, 0x0a,
-     647,   11,   11,   11, 0x0a,
-     669,   11,   11,   11, 0x0a,
-     694,   11,   11,   11, 0x0a,
-     720,  528,   11,   11, 0x0a,
-     749,   11,   11,   11, 0x0a,
-     772,   11,   11,   11, 0x0a,
-     796,   11,   11,   11, 0x0a,
-     818,  816,   11,   11, 0x0a,
-     840,  838,   11,   11, 0x0a,
-     864,   11,   11,   11, 0x0a,
-     883,   11,   11,   11, 0x0a,
-     903,   11,   11,   11, 0x08,
-     946,   11,   11,   11, 0x08,
-     986,   11,   11,   11, 0x08,
-    1018,   11,   11,   11, 0x08,
-    1050,   11,   11,   11, 0x08,
-    1082,   11,   11,   11, 0x08,
-    1104,   11,   11,   11, 0x08,
-    1126,   11,   11,   11, 0x08,
-    1150,   11,   11,   11, 0x08,
-    1180,   11,   11,   11, 0x08,
-    1210,   11,   11,   11, 0x08,
-    1247,   11,   11,   11, 0x08,
-    1292, 1284,   11,   11, 0x08,
-    1323, 1318,   11,   11, 0x08,
-    1356, 1318,   11,   11, 0x08,
-    1389, 1318,   11,   11, 0x08,
-    1423, 1318,   11,   11, 0x08,
-    1457, 1318,   11,   11, 0x08,
-    1493, 1318,   11,   11, 0x08,
-    1529, 1318,   11,   11, 0x08,
-    1563, 1318,   11,   11, 0x08,
-    1597, 1318,   11,   11, 0x08,
-    1629, 1318,   11,   11, 0x08,
-    1661, 1318,   11,   11, 0x08,
-    1689, 1318,   11,   11, 0x08,
-    1717, 1318,   11,   11, 0x08,
-    1745, 1318,   11,   11, 0x08,
-    1773, 1318,   11,   11, 0x08,
-    1808, 1318,   11,   11, 0x08,
-    1843, 1318,   11,   11, 0x08,
+     606,   11,   11,   11, 0x0a,
+     625,   11,   11,   11, 0x0a,
+     641,   11,   11,   11, 0x0a,
+     664,   11,   11,   11, 0x0a,
+     688,   11,   11,   11, 0x0a,
+     710,   11,   11,   11, 0x0a,
+     735,   11,   11,   11, 0x0a,
+     761,  528,   11,   11, 0x0a,
+     790,   11,   11,   11, 0x0a,
+     813,   11,   11,   11, 0x0a,
+     837,   11,   11,   11, 0x0a,
+     859,  857,   11,   11, 0x0a,
+     881,  879,   11,   11, 0x0a,
+     905,   11,   11,   11, 0x0a,
+     924,   11,   11,   11, 0x0a,
+     944,   11,   11,   11, 0x08,
+     987,   11,   11,   11, 0x08,
+    1027,   11,   11,   11, 0x08,
+    1059,   11,   11,   11, 0x08,
+    1091,   11,   11,   11, 0x08,
+    1123,   11,   11,   11, 0x08,
+    1145,   11,   11,   11, 0x08,
+    1167,   11,   11,   11, 0x08,
+    1191,   11,   11,   11, 0x08,
+    1221,   11,   11,   11, 0x08,
+    1251,   11,   11,   11, 0x08,
+    1288,   11,   11,   11, 0x08,
+    1333, 1325,   11,   11, 0x08,
+    1364, 1359,   11,   11, 0x08,
+    1397, 1359,   11,   11, 0x08,
+    1430, 1359,   11,   11, 0x08,
+    1464, 1359,   11,   11, 0x08,
+    1498, 1359,   11,   11, 0x08,
+    1534, 1359,   11,   11, 0x08,
+    1570, 1359,   11,   11, 0x08,
+    1604, 1359,   11,   11, 0x08,
+    1638, 1359,   11,   11, 0x08,
+    1670, 1359,   11,   11, 0x08,
+    1702, 1359,   11,   11, 0x08,
+    1730, 1359,   11,   11, 0x08,
+    1758, 1359,   11,   11, 0x08,
+    1786, 1359,   11,   11, 0x08,
+    1814, 1359,   11,   11, 0x08,
+    1849, 1359,   11,   11, 0x08,
+    1884, 1359,   11,   11, 0x08,
 
        0        // eod
 };
@@ -113,7 +115,8 @@ static const char qt_meta_stringdata_MainWindow[] = {
     "updateSelectedObject()\0"
     "updateControlPDPositional()\0i\0"
     "showSelectedObject(int)\0setGravity()\0"
-    "setGravity(Vec4)\0checkFoot(bool)\0"
+    "setGravity(Vec4)\0setSimbiconDistance()\0"
+    "setSimbiconForce()\0checkFoot(bool)\0"
     "checkBodyBalance(bool)\0checkShowEffector(bool)\0"
     "checkShowTarget(bool)\0checkFrameFootLeft(bool)\0"
     "checkFrameFootRight(bool)\0"
@@ -177,50 +180,52 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 15: _t->showSelectedObject((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 16: _t->setGravity(); break;
         case 17: _t->setGravity((*reinterpret_cast< Vec4(*)>(_a[1]))); break;
-        case 18: _t->checkFoot((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 19: _t->checkBodyBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 20: _t->checkShowEffector((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 21: _t->checkShowTarget((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 22: _t->checkFrameFootLeft((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 23: _t->checkFrameFootRight((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 24: _t->showPropertiesFootFrame((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 25: _t->checkEnabledCPDP((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 26: _t->checkHasCoffeeCup((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 27: _t->applyForce2Object(); break;
-        case 28: _t->setMaxTimeLine((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 29: _t->adjustTolerance((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 30: _t->plusFrameEdition(); break;
-        case 31: _t->minusFrameEdition(); break;
-        case 32: _t->on_actionPlay_Pause_Simulation_triggered(); break;
-        case 33: _t->on_actionRestart_Simulation_triggered(); break;
-        case 34: _t->on_actionOpen_Model_activated(); break;
-        case 35: _t->on_actionOpen_MoCap_triggered(); break;
-        case 36: _t->on_actionSave_Model_triggered(); break;
-        case 37: _t->on_btnStart_clicked(); break;
-        case 38: _t->on_btnPause_clicked(); break;
-        case 39: _t->on_btnRestart_clicked(); break;
-        case 40: _t->on_saveEditingFrame_clicked(); break;
-        case 41: _t->on_loadEditedFrames_clicked(); break;
-        case 42: _t->on_actionSave_Simulation_triggered(); break;
-        case 43: _t->on_actionOpen_Simulation_triggered(); break;
-        case 44: _t->on_checkBox_clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 45: _t->on_xksTqBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 46: _t->on_xkdTqBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 47: _t->on_xksForBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 48: _t->on_xkdForBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 49: _t->on_xkmomlinBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 50: _t->on_xkmomangBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 51: _t->on_xksPdProp_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 52: _t->on_xkdPdProp_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 53: _t->on_posx_ks_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 54: _t->on_posx_kd_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 55: _t->on_ksx_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 56: _t->on_kdx_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 57: _t->on_ksy_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 58: _t->on_ksz_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
-        case 59: _t->on_angleBalBodyy_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 60: _t->on_angleBalBodyx_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 61: _t->on_angleBalBodyz_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 18: _t->setSimbiconDistance(); break;
+        case 19: _t->setSimbiconForce(); break;
+        case 20: _t->checkFoot((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 21: _t->checkBodyBalance((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 22: _t->checkShowEffector((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 23: _t->checkShowTarget((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 24: _t->checkFrameFootLeft((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 25: _t->checkFrameFootRight((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 26: _t->showPropertiesFootFrame((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 27: _t->checkEnabledCPDP((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 28: _t->checkHasCoffeeCup((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 29: _t->applyForce2Object(); break;
+        case 30: _t->setMaxTimeLine((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 31: _t->adjustTolerance((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 32: _t->plusFrameEdition(); break;
+        case 33: _t->minusFrameEdition(); break;
+        case 34: _t->on_actionPlay_Pause_Simulation_triggered(); break;
+        case 35: _t->on_actionRestart_Simulation_triggered(); break;
+        case 36: _t->on_actionOpen_Model_activated(); break;
+        case 37: _t->on_actionOpen_MoCap_triggered(); break;
+        case 38: _t->on_actionSave_Model_triggered(); break;
+        case 39: _t->on_btnStart_clicked(); break;
+        case 40: _t->on_btnPause_clicked(); break;
+        case 41: _t->on_btnRestart_clicked(); break;
+        case 42: _t->on_saveEditingFrame_clicked(); break;
+        case 43: _t->on_loadEditedFrames_clicked(); break;
+        case 44: _t->on_actionSave_Simulation_triggered(); break;
+        case 45: _t->on_actionOpen_Simulation_triggered(); break;
+        case 46: _t->on_checkBox_clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 47: _t->on_xksTqBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 48: _t->on_xkdTqBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 49: _t->on_xksForBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 50: _t->on_xkdForBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 51: _t->on_xkmomlinBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 52: _t->on_xkmomangBal_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 53: _t->on_xksPdProp_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 54: _t->on_xkdPdProp_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 55: _t->on_posx_ks_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 56: _t->on_posx_kd_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 57: _t->on_ksx_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 58: _t->on_kdx_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 59: _t->on_ksy_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 60: _t->on_ksz_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
+        case 61: _t->on_angleBalBodyy_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 62: _t->on_angleBalBodyx_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 63: _t->on_angleBalBodyz_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -258,9 +263,9 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 62)
+        if (_id < 64)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 62;
+        _id -= 64;
     }
     return _id;
 }

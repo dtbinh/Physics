@@ -34,6 +34,8 @@ public slots:
     void showSelectedObject(int i);
     void setGravity();
     void setGravity(Vec4);
+    void setSimbiconDistance();
+    void setSimbiconForce();
     void checkFoot(bool);
     void checkBodyBalance(bool);
     void checkShowEffector(bool);

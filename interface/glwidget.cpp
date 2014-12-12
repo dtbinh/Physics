@@ -279,6 +279,9 @@ GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
 {
     setFocusPolicy(Qt::StrongFocus);
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_POLYGON_SMOOTH);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_STENCIL_FUNC);
     scene = new Scene(this);
@@ -313,11 +316,17 @@ void GLWidget::initializeGL()
 {
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+    //glEnable(GL_MULTISAMPLE_ARB);
+    //glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
 
-
+    glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
+    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);				// Black Background
+    glClearDepth(1.0f);									// Depth Buffer Setup
+    glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+    glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
     glShadeModel(GL_SMOOTH);
     //glEnable(GL_COLOR_MATERIAL);
 
@@ -376,6 +385,7 @@ void GLWidget::initializeGL()
     glEnable (GL_POINT_SMOOTH);
 glEnable(GL_TEXTURE_2D);
 glEnable(GL_BLEND);
+    glCullFace(GL_FRONT);
 
     //glEnable(GL_COLOR_MATERIAL);
 //    glEnable(GL_NORMALIZE);
@@ -421,25 +431,13 @@ void GLWidget::drawScene(){
 
     glPushMatrix();
 
-//    glPushMatrix();
-//    QPainter novo(this);
-//    //novo.compositionMode();
-//    //glColor3f(1,0,0);
-//    //glScalef(1,1,1);
-//    QPoint p(300,300);
-//    QString t("OpengL");
-//    novo.drawText(p,t);
-//    glPopMatrix();
-//    novo.resetMatrix();
-
-
-
-    glPushMatrix();
         glTranslated(-0.20,-0.135,-0.6);
         gluLookAt(cam->eye.x(),cam->eye.y(),cam->eye.z(), cam->at.x(),cam->at.y(),cam->at.z(), cam->up.x(),cam->up.y(),cam->up.z());
         glTranslated(cam->eye.x(),cam->eye.y(),cam->eye.z());
         Draw::drawAxisCameraView(0.02);
     glPopMatrix();
+    glPushMatrix();
+
 
     glColor3f(1,1,0);
     QString text = QString("Lock Axis: ");
@@ -453,7 +451,7 @@ void GLWidget::drawScene(){
         renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"),2000);
  //   glPushMatrix();
 
-//glPopMatrix();
+    glPopMatrix();
 
     gluLookAt(cam->eye.x1,cam->eye.x2,cam->eye.x3, cam->at.x1,cam->at.x2,cam->at.x3, cam->up.x1,cam->up.x2,cam->up.x3);
 
@@ -462,14 +460,16 @@ void GLWidget::drawScene(){
     if (shadow) drawShadows();
     if (!sim_pause) if (load_exemple_curve) showCurveExample();
     if (show_character){
+
         scene->draw();
+
         if(!capture_pause)
             if(scene->getSizeCharacter()!=0)
                 if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
                     motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
         if (scene->getExternalForce().module()!=0)
             ciclo++;
-        if (ciclo>20){
+        if (ciclo>30){
             scene->setExternalForce(Vec4(0,0,0));
             ciclo = 0;
         }
@@ -489,8 +489,18 @@ void GLWidget::drawScene(){
             if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
                 scene->getCharacter(0)->getMoCap()->showMoCap(Vec4(0,0,-2.0),frame_edit);
     glPopMatrix();
-    Draw::drawGround(10);
+
+    glPushMatrix();
+    //glLoadIdentity();
+    //Draw::drawSkybox(Vec4(0,0,0),Vec4(20,20,20));
+
     //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
+    Draw::drawGroundTexture(10,0);
+    //if (!showInfo){ Draw::drawGroundTexture(10,0);}
+    //else{
+        //glClearColor(1,0,0,1);
+    //}
+    glPopMatrix();
 
     //glRasterPos2d(0.5,0.5);
     //char* p = (char*) "Pode ser assim?";
@@ -501,7 +511,7 @@ void GLWidget::drawScene(){
 
     //glPopMatrix();
     //glEnable(GL_LIGHTING);
-    glPopMatrix();
+    //glPopMatrix();
 
 
 }
@@ -956,7 +966,7 @@ void GLWidget::drawShadows()
 
 
         /* Draw "top" of floor.  Use blending to blend in reflection (jah foi habilitado o blend). */
-        Draw::drawGround(10);
+        Draw::drawGroundTexture(10,0);
 
         if (true) {
 
@@ -1207,7 +1217,7 @@ void GLWidget::setEndClycle(int v)
     }
 }
 
-void GLWidget::setToleranceCOM(float val)
+void GLWidget::setToleranceCOM(double val)
 {
     if(!(scene->getSizeCharacter()>0)) return;
     scene->getCharacter(0)->getBalance()->setLimitCone(val);
@@ -1237,6 +1247,16 @@ void GLWidget::setGravityParameters(Vec4 g)
 {
     scene->setGravityParameters(g);
 
+}
+
+void GLWidget::setSimbiconForceParameters(Vec4 g)
+{
+    scene->setKVelocityLocomotion(g);
+}
+
+void GLWidget::setSimbiconDistanceParameters(Vec4 g)
+{
+    scene->setKDistanceLocomotion(g);
 }
 
 void GLWidget::setGravity(bool b)
@@ -1453,6 +1473,7 @@ void GLWidget::loadSimulationParameters(QString file)
         updateBalanceCone(scene->getCharacter(i)->getBalance()->getMCone(),scene->getCharacter(i)->getBalance()->getAngleCone(),scene->getCharacter(i)->getBalance()->getRadiusCone(),scene->getCharacter(i)->getBalance()->getHeightCone());
 
     }
+    scene->getCharacter(0)->showHierarchies();
     //printf("\nMassa total: %.3f",scene->getCharacter(0)->getMassTotal());
     scene->createRamp();
 

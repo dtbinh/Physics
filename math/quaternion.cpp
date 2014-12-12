@@ -504,6 +504,8 @@ void Quaternion::toAxisAngle( Vec4* axis, dReal* angle ) {
   axis->x3 = trunc(axis->z()*pow(10.0,10.0))/pow(10.0,10.0);
   //*/
 }
+
+
 //---------------------------------------------------------------------------
 //converte eixo e angulo em um quaternion e atribui a this
 void Quaternion::fromAxisAngle( Vec4 axis, dReal angle ) {

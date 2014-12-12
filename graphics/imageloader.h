@@ -1,13 +1,11 @@
-
-
-
-
 #ifndef IMAGE_LOADER_H_INCLUDED
 #define IMAGE_LOADER_H_INCLUDED
-
+#include <GL/glut.h>
+#include <QString>
 //Represents an image
 class Image {
 	public:
+        Image(){};
 		Image(char* ps, int w, int h);
 		~Image();
 
@@ -24,12 +22,7 @@ class Image {
 
 //Reads a bitmap image from file.
 Image* loadBMP(const char* filename);
-
-
-
-
-
-
+void BMP_Texture(GLuint textureArray[], QString strFileName, int ID);
 
 
 

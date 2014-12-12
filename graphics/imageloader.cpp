@@ -14,7 +14,7 @@ Image::Image(char* ps, int w, int h) : pixels(ps), width(w), height(h) {
 }
 
 Image::~Image() {
-	delete[] pixels;
+    delete []pixels;
 }
 
 namespace {
@@ -177,11 +177,35 @@ Image* loadBMP(const char* filename) {
 	}
 
 	input.close();
-	return new Image(pixels2.release(), width, height);
+    Image *n = new Image(pixels2.release(), width, height);
+    return n;
 }
 
 
+void BMP_Texture(GLuint textureArray[], QString strFileName, int ID)
+{
+    if(strFileName.isEmpty())	return;
 
+    Image *pBitMap = loadBMP(strFileName.toLatin1().data());
+
+    if(pBitMap == NULL)	exit(0);
+
+    glGenTextures(1, &textureArray[ID]);
+    glBindTexture(GL_TEXTURE_2D, textureArray[ID]);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, pBitMap->width, pBitMap->height, GL_RGB, GL_UNSIGNED_BYTE, pBitMap->pixels);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    if (pBitMap)
+    {
+        if (pBitMap->pixels)
+        {
+            free(pBitMap->pixels);
+        }
+        free(pBitMap);
+    }
+}
 
 
 

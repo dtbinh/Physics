@@ -28,6 +28,9 @@ public:
     static void drawCOMProjected(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
     static void drawTargetProjected(Vec4 p,float size=0.5,Vec4 color=Vec4(1,1,1));
     static void drawGround(int size);
+    static void drawGroundTexture(int size,int texture);
+    static void drawCircle2D(Vec4 center,float radius, Vec4 color,float size); //desenha um circulo projetado no eixo xz
+    static void drawSkybox(Vec4 min= Vec4(0,0,0), Vec4 max = Vec4(10,10,10) ,int texture=0);
     static void drawCoffeeCup(Vec4 position, int material,Quaternion q=Quaternion());
     static void drawObj(Vec4 position, int material,Quaternion q, QString file, ObjMesh *n);
     static void drawObj(Matrix4x4 *transform,int material,ObjMesh *n);
@@ -40,6 +43,7 @@ public:
     static void gluClosedCylinder(GLUquadric*, GLdouble, GLdouble, GLdouble, GLint, GLint);
     static void shadowMatrix( GLfloat shadowMat[4][4], GLfloat groundplane[4], GLfloat lightpos[4] );
     static void setTransformODE(const dReal* pos, const dReal* R);
+    static void drawText(QString text,int x, int y);
     //static void gluCapsule(GLUquadric*, GLdouble, GLdouble, GLdouble, GLint, GLint);
 };
 
