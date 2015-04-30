@@ -41,6 +41,11 @@ class Balance
     float radius;    //raio do pé
     float m;         //modulo da força
     float limit;     //limite de angulo
+    bool jump;
+    float init_jump;
+    float min_jump;
+    float max_jump;
+    float sensor_tolerance;
 
 
 
@@ -66,6 +71,7 @@ public:
     void setKsForce(Vec4 ksf);
     Vec4 getKdForce();
     void setKdForce(Vec4 kdf);
+    void habiliteJump(bool b);
 
     Vec4 getKMomentumLinear();
     Vec4 getKMomentumAngular();
@@ -78,6 +84,10 @@ public:
     void setKMomentumAngular(Vec4 k);
     float getCompensation();
     void setCompensation(float f);
+    //suavidade
+    void  setStepsInterpolation(float limit);
+    float getStepsInterpolation();
+
     //cone de ficção
     void setLimitCone(float v);
     float getLimitCone();
@@ -92,6 +102,10 @@ public:
     //discretização do deslocamento do com
     void setLimitSteps(int value);
     int getLimitSteps();
+    //tolerancia do sensor
+    void setSensorTolerance(float value);
+    float getSensorTolerance();
+
     //constantes do Simbicon
     Vec4 getKVelocityLocomotion();
     void setKVelocityLocomotion(Vec4 k);

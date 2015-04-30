@@ -36,17 +36,22 @@ void MoCap::setAddressFile(QString file)
 
 QString MoCap::getAddressFile()
 {
-    return file;
+    QDir qfile;
+    QString relative = qfile.relativeFilePath(file);
+    return relative;
 }
 
 void MoCap::setAddressFileLoad(QString file)
 {
+
     this->file_load = file;
 }
 
 QString MoCap::getAddressFileLoad()
 {
-    return file_load;
+    QDir qfile;
+    QString relative = qfile.relativeFilePath(file_load);
+    return relative;
 }
 
 void MoCap::updateHeightBody(Vec4 h, int id)

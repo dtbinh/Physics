@@ -1,7 +1,9 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
-#define dDOUBLE
+//#define dDOUBLE
 #include <ode/ode.h>
+#include <ode/precision.h>
+#include <ode/odecpp_collision.h>
 #include "functions.h"
 
 #define BodyID dBodyID

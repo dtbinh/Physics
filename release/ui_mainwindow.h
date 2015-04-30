@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Dec 9 14:57:01 2014
-**      by: Qt User Interface Compiler version 4.8.1
+** Created by: Qt User Interface Compiler version 5.2.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,29 +10,29 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QCheckBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QFrame>
-#include <QtGui/QGridLayout>
-#include <QtGui/QGroupBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QListWidget>
-#include <QtGui/QMainWindow>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QPushButton>
-#include <QtGui/QSlider>
-#include <QtGui/QSpinBox>
-#include <QtGui/QSplitter>
-#include <QtGui/QTabWidget>
-#include <QtGui/QToolBar>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QSplitter>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 #include <interface/glwidget.h>
 
 QT_BEGIN_NAMESPACE
@@ -196,7 +195,10 @@ public:
     QSpinBox *endClycle;
     QCheckBox *checkShowMocap;
     QCheckBox *checkScreenShot;
-    QDoubleSpinBox *toleranciaCOM;
+    QWidget *layoutWidget5;
+    QHBoxLayout *horizontalLayout_42;
+    QLabel *label_39;
+    QDoubleSpinBox *stepsInterpolation;
     QWidget *tabManipulatorSim;
     QGridLayout *gridLayout_12;
     QListWidget *listWidgetObjects;
@@ -302,6 +304,14 @@ public:
     QDoubleSpinBox *xkFor;
     QDoubleSpinBox *ykFor;
     QDoubleSpinBox *zkFor;
+    QWidget *layoutWidget6;
+    QHBoxLayout *horizontalLayout_43;
+    QLabel *label_40;
+    QDoubleSpinBox *densityBall;
+    QWidget *layoutWidget7;
+    QHBoxLayout *horizontalLayout_44;
+    QLabel *label_41;
+    QDoubleSpinBox *velocityBall;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuControl;
@@ -310,37 +320,37 @@ public:
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
-            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+            MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->resize(658, 780);
         actionPlay_Pause_Simulation = new QAction(MainWindow);
-        actionPlay_Pause_Simulation->setObjectName(QString::fromUtf8("actionPlay_Pause_Simulation"));
+        actionPlay_Pause_Simulation->setObjectName(QStringLiteral("actionPlay_Pause_Simulation"));
         actionRestart_Simulation = new QAction(MainWindow);
-        actionRestart_Simulation->setObjectName(QString::fromUtf8("actionRestart_Simulation"));
+        actionRestart_Simulation->setObjectName(QStringLiteral("actionRestart_Simulation"));
         actionOpen_Model = new QAction(MainWindow);
-        actionOpen_Model->setObjectName(QString::fromUtf8("actionOpen_Model"));
+        actionOpen_Model->setObjectName(QStringLiteral("actionOpen_Model"));
         actionOpen_MoCap = new QAction(MainWindow);
-        actionOpen_MoCap->setObjectName(QString::fromUtf8("actionOpen_MoCap"));
+        actionOpen_MoCap->setObjectName(QStringLiteral("actionOpen_MoCap"));
         actionSave_Model = new QAction(MainWindow);
-        actionSave_Model->setObjectName(QString::fromUtf8("actionSave_Model"));
+        actionSave_Model->setObjectName(QStringLiteral("actionSave_Model"));
         actionSave_Simulation = new QAction(MainWindow);
-        actionSave_Simulation->setObjectName(QString::fromUtf8("actionSave_Simulation"));
+        actionSave_Simulation->setObjectName(QStringLiteral("actionSave_Simulation"));
         actionOpen_Simulation = new QAction(MainWindow);
-        actionOpen_Simulation->setObjectName(QString::fromUtf8("actionOpen_Simulation"));
+        actionOpen_Simulation->setObjectName(QStringLiteral("actionOpen_Simulation"));
         centralWidget = new QWidget(MainWindow);
-        centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
+        centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
         splitter = new QSplitter(centralWidget);
-        splitter->setObjectName(QString::fromUtf8("splitter"));
+        splitter->setObjectName(QStringLiteral("splitter"));
         splitter->setOrientation(Qt::Horizontal);
         widgetPhysics = new GLWidget(splitter);
-        widgetPhysics->setObjectName(QString::fromUtf8("widgetPhysics"));
+        widgetPhysics->setObjectName(QStringLiteral("widgetPhysics"));
         widgetPhysics->setAutoFillBackground(false);
         splitter->addWidget(widgetPhysics);
         widgetOpt = new QWidget(splitter);
-        widgetOpt->setObjectName(QString::fromUtf8("widgetOpt"));
+        widgetOpt->setObjectName(QStringLiteral("widgetOpt"));
         QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -349,31 +359,32 @@ public:
         widgetOpt->setMaximumSize(QSize(350, 16777215));
         gridLayout_2 = new QGridLayout(widgetOpt);
         gridLayout_2->setSpacing(0);
+        gridLayout_2->setContentsMargins(11, 11, 11, 11);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
         gridLayout_2->setContentsMargins(0, 0, 0, 0);
-        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         Options = new QTabWidget(widgetOpt);
-        Options->setObjectName(QString::fromUtf8("Options"));
+        Options->setObjectName(QStringLiteral("Options"));
         Options->setLayoutDirection(Qt::LeftToRight);
         Options->setTabPosition(QTabWidget::West);
         Options->setTabsClosable(false);
         Options->setMovable(true);
         tabParSim = new QWidget();
-        tabParSim->setObjectName(QString::fromUtf8("tabParSim"));
+        tabParSim->setObjectName(QStringLiteral("tabParSim"));
         layoutWidget = new QWidget(tabParSim);
-        layoutWidget->setObjectName(QString::fromUtf8("layoutWidget"));
+        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
         layoutWidget->setGeometry(QRect(0, 10, 311, 29));
         horizontalLayout = new QHBoxLayout(layoutWidget);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(layoutWidget);
-        label->setObjectName(QString::fromUtf8("label"));
+        label->setObjectName(QStringLiteral("label"));
 
         horizontalLayout->addWidget(label);
 
         stepSim = new QSpinBox(layoutWidget);
-        stepSim->setObjectName(QString::fromUtf8("stepSim"));
+        stepSim->setObjectName(QStringLiteral("stepSim"));
         stepSim->setMinimum(1);
         stepSim->setMaximum(1000);
         stepSim->setValue(67);
@@ -381,23 +392,23 @@ public:
         horizontalLayout->addWidget(stepSim);
 
         enableGravity = new QCheckBox(tabParSim);
-        enableGravity->setObjectName(QString::fromUtf8("enableGravity"));
+        enableGravity->setObjectName(QStringLiteral("enableGravity"));
         enableGravity->setGeometry(QRect(0, 70, 131, 22));
         layoutWidget1 = new QWidget(tabParSim);
-        layoutWidget1->setObjectName(QString::fromUtf8("layoutWidget1"));
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
         layoutWidget1->setGeometry(QRect(0, 40, 310, 29));
         horizontalLayout_10 = new QHBoxLayout(layoutWidget1);
         horizontalLayout_10->setSpacing(6);
         horizontalLayout_10->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
+        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
         horizontalLayout_10->setContentsMargins(0, 0, 0, 0);
         label_11 = new QLabel(layoutWidget1);
-        label_11->setObjectName(QString::fromUtf8("label_11"));
+        label_11->setObjectName(QStringLiteral("label_11"));
 
         horizontalLayout_10->addWidget(label_11);
 
         gravx = new QDoubleSpinBox(layoutWidget1);
-        gravx->setObjectName(QString::fromUtf8("gravx"));
+        gravx->setObjectName(QStringLiteral("gravx"));
         gravx->setDecimals(1);
         gravx->setMinimum(-99);
         gravx->setMaximum(99);
@@ -405,7 +416,7 @@ public:
         horizontalLayout_10->addWidget(gravx);
 
         gravy = new QDoubleSpinBox(layoutWidget1);
-        gravy->setObjectName(QString::fromUtf8("gravy"));
+        gravy->setObjectName(QStringLiteral("gravy"));
         gravy->setDecimals(1);
         gravy->setMinimum(-99);
         gravy->setMaximum(99);
@@ -414,7 +425,7 @@ public:
         horizontalLayout_10->addWidget(gravy);
 
         gravz = new QDoubleSpinBox(layoutWidget1);
-        gravz->setObjectName(QString::fromUtf8("gravz"));
+        gravz->setObjectName(QStringLiteral("gravz"));
         gravz->setDecimals(1);
         gravz->setMinimum(-99);
         gravz->setMaximum(99);
@@ -422,29 +433,29 @@ public:
         horizontalLayout_10->addWidget(gravz);
 
         checkBox = new QCheckBox(tabParSim);
-        checkBox->setObjectName(QString::fromUtf8("checkBox"));
+        checkBox->setObjectName(QStringLiteral("checkBox"));
         checkBox->setGeometry(QRect(0, 100, 281, 16));
         kdtoks = new QCheckBox(tabParSim);
-        kdtoks->setObjectName(QString::fromUtf8("kdtoks"));
+        kdtoks->setObjectName(QStringLiteral("kdtoks"));
         kdtoks->setGeometry(QRect(0, 130, 201, 22));
         checkMesh = new QCheckBox(tabParSim);
-        checkMesh->setObjectName(QString::fromUtf8("checkMesh"));
+        checkMesh->setObjectName(QStringLiteral("checkMesh"));
         checkMesh->setGeometry(QRect(0, 160, 181, 22));
         infoShow = new QCheckBox(tabParSim);
-        infoShow->setObjectName(QString::fromUtf8("infoShow"));
+        infoShow->setObjectName(QStringLiteral("infoShow"));
         infoShow->setGeometry(QRect(0, 190, 97, 22));
         Options->addTab(tabParSim, QString());
         tab = new QWidget();
-        tab->setObjectName(QString::fromUtf8("tab"));
+        tab->setObjectName(QStringLiteral("tab"));
         groupBox_3 = new QGroupBox(tab);
-        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
+        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
         groupBox_3->setGeometry(QRect(9, 9, 301, 271));
         QFont font;
         font.setPointSize(9);
         font.setBold(true);
         font.setWeight(75);
         groupBox_3->setFont(font);
-        groupBox_3->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_3->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -458,32 +469,33 @@ public:
 "}"));
         gridLayout_7 = new QGridLayout(groupBox_3);
         gridLayout_7->setSpacing(2);
+        gridLayout_7->setContentsMargins(11, 11, 11, 11);
+        gridLayout_7->setObjectName(QStringLiteral("gridLayout_7"));
         gridLayout_7->setContentsMargins(2, 2, 2, 2);
-        gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
         horizontalLayout_11 = new QHBoxLayout();
         horizontalLayout_11->setSpacing(6);
-        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
+        horizontalLayout_11->setObjectName(QStringLiteral("horizontalLayout_11"));
         label_12 = new QLabel(groupBox_3);
-        label_12->setObjectName(QString::fromUtf8("label_12"));
+        label_12->setObjectName(QStringLiteral("label_12"));
 
         horizontalLayout_11->addWidget(label_12);
 
         xksTqBal = new QDoubleSpinBox(groupBox_3);
-        xksTqBal->setObjectName(QString::fromUtf8("xksTqBal"));
+        xksTqBal->setObjectName(QStringLiteral("xksTqBal"));
         xksTqBal->setMinimum(-500);
         xksTqBal->setMaximum(500);
 
         horizontalLayout_11->addWidget(xksTqBal);
 
         yksTqBal = new QDoubleSpinBox(groupBox_3);
-        yksTqBal->setObjectName(QString::fromUtf8("yksTqBal"));
+        yksTqBal->setObjectName(QStringLiteral("yksTqBal"));
         yksTqBal->setMinimum(-500);
         yksTqBal->setMaximum(500);
 
         horizontalLayout_11->addWidget(yksTqBal);
 
         zksTqBal = new QDoubleSpinBox(groupBox_3);
-        zksTqBal->setObjectName(QString::fromUtf8("zksTqBal"));
+        zksTqBal->setObjectName(QStringLiteral("zksTqBal"));
         zksTqBal->setMinimum(-500);
         zksTqBal->setMaximum(500);
 
@@ -494,28 +506,28 @@ public:
 
         horizontalLayout_12 = new QHBoxLayout();
         horizontalLayout_12->setSpacing(6);
-        horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
+        horizontalLayout_12->setObjectName(QStringLiteral("horizontalLayout_12"));
         label_13 = new QLabel(groupBox_3);
-        label_13->setObjectName(QString::fromUtf8("label_13"));
+        label_13->setObjectName(QStringLiteral("label_13"));
 
         horizontalLayout_12->addWidget(label_13);
 
         xkdTqBal = new QDoubleSpinBox(groupBox_3);
-        xkdTqBal->setObjectName(QString::fromUtf8("xkdTqBal"));
+        xkdTqBal->setObjectName(QStringLiteral("xkdTqBal"));
         xkdTqBal->setMinimum(-500);
         xkdTqBal->setMaximum(500);
 
         horizontalLayout_12->addWidget(xkdTqBal);
 
         ykdTqBal = new QDoubleSpinBox(groupBox_3);
-        ykdTqBal->setObjectName(QString::fromUtf8("ykdTqBal"));
+        ykdTqBal->setObjectName(QStringLiteral("ykdTqBal"));
         ykdTqBal->setMinimum(-500);
         ykdTqBal->setMaximum(500);
 
         horizontalLayout_12->addWidget(ykdTqBal);
 
         zkdTqBal = new QDoubleSpinBox(groupBox_3);
-        zkdTqBal->setObjectName(QString::fromUtf8("zkdTqBal"));
+        zkdTqBal->setObjectName(QStringLiteral("zkdTqBal"));
         zkdTqBal->setMinimum(-500);
         zkdTqBal->setMaximum(500);
 
@@ -526,28 +538,28 @@ public:
 
         horizontalLayout_13 = new QHBoxLayout();
         horizontalLayout_13->setSpacing(6);
-        horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
+        horizontalLayout_13->setObjectName(QStringLiteral("horizontalLayout_13"));
         label_14 = new QLabel(groupBox_3);
-        label_14->setObjectName(QString::fromUtf8("label_14"));
+        label_14->setObjectName(QStringLiteral("label_14"));
 
         horizontalLayout_13->addWidget(label_14);
 
         xksForBal = new QDoubleSpinBox(groupBox_3);
-        xksForBal->setObjectName(QString::fromUtf8("xksForBal"));
+        xksForBal->setObjectName(QStringLiteral("xksForBal"));
         xksForBal->setMinimum(-9999);
         xksForBal->setMaximum(9999);
 
         horizontalLayout_13->addWidget(xksForBal);
 
         yksForBal = new QDoubleSpinBox(groupBox_3);
-        yksForBal->setObjectName(QString::fromUtf8("yksForBal"));
+        yksForBal->setObjectName(QStringLiteral("yksForBal"));
         yksForBal->setMinimum(-9999);
         yksForBal->setMaximum(9999);
 
         horizontalLayout_13->addWidget(yksForBal);
 
         zksForBal = new QDoubleSpinBox(groupBox_3);
-        zksForBal->setObjectName(QString::fromUtf8("zksForBal"));
+        zksForBal->setObjectName(QStringLiteral("zksForBal"));
         zksForBal->setMinimum(-9999);
         zksForBal->setMaximum(9999);
 
@@ -558,28 +570,28 @@ public:
 
         horizontalLayout_14 = new QHBoxLayout();
         horizontalLayout_14->setSpacing(6);
-        horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
+        horizontalLayout_14->setObjectName(QStringLiteral("horizontalLayout_14"));
         label_15 = new QLabel(groupBox_3);
-        label_15->setObjectName(QString::fromUtf8("label_15"));
+        label_15->setObjectName(QStringLiteral("label_15"));
 
         horizontalLayout_14->addWidget(label_15);
 
         xkdForBal = new QDoubleSpinBox(groupBox_3);
-        xkdForBal->setObjectName(QString::fromUtf8("xkdForBal"));
+        xkdForBal->setObjectName(QStringLiteral("xkdForBal"));
         xkdForBal->setMinimum(-999);
         xkdForBal->setMaximum(999);
 
         horizontalLayout_14->addWidget(xkdForBal);
 
         ykdForBal = new QDoubleSpinBox(groupBox_3);
-        ykdForBal->setObjectName(QString::fromUtf8("ykdForBal"));
+        ykdForBal->setObjectName(QStringLiteral("ykdForBal"));
         ykdForBal->setMinimum(-500);
         ykdForBal->setMaximum(500);
 
         horizontalLayout_14->addWidget(ykdForBal);
 
         zkdForBal = new QDoubleSpinBox(groupBox_3);
-        zkdForBal->setObjectName(QString::fromUtf8("zkdForBal"));
+        zkdForBal->setObjectName(QStringLiteral("zkdForBal"));
         zkdForBal->setMinimum(-500);
         zkdForBal->setMaximum(500);
 
@@ -590,28 +602,28 @@ public:
 
         horizontalLayout_19 = new QHBoxLayout();
         horizontalLayout_19->setSpacing(6);
-        horizontalLayout_19->setObjectName(QString::fromUtf8("horizontalLayout_19"));
+        horizontalLayout_19->setObjectName(QStringLiteral("horizontalLayout_19"));
         label_18 = new QLabel(groupBox_3);
-        label_18->setObjectName(QString::fromUtf8("label_18"));
+        label_18->setObjectName(QStringLiteral("label_18"));
 
         horizontalLayout_19->addWidget(label_18);
 
         xkmomlinBal = new QDoubleSpinBox(groupBox_3);
-        xkmomlinBal->setObjectName(QString::fromUtf8("xkmomlinBal"));
+        xkmomlinBal->setObjectName(QStringLiteral("xkmomlinBal"));
         xkmomlinBal->setMinimum(-500);
         xkmomlinBal->setMaximum(500);
 
         horizontalLayout_19->addWidget(xkmomlinBal);
 
         ykmomlinBal = new QDoubleSpinBox(groupBox_3);
-        ykmomlinBal->setObjectName(QString::fromUtf8("ykmomlinBal"));
+        ykmomlinBal->setObjectName(QStringLiteral("ykmomlinBal"));
         ykmomlinBal->setMinimum(-500);
         ykmomlinBal->setMaximum(500);
 
         horizontalLayout_19->addWidget(ykmomlinBal);
 
         zkmomlinBal = new QDoubleSpinBox(groupBox_3);
-        zkmomlinBal->setObjectName(QString::fromUtf8("zkmomlinBal"));
+        zkmomlinBal->setObjectName(QStringLiteral("zkmomlinBal"));
         zkmomlinBal->setMinimum(-500);
         zkmomlinBal->setMaximum(500);
 
@@ -622,28 +634,28 @@ public:
 
         horizontalLayout_37 = new QHBoxLayout();
         horizontalLayout_37->setSpacing(6);
-        horizontalLayout_37->setObjectName(QString::fromUtf8("horizontalLayout_37"));
+        horizontalLayout_37->setObjectName(QStringLiteral("horizontalLayout_37"));
         label_35 = new QLabel(groupBox_3);
-        label_35->setObjectName(QString::fromUtf8("label_35"));
+        label_35->setObjectName(QStringLiteral("label_35"));
 
         horizontalLayout_37->addWidget(label_35);
 
         xkmomangBal = new QDoubleSpinBox(groupBox_3);
-        xkmomangBal->setObjectName(QString::fromUtf8("xkmomangBal"));
+        xkmomangBal->setObjectName(QStringLiteral("xkmomangBal"));
         xkmomangBal->setMinimum(-500);
         xkmomangBal->setMaximum(500);
 
         horizontalLayout_37->addWidget(xkmomangBal);
 
         ykmomangBal = new QDoubleSpinBox(groupBox_3);
-        ykmomangBal->setObjectName(QString::fromUtf8("ykmomangBal"));
+        ykmomangBal->setObjectName(QStringLiteral("ykmomangBal"));
         ykmomangBal->setMinimum(-500);
         ykmomangBal->setMaximum(500);
 
         horizontalLayout_37->addWidget(ykmomangBal);
 
         zkmomangBal = new QDoubleSpinBox(groupBox_3);
-        zkmomangBal->setObjectName(QString::fromUtf8("zkmomangBal"));
+        zkmomangBal->setObjectName(QStringLiteral("zkmomangBal"));
         zkmomangBal->setMinimum(-500);
         zkmomangBal->setMaximum(500);
 
@@ -654,21 +666,21 @@ public:
 
         horizontalLayout_20 = new QHBoxLayout();
         horizontalLayout_20->setSpacing(6);
-        horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
+        horizontalLayout_20->setObjectName(QStringLiteral("horizontalLayout_20"));
         checkMomentum = new QCheckBox(groupBox_3);
-        checkMomentum->setObjectName(QString::fromUtf8("checkMomentum"));
+        checkMomentum->setObjectName(QStringLiteral("checkMomentum"));
         checkMomentum->setChecked(true);
 
         horizontalLayout_20->addWidget(checkMomentum);
 
         checkTorqueBal = new QCheckBox(groupBox_3);
-        checkTorqueBal->setObjectName(QString::fromUtf8("checkTorqueBal"));
+        checkTorqueBal->setObjectName(QStringLiteral("checkTorqueBal"));
         checkTorqueBal->setChecked(true);
 
         horizontalLayout_20->addWidget(checkTorqueBal);
 
         checkForceBal = new QCheckBox(groupBox_3);
-        checkForceBal->setObjectName(QString::fromUtf8("checkForceBal"));
+        checkForceBal->setObjectName(QStringLiteral("checkForceBal"));
         checkForceBal->setChecked(true);
 
         horizontalLayout_20->addWidget(checkForceBal);
@@ -678,28 +690,28 @@ public:
 
         horizontalLayout_21 = new QHBoxLayout();
         horizontalLayout_21->setSpacing(6);
-        horizontalLayout_21->setObjectName(QString::fromUtf8("horizontalLayout_21"));
+        horizontalLayout_21->setObjectName(QStringLiteral("horizontalLayout_21"));
         label_20 = new QLabel(groupBox_3);
-        label_20->setObjectName(QString::fromUtf8("label_20"));
+        label_20->setObjectName(QStringLiteral("label_20"));
 
         horizontalLayout_21->addWidget(label_20);
 
         angleBalBodyx = new QSpinBox(groupBox_3);
-        angleBalBodyx->setObjectName(QString::fromUtf8("angleBalBodyx"));
+        angleBalBodyx->setObjectName(QStringLiteral("angleBalBodyx"));
         angleBalBodyx->setMinimum(-361);
         angleBalBodyx->setMaximum(361);
 
         horizontalLayout_21->addWidget(angleBalBodyx);
 
         angleBalBodyy = new QSpinBox(groupBox_3);
-        angleBalBodyy->setObjectName(QString::fromUtf8("angleBalBodyy"));
+        angleBalBodyy->setObjectName(QStringLiteral("angleBalBodyy"));
         angleBalBodyy->setMinimum(-361);
         angleBalBodyy->setMaximum(361);
 
         horizontalLayout_21->addWidget(angleBalBodyy);
 
         angleBalBodyz = new QSpinBox(groupBox_3);
-        angleBalBodyz->setObjectName(QString::fromUtf8("angleBalBodyz"));
+        angleBalBodyz->setObjectName(QStringLiteral("angleBalBodyz"));
         angleBalBodyz->setMinimum(-361);
         angleBalBodyz->setMaximum(361);
 
@@ -709,10 +721,10 @@ public:
         gridLayout_7->addLayout(horizontalLayout_21, 8, 0, 1, 1);
 
         groupBox_4 = new QGroupBox(tab);
-        groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
+        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
         groupBox_4->setGeometry(QRect(10, 287, 299, 84));
         groupBox_4->setFont(font);
-        groupBox_4->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_4->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -727,17 +739,17 @@ public:
         gridLayout_8 = new QGridLayout(groupBox_4);
         gridLayout_8->setSpacing(6);
         gridLayout_8->setContentsMargins(11, 11, 11, 11);
-        gridLayout_8->setObjectName(QString::fromUtf8("gridLayout_8"));
+        gridLayout_8->setObjectName(QStringLiteral("gridLayout_8"));
         horizontalLayout_15 = new QHBoxLayout();
         horizontalLayout_15->setSpacing(6);
-        horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
+        horizontalLayout_15->setObjectName(QStringLiteral("horizontalLayout_15"));
         label_16 = new QLabel(groupBox_4);
-        label_16->setObjectName(QString::fromUtf8("label_16"));
+        label_16->setObjectName(QStringLiteral("label_16"));
 
         horizontalLayout_15->addWidget(label_16);
 
         xksPdProp = new QDoubleSpinBox(groupBox_4);
-        xksPdProp->setObjectName(QString::fromUtf8("xksPdProp"));
+        xksPdProp->setObjectName(QStringLiteral("xksPdProp"));
         xksPdProp->setMinimum(-500);
         xksPdProp->setMaximum(500);
         xksPdProp->setValue(1);
@@ -745,7 +757,7 @@ public:
         horizontalLayout_15->addWidget(xksPdProp);
 
         yksPdProp = new QDoubleSpinBox(groupBox_4);
-        yksPdProp->setObjectName(QString::fromUtf8("yksPdProp"));
+        yksPdProp->setObjectName(QStringLiteral("yksPdProp"));
         yksPdProp->setMinimum(-500);
         yksPdProp->setMaximum(500);
         yksPdProp->setValue(1);
@@ -753,7 +765,7 @@ public:
         horizontalLayout_15->addWidget(yksPdProp);
 
         zksPdProp = new QDoubleSpinBox(groupBox_4);
-        zksPdProp->setObjectName(QString::fromUtf8("zksPdProp"));
+        zksPdProp->setObjectName(QStringLiteral("zksPdProp"));
         zksPdProp->setMinimum(-500);
         zksPdProp->setMaximum(500);
         zksPdProp->setValue(1);
@@ -765,14 +777,14 @@ public:
 
         horizontalLayout_16 = new QHBoxLayout();
         horizontalLayout_16->setSpacing(6);
-        horizontalLayout_16->setObjectName(QString::fromUtf8("horizontalLayout_16"));
+        horizontalLayout_16->setObjectName(QStringLiteral("horizontalLayout_16"));
         label_17 = new QLabel(groupBox_4);
-        label_17->setObjectName(QString::fromUtf8("label_17"));
+        label_17->setObjectName(QStringLiteral("label_17"));
 
         horizontalLayout_16->addWidget(label_17);
 
         xkdPdProp = new QDoubleSpinBox(groupBox_4);
-        xkdPdProp->setObjectName(QString::fromUtf8("xkdPdProp"));
+        xkdPdProp->setObjectName(QStringLiteral("xkdPdProp"));
         xkdPdProp->setMinimum(-500);
         xkdPdProp->setMaximum(500);
         xkdPdProp->setSingleStep(0.1);
@@ -781,7 +793,7 @@ public:
         horizontalLayout_16->addWidget(xkdPdProp);
 
         ykdPdProp = new QDoubleSpinBox(groupBox_4);
-        ykdPdProp->setObjectName(QString::fromUtf8("ykdPdProp"));
+        ykdPdProp->setObjectName(QStringLiteral("ykdPdProp"));
         ykdPdProp->setMinimum(-500);
         ykdPdProp->setMaximum(500);
         ykdPdProp->setSingleStep(0.1);
@@ -790,7 +802,7 @@ public:
         horizontalLayout_16->addWidget(ykdPdProp);
 
         zkdPdProp = new QDoubleSpinBox(groupBox_4);
-        zkdPdProp->setObjectName(QString::fromUtf8("zkdPdProp"));
+        zkdPdProp->setObjectName(QStringLiteral("zkdPdProp"));
         zkdPdProp->setMinimum(-500);
         zkdPdProp->setMaximum(500);
         zkdPdProp->setSingleStep(0.1);
@@ -802,10 +814,10 @@ public:
         gridLayout_8->addLayout(horizontalLayout_16, 1, 0, 1, 1);
 
         groupBoxCone = new QGroupBox(tab);
-        groupBoxCone->setObjectName(QString::fromUtf8("groupBoxCone"));
+        groupBoxCone->setObjectName(QStringLiteral("groupBoxCone"));
         groupBoxCone->setGeometry(QRect(10, 430, 301, 241));
         groupBoxCone->setFont(font);
-        groupBoxCone->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBoxCone->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -818,26 +830,26 @@ public:
 "  border-radius: 5px;\n"
 "}"));
         layoutWidget2 = new QWidget(groupBoxCone);
-        layoutWidget2->setObjectName(QString::fromUtf8("layoutWidget2"));
+        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
         layoutWidget2->setGeometry(QRect(3, 3, 291, 236));
         verticalLayout_3 = new QVBoxLayout(layoutWidget2);
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
         verticalLayout_3->setContentsMargins(0, 0, 0, 0);
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setSpacing(1);
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         horizontalLayout_27 = new QHBoxLayout();
         horizontalLayout_27->setSpacing(6);
-        horizontalLayout_27->setObjectName(QString::fromUtf8("horizontalLayout_27"));
+        horizontalLayout_27->setObjectName(QStringLiteral("horizontalLayout_27"));
         label_28 = new QLabel(layoutWidget2);
-        label_28->setObjectName(QString::fromUtf8("label_28"));
+        label_28->setObjectName(QStringLiteral("label_28"));
 
         horizontalLayout_27->addWidget(label_28);
 
         coneM = new QDoubleSpinBox(layoutWidget2);
-        coneM->setObjectName(QString::fromUtf8("coneM"));
+        coneM->setObjectName(QStringLiteral("coneM"));
         coneM->setMaximum(2000);
         coneM->setSingleStep(2);
         coneM->setValue(20);
@@ -849,14 +861,14 @@ public:
 
         horizontalLayout_29 = new QHBoxLayout();
         horizontalLayout_29->setSpacing(6);
-        horizontalLayout_29->setObjectName(QString::fromUtf8("horizontalLayout_29"));
+        horizontalLayout_29->setObjectName(QStringLiteral("horizontalLayout_29"));
         label_30 = new QLabel(layoutWidget2);
-        label_30->setObjectName(QString::fromUtf8("label_30"));
+        label_30->setObjectName(QStringLiteral("label_30"));
 
         horizontalLayout_29->addWidget(label_30);
 
         coneHeight = new QDoubleSpinBox(layoutWidget2);
-        coneHeight->setObjectName(QString::fromUtf8("coneHeight"));
+        coneHeight->setObjectName(QStringLiteral("coneHeight"));
         coneHeight->setMaximum(500);
         coneHeight->setSingleStep(0.01);
         coneHeight->setValue(0.03);
@@ -868,14 +880,14 @@ public:
 
         horizontalLayout_28 = new QHBoxLayout();
         horizontalLayout_28->setSpacing(6);
-        horizontalLayout_28->setObjectName(QString::fromUtf8("horizontalLayout_28"));
+        horizontalLayout_28->setObjectName(QStringLiteral("horizontalLayout_28"));
         label_19 = new QLabel(layoutWidget2);
-        label_19->setObjectName(QString::fromUtf8("label_19"));
+        label_19->setObjectName(QStringLiteral("label_19"));
 
         horizontalLayout_28->addWidget(label_19);
 
         coneRadius = new QDoubleSpinBox(layoutWidget2);
-        coneRadius->setObjectName(QString::fromUtf8("coneRadius"));
+        coneRadius->setObjectName(QStringLiteral("coneRadius"));
         coneRadius->setMaximum(500);
         coneRadius->setSingleStep(0.01);
         coneRadius->setValue(0.07);
@@ -887,14 +899,14 @@ public:
 
         horizontalLayout_30 = new QHBoxLayout();
         horizontalLayout_30->setSpacing(6);
-        horizontalLayout_30->setObjectName(QString::fromUtf8("horizontalLayout_30"));
+        horizontalLayout_30->setObjectName(QStringLiteral("horizontalLayout_30"));
         label_29 = new QLabel(layoutWidget2);
-        label_29->setObjectName(QString::fromUtf8("label_29"));
+        label_29->setObjectName(QStringLiteral("label_29"));
 
         horizontalLayout_30->addWidget(label_29);
 
         coneAngle = new QDoubleSpinBox(layoutWidget2);
-        coneAngle->setObjectName(QString::fromUtf8("coneAngle"));
+        coneAngle->setObjectName(QStringLiteral("coneAngle"));
         coneAngle->setMinimum(-180);
         coneAngle->setMaximum(180);
         coneAngle->setSingleStep(5);
@@ -910,14 +922,14 @@ public:
 
         horizontalLayout_23 = new QHBoxLayout();
         horizontalLayout_23->setSpacing(6);
-        horizontalLayout_23->setObjectName(QString::fromUtf8("horizontalLayout_23"));
+        horizontalLayout_23->setObjectName(QStringLiteral("horizontalLayout_23"));
         label_24 = new QLabel(layoutWidget2);
-        label_24->setObjectName(QString::fromUtf8("label_24"));
+        label_24->setObjectName(QStringLiteral("label_24"));
 
         horizontalLayout_23->addWidget(label_24);
 
         coneLimit = new QSpinBox(layoutWidget2);
-        coneLimit->setObjectName(QString::fromUtf8("coneLimit"));
+        coneLimit->setObjectName(QStringLiteral("coneLimit"));
         coneLimit->setMaximum(100);
 
         horizontalLayout_23->addWidget(coneLimit);
@@ -926,18 +938,19 @@ public:
         verticalLayout_3->addLayout(horizontalLayout_23);
 
         FootLeft = new QFrame(layoutWidget2);
-        FootLeft->setObjectName(QString::fromUtf8("FootLeft"));
+        FootLeft->setObjectName(QStringLiteral("FootLeft"));
         horizontalLayout_25 = new QHBoxLayout(FootLeft);
         horizontalLayout_25->setSpacing(1);
+        horizontalLayout_25->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_25->setObjectName(QStringLiteral("horizontalLayout_25"));
         horizontalLayout_25->setContentsMargins(2, 2, 2, 2);
-        horizontalLayout_25->setObjectName(QString::fromUtf8("horizontalLayout_25"));
         label_26 = new QLabel(FootLeft);
-        label_26->setObjectName(QString::fromUtf8("label_26"));
+        label_26->setObjectName(QStringLiteral("label_26"));
 
         horizontalLayout_25->addWidget(label_26);
 
         coneFoot1 = new QSlider(FootLeft);
-        coneFoot1->setObjectName(QString::fromUtf8("coneFoot1"));
+        coneFoot1->setObjectName(QStringLiteral("coneFoot1"));
         coneFoot1->setMaximum(100);
         coneFoot1->setPageStep(5);
         coneFoot1->setValue(100);
@@ -946,7 +959,7 @@ public:
         horizontalLayout_25->addWidget(coneFoot1);
 
         conePerc1 = new QLabel(FootLeft);
-        conePerc1->setObjectName(QString::fromUtf8("conePerc1"));
+        conePerc1->setObjectName(QStringLiteral("conePerc1"));
 
         horizontalLayout_25->addWidget(conePerc1);
 
@@ -954,18 +967,19 @@ public:
         verticalLayout_3->addWidget(FootLeft);
 
         FootRight = new QFrame(layoutWidget2);
-        FootRight->setObjectName(QString::fromUtf8("FootRight"));
+        FootRight->setObjectName(QStringLiteral("FootRight"));
         horizontalLayout_26 = new QHBoxLayout(FootRight);
         horizontalLayout_26->setSpacing(1);
+        horizontalLayout_26->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_26->setObjectName(QStringLiteral("horizontalLayout_26"));
         horizontalLayout_26->setContentsMargins(2, 2, 2, 2);
-        horizontalLayout_26->setObjectName(QString::fromUtf8("horizontalLayout_26"));
         label_27 = new QLabel(FootRight);
-        label_27->setObjectName(QString::fromUtf8("label_27"));
+        label_27->setObjectName(QStringLiteral("label_27"));
 
         horizontalLayout_26->addWidget(label_27);
 
         coneFoot2 = new QSlider(FootRight);
-        coneFoot2->setObjectName(QString::fromUtf8("coneFoot2"));
+        coneFoot2->setObjectName(QStringLiteral("coneFoot2"));
         coneFoot2->setMaximum(100);
         coneFoot2->setPageStep(5);
         coneFoot2->setValue(100);
@@ -974,7 +988,7 @@ public:
         horizontalLayout_26->addWidget(coneFoot2);
 
         conePerc2 = new QLabel(FootRight);
-        conePerc2->setObjectName(QString::fromUtf8("conePerc2"));
+        conePerc2->setObjectName(QStringLiteral("conePerc2"));
 
         horizontalLayout_26->addWidget(conePerc2);
 
@@ -982,10 +996,10 @@ public:
         verticalLayout_3->addWidget(FootRight);
 
         groupBox_7 = new QGroupBox(tab);
-        groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
+        groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
         groupBox_7->setGeometry(QRect(10, 380, 301, 44));
         groupBox_7->setFont(font);
-        groupBox_7->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_7->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1000,29 +1014,29 @@ public:
         gridLayout_11 = new QGridLayout(groupBox_7);
         gridLayout_11->setSpacing(6);
         gridLayout_11->setContentsMargins(11, 11, 11, 11);
-        gridLayout_11->setObjectName(QString::fromUtf8("gridLayout_11"));
+        gridLayout_11->setObjectName(QStringLiteral("gridLayout_11"));
         horizontalLayout_24 = new QHBoxLayout();
         horizontalLayout_24->setSpacing(2);
-        horizontalLayout_24->setObjectName(QString::fromUtf8("horizontalLayout_24"));
+        horizontalLayout_24->setObjectName(QStringLiteral("horizontalLayout_24"));
         checkGRF = new QCheckBox(groupBox_7);
-        checkGRF->setObjectName(QString::fromUtf8("checkGRF"));
+        checkGRF->setObjectName(QStringLiteral("checkGRF"));
         checkGRF->setChecked(true);
 
         horizontalLayout_24->addWidget(checkGRF);
 
         checkShadow = new QCheckBox(groupBox_7);
-        checkShadow->setObjectName(QString::fromUtf8("checkShadow"));
+        checkShadow->setObjectName(QStringLiteral("checkShadow"));
 
         horizontalLayout_24->addWidget(checkShadow);
 
         checkShowChara = new QCheckBox(groupBox_7);
-        checkShowChara->setObjectName(QString::fromUtf8("checkShowChara"));
+        checkShowChara->setObjectName(QStringLiteral("checkShowChara"));
         checkShowChara->setChecked(true);
 
         horizontalLayout_24->addWidget(checkShowChara);
 
         checkWireChara = new QCheckBox(groupBox_7);
-        checkWireChara->setObjectName(QString::fromUtf8("checkWireChara"));
+        checkWireChara->setObjectName(QStringLiteral("checkWireChara"));
 
         horizontalLayout_24->addWidget(checkWireChara);
 
@@ -1031,49 +1045,49 @@ public:
 
         Options->addTab(tab, QString());
         tab_2 = new QWidget();
-        tab_2->setObjectName(QString::fromUtf8("tab_2"));
+        tab_2->setObjectName(QStringLiteral("tab_2"));
         btnStart = new QPushButton(tab_2);
-        btnStart->setObjectName(QString::fromUtf8("btnStart"));
+        btnStart->setObjectName(QStringLiteral("btnStart"));
         btnStart->setGeometry(QRect(10, 20, 98, 27));
         btnPause = new QPushButton(tab_2);
-        btnPause->setObjectName(QString::fromUtf8("btnPause"));
+        btnPause->setObjectName(QStringLiteral("btnPause"));
         btnPause->setGeometry(QRect(110, 20, 98, 27));
         btnRestart = new QPushButton(tab_2);
-        btnRestart->setObjectName(QString::fromUtf8("btnRestart"));
+        btnRestart->setObjectName(QStringLiteral("btnRestart"));
         btnRestart->setGeometry(QRect(210, 20, 98, 27));
         timeLineMotion = new QSlider(tab_2);
-        timeLineMotion->setObjectName(QString::fromUtf8("timeLineMotion"));
+        timeLineMotion->setObjectName(QStringLiteral("timeLineMotion"));
         timeLineMotion->setGeometry(QRect(10, 70, 291, 29));
         timeLineMotion->setPageStep(1);
         timeLineMotion->setOrientation(Qt::Horizontal);
         layoutWidget3 = new QWidget(tab_2);
-        layoutWidget3->setObjectName(QString::fromUtf8("layoutWidget3"));
-        layoutWidget3->setGeometry(QRect(90, 100, 135, 19));
+        layoutWidget3->setObjectName(QStringLiteral("layoutWidget3"));
+        layoutWidget3->setGeometry(QRect(90, 100, 136, 19));
         horizontalLayout_22 = new QHBoxLayout(layoutWidget3);
         horizontalLayout_22->setSpacing(6);
         horizontalLayout_22->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_22->setObjectName(QString::fromUtf8("horizontalLayout_22"));
+        horizontalLayout_22->setObjectName(QStringLiteral("horizontalLayout_22"));
         horizontalLayout_22->setContentsMargins(0, 0, 0, 0);
         iframe = new QLabel(layoutWidget3);
-        iframe->setObjectName(QString::fromUtf8("iframe"));
+        iframe->setObjectName(QStringLiteral("iframe"));
 
         horizontalLayout_22->addWidget(iframe);
 
         label_23 = new QLabel(layoutWidget3);
-        label_23->setObjectName(QString::fromUtf8("label_23"));
+        label_23->setObjectName(QStringLiteral("label_23"));
 
         horizontalLayout_22->addWidget(label_23);
 
         nframe = new QLabel(layoutWidget3);
-        nframe->setObjectName(QString::fromUtf8("nframe"));
+        nframe->setObjectName(QStringLiteral("nframe"));
 
         horizontalLayout_22->addWidget(nframe);
 
         groupBox_11 = new QGroupBox(tab_2);
-        groupBox_11->setObjectName(QString::fromUtf8("groupBox_11"));
+        groupBox_11->setObjectName(QStringLiteral("groupBox_11"));
         groupBox_11->setGeometry(QRect(10, 230, 301, 221));
         groupBox_11->setFont(font);
-        groupBox_11->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_11->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1088,17 +1102,17 @@ public:
         verticalLayout_4 = new QVBoxLayout(groupBox_11);
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
         horizontalLayout_36 = new QHBoxLayout();
         horizontalLayout_36->setSpacing(6);
-        horizontalLayout_36->setObjectName(QString::fromUtf8("horizontalLayout_36"));
+        horizontalLayout_36->setObjectName(QStringLiteral("horizontalLayout_36"));
         label_34 = new QLabel(groupBox_11);
-        label_34->setObjectName(QString::fromUtf8("label_34"));
+        label_34->setObjectName(QStringLiteral("label_34"));
 
         horizontalLayout_36->addWidget(label_34);
 
         frameEdit = new QSpinBox(groupBox_11);
-        frameEdit->setObjectName(QString::fromUtf8("frameEdit"));
+        frameEdit->setObjectName(QStringLiteral("frameEdit"));
 
         horizontalLayout_36->addWidget(frameEdit);
 
@@ -1106,47 +1120,47 @@ public:
         verticalLayout_4->addLayout(horizontalLayout_36);
 
         checkShowEditingFrame = new QCheckBox(groupBox_11);
-        checkShowEditingFrame->setObjectName(QString::fromUtf8("checkShowEditingFrame"));
+        checkShowEditingFrame->setObjectName(QStringLiteral("checkShowEditingFrame"));
 
         verticalLayout_4->addWidget(checkShowEditingFrame);
 
         checkFrameFootLeft = new QCheckBox(groupBox_11);
-        checkFrameFootLeft->setObjectName(QString::fromUtf8("checkFrameFootLeft"));
+        checkFrameFootLeft->setObjectName(QStringLiteral("checkFrameFootLeft"));
         checkFrameFootLeft->setChecked(true);
 
         verticalLayout_4->addWidget(checkFrameFootLeft);
 
         checkFrameFootRight = new QCheckBox(groupBox_11);
-        checkFrameFootRight->setObjectName(QString::fromUtf8("checkFrameFootRight"));
+        checkFrameFootRight->setObjectName(QStringLiteral("checkFrameFootRight"));
         checkFrameFootRight->setChecked(true);
 
         verticalLayout_4->addWidget(checkFrameFootRight);
 
         saveEditingFrame = new QPushButton(groupBox_11);
-        saveEditingFrame->setObjectName(QString::fromUtf8("saveEditingFrame"));
+        saveEditingFrame->setObjectName(QStringLiteral("saveEditingFrame"));
 
         verticalLayout_4->addWidget(saveEditingFrame);
 
         loadEditedFrames = new QPushButton(groupBox_11);
-        loadEditedFrames->setObjectName(QString::fromUtf8("loadEditedFrames"));
+        loadEditedFrames->setObjectName(QStringLiteral("loadEditedFrames"));
 
         verticalLayout_4->addWidget(loadEditedFrames);
 
         layoutWidget4 = new QWidget(tab_2);
-        layoutWidget4->setObjectName(QString::fromUtf8("layoutWidget4"));
-        layoutWidget4->setGeometry(QRect(20, 140, 268, 29));
+        layoutWidget4->setObjectName(QStringLiteral("layoutWidget4"));
+        layoutWidget4->setGeometry(QRect(20, 140, 274, 29));
         horizontalLayout_35 = new QHBoxLayout(layoutWidget4);
         horizontalLayout_35->setSpacing(6);
         horizontalLayout_35->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_35->setObjectName(QString::fromUtf8("horizontalLayout_35"));
+        horizontalLayout_35->setObjectName(QStringLiteral("horizontalLayout_35"));
         horizontalLayout_35->setContentsMargins(0, 0, 0, 0);
         label_22 = new QLabel(layoutWidget4);
-        label_22->setObjectName(QString::fromUtf8("label_22"));
+        label_22->setObjectName(QStringLiteral("label_22"));
 
         horizontalLayout_35->addWidget(label_22);
 
         sensorTolerance = new QDoubleSpinBox(layoutWidget4);
-        sensorTolerance->setObjectName(QString::fromUtf8("sensorTolerance"));
+        sensorTolerance->setObjectName(QStringLiteral("sensorTolerance"));
         sensorTolerance->setDecimals(4);
         sensorTolerance->setMaximum(999);
         sensorTolerance->setSingleStep(0.01);
@@ -1155,10 +1169,10 @@ public:
         horizontalLayout_35->addWidget(sensorTolerance);
 
         groupBox_12 = new QGroupBox(tab_2);
-        groupBox_12->setObjectName(QString::fromUtf8("groupBox_12"));
+        groupBox_12->setObjectName(QStringLiteral("groupBox_12"));
         groupBox_12->setGeometry(QRect(10, 470, 301, 112));
         groupBox_12->setFont(font);
-        groupBox_12->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_12->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1173,23 +1187,23 @@ public:
         gridLayout_15 = new QGridLayout(groupBox_12);
         gridLayout_15->setSpacing(6);
         gridLayout_15->setContentsMargins(11, 11, 11, 11);
-        gridLayout_15->setObjectName(QString::fromUtf8("gridLayout_15"));
+        gridLayout_15->setObjectName(QStringLiteral("gridLayout_15"));
         mocapCyclic = new QCheckBox(groupBox_12);
-        mocapCyclic->setObjectName(QString::fromUtf8("mocapCyclic"));
+        mocapCyclic->setObjectName(QStringLiteral("mocapCyclic"));
         mocapCyclic->setChecked(true);
 
         gridLayout_15->addWidget(mocapCyclic, 0, 0, 1, 1);
 
         horizontalLayout_38 = new QHBoxLayout();
         horizontalLayout_38->setSpacing(6);
-        horizontalLayout_38->setObjectName(QString::fromUtf8("horizontalLayout_38"));
+        horizontalLayout_38->setObjectName(QStringLiteral("horizontalLayout_38"));
         label_36 = new QLabel(groupBox_12);
-        label_36->setObjectName(QString::fromUtf8("label_36"));
+        label_36->setObjectName(QStringLiteral("label_36"));
 
         horizontalLayout_38->addWidget(label_36);
 
         beginClycle = new QSpinBox(groupBox_12);
-        beginClycle->setObjectName(QString::fromUtf8("beginClycle"));
+        beginClycle->setObjectName(QStringLiteral("beginClycle"));
 
         horizontalLayout_38->addWidget(beginClycle);
 
@@ -1198,14 +1212,14 @@ public:
 
         horizontalLayout_39 = new QHBoxLayout();
         horizontalLayout_39->setSpacing(6);
-        horizontalLayout_39->setObjectName(QString::fromUtf8("horizontalLayout_39"));
+        horizontalLayout_39->setObjectName(QStringLiteral("horizontalLayout_39"));
         label_37 = new QLabel(groupBox_12);
-        label_37->setObjectName(QString::fromUtf8("label_37"));
+        label_37->setObjectName(QStringLiteral("label_37"));
 
         horizontalLayout_39->addWidget(label_37);
 
         endClycle = new QSpinBox(groupBox_12);
-        endClycle->setObjectName(QString::fromUtf8("endClycle"));
+        endClycle->setObjectName(QStringLiteral("endClycle"));
 
         horizontalLayout_39->addWidget(endClycle);
 
@@ -1213,34 +1227,49 @@ public:
         gridLayout_15->addLayout(horizontalLayout_39, 2, 0, 1, 1);
 
         checkShowMocap = new QCheckBox(tab_2);
-        checkShowMocap->setObjectName(QString::fromUtf8("checkShowMocap"));
+        checkShowMocap->setObjectName(QStringLiteral("checkShowMocap"));
         checkShowMocap->setGeometry(QRect(20, 200, 151, 22));
         checkShowMocap->setChecked(true);
         checkScreenShot = new QCheckBox(tab_2);
-        checkScreenShot->setObjectName(QString::fromUtf8("checkScreenShot"));
+        checkScreenShot->setObjectName(QStringLiteral("checkScreenShot"));
         checkScreenShot->setGeometry(QRect(20, 120, 251, 22));
-        toleranciaCOM = new QDoubleSpinBox(tab_2);
-        toleranciaCOM->setObjectName(QString::fromUtf8("toleranciaCOM"));
-        toleranciaCOM->setGeometry(QRect(200, 180, 62, 27));
-        toleranciaCOM->setDecimals(4);
-        toleranciaCOM->setMinimum(-0.0001);
-        toleranciaCOM->setMaximum(1000);
+        layoutWidget5 = new QWidget(tab_2);
+        layoutWidget5->setObjectName(QStringLiteral("layoutWidget5"));
+        layoutWidget5->setGeometry(QRect(20, 170, 271, 29));
+        horizontalLayout_42 = new QHBoxLayout(layoutWidget5);
+        horizontalLayout_42->setSpacing(6);
+        horizontalLayout_42->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_42->setObjectName(QStringLiteral("horizontalLayout_42"));
+        horizontalLayout_42->setContentsMargins(0, 0, 0, 0);
+        label_39 = new QLabel(layoutWidget5);
+        label_39->setObjectName(QStringLiteral("label_39"));
+
+        horizontalLayout_42->addWidget(label_39);
+
+        stepsInterpolation = new QDoubleSpinBox(layoutWidget5);
+        stepsInterpolation->setObjectName(QStringLiteral("stepsInterpolation"));
+        stepsInterpolation->setDecimals(2);
+        stepsInterpolation->setMinimum(0);
+        stepsInterpolation->setMaximum(100000);
+
+        horizontalLayout_42->addWidget(stepsInterpolation);
+
         Options->addTab(tab_2, QString());
         tabManipulatorSim = new QWidget();
-        tabManipulatorSim->setObjectName(QString::fromUtf8("tabManipulatorSim"));
+        tabManipulatorSim->setObjectName(QStringLiteral("tabManipulatorSim"));
         gridLayout_12 = new QGridLayout(tabManipulatorSim);
         gridLayout_12->setSpacing(6);
         gridLayout_12->setContentsMargins(11, 11, 11, 11);
-        gridLayout_12->setObjectName(QString::fromUtf8("gridLayout_12"));
+        gridLayout_12->setObjectName(QStringLiteral("gridLayout_12"));
         listWidgetObjects = new QListWidget(tabManipulatorSim);
-        listWidgetObjects->setObjectName(QString::fromUtf8("listWidgetObjects"));
+        listWidgetObjects->setObjectName(QStringLiteral("listWidgetObjects"));
 
         gridLayout_12->addWidget(listWidgetObjects, 0, 0, 1, 1);
 
         groupBox_9 = new QGroupBox(tabManipulatorSim);
-        groupBox_9->setObjectName(QString::fromUtf8("groupBox_9"));
+        groupBox_9->setObjectName(QStringLiteral("groupBox_9"));
         groupBox_9->setFont(font);
-        groupBox_9->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_9->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1255,22 +1284,22 @@ public:
         gridLayout_6 = new QGridLayout(groupBox_9);
         gridLayout_6->setSpacing(6);
         gridLayout_6->setContentsMargins(11, 11, 11, 11);
-        gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
+        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
         horizontalLayout_31 = new QHBoxLayout();
         horizontalLayout_31->setSpacing(6);
-        horizontalLayout_31->setObjectName(QString::fromUtf8("horizontalLayout_31"));
+        horizontalLayout_31->setObjectName(QStringLiteral("horizontalLayout_31"));
         enable_cpdp = new QCheckBox(groupBox_9);
-        enable_cpdp->setObjectName(QString::fromUtf8("enable_cpdp"));
+        enable_cpdp->setObjectName(QStringLiteral("enable_cpdp"));
 
         horizontalLayout_31->addWidget(enable_cpdp);
 
         show_effector = new QCheckBox(groupBox_9);
-        show_effector->setObjectName(QString::fromUtf8("show_effector"));
+        show_effector->setObjectName(QStringLiteral("show_effector"));
 
         horizontalLayout_31->addWidget(show_effector);
 
         show_target = new QCheckBox(groupBox_9);
-        show_target->setObjectName(QString::fromUtf8("show_target"));
+        show_target->setObjectName(QStringLiteral("show_target"));
 
         horizontalLayout_31->addWidget(show_target);
 
@@ -1279,14 +1308,14 @@ public:
 
         horizontalLayout_32 = new QHBoxLayout();
         horizontalLayout_32->setSpacing(6);
-        horizontalLayout_32->setObjectName(QString::fromUtf8("horizontalLayout_32"));
+        horizontalLayout_32->setObjectName(QStringLiteral("horizontalLayout_32"));
         label_31 = new QLabel(groupBox_9);
-        label_31->setObjectName(QString::fromUtf8("label_31"));
+        label_31->setObjectName(QStringLiteral("label_31"));
 
         horizontalLayout_32->addWidget(label_31);
 
         posx_target = new QDoubleSpinBox(groupBox_9);
-        posx_target->setObjectName(QString::fromUtf8("posx_target"));
+        posx_target->setObjectName(QStringLiteral("posx_target"));
         posx_target->setDecimals(2);
         posx_target->setMinimum(-1000);
         posx_target->setMaximum(1000);
@@ -1295,7 +1324,7 @@ public:
         horizontalLayout_32->addWidget(posx_target);
 
         posy_target = new QDoubleSpinBox(groupBox_9);
-        posy_target->setObjectName(QString::fromUtf8("posy_target"));
+        posy_target->setObjectName(QStringLiteral("posy_target"));
         posy_target->setDecimals(2);
         posy_target->setMinimum(-1000);
         posy_target->setMaximum(1000);
@@ -1304,7 +1333,7 @@ public:
         horizontalLayout_32->addWidget(posy_target);
 
         posz_target = new QDoubleSpinBox(groupBox_9);
-        posz_target->setObjectName(QString::fromUtf8("posz_target"));
+        posz_target->setObjectName(QStringLiteral("posz_target"));
         posz_target->setDecimals(2);
         posz_target->setMinimum(-1000);
         posz_target->setMaximum(1000);
@@ -1317,14 +1346,14 @@ public:
 
         horizontalLayout_33 = new QHBoxLayout();
         horizontalLayout_33->setSpacing(6);
-        horizontalLayout_33->setObjectName(QString::fromUtf8("horizontalLayout_33"));
+        horizontalLayout_33->setObjectName(QStringLiteral("horizontalLayout_33"));
         label_32 = new QLabel(groupBox_9);
-        label_32->setObjectName(QString::fromUtf8("label_32"));
+        label_32->setObjectName(QStringLiteral("label_32"));
 
         horizontalLayout_33->addWidget(label_32);
 
         posx_ks = new QDoubleSpinBox(groupBox_9);
-        posx_ks->setObjectName(QString::fromUtf8("posx_ks"));
+        posx_ks->setObjectName(QStringLiteral("posx_ks"));
         posx_ks->setDecimals(2);
         posx_ks->setMinimum(-1000);
         posx_ks->setMaximum(1000);
@@ -1333,7 +1362,7 @@ public:
         horizontalLayout_33->addWidget(posx_ks);
 
         posy_ks = new QDoubleSpinBox(groupBox_9);
-        posy_ks->setObjectName(QString::fromUtf8("posy_ks"));
+        posy_ks->setObjectName(QStringLiteral("posy_ks"));
         posy_ks->setDecimals(2);
         posy_ks->setMinimum(-1000);
         posy_ks->setMaximum(1000);
@@ -1342,7 +1371,7 @@ public:
         horizontalLayout_33->addWidget(posy_ks);
 
         posz_ks = new QDoubleSpinBox(groupBox_9);
-        posz_ks->setObjectName(QString::fromUtf8("posz_ks"));
+        posz_ks->setObjectName(QStringLiteral("posz_ks"));
         posz_ks->setDecimals(2);
         posz_ks->setMinimum(-1000);
         posz_ks->setMaximum(1000);
@@ -1355,14 +1384,14 @@ public:
 
         horizontalLayout_34 = new QHBoxLayout();
         horizontalLayout_34->setSpacing(6);
-        horizontalLayout_34->setObjectName(QString::fromUtf8("horizontalLayout_34"));
+        horizontalLayout_34->setObjectName(QStringLiteral("horizontalLayout_34"));
         label_33 = new QLabel(groupBox_9);
-        label_33->setObjectName(QString::fromUtf8("label_33"));
+        label_33->setObjectName(QStringLiteral("label_33"));
 
         horizontalLayout_34->addWidget(label_33);
 
         posx_kd = new QDoubleSpinBox(groupBox_9);
-        posx_kd->setObjectName(QString::fromUtf8("posx_kd"));
+        posx_kd->setObjectName(QStringLiteral("posx_kd"));
         posx_kd->setDecimals(2);
         posx_kd->setMinimum(-1000);
         posx_kd->setMaximum(1000);
@@ -1371,7 +1400,7 @@ public:
         horizontalLayout_34->addWidget(posx_kd);
 
         posy_kd = new QDoubleSpinBox(groupBox_9);
-        posy_kd->setObjectName(QString::fromUtf8("posy_kd"));
+        posy_kd->setObjectName(QStringLiteral("posy_kd"));
         posy_kd->setDecimals(2);
         posy_kd->setMinimum(-1000);
         posy_kd->setMaximum(1000);
@@ -1380,7 +1409,7 @@ public:
         horizontalLayout_34->addWidget(posy_kd);
 
         posz_kd = new QDoubleSpinBox(groupBox_9);
-        posz_kd->setObjectName(QString::fromUtf8("posz_kd"));
+        posz_kd->setObjectName(QStringLiteral("posz_kd"));
         posz_kd->setDecimals(2);
         posz_kd->setMinimum(-1000);
         posz_kd->setMaximum(1000);
@@ -1395,9 +1424,9 @@ public:
         gridLayout_12->addWidget(groupBox_9, 2, 0, 1, 1);
 
         groupBox_2 = new QGroupBox(tabManipulatorSim);
-        groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
         groupBox_2->setFont(font);
-        groupBox_2->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_2->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1412,29 +1441,29 @@ public:
         gridLayout_3 = new QGridLayout(groupBox_2);
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
-        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
         gridLayout_3->setHorizontalSpacing(2);
         gridLayout_3->setVerticalSpacing(0);
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setSpacing(6);
-        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
         label_9 = new QLabel(groupBox_2);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_9->setObjectName(QStringLiteral("label_9"));
 
         horizontalLayout_8->addWidget(label_9);
 
         scalex = new QDoubleSpinBox(groupBox_2);
-        scalex->setObjectName(QString::fromUtf8("scalex"));
+        scalex->setObjectName(QStringLiteral("scalex"));
 
         horizontalLayout_8->addWidget(scalex);
 
         scaley = new QDoubleSpinBox(groupBox_2);
-        scaley->setObjectName(QString::fromUtf8("scaley"));
+        scaley->setObjectName(QStringLiteral("scaley"));
 
         horizontalLayout_8->addWidget(scaley);
 
         scalez = new QDoubleSpinBox(groupBox_2);
-        scalez->setObjectName(QString::fromUtf8("scalez"));
+        scalez->setObjectName(QStringLiteral("scalez"));
 
         horizontalLayout_8->addWidget(scalez);
 
@@ -1443,14 +1472,14 @@ public:
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setSpacing(6);
-        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
         label_7 = new QLabel(groupBox_2);
-        label_7->setObjectName(QString::fromUtf8("label_7"));
+        label_7->setObjectName(QStringLiteral("label_7"));
 
         horizontalLayout_6->addWidget(label_7);
 
         posx = new QDoubleSpinBox(groupBox_2);
-        posx->setObjectName(QString::fromUtf8("posx"));
+        posx->setObjectName(QStringLiteral("posx"));
         posx->setDecimals(3);
         posx->setMinimum(-1000);
         posx->setMaximum(1000);
@@ -1458,7 +1487,7 @@ public:
         horizontalLayout_6->addWidget(posx);
 
         posy = new QDoubleSpinBox(groupBox_2);
-        posy->setObjectName(QString::fromUtf8("posy"));
+        posy->setObjectName(QStringLiteral("posy"));
         posy->setDecimals(3);
         posy->setMinimum(-1000);
         posy->setMaximum(1000);
@@ -1466,7 +1495,7 @@ public:
         horizontalLayout_6->addWidget(posy);
 
         posz = new QDoubleSpinBox(groupBox_2);
-        posz->setObjectName(QString::fromUtf8("posz"));
+        posz->setObjectName(QStringLiteral("posz"));
         posz->setDecimals(3);
         posz->setMinimum(-1000);
         posz->setMaximum(1000);
@@ -1478,14 +1507,14 @@ public:
 
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setSpacing(6);
-        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
         label_10 = new QLabel(groupBox_2);
-        label_10->setObjectName(QString::fromUtf8("label_10"));
+        label_10->setObjectName(QStringLiteral("label_10"));
 
         horizontalLayout_9->addWidget(label_10);
 
         mass = new QDoubleSpinBox(groupBox_2);
-        mass->setObjectName(QString::fromUtf8("mass"));
+        mass->setObjectName(QStringLiteral("mass"));
 
         horizontalLayout_9->addWidget(mass);
 
@@ -1494,28 +1523,28 @@ public:
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setSpacing(6);
-        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
         label_8 = new QLabel(groupBox_2);
-        label_8->setObjectName(QString::fromUtf8("label_8"));
+        label_8->setObjectName(QStringLiteral("label_8"));
 
         horizontalLayout_7->addWidget(label_8);
 
         oeulerx = new QSpinBox(groupBox_2);
-        oeulerx->setObjectName(QString::fromUtf8("oeulerx"));
+        oeulerx->setObjectName(QStringLiteral("oeulerx"));
         oeulerx->setMinimum(-360);
         oeulerx->setMaximum(360);
 
         horizontalLayout_7->addWidget(oeulerx);
 
         oeulery = new QSpinBox(groupBox_2);
-        oeulery->setObjectName(QString::fromUtf8("oeulery"));
+        oeulery->setObjectName(QStringLiteral("oeulery"));
         oeulery->setMinimum(-360);
         oeulery->setMaximum(360);
 
         horizontalLayout_7->addWidget(oeulery);
 
         oeulerz = new QSpinBox(groupBox_2);
-        oeulerz->setObjectName(QString::fromUtf8("oeulerz"));
+        oeulerz->setObjectName(QStringLiteral("oeulerz"));
         oeulerz->setMinimum(-360);
         oeulerz->setMaximum(360);
 
@@ -1525,12 +1554,12 @@ public:
         gridLayout_3->addLayout(horizontalLayout_7, 3, 0, 1, 1);
 
         isFoot = new QCheckBox(groupBox_2);
-        isFoot->setObjectName(QString::fromUtf8("isFoot"));
+        isFoot->setObjectName(QStringLiteral("isFoot"));
 
         gridLayout_3->addWidget(isFoot, 6, 0, 1, 1);
 
         isBodyBalance = new QCheckBox(groupBox_2);
-        isBodyBalance->setObjectName(QString::fromUtf8("isBodyBalance"));
+        isBodyBalance->setObjectName(QStringLiteral("isBodyBalance"));
 
         gridLayout_3->addWidget(isBodyBalance, 7, 0, 1, 1);
 
@@ -1538,9 +1567,9 @@ public:
         gridLayout_12->addWidget(groupBox_2, 3, 0, 1, 1);
 
         groupBox = new QGroupBox(tabManipulatorSim);
-        groupBox->setObjectName(QString::fromUtf8("groupBox"));
+        groupBox->setObjectName(QStringLiteral("groupBox"));
         groupBox->setFont(font);
-        groupBox->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1555,17 +1584,17 @@ public:
         gridLayout_5 = new QGridLayout(groupBox);
         gridLayout_5->setSpacing(6);
         gridLayout_5->setContentsMargins(11, 11, 11, 11);
-        gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
         label_2 = new QLabel(groupBox);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setObjectName(QStringLiteral("label_2"));
 
         gridLayout_5->addWidget(label_2, 0, 0, 1, 1);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(0);
-        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
         forcex = new QDoubleSpinBox(groupBox);
-        forcex->setObjectName(QString::fromUtf8("forcex"));
+        forcex->setObjectName(QStringLiteral("forcex"));
         forcex->setMaximumSize(QSize(75, 16777215));
         forcex->setMinimum(-10000);
         forcex->setMaximum(10000);
@@ -1574,7 +1603,7 @@ public:
         horizontalLayout_2->addWidget(forcex);
 
         forcey = new QDoubleSpinBox(groupBox);
-        forcey->setObjectName(QString::fromUtf8("forcey"));
+        forcey->setObjectName(QStringLiteral("forcey"));
         forcey->setMaximumSize(QSize(75, 16777215));
         forcey->setMinimum(-10000);
         forcey->setMaximum(10000);
@@ -1583,7 +1612,7 @@ public:
         horizontalLayout_2->addWidget(forcey);
 
         forcez = new QDoubleSpinBox(groupBox);
-        forcez->setObjectName(QString::fromUtf8("forcez"));
+        forcez->setObjectName(QStringLiteral("forcez"));
         forcez->setMaximumSize(QSize(75, 16777215));
         forcez->setMinimum(-10000);
         forcez->setMaximum(10000);
@@ -1592,7 +1621,7 @@ public:
         horizontalLayout_2->addWidget(forcez);
 
         applyForce = new QPushButton(groupBox);
-        applyForce->setObjectName(QString::fromUtf8("applyForce"));
+        applyForce->setObjectName(QStringLiteral("applyForce"));
         applyForce->setMaximumSize(QSize(50, 16777215));
 
         horizontalLayout_2->addWidget(applyForce);
@@ -1604,9 +1633,9 @@ public:
         gridLayout_12->addWidget(groupBox, 4, 0, 1, 1);
 
         groupBox_10 = new QGroupBox(tabManipulatorSim);
-        groupBox_10->setObjectName(QString::fromUtf8("groupBox_10"));
+        groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
         groupBox_10->setFont(font);
-        groupBox_10->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_10->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1621,9 +1650,9 @@ public:
         gridLayout_13 = new QGridLayout(groupBox_10);
         gridLayout_13->setSpacing(6);
         gridLayout_13->setContentsMargins(11, 11, 11, 11);
-        gridLayout_13->setObjectName(QString::fromUtf8("gridLayout_13"));
+        gridLayout_13->setObjectName(QStringLiteral("gridLayout_13"));
         hasCup = new QCheckBox(groupBox_10);
-        hasCup->setObjectName(QString::fromUtf8("hasCup"));
+        hasCup->setObjectName(QStringLiteral("hasCup"));
 
         gridLayout_13->addWidget(hasCup, 0, 0, 1, 1);
 
@@ -1632,20 +1661,20 @@ public:
 
         Options->addTab(tabManipulatorSim, QString());
         controlpd = new QWidget();
-        controlpd->setObjectName(QString::fromUtf8("controlpd"));
+        controlpd->setObjectName(QStringLiteral("controlpd"));
         gridLayout_10 = new QGridLayout(controlpd);
         gridLayout_10->setSpacing(6);
         gridLayout_10->setContentsMargins(11, 11, 11, 11);
-        gridLayout_10->setObjectName(QString::fromUtf8("gridLayout_10"));
+        gridLayout_10->setObjectName(QStringLiteral("gridLayout_10"));
         listWidgetJoints = new QListWidget(controlpd);
-        listWidgetJoints->setObjectName(QString::fromUtf8("listWidgetJoints"));
+        listWidgetJoints->setObjectName(QStringLiteral("listWidgetJoints"));
 
         gridLayout_10->addWidget(listWidgetJoints, 0, 0, 1, 1);
 
         groupBox_5 = new QGroupBox(controlpd);
-        groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
+        groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
         groupBox_5->setFont(font);
-        groupBox_5->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_5->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1660,17 +1689,17 @@ public:
         gridLayout_9 = new QGridLayout(groupBox_5);
         gridLayout_9->setSpacing(6);
         gridLayout_9->setContentsMargins(11, 11, 11, 11);
-        gridLayout_9->setObjectName(QString::fromUtf8("gridLayout_9"));
+        gridLayout_9->setObjectName(QStringLiteral("gridLayout_9"));
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         label_3 = new QLabel(groupBox_5);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setObjectName(QStringLiteral("label_3"));
 
         horizontalLayout_3->addWidget(label_3);
 
         ksx = new QDoubleSpinBox(groupBox_5);
-        ksx->setObjectName(QString::fromUtf8("ksx"));
+        ksx->setObjectName(QStringLiteral("ksx"));
         ksx->setMinimum(-1000);
         ksx->setMaximum(1000);
         ksx->setSingleStep(0.1);
@@ -1678,7 +1707,7 @@ public:
         horizontalLayout_3->addWidget(ksx);
 
         ksy = new QDoubleSpinBox(groupBox_5);
-        ksy->setObjectName(QString::fromUtf8("ksy"));
+        ksy->setObjectName(QStringLiteral("ksy"));
         ksy->setMinimum(-1000);
         ksy->setMaximum(1000);
         ksy->setSingleStep(0.1);
@@ -1686,7 +1715,7 @@ public:
         horizontalLayout_3->addWidget(ksy);
 
         ksz = new QDoubleSpinBox(groupBox_5);
-        ksz->setObjectName(QString::fromUtf8("ksz"));
+        ksz->setObjectName(QStringLiteral("ksz"));
         ksz->setMinimum(-1000);
         ksz->setMaximum(1000);
         ksz->setSingleStep(0.1);
@@ -1698,14 +1727,14 @@ public:
 
         horizontalLayout_4 = new QHBoxLayout();
         horizontalLayout_4->setSpacing(6);
-        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
         label_4 = new QLabel(groupBox_5);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
+        label_4->setObjectName(QStringLiteral("label_4"));
 
         horizontalLayout_4->addWidget(label_4);
 
         kdx = new QDoubleSpinBox(groupBox_5);
-        kdx->setObjectName(QString::fromUtf8("kdx"));
+        kdx->setObjectName(QStringLiteral("kdx"));
         kdx->setMinimum(-1000);
         kdx->setMaximum(1000);
         kdx->setSingleStep(0.1);
@@ -1713,7 +1742,7 @@ public:
         horizontalLayout_4->addWidget(kdx);
 
         kdy = new QDoubleSpinBox(groupBox_5);
-        kdy->setObjectName(QString::fromUtf8("kdy"));
+        kdy->setObjectName(QStringLiteral("kdy"));
         kdy->setMinimum(-1000);
         kdy->setMaximum(1000);
         kdy->setSingleStep(0.1);
@@ -1721,7 +1750,7 @@ public:
         horizontalLayout_4->addWidget(kdy);
 
         kdz = new QDoubleSpinBox(groupBox_5);
-        kdz->setObjectName(QString::fromUtf8("kdz"));
+        kdz->setObjectName(QStringLiteral("kdz"));
         kdz->setMinimum(-1000);
         kdz->setMaximum(1000);
         kdz->setSingleStep(0.1);
@@ -1733,28 +1762,28 @@ public:
 
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setSpacing(6);
-        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
         label_5 = new QLabel(groupBox_5);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
+        label_5->setObjectName(QStringLiteral("label_5"));
 
         horizontalLayout_5->addWidget(label_5);
 
         eulerx = new QDoubleSpinBox(groupBox_5);
-        eulerx->setObjectName(QString::fromUtf8("eulerx"));
+        eulerx->setObjectName(QStringLiteral("eulerx"));
         eulerx->setMinimum(-360);
         eulerx->setMaximum(360);
 
         horizontalLayout_5->addWidget(eulerx);
 
         eulery = new QDoubleSpinBox(groupBox_5);
-        eulery->setObjectName(QString::fromUtf8("eulery"));
+        eulery->setObjectName(QStringLiteral("eulery"));
         eulery->setMinimum(-360);
         eulery->setMaximum(360);
 
         horizontalLayout_5->addWidget(eulery);
 
         eulerz = new QDoubleSpinBox(groupBox_5);
-        eulerz->setObjectName(QString::fromUtf8("eulerz"));
+        eulerz->setObjectName(QStringLiteral("eulerz"));
         eulerz->setMinimum(-360);
         eulerz->setMaximum(360);
 
@@ -1764,7 +1793,7 @@ public:
         gridLayout_9->addLayout(horizontalLayout_5, 2, 0, 1, 1);
 
         enablepd = new QCheckBox(groupBox_5);
-        enablepd->setObjectName(QString::fromUtf8("enablepd"));
+        enablepd->setObjectName(QStringLiteral("enablepd"));
 
         gridLayout_9->addWidget(enablepd, 3, 0, 1, 1);
 
@@ -1772,9 +1801,9 @@ public:
         gridLayout_10->addWidget(groupBox_5, 1, 0, 1, 1);
 
         groupBox_6 = new QGroupBox(controlpd);
-        groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
+        groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
         groupBox_6->setFont(font);
-        groupBox_6->setStyleSheet(QString::fromUtf8("QGroupBox::title { \n"
+        groupBox_6->setStyleSheet(QLatin1String("QGroupBox::title { \n"
 "   \n"
 "     subcontrol-position: top left; /* position at the top left*/ \n"
 "  padding: 2px 13px;\n"
@@ -1789,27 +1818,27 @@ public:
         gridLayout_4 = new QGridLayout(groupBox_6);
         gridLayout_4->setSpacing(6);
         gridLayout_4->setContentsMargins(11, 11, 11, 11);
-        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
+        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
         horizontalLayout_17 = new QHBoxLayout();
         horizontalLayout_17->setSpacing(6);
-        horizontalLayout_17->setObjectName(QString::fromUtf8("horizontalLayout_17"));
+        horizontalLayout_17->setObjectName(QStringLiteral("horizontalLayout_17"));
         label_6 = new QLabel(groupBox_6);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
+        label_6->setObjectName(QStringLiteral("label_6"));
 
         horizontalLayout_17->addWidget(label_6);
 
         xksPdApply = new QLabel(groupBox_6);
-        xksPdApply->setObjectName(QString::fromUtf8("xksPdApply"));
+        xksPdApply->setObjectName(QStringLiteral("xksPdApply"));
 
         horizontalLayout_17->addWidget(xksPdApply);
 
         yksPdApply = new QLabel(groupBox_6);
-        yksPdApply->setObjectName(QString::fromUtf8("yksPdApply"));
+        yksPdApply->setObjectName(QStringLiteral("yksPdApply"));
 
         horizontalLayout_17->addWidget(yksPdApply);
 
         zksPdApply = new QLabel(groupBox_6);
-        zksPdApply->setObjectName(QString::fromUtf8("zksPdApply"));
+        zksPdApply->setObjectName(QStringLiteral("zksPdApply"));
 
         horizontalLayout_17->addWidget(zksPdApply);
 
@@ -1818,24 +1847,24 @@ public:
 
         horizontalLayout_18 = new QHBoxLayout();
         horizontalLayout_18->setSpacing(6);
-        horizontalLayout_18->setObjectName(QString::fromUtf8("horizontalLayout_18"));
+        horizontalLayout_18->setObjectName(QStringLiteral("horizontalLayout_18"));
         label_21 = new QLabel(groupBox_6);
-        label_21->setObjectName(QString::fromUtf8("label_21"));
+        label_21->setObjectName(QStringLiteral("label_21"));
 
         horizontalLayout_18->addWidget(label_21);
 
         xkdPdApply = new QLabel(groupBox_6);
-        xkdPdApply->setObjectName(QString::fromUtf8("xkdPdApply"));
+        xkdPdApply->setObjectName(QStringLiteral("xkdPdApply"));
 
         horizontalLayout_18->addWidget(xkdPdApply);
 
         ykdPdApply = new QLabel(groupBox_6);
-        ykdPdApply->setObjectName(QString::fromUtf8("ykdPdApply"));
+        ykdPdApply->setObjectName(QStringLiteral("ykdPdApply"));
 
         horizontalLayout_18->addWidget(ykdPdApply);
 
         zkdPdApply = new QLabel(groupBox_6);
-        zkdPdApply->setObjectName(QString::fromUtf8("zkdPdApply"));
+        zkdPdApply->setObjectName(QStringLiteral("zkdPdApply"));
 
         horizontalLayout_18->addWidget(zkdPdApply);
 
@@ -1846,86 +1875,129 @@ public:
         gridLayout_10->addWidget(groupBox_6, 2, 0, 1, 1);
 
         infoPD = new QFrame(controlpd);
-        infoPD->setObjectName(QString::fromUtf8("infoPD"));
+        infoPD->setObjectName(QStringLiteral("infoPD"));
         infoPD->setFrameShape(QFrame::NoFrame);
         infoPD->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(infoPD);
         verticalLayout->setSpacing(0);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
 
         gridLayout_10->addWidget(infoPD, 3, 0, 1, 1);
 
         Options->addTab(controlpd, QString());
         tab_3 = new QWidget();
-        tab_3->setObjectName(QString::fromUtf8("tab_3"));
+        tab_3->setObjectName(QStringLiteral("tab_3"));
         layoutWidget_2 = new QWidget(tab_3);
-        layoutWidget_2->setObjectName(QString::fromUtf8("layoutWidget_2"));
+        layoutWidget_2->setObjectName(QStringLiteral("layoutWidget_2"));
         layoutWidget_2->setGeometry(QRect(10, 70, 306, 29));
         horizontalLayout_40 = new QHBoxLayout(layoutWidget_2);
         horizontalLayout_40->setSpacing(6);
         horizontalLayout_40->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_40->setObjectName(QString::fromUtf8("horizontalLayout_40"));
+        horizontalLayout_40->setObjectName(QStringLiteral("horizontalLayout_40"));
         horizontalLayout_40->setContentsMargins(0, 0, 0, 0);
         label_25 = new QLabel(layoutWidget_2);
-        label_25->setObjectName(QString::fromUtf8("label_25"));
+        label_25->setObjectName(QStringLiteral("label_25"));
 
         horizontalLayout_40->addWidget(label_25);
 
         xkDis = new QDoubleSpinBox(layoutWidget_2);
-        xkDis->setObjectName(QString::fromUtf8("xkDis"));
+        xkDis->setObjectName(QStringLiteral("xkDis"));
         xkDis->setMinimum(-500);
         xkDis->setMaximum(500);
 
         horizontalLayout_40->addWidget(xkDis);
 
         ykDis = new QDoubleSpinBox(layoutWidget_2);
-        ykDis->setObjectName(QString::fromUtf8("ykDis"));
+        ykDis->setObjectName(QStringLiteral("ykDis"));
         ykDis->setMinimum(-500);
         ykDis->setMaximum(500);
 
         horizontalLayout_40->addWidget(ykDis);
 
         zkDis = new QDoubleSpinBox(layoutWidget_2);
-        zkDis->setObjectName(QString::fromUtf8("zkDis"));
+        zkDis->setObjectName(QStringLiteral("zkDis"));
         zkDis->setMinimum(-500);
         zkDis->setMaximum(500);
 
         horizontalLayout_40->addWidget(zkDis);
 
         layoutWidget_3 = new QWidget(tab_3);
-        layoutWidget_3->setObjectName(QString::fromUtf8("layoutWidget_3"));
+        layoutWidget_3->setObjectName(QStringLiteral("layoutWidget_3"));
         layoutWidget_3->setGeometry(QRect(10, 20, 308, 29));
         horizontalLayout_41 = new QHBoxLayout(layoutWidget_3);
         horizontalLayout_41->setSpacing(6);
         horizontalLayout_41->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_41->setObjectName(QString::fromUtf8("horizontalLayout_41"));
+        horizontalLayout_41->setObjectName(QStringLiteral("horizontalLayout_41"));
         horizontalLayout_41->setContentsMargins(0, 0, 0, 0);
         label_38 = new QLabel(layoutWidget_3);
-        label_38->setObjectName(QString::fromUtf8("label_38"));
+        label_38->setObjectName(QStringLiteral("label_38"));
 
         horizontalLayout_41->addWidget(label_38);
 
         xkFor = new QDoubleSpinBox(layoutWidget_3);
-        xkFor->setObjectName(QString::fromUtf8("xkFor"));
+        xkFor->setObjectName(QStringLiteral("xkFor"));
         xkFor->setMinimum(-500);
         xkFor->setMaximum(500);
 
         horizontalLayout_41->addWidget(xkFor);
 
         ykFor = new QDoubleSpinBox(layoutWidget_3);
-        ykFor->setObjectName(QString::fromUtf8("ykFor"));
+        ykFor->setObjectName(QStringLiteral("ykFor"));
         ykFor->setMinimum(-500);
         ykFor->setMaximum(500);
 
         horizontalLayout_41->addWidget(ykFor);
 
         zkFor = new QDoubleSpinBox(layoutWidget_3);
-        zkFor->setObjectName(QString::fromUtf8("zkFor"));
+        zkFor->setObjectName(QStringLiteral("zkFor"));
         zkFor->setMinimum(-500);
         zkFor->setMaximum(500);
 
         horizontalLayout_41->addWidget(zkFor);
+
+        layoutWidget6 = new QWidget(tab_3);
+        layoutWidget6->setObjectName(QStringLiteral("layoutWidget6"));
+        layoutWidget6->setGeometry(QRect(10, 130, 182, 29));
+        horizontalLayout_43 = new QHBoxLayout(layoutWidget6);
+        horizontalLayout_43->setSpacing(6);
+        horizontalLayout_43->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_43->setObjectName(QStringLiteral("horizontalLayout_43"));
+        horizontalLayout_43->setContentsMargins(0, 0, 0, 0);
+        label_40 = new QLabel(layoutWidget6);
+        label_40->setObjectName(QStringLiteral("label_40"));
+
+        horizontalLayout_43->addWidget(label_40);
+
+        densityBall = new QDoubleSpinBox(layoutWidget6);
+        densityBall->setObjectName(QStringLiteral("densityBall"));
+        densityBall->setMinimum(-500);
+        densityBall->setMaximum(500);
+        densityBall->setValue(0.5);
+
+        horizontalLayout_43->addWidget(densityBall);
+
+        layoutWidget7 = new QWidget(tab_3);
+        layoutWidget7->setObjectName(QStringLiteral("layoutWidget7"));
+        layoutWidget7->setGeometry(QRect(10, 170, 185, 29));
+        horizontalLayout_44 = new QHBoxLayout(layoutWidget7);
+        horizontalLayout_44->setSpacing(6);
+        horizontalLayout_44->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_44->setObjectName(QStringLiteral("horizontalLayout_44"));
+        horizontalLayout_44->setContentsMargins(0, 0, 0, 0);
+        label_41 = new QLabel(layoutWidget7);
+        label_41->setObjectName(QStringLiteral("label_41"));
+
+        horizontalLayout_44->addWidget(label_41);
+
+        velocityBall = new QDoubleSpinBox(layoutWidget7);
+        velocityBall->setObjectName(QStringLiteral("velocityBall"));
+        velocityBall->setMinimum(-500);
+        velocityBall->setMaximum(500);
+        velocityBall->setValue(5);
+
+        horizontalLayout_44->addWidget(velocityBall);
 
         Options->addTab(tab_3, QString());
 
@@ -1937,15 +2009,15 @@ public:
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
-        menuBar->setObjectName(QString::fromUtf8("menuBar"));
+        menuBar->setObjectName(QStringLiteral("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 658, 25));
         menuFile = new QMenu(menuBar);
-        menuFile->setObjectName(QString::fromUtf8("menuFile"));
+        menuFile->setObjectName(QStringLiteral("menuFile"));
         menuControl = new QMenu(menuBar);
-        menuControl->setObjectName(QString::fromUtf8("menuControl"));
+        menuControl->setObjectName(QStringLiteral("menuControl"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
-        mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
+        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
         MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
 
         menuBar->addAction(menuFile->menuAction());
@@ -1960,7 +2032,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        Options->setCurrentIndex(2);
+        Options->setCurrentIndex(5);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -1968,120 +2040,122 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Physics Simulator", 0, QApplication::UnicodeUTF8));
-        actionPlay_Pause_Simulation->setText(QApplication::translate("MainWindow", "Play/Pause", 0, QApplication::UnicodeUTF8));
-        actionPlay_Pause_Simulation->setShortcut(QApplication::translate("MainWindow", "Space", 0, QApplication::UnicodeUTF8));
-        actionRestart_Simulation->setText(QApplication::translate("MainWindow", "Restart", 0, QApplication::UnicodeUTF8));
-        actionRestart_Simulation->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0, QApplication::UnicodeUTF8));
-        actionOpen_Model->setText(QApplication::translate("MainWindow", "Open Model", 0, QApplication::UnicodeUTF8));
-        actionOpen_Model->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0, QApplication::UnicodeUTF8));
-        actionOpen_MoCap->setText(QApplication::translate("MainWindow", "Open MoCap", 0, QApplication::UnicodeUTF8));
-        actionOpen_MoCap->setShortcut(QApplication::translate("MainWindow", "Ctrl+M", 0, QApplication::UnicodeUTF8));
-        actionSave_Model->setText(QApplication::translate("MainWindow", "Save Model", 0, QApplication::UnicodeUTF8));
-        actionSave_Model->setShortcut(QApplication::translate("MainWindow", "Shift+M", 0, QApplication::UnicodeUTF8));
-        actionSave_Simulation->setText(QApplication::translate("MainWindow", "Save Simulation", 0, QApplication::UnicodeUTF8));
-        actionSave_Simulation->setShortcut(QApplication::translate("MainWindow", "Shift+S", 0, QApplication::UnicodeUTF8));
-        actionOpen_Simulation->setText(QApplication::translate("MainWindow", "Open Simulation", 0, QApplication::UnicodeUTF8));
-        actionOpen_Simulation->setShortcut(QApplication::translate("MainWindow", "Ctrl+S", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("MainWindow", "Steps:", 0, QApplication::UnicodeUTF8));
-        enableGravity->setText(QApplication::translate("MainWindow", "Enable Gravity", 0, QApplication::UnicodeUTF8));
-        label_11->setText(QApplication::translate("MainWindow", "Gravity", 0, QApplication::UnicodeUTF8));
-        checkBox->setText(QApplication::translate("MainWindow", "Update Simultaneously", 0, QApplication::UnicodeUTF8));
-        kdtoks->setText(QApplication::translate("MainWindow", "Kd = 1/10ks Automaticaly", 0, QApplication::UnicodeUTF8));
-        checkMesh->setText(QApplication::translate("MainWindow", "Render with Mesh", 0, QApplication::UnicodeUTF8));
-        infoShow->setText(QApplication::translate("MainWindow", "Show Info", 0, QApplication::UnicodeUTF8));
-        Options->setTabText(Options->indexOf(tabParSim), QApplication::translate("MainWindow", "Parameters Simulation", 0, QApplication::UnicodeUTF8));
-        groupBox_3->setTitle(QApplication::translate("MainWindow", "Balance Control", 0, QApplication::UnicodeUTF8));
-        label_12->setText(QApplication::translate("MainWindow", "Tq Ks:", 0, QApplication::UnicodeUTF8));
-        label_13->setText(QApplication::translate("MainWindow", "Tq Kd:", 0, QApplication::UnicodeUTF8));
-        label_14->setText(QApplication::translate("MainWindow", "Fc Ks", 0, QApplication::UnicodeUTF8));
-        label_15->setText(QApplication::translate("MainWindow", "Fc kd:", 0, QApplication::UnicodeUTF8));
-        label_18->setText(QApplication::translate("MainWindow", "Mm L:", 0, QApplication::UnicodeUTF8));
-        label_35->setText(QApplication::translate("MainWindow", "Mm A:", 0, QApplication::UnicodeUTF8));
-        checkMomentum->setText(QApplication::translate("MainWindow", "Momentum", 0, QApplication::UnicodeUTF8));
-        checkTorqueBal->setText(QApplication::translate("MainWindow", "Torque", 0, QApplication::UnicodeUTF8));
-        checkForceBal->setText(QApplication::translate("MainWindow", "Force", 0, QApplication::UnicodeUTF8));
-        label_20->setText(QApplication::translate("MainWindow", "Angle", 0, QApplication::UnicodeUTF8));
-        groupBox_4->setTitle(QApplication::translate("MainWindow", "PD control Proportional", 0, QApplication::UnicodeUTF8));
-        label_16->setText(QApplication::translate("MainWindow", "Ks:", 0, QApplication::UnicodeUTF8));
-        label_17->setText(QApplication::translate("MainWindow", "kd:", 0, QApplication::UnicodeUTF8));
-        groupBoxCone->setTitle(QApplication::translate("MainWindow", "Cone Friction Foots", 0, QApplication::UnicodeUTF8));
-        label_28->setText(QApplication::translate("MainWindow", "Module:", 0, QApplication::UnicodeUTF8));
-        label_30->setText(QApplication::translate("MainWindow", "Height:", 0, QApplication::UnicodeUTF8));
-        label_19->setText(QApplication::translate("MainWindow", "Radius:", 0, QApplication::UnicodeUTF8));
-        label_29->setText(QApplication::translate("MainWindow", "Angle:", 0, QApplication::UnicodeUTF8));
-        label_24->setText(QApplication::translate("MainWindow", "Limit Percent:", 0, QApplication::UnicodeUTF8));
-        label_26->setText(QApplication::translate("MainWindow", "foot 1", 0, QApplication::UnicodeUTF8));
-        conePerc1->setText(QApplication::translate("MainWindow", "%", 0, QApplication::UnicodeUTF8));
-        label_27->setText(QApplication::translate("MainWindow", "foot 2", 0, QApplication::UnicodeUTF8));
-        conePerc2->setText(QApplication::translate("MainWindow", "%", 0, QApplication::UnicodeUTF8));
-        groupBox_7->setTitle(QApplication::translate("MainWindow", "Character Draw", 0, QApplication::UnicodeUTF8));
-        checkGRF->setText(QApplication::translate("MainWindow", "GRF", 0, QApplication::UnicodeUTF8));
-        checkShadow->setText(QApplication::translate("MainWindow", "Shadow", 0, QApplication::UnicodeUTF8));
-        checkShowChara->setText(QApplication::translate("MainWindow", "Chara", 0, QApplication::UnicodeUTF8));
-        checkWireChara->setText(QApplication::translate("MainWindow", " Wire", 0, QApplication::UnicodeUTF8));
-        Options->setTabText(Options->indexOf(tab), QApplication::translate("MainWindow", "General Controller", 0, QApplication::UnicodeUTF8));
-        btnStart->setText(QApplication::translate("MainWindow", "Start", 0, QApplication::UnicodeUTF8));
-        btnPause->setText(QApplication::translate("MainWindow", "Pause", 0, QApplication::UnicodeUTF8));
-        btnRestart->setText(QApplication::translate("MainWindow", "Restart", 0, QApplication::UnicodeUTF8));
-        iframe->setText(QApplication::translate("MainWindow", "frame", 0, QApplication::UnicodeUTF8));
-        label_23->setText(QApplication::translate("MainWindow", "/", 0, QApplication::UnicodeUTF8));
-        nframe->setText(QApplication::translate("MainWindow", "totalframe", 0, QApplication::UnicodeUTF8));
-        groupBox_11->setTitle(QApplication::translate("MainWindow", "Editing Frames", 0, QApplication::UnicodeUTF8));
-        label_34->setText(QApplication::translate("MainWindow", "Frame", 0, QApplication::UnicodeUTF8));
-        checkShowEditingFrame->setText(QApplication::translate("MainWindow", "Show Editing", 0, QApplication::UnicodeUTF8));
-        checkFrameFootLeft->setText(QApplication::translate("MainWindow", "Foot Left in Ground", 0, QApplication::UnicodeUTF8));
-        checkFrameFootRight->setText(QApplication::translate("MainWindow", "Foot Right in Ground", 0, QApplication::UnicodeUTF8));
-        saveEditingFrame->setText(QApplication::translate("MainWindow", "Save Editing Frames", 0, QApplication::UnicodeUTF8));
-        loadEditedFrames->setText(QApplication::translate("MainWindow", "Load Edited Frames", 0, QApplication::UnicodeUTF8));
-        label_22->setText(QApplication::translate("MainWindow", "Adjust Sensor Tollerance:", 0, QApplication::UnicodeUTF8));
-        groupBox_12->setTitle(QApplication::translate("MainWindow", "Frame Period", 0, QApplication::UnicodeUTF8));
-        mocapCyclic->setText(QApplication::translate("MainWindow", "Cyclic", 0, QApplication::UnicodeUTF8));
-        label_36->setText(QApplication::translate("MainWindow", "Begin", 0, QApplication::UnicodeUTF8));
-        label_37->setText(QApplication::translate("MainWindow", "End", 0, QApplication::UnicodeUTF8));
-        checkShowMocap->setText(QApplication::translate("MainWindow", "Show MoCap", 0, QApplication::UnicodeUTF8));
-        checkScreenShot->setText(QApplication::translate("MainWindow", "ScreenShots", 0, QApplication::UnicodeUTF8));
-        Options->setTabText(Options->indexOf(tab_2), QApplication::translate("MainWindow", "Motion Config", 0, QApplication::UnicodeUTF8));
-        groupBox_9->setTitle(QApplication::translate("MainWindow", "Control PD Linear", 0, QApplication::UnicodeUTF8));
-        enable_cpdp->setText(QApplication::translate("MainWindow", "enabled", 0, QApplication::UnicodeUTF8));
-        show_effector->setText(QApplication::translate("MainWindow", "effector", 0, QApplication::UnicodeUTF8));
-        show_target->setText(QApplication::translate("MainWindow", "target", 0, QApplication::UnicodeUTF8));
-        label_31->setText(QApplication::translate("MainWindow", "Target", 0, QApplication::UnicodeUTF8));
-        label_32->setText(QApplication::translate("MainWindow", "ks", 0, QApplication::UnicodeUTF8));
-        label_33->setText(QApplication::translate("MainWindow", "kd", 0, QApplication::UnicodeUTF8));
-        groupBox_2->setTitle(QApplication::translate("MainWindow", "Properties Default", 0, QApplication::UnicodeUTF8));
-        label_9->setText(QApplication::translate("MainWindow", "Dim", 0, QApplication::UnicodeUTF8));
-        label_7->setText(QApplication::translate("MainWindow", "Pos", 0, QApplication::UnicodeUTF8));
-        label_10->setText(QApplication::translate("MainWindow", "Mass", 0, QApplication::UnicodeUTF8));
-        label_8->setText(QApplication::translate("MainWindow", "Euler", 0, QApplication::UnicodeUTF8));
-        isFoot->setText(QApplication::translate("MainWindow", "is foot", 0, QApplication::UnicodeUTF8));
-        isBodyBalance->setText(QApplication::translate("MainWindow", "is body balance", 0, QApplication::UnicodeUTF8));
-        groupBox->setTitle(QApplication::translate("MainWindow", "Actuators", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("MainWindow", "Force:", 0, QApplication::UnicodeUTF8));
-        applyForce->setText(QApplication::translate("MainWindow", "Apply", 0, QApplication::UnicodeUTF8));
-        groupBox_10->setTitle(QApplication::translate("MainWindow", "Coffee Cup", 0, QApplication::UnicodeUTF8));
-        hasCup->setText(QApplication::translate("MainWindow", "has Coffee Cup", 0, QApplication::UnicodeUTF8));
-        Options->setTabText(Options->indexOf(tabManipulatorSim), QApplication::translate("MainWindow", "Manipulators Objects", 0, QApplication::UnicodeUTF8));
-        groupBox_5->setTitle(QApplication::translate("MainWindow", "Control PD", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("MainWindow", "ks", 0, QApplication::UnicodeUTF8));
-        label_4->setText(QApplication::translate("MainWindow", "kd", 0, QApplication::UnicodeUTF8));
-        label_5->setText(QApplication::translate("MainWindow", "Angle", 0, QApplication::UnicodeUTF8));
-        enablepd->setText(QApplication::translate("MainWindow", "Enabled", 0, QApplication::UnicodeUTF8));
-        groupBox_6->setTitle(QApplication::translate("MainWindow", "Control PD Applied", 0, QApplication::UnicodeUTF8));
-        label_6->setText(QApplication::translate("MainWindow", "Ks", 0, QApplication::UnicodeUTF8));
-        xksPdApply->setText(QApplication::translate("MainWindow", "val1", 0, QApplication::UnicodeUTF8));
-        yksPdApply->setText(QApplication::translate("MainWindow", "val2", 0, QApplication::UnicodeUTF8));
-        zksPdApply->setText(QApplication::translate("MainWindow", "val3", 0, QApplication::UnicodeUTF8));
-        label_21->setText(QApplication::translate("MainWindow", "Kd", 0, QApplication::UnicodeUTF8));
-        xkdPdApply->setText(QApplication::translate("MainWindow", "val1", 0, QApplication::UnicodeUTF8));
-        ykdPdApply->setText(QApplication::translate("MainWindow", "val2", 0, QApplication::UnicodeUTF8));
-        zkdPdApply->setText(QApplication::translate("MainWindow", "val3", 0, QApplication::UnicodeUTF8));
-        Options->setTabText(Options->indexOf(controlpd), QApplication::translate("MainWindow", "Manipulator Joints", 0, QApplication::UnicodeUTF8));
-        label_25->setText(QApplication::translate("MainWindow", "Dis K:", 0, QApplication::UnicodeUTF8));
-        label_38->setText(QApplication::translate("MainWindow", "Vel K:", 0, QApplication::UnicodeUTF8));
-        Options->setTabText(Options->indexOf(tab_3), QApplication::translate("MainWindow", "Simbicon", 0, QApplication::UnicodeUTF8));
-        menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
-        menuControl->setTitle(QApplication::translate("MainWindow", "Simulation", 0, QApplication::UnicodeUTF8));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Physics Simulator", 0));
+        actionPlay_Pause_Simulation->setText(QApplication::translate("MainWindow", "Play/Pause", 0));
+        actionPlay_Pause_Simulation->setShortcut(QApplication::translate("MainWindow", "Space", 0));
+        actionRestart_Simulation->setText(QApplication::translate("MainWindow", "Restart", 0));
+        actionRestart_Simulation->setShortcut(QApplication::translate("MainWindow", "Ctrl+R", 0));
+        actionOpen_Model->setText(QApplication::translate("MainWindow", "Open Model", 0));
+        actionOpen_Model->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0));
+        actionOpen_MoCap->setText(QApplication::translate("MainWindow", "Open MoCap", 0));
+        actionOpen_MoCap->setShortcut(QApplication::translate("MainWindow", "Ctrl+M", 0));
+        actionSave_Model->setText(QApplication::translate("MainWindow", "Save Model", 0));
+        actionSave_Model->setShortcut(QApplication::translate("MainWindow", "Shift+M", 0));
+        actionSave_Simulation->setText(QApplication::translate("MainWindow", "Save Simulation", 0));
+        actionSave_Simulation->setShortcut(QApplication::translate("MainWindow", "Shift+S", 0));
+        actionOpen_Simulation->setText(QApplication::translate("MainWindow", "Open Simulation", 0));
+        label->setText(QApplication::translate("MainWindow", "Steps:", 0));
+        enableGravity->setText(QApplication::translate("MainWindow", "Enable Gravity", 0));
+        label_11->setText(QApplication::translate("MainWindow", "Gravity", 0));
+        checkBox->setText(QApplication::translate("MainWindow", "Update Simultaneously", 0));
+        kdtoks->setText(QApplication::translate("MainWindow", "Kd = 1/10ks Automaticaly", 0));
+        checkMesh->setText(QApplication::translate("MainWindow", "Render with Mesh", 0));
+        infoShow->setText(QApplication::translate("MainWindow", "Show Info", 0));
+        Options->setTabText(Options->indexOf(tabParSim), QApplication::translate("MainWindow", "Parameters Simulation", 0));
+        groupBox_3->setTitle(QApplication::translate("MainWindow", "Balance Control", 0));
+        label_12->setText(QApplication::translate("MainWindow", "Tq Ks:", 0));
+        label_13->setText(QApplication::translate("MainWindow", "Tq Kd:", 0));
+        label_14->setText(QApplication::translate("MainWindow", "Fc Ks", 0));
+        label_15->setText(QApplication::translate("MainWindow", "Fc kd:", 0));
+        label_18->setText(QApplication::translate("MainWindow", "Mm L:", 0));
+        label_35->setText(QApplication::translate("MainWindow", "Mm A:", 0));
+        checkMomentum->setText(QApplication::translate("MainWindow", "Momentum", 0));
+        checkTorqueBal->setText(QApplication::translate("MainWindow", "Torque", 0));
+        checkForceBal->setText(QApplication::translate("MainWindow", "Force", 0));
+        label_20->setText(QApplication::translate("MainWindow", "Angle", 0));
+        groupBox_4->setTitle(QApplication::translate("MainWindow", "PD control Proportional", 0));
+        label_16->setText(QApplication::translate("MainWindow", "Ks:", 0));
+        label_17->setText(QApplication::translate("MainWindow", "kd:", 0));
+        groupBoxCone->setTitle(QApplication::translate("MainWindow", "Cone Friction Foots", 0));
+        label_28->setText(QApplication::translate("MainWindow", "Module:", 0));
+        label_30->setText(QApplication::translate("MainWindow", "Height:", 0));
+        label_19->setText(QApplication::translate("MainWindow", "Radius:", 0));
+        label_29->setText(QApplication::translate("MainWindow", "Angle:", 0));
+        label_24->setText(QApplication::translate("MainWindow", "Limit Percent:", 0));
+        label_26->setText(QApplication::translate("MainWindow", "foot 1", 0));
+        conePerc1->setText(QApplication::translate("MainWindow", "%", 0));
+        label_27->setText(QApplication::translate("MainWindow", "foot 2", 0));
+        conePerc2->setText(QApplication::translate("MainWindow", "%", 0));
+        groupBox_7->setTitle(QApplication::translate("MainWindow", "Character Draw", 0));
+        checkGRF->setText(QApplication::translate("MainWindow", "GRF", 0));
+        checkShadow->setText(QApplication::translate("MainWindow", "Shadow", 0));
+        checkShowChara->setText(QApplication::translate("MainWindow", "Chara", 0));
+        checkWireChara->setText(QApplication::translate("MainWindow", " Wire", 0));
+        Options->setTabText(Options->indexOf(tab), QApplication::translate("MainWindow", "General Controller", 0));
+        btnStart->setText(QApplication::translate("MainWindow", "Start", 0));
+        btnPause->setText(QApplication::translate("MainWindow", "Pause", 0));
+        btnRestart->setText(QApplication::translate("MainWindow", "Restart", 0));
+        iframe->setText(QApplication::translate("MainWindow", "frame", 0));
+        label_23->setText(QApplication::translate("MainWindow", "/", 0));
+        nframe->setText(QApplication::translate("MainWindow", "totalframe", 0));
+        groupBox_11->setTitle(QApplication::translate("MainWindow", "Editing Frames", 0));
+        label_34->setText(QApplication::translate("MainWindow", "Frame", 0));
+        checkShowEditingFrame->setText(QApplication::translate("MainWindow", "Show Editing", 0));
+        checkFrameFootLeft->setText(QApplication::translate("MainWindow", "Foot Left in Ground", 0));
+        checkFrameFootRight->setText(QApplication::translate("MainWindow", "Foot Right in Ground", 0));
+        saveEditingFrame->setText(QApplication::translate("MainWindow", "Save Editing Frames", 0));
+        loadEditedFrames->setText(QApplication::translate("MainWindow", "Load Edited Frames", 0));
+        label_22->setText(QApplication::translate("MainWindow", "Adjust Sensor Tollerance:", 0));
+        groupBox_12->setTitle(QApplication::translate("MainWindow", "Frame Period", 0));
+        mocapCyclic->setText(QApplication::translate("MainWindow", "Cyclic", 0));
+        label_36->setText(QApplication::translate("MainWindow", "Begin", 0));
+        label_37->setText(QApplication::translate("MainWindow", "End", 0));
+        checkShowMocap->setText(QApplication::translate("MainWindow", "Show MoCap", 0));
+        checkScreenShot->setText(QApplication::translate("MainWindow", "ScreenShots", 0));
+        label_39->setText(QApplication::translate("MainWindow", "Steps Interpolation:", 0));
+        Options->setTabText(Options->indexOf(tab_2), QApplication::translate("MainWindow", "Motion Config", 0));
+        groupBox_9->setTitle(QApplication::translate("MainWindow", "Control PD Linear", 0));
+        enable_cpdp->setText(QApplication::translate("MainWindow", "enabled", 0));
+        show_effector->setText(QApplication::translate("MainWindow", "effector", 0));
+        show_target->setText(QApplication::translate("MainWindow", "target", 0));
+        label_31->setText(QApplication::translate("MainWindow", "Target", 0));
+        label_32->setText(QApplication::translate("MainWindow", "ks", 0));
+        label_33->setText(QApplication::translate("MainWindow", "kd", 0));
+        groupBox_2->setTitle(QApplication::translate("MainWindow", "Properties Default", 0));
+        label_9->setText(QApplication::translate("MainWindow", "Dim", 0));
+        label_7->setText(QApplication::translate("MainWindow", "Pos", 0));
+        label_10->setText(QApplication::translate("MainWindow", "Mass", 0));
+        label_8->setText(QApplication::translate("MainWindow", "Euler", 0));
+        isFoot->setText(QApplication::translate("MainWindow", "is foot", 0));
+        isBodyBalance->setText(QApplication::translate("MainWindow", "is body balance", 0));
+        groupBox->setTitle(QApplication::translate("MainWindow", "Actuators", 0));
+        label_2->setText(QApplication::translate("MainWindow", "Force:", 0));
+        applyForce->setText(QApplication::translate("MainWindow", "Apply", 0));
+        groupBox_10->setTitle(QApplication::translate("MainWindow", "Coffee Cup", 0));
+        hasCup->setText(QApplication::translate("MainWindow", "has Coffee Cup", 0));
+        Options->setTabText(Options->indexOf(tabManipulatorSim), QApplication::translate("MainWindow", "Manipulators Objects", 0));
+        groupBox_5->setTitle(QApplication::translate("MainWindow", "Control PD", 0));
+        label_3->setText(QApplication::translate("MainWindow", "ks", 0));
+        label_4->setText(QApplication::translate("MainWindow", "kd", 0));
+        label_5->setText(QApplication::translate("MainWindow", "Angle", 0));
+        enablepd->setText(QApplication::translate("MainWindow", "Enabled", 0));
+        groupBox_6->setTitle(QApplication::translate("MainWindow", "Control PD Applied", 0));
+        label_6->setText(QApplication::translate("MainWindow", "Ks", 0));
+        xksPdApply->setText(QApplication::translate("MainWindow", "val1", 0));
+        yksPdApply->setText(QApplication::translate("MainWindow", "val2", 0));
+        zksPdApply->setText(QApplication::translate("MainWindow", "val3", 0));
+        label_21->setText(QApplication::translate("MainWindow", "Kd", 0));
+        xkdPdApply->setText(QApplication::translate("MainWindow", "val1", 0));
+        ykdPdApply->setText(QApplication::translate("MainWindow", "val2", 0));
+        zkdPdApply->setText(QApplication::translate("MainWindow", "val3", 0));
+        Options->setTabText(Options->indexOf(controlpd), QApplication::translate("MainWindow", "Manipulator Joints", 0));
+        label_25->setText(QApplication::translate("MainWindow", "Dis K:", 0));
+        label_38->setText(QApplication::translate("MainWindow", "Vel K:", 0));
+        label_40->setText(QApplication::translate("MainWindow", "Mass Balls:", 0));
+        label_41->setText(QApplication::translate("MainWindow", "Velocity Balls:", 0));
+        Options->setTabText(Options->indexOf(tab_3), QApplication::translate("MainWindow", "Robustez", 0));
+        menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
+        menuControl->setTitle(QApplication::translate("MainWindow", "Simulation", 0));
     } // retranslateUi
 
 };

@@ -338,26 +338,23 @@ void Matrix4x4::setTranslate(Vec4 tl)
 
 }
 
-Vec4 Matrix4x4::transform_origin_ray(Matrix4x4 *t,Vec4 p)
+Vec4 Matrix4x4::transform_origin_ray(Matrix4x4 t,Vec4 p)
 {
     Matrix4x4 inv_trans,inv_scale,inv_rot;
-    inv_trans.setMatrix4x4(t->translate_m);
-    inv_scale.setMatrix4x4(t->scale_m);
-    inv_rot.setMatrix4x4(t->rotate_m);
-    //inv_scale.showMatrix4x4();
+    inv_trans.setMatrix4x4(t.translate_m);
+    inv_scale.setMatrix4x4(t.scale_m);
+    inv_rot.setMatrix4x4(t.rotate_m);
 
     inv_trans.matrix[12] = -inv_trans.matrix[12];
     inv_trans.matrix[13] = -inv_trans.matrix[13];
     inv_trans.matrix[14] = -inv_trans.matrix[14];
-    //inv_trans.showMatrix4x4();
 
     inv_scale.matrix[0] = 1.0/inv_scale.matrix[0];
     inv_scale.matrix[5] = 1.0/inv_scale.matrix[5];
     inv_scale.matrix[10] = 1.0/inv_scale.matrix[10];
-    //inv_trans.showMatrix4x4();
 
     inv_rot = inv_rot.transpose();
-    //inv_rot.showMatrix4x4();
+
     Matrix4x4 result;
     result = result.multMatrix(result.multMatrix(inv_scale,inv_rot),inv_trans);
     Vec4 out = inv_trans.transpose().vector(p);
@@ -372,7 +369,6 @@ Vec4 Matrix4x4::transform_direction_ray(Matrix4x4 t,Vec4 p)
 
     inv_scale.setMatrix4x4(t.scale_m);
     inv_rot.setMatrix4x4(t.rotate_m);
-//    inv_scale.showMatrix4x4();
 
     inv_scale.matrix[0] = 1.0/inv_scale.matrix[0];
     inv_scale.matrix[5] = 1.0/inv_scale.matrix[5];
@@ -394,17 +390,7 @@ Vec4 Matrix4x4::transform_position_ray(Matrix4x4 t,Vec4 p)
     trans.setMatrix4x4(t.translate_m);
     scale.setMatrix4x4(t.scale_m);
     rot.setMatrix4x4(t.rotate_m);
-    //inv_scale.showMatrix4x4();
 
-//    inv_trans.matrix[12] = -inv_trans.matrix[12];
-//    inv_trans.matrix[13] = -inv_trans.matrix[13];
-//    inv_trans.matrix[14] = -inv_trans.matrix[14];
-
-//    inv_scale.matrix[0] = 1.0/inv_scale.matrix[0];
-//    inv_scale.matrix[5] = 1.0/inv_scale.matrix[5];
-//    inv_scale.matrix[10] = 1.0/inv_scale.matrix[10];
-
-//    inv_rot = inv_rot.transpose();
     Matrix4x4 result;
     result = result.multMatrix(result.multMatrix(trans,rot),scale);
     Vec4 out = scale.transpose().vector(p);
@@ -413,12 +399,12 @@ Vec4 Matrix4x4::transform_position_ray(Matrix4x4 t,Vec4 p)
     return this->transpose().vector(p);
 }
 
-Vec4 Matrix4x4::transform_normal_ray(Matrix4x4 *t,Vec4 p)
+Vec4 Matrix4x4::transform_normal_ray(Matrix4x4 t,Vec4 p)
 {
     Matrix4x4 scale,rot;
 
-    scale.setMatrix4x4(t->scale_m);
-    rot.setMatrix4x4(t->rotate_m);
+    scale.setMatrix4x4(t.scale_m);
+    rot.setMatrix4x4(t.rotate_m);
     scale.matrix[0] = 1.0/scale.matrix[0];
     scale.matrix[5] = 1.0/scale.matrix[5];
     scale.matrix[10] = 1.0/scale.matrix[10];
@@ -427,7 +413,7 @@ Vec4 Matrix4x4::transform_normal_ray(Matrix4x4 *t,Vec4 p)
     result = result.multMatrix(rot,scale);
     Vec4 out = scale.transpose().vector(p);
     out = rot.transpose().vector(out);
-//    out = inv_scale.transpose().vector(out);
+
     return out;
 }
 

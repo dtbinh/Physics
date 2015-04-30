@@ -5,7 +5,7 @@
 #include "GL/glut.h"
 #include "math/quaternion.h"
 #include "physics/physics.h"
-
+#include "graphics/mesh.h"
 #include "imageloader.h"
 #define SEGMENTS 30
 bool idraw_ground = false;
@@ -148,12 +148,6 @@ void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
     normals[3] = Vec4::crossProduct(vertexs[7]-vertexs[3],vertexs[6]-vertexs[7]).unitary(); //vertices:2,3,6,7
     normals[4] = Vec4::crossProduct(vertexs[4]-vertexs[5],vertexs[0]-vertexs[4]).unitary(); //vertices:0,1,4,5
     normals[5] = Vec4::crossProduct(vertexs[4]-vertexs[0],vertexs[7]-vertexs[4]).unitary(); //vertices:0,3,4,7
-//    normals[0] = transform->transform_normal_ray(transform,Vec4( 0,-1, 0)).unitary();
-//    normals[1] = transform->transform_normal_ray(transform,Vec4( 0, 1, 0)).unitary();
-//    normals[2] = transform->transform_normal_ray(transform,Vec4( 0, 0, 1)).unitary();
-//    normals[3] = transform->transform_normal_ray(transform,Vec4( 1, 0, 0)).unitary();
-//    normals[4] = transform->transform_normal_ray(transform,Vec4( 0, 0,-1)).unitary();
-//    normals[5] = transform->transform_normal_ray(transform,Vec4(-1, 0, 0)).unitary();
 
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
@@ -169,11 +163,13 @@ void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
         glVertex3f(vertexs[2].x(),vertexs[2].y(),vertexs[2].z());
         glVertex3f(vertexs[1].x(),vertexs[1].y(),vertexs[1].z());
 
+
         glNormal3f(normals[1].x(),normals[1].y(),normals[1].z());
         glVertex3f(vertexs[4].x(),vertexs[4].y(),vertexs[4].z());
         glVertex3f(vertexs[5].x(),vertexs[5].y(),vertexs[5].z());
         glVertex3f(vertexs[6].x(),vertexs[6].y(),vertexs[6].z());
         glVertex3f(vertexs[7].x(),vertexs[7].y(),vertexs[7].z());
+
 
         glNormal3f(normals[2].x(),normals[2].y(),normals[2].z());
         glVertex3f(vertexs[1].x(),vertexs[1].y(),vertexs[1].z());
@@ -181,11 +177,13 @@ void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
         glVertex3f(vertexs[6].x(),vertexs[6].y(),vertexs[6].z());
         glVertex3f(vertexs[5].x(),vertexs[5].y(),vertexs[5].z());
 
+
         glNormal3f(normals[3].x(),normals[3].y(),normals[3].z());
         glVertex3f(vertexs[2].x(),vertexs[2].y(),vertexs[2].z());
         glVertex3f(vertexs[3].x(),vertexs[3].y(),vertexs[3].z());
         glVertex3f(vertexs[7].x(),vertexs[7].y(),vertexs[7].z());
         glVertex3f(vertexs[6].x(),vertexs[6].y(),vertexs[6].z());
+
 
         glNormal3f(normals[4].x(),normals[4].y(),normals[4].z());
         glVertex3f(vertexs[4].x(),vertexs[4].y(),vertexs[4].z());
@@ -193,14 +191,101 @@ void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
         glVertex3f(vertexs[1].x(),vertexs[1].y(),vertexs[1].z());
         glVertex3f(vertexs[5].x(),vertexs[5].y(),vertexs[5].z());
 
+
         glNormal3f(normals[5].x(),normals[5].y(),normals[5].z());
         glVertex3f(vertexs[0].x(),vertexs[0].y(),vertexs[0].z());
         glVertex3f(vertexs[4].x(),vertexs[4].y(),vertexs[4].z());
         glVertex3f(vertexs[7].x(),vertexs[7].y(),vertexs[7].z());
         glVertex3f(vertexs[3].x(),vertexs[3].y(),vertexs[3].z());
+
     glEnd();
     glPopMatrix();
     delete mat;
+
+}
+
+Mesh *Draw::getMeshCube(Matrix4x4 *transform, Vec4 p, Mesh *mesh)
+{
+    Vec4 vertexs[8];
+    Vec4 normals[6];
+
+    vertexs[0] = (Vec4(-p.x()/2,-p.y()/2,-p.z()/2));
+    vertexs[0] = (transform->transpose()).vector(vertexs[0]);
+    vertexs[1] = (Vec4(-p.x()/2,-p.y()/2, p.z()/2));
+    vertexs[1] = transform->transpose().vector(vertexs[1]);
+    vertexs[2] = (Vec4( p.x()/2,-p.y()/2, p.z()/2));
+    vertexs[2] = transform->transpose().vector(vertexs[2]);
+    vertexs[3] = (Vec4( p.x()/2,-p.y()/2,-p.z()/2));
+    vertexs[3] = transform->transpose().vector(vertexs[3]);
+    vertexs[4] = (Vec4(-p.x()/2, p.y()/2,-p.z()/2));
+    vertexs[4] = transform->transpose().vector(vertexs[4]);
+    vertexs[5] = (Vec4(-p.x()/2, p.y()/2, p.z()/2));
+    vertexs[5] = transform->transpose().vector(vertexs[5]);
+    vertexs[6] = (Vec4( p.x()/2, p.y()/2, p.z()/2));
+    vertexs[6] = transform->transpose().vector(vertexs[6]);
+    vertexs[7] = (Vec4( p.x()/2, p.y()/2,-p.z()/2));
+    vertexs[7] = transform->transpose().vector(vertexs[7]);
+
+    normals[0] = Vec4::crossProduct(vertexs[3]-vertexs[0],vertexs[2]-vertexs[3]).unitary(); //vertices:0,1,2,3
+    normals[1] = Vec4::crossProduct(vertexs[4]-vertexs[7],vertexs[5]-vertexs[4]).unitary(); //vertices:4,5,6,7
+    normals[2] = Vec4::crossProduct(vertexs[6]-vertexs[2],vertexs[5]-vertexs[6]).unitary(); //vertices:1,2,5,6
+    normals[3] = Vec4::crossProduct(vertexs[7]-vertexs[3],vertexs[6]-vertexs[7]).unitary(); //vertices:2,3,6,7
+    normals[4] = Vec4::crossProduct(vertexs[4]-vertexs[5],vertexs[0]-vertexs[4]).unitary(); //vertices:0,1,4,5
+    normals[5] = Vec4::crossProduct(vertexs[4]-vertexs[0],vertexs[7]-vertexs[4]).unitary(); //vertices:0,3,4,7
+
+    Face face[6];
+    face[0].vertexs.push_back(&vertexs[0]);
+    face[0].vertexs.push_back(&vertexs[3]);
+    face[0].vertexs.push_back(&vertexs[2]);
+    face[0].vertexs.push_back(&vertexs[1]);
+    face[0].normals.push_back(&normals[0]);
+    mesh->faces.push_back(face[0]);
+
+
+    face[1].vertexs.push_back(&vertexs[4]);
+    face[1].vertexs.push_back(&vertexs[5]);
+    face[1].vertexs.push_back(&vertexs[6]);
+    face[1].vertexs.push_back(&vertexs[7]);
+    face[1].normals.push_back(&normals[1]);
+    mesh->faces.push_back(face[1]);
+
+
+    face[2].vertexs.push_back(&vertexs[1]);
+    face[2].vertexs.push_back(&vertexs[2]);
+    face[2].vertexs.push_back(&vertexs[6]);
+    face[2].vertexs.push_back(&vertexs[5]);
+    face[2].normals.push_back(&normals[2]);
+    mesh->faces.push_back(face[2]);
+
+
+    face[3].vertexs.push_back(&vertexs[2]);
+    face[3].vertexs.push_back(&vertexs[6]);
+    face[3].vertexs.push_back(&vertexs[5]);
+    face[3].vertexs.push_back(&vertexs[2]);
+    face[3].normals.push_back(&normals[3]);
+    mesh->faces.push_back(face[3]);
+
+    glNormal3f(normals[4].x(),normals[4].y(),normals[4].z());
+    glVertex3f(vertexs[4].x(),vertexs[4].y(),vertexs[4].z());
+    glVertex3f(vertexs[0].x(),vertexs[0].y(),vertexs[0].z());
+    glVertex3f(vertexs[1].x(),vertexs[1].y(),vertexs[1].z());
+    glVertex3f(vertexs[5].x(),vertexs[5].y(),vertexs[5].z());
+    face[4].vertexs.push_back(&vertexs[4]);
+    face[4].vertexs.push_back(&vertexs[0]);
+    face[4].vertexs.push_back(&vertexs[1]);
+    face[4].vertexs.push_back(&vertexs[5]);
+    face[4].normals.push_back(&normals[4]);
+    mesh->faces.push_back(face[4]);
+
+
+    face[5].vertexs.push_back(&vertexs[0]);
+    face[5].vertexs.push_back(&vertexs[4]);
+    face[5].vertexs.push_back(&vertexs[7]);
+    face[5].vertexs.push_back(&vertexs[3]);
+    face[5].normals.push_back(&normals[5]);
+    mesh->faces.push_back(face[5]);
+
+    return mesh;
 }
 
 void Draw::drawCylinder(Matrix4x4 *transform,Material *mat)
@@ -515,9 +600,9 @@ void Draw::drawGround(int size)
     }
 
     glEnd();
-    glEnable(GL_LIGHTING);
-    glDisable(GL_LIGHTING);
-    glLineWidth(1.0);
+    //glEnable(GL_LIGHTING);
+    //glDisable(GL_LIGHTING);
+    glLineWidth(1.4);
     glBegin(GL_LINES);
     for(int i=-size;i<=size;i+=2){
         for(int j=-size;j<=size;j+=2){
@@ -543,7 +628,8 @@ void Draw::drawGround(int size)
     glEnd();
     glEnable(GL_LIGHTING);
     Material *mat = new Material();
-    mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+    mat->setMaterial(mat,MATERIAL_BRASS);
+
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -1149,6 +1235,7 @@ void Draw::drawSelection(Vec4 p,float )
 
 void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
 {
+    glPushMatrix();
     GLUquadricObj *quad = gluNewQuadric();
     float larg = size;
     Vec4 from = origin;
@@ -1189,8 +1276,10 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     }
     glPopMatrix();
 
+    glPopMatrix();
     gluDeleteQuadric( quad );
     delete mat;
+
 }
 
 void Draw::drawArrow2D(float angle, Vec4 anchor)

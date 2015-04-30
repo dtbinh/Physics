@@ -44,10 +44,10 @@ public:
 
     /* funções utilizadas para computar a interseção do raio com o objeto */
 
-    Vec4 transform_origin_ray(Matrix4x4* t,Vec4 p);     //calcula a origem do raio de acordo com transformações inversas
+    Vec4 transform_origin_ray(Matrix4x4 t,Vec4 p);     //calcula a origem do raio de acordo com transformações inversas
     Vec4 transform_direction_ray(Matrix4x4 t,Vec4 p);  //calcula a direção do raio de acordo com transformações inversas
     Vec4 transform_position_ray(Matrix4x4 t,Vec4 p);   //calcula a posição de um vetor de acordo com transformações inversas
-    Vec4 transform_normal_ray(Matrix4x4* t,Vec4 p);     //calcula a normal de um vetor de acordo com transformações inversas
+    Vec4 transform_normal_ray(Matrix4x4 t,Vec4 p);     //calcula a normal de um vetor de acordo com transformações inversas
 
 
 

@@ -42,22 +42,27 @@ void Character::draw()
     for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
         (*it)->draw();
     }
+
     bool sensor_use = false;
     if(this->getMoCap()!=NULL){
         if(this->getMoCap()->status) sensor_use = true;
     }
+
+    std::vector<Object*> foots =  getBodiesFoot();
+
+    if (foots.size()>0 && this->balance!=NULL)
     if(sensor_use){
-    if (Sensor::getHierarchy2UseMocap(this)!=2){
-        if (Sensor::getHierarchy2UseMocap(this)==0){
-            for(int i=0;i<objects.size();i++)
-                if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+        if (Sensor::getHierarchy2UseMocap(this)!=2){
+            if (Sensor::getHierarchy2UseMocap(this)==0){
+                for(int i=0;i<objects.size();i++)
+                    if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+            }
+            else{
+                int v = Sensor::getHierarchy2UseMocap(this);
+                v -= 3;
+                if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+            }
         }
-        else{
-            int v = Sensor::getHierarchy2UseMocap(this);
-            v -= 3;
-            if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
-        }
-    }
     }
     else{
         if (Sensor::getHierarchy2Use(this)!=2){
@@ -75,7 +80,9 @@ void Character::draw()
 
 
 
+
     if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+
 
     drawCOM();
     drawFootProjected();
@@ -136,33 +143,23 @@ void Character::drawFootProjected()
     int count = 0;
     //Vec4 Cfoot_;
     //int count = 0;
+    bool draw = false;
     int stance = Sensor::getStanceFoot(this);
-    if (stance<0){
+    if (stance<0 && foots.size()==2){
         Cfoot_ = foots.at(0)->getPositionCurrent()+foots.at(1)->getPositionCurrent();
         Cfoot_.x2 = 0;
         count = 2;
-    }else{
+        draw = true;
+    }else if(foots.size()>0){
         Cfoot_ = this->getBody(stance)->getPositionCurrent();
         Cfoot_.x2 = 0;
         count = 1;
+        draw = true;
     }
-//    for(int i=0;i<foots.size();i++){
-//        if (!Sensor::isSwingFoot(foots.at(i),chara)){
-//            Cfoot_ += foots.at(i)->getPositionCurrent();
-//            count++;
-//        }
-//    }
-    Cfoot_ /= count;
-//    for(int i=0;i<foots.size();i++){
-//        if (!Sensor::isSwingFoot(foots.at(i),this)){
-//            Cfoot_ += foots.at(i)->getPositionCurrent();
-//            count++;
-//        }
-//    }
-//    Cfoot_ /= count;
-//    Cfoot_.x2 = 0;
-
-    Draw::drawTargetProjected(Cfoot_,0.05);
+    if(draw){
+        Cfoot_ /= count;
+        Draw::drawTargetProjected(Cfoot_,0.05);
+    }
 
 }
 
@@ -370,11 +367,11 @@ std::vector<Joint*> Character::getJointChilds(Joint *exclude, Object *obj)
 
 }
 
-std::vector<Object*> Character::getBodiesFoot()
+std::vector<Object*> Character::getBodiesFoot(Object* nofoot)
 {
     std::vector<Object*> foots;
     for(int i=0;i<getNumBodies();i++){
-        if (getBody(i)->getFoot()) foots.push_back(getBody(i));
+        if (getBody(i)->getFoot() && getBody(i)!=nofoot) foots.push_back(getBody(i));
     }
     return foots;
 }

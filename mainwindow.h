@@ -55,13 +55,14 @@ public slots:
     void plusFrameEdition();
     void minusFrameEdition();
 
+    //balls shot
+    void setBallsConfiguration();
+
 
 private slots:
     void on_actionPlay_Pause_Simulation_triggered();
 
     void on_actionRestart_Simulation_triggered();
-
-    void on_actionOpen_Model_activated();
 
     void on_actionOpen_MoCap_triggered();
 
@@ -116,6 +117,10 @@ private slots:
     void on_angleBalBodyx_valueChanged(int arg1);
 
     void on_angleBalBodyz_valueChanged(int arg1);
+
+    void on_actionOpen_Model_triggered();
+
+
 
 private:
     Ui::MainWindow *ui;

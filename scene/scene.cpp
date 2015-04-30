@@ -14,6 +14,7 @@
 #include "mocap/framequat.h"
 #include "mocap/frame.h"
 #include "extra/utils.h"
+#include "math/ray.h"
 bool apply = true;
 QList<QList <Vec4> > motion;
 QList<QList <Vec4> > mocap;
@@ -96,10 +97,13 @@ void Scene::restartPhysics()
     objects_shoot.clear();
     for (unsigned int i=0;i<characters.size();i++){
         characters.at(i)->restartPhysics();
-        characters.at(i)->checkContactFoot(true);
+        if (characters.at(i)->getBodiesFoot().size()>0)
+            characters.at(i)->checkContactFoot(true);
     }
     if(enableGravity) Physics::setGravity(this,this->gravity);
     else Physics::setGravity(this,Vec4());
+
+    //createCharacter();
 
 }
 
@@ -122,9 +126,8 @@ void Scene::startPhysics()
 bool entrou=true;
 double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
 timeval tempo_inicio;
-void Scene::simulationStep()
+void Scene::simulationStep(bool balance)
 {
-
     if(!sim_status) return;
     Vec4 vel_des= Vec4();
     Vec4 mom_lin_des= Vec4();
@@ -197,7 +200,7 @@ void Scene::simulationStep()
            }
            for(unsigned int k=0;k<jts.size();k++) Physics::setEnableJoint(jts.at(k));
            for(unsigned int j=0;j<characters.size();j++){
-               if(characters.at(j)->balance!=NULL && enableGravity){
+               if(characters.at(j)->balance!=NULL && enableGravity && balance){
                    this->getCharacter(j)->getBalance()->evaluate(jDes,mass_total,frame_step,qd,vel_angd,vel_des,mom_lin_des,mom_ang_des);
                    for(std::vector<ControlPD*>::iterator it = characters.at(j)->controllers.begin(); it!=characters.at(j)->controllers.end(); it++){
                        (*it)->evaluate();
@@ -273,6 +276,7 @@ void Scene::draw()
             }
         objs.clear();
     }
+
     if (show_grf)
 //    if (characters.size()>0){
 //        for(int i=0;i<getCharacter(0)->getNumBodies();i++){
@@ -595,6 +599,24 @@ void Scene::clearGroundForces()
     groundForces.clear();
 }
 
+void Scene::setViewer(Vec4 eye, Vec4 at, Vec4 up)
+{
+    viewer[0] = eye;
+    viewer[1] = at;
+    viewer[2] = up;
+}
+
+void Scene::setProjection(Vec4 p)
+{
+    projection = p;
+}
+
+void Scene::setWindow(int width, int height)
+{
+    this->width = width;
+    this->height = height;
+}
+
 Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara, Vec4 /*limSup*/, Vec4/* limInf*/)
 {
     Joint *joint = NULL;
@@ -634,6 +656,14 @@ std::vector<Object*> Scene::objectsScene()
     for(unsigned int i=0;i<characters.size();i++) for(unsigned int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
     //for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
     for(unsigned int i=0;i<objects_shoot.size();i++) allobjetcs.push_back(objects_shoot.at(i));
+    return allobjetcs;
+}
+
+std::vector<Object *> Scene::objectsSceneChara()
+{
+    std::vector<Object*> allobjetcs;
+    for(unsigned int i=0;i<characters.size();i++) for(unsigned int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
+    //for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
     return allobjetcs;
 }
 
@@ -677,6 +707,8 @@ void Scene::applyForce(Vec4 force)
 
 void Scene::clear()
 {
+    sim_step = 0;
+    frame_step = 0;
     objects.clear();
     characters.clear();
     Physics::closeScene(this);
@@ -744,7 +776,7 @@ int Scene::getSizeCharacter()
 
 Object *Scene::getObject(dBodyID id)
 {
-    std::vector<Object*> objs = objectsScene();
+    std::vector<Object*> objs = objectsSceneChara();
     for(unsigned int i=0;i<objs.size();i++)
         if (id == objs.at(i)->getBody()) return objs.at(i);
     return NULL;
@@ -914,6 +946,70 @@ void Scene::setCompensacao(int value)
     characters.at(0)->getBalance()->setCompensation(value/100.);
 }
 
+Object *Scene::objectClicked(int width, int height)
+{
+    Matrix4x4 changetoviewer;
+    changetoviewer.setIdentity();
+    Vec4 kv,iv,jv,kvl,ivl,jvl;
+    kv = (viewer[0] - viewer[1])/((viewer[0] - viewer[1]).module());
+    iv = (viewer[2] ^ kv)/(viewer[2] ^ kv).module();
+    jv = (kv ^ iv)/(kv ^ iv).module();
+    ivl.setVec4(iv.x1,jv.x1,kv.x1);
+    jvl.setVec4(iv.x2,jv.x2,kv.x2);
+    kvl.setVec4(iv.x3,jv.x3,kv.x3);
+    Vec4 translate(-(iv*viewer[0]),-(jv*viewer[0]),-(kv*viewer[0]));
+
+    changetoviewer.setAxisX(iv);
+    changetoviewer.setAxisY(jv);
+    changetoviewer.setAxisZ(kv);
+    changetoviewer.setTranslate(translate);
+
+    changetoviewer = changetoviewer.transpose();
+    changetoviewer.setTranslate(viewer[0]);
+
+
+    float h = 2.0*projection.x3*(tan(M_PI*projection.x1/360.0));
+    float w = h*projection.x2;
+    float deltax = w/this->width;
+    float deltay = h/this->height;
+
+    int j = height;
+    int i = width;
+
+
+    float alfa,beta;
+
+    alfa  = -w/2.0 + deltax/2.0  + i*deltax;
+    beta  = -h/2.0 + deltay/2.0 + j*deltay;
+
+
+    Vec4 dir(alfa,beta,-projection.x3);
+    Ray ray(changetoviewer.transpose().vector(Vec4(0,0,0)),changetoviewer.transpose().vector(dir));
+    ray.setDirection((ray.direction - ray.origin).unitary());
+    //ray.origin.showVec4(); //mostrar a origem
+    //ray.positionRay(20).showVec4(); //mostra a direção
+    return getObject(ray);
+}
+
+Object *Scene::getObject(Ray ray)
+{
+    Object *obj = NULL;
+    Object *objsel = NULL;
+    std::vector<Object*> objectschara;
+    objectschara = objectsSceneChara();
+    float t = 120000;  //parametro t
+    for (int i=0;i<objectschara.size();i++){
+        obj = objectschara[i];
+        float t_ = obj->intersectionRay(ray,t);
+        if (t_<t && t_>0){
+            objsel = obj;
+            t = t_;
+        }
+    }
+
+    return objsel;
+}
+
 void Scene::setAlphaCharacter(float val)
 {
     if (characters.size()==0) return;
@@ -974,9 +1070,9 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis,float den)
        Vec4 directionVelInicial = posPelvisModel-(inicio);
 
          //directionVelInicial.normaliza();
-       Vec4 velInicial = directionVelInicial*(16);// dRandReal()*30.0+10.0 );
-       Vec4 vell = velInicial;
-       vell.x2=0;
+       Vec4 velInicial = directionVelInicial*(3);// dRandReal()*30.0+10.0 );
+       //Vec4 vell = velInicial;
+       //vell.x2=0;
        //printf("\nVelocidade: %.3f",vell.module());
        dReal massTotal;
        //if ( pelvisIsTheTarget ) {
@@ -1094,6 +1190,67 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis,float den)
       }
 }
 
+void Scene::shotBallsCharacterBody(Object *body, float velocity, float den)
+{
+    //if ( inicio.modulo() == 0.0 ) {
+    //srand(time(NULL));
+    //int r = rand() % chara->getNumBodies();
+    Vec4 posPelvisModel = body->getPositionCurrent();
+    //float mass = chara->getBody(posPelvis)->getFMass();
+    //this->objetos.push_back( new Objeto( Simulation::world, Simulation::space, posPelvisModelo, mass.mass, influExtSimFF, true, SPHERE ) ); //para a geometria do objeto ser aleatoria, basta nao definir o ultimo parametro
+    //inicio
+       Vec4 directionFromCenter = Vec4( dRandReal()*3.0-1.0, dRandReal()*1.2, dRandReal()*3.0-1.0 );
+         if ( directionFromCenter.module() == 0.0 ) {
+           directionFromCenter = Vec4(0.0,1.0,0.0);
+         } else {
+           directionFromCenter.normalize();
+         }
+       Vec4 inicio = posPelvisModel+(directionFromCenter*(1.0));
+       if ( inicio.y() <= 0.1 ) {
+           directionFromCenter.x2 = 0.0;
+           directionFromCenter.normalize();
+           inicio = posPelvisModel+(directionFromCenter*(1.0));
+         }
+
+     //velInicial
+       Vec4 deltaCenter = velocity; //(0.0,0.0,0.0);
+
+         deltaCenter = Vec4( dRandReal()*0.3-0.15, dRandReal()*1.6-0.75, dRandReal()*0.3-0.15 );
+
+       Vec4 directionVelInicial = posPelvisModel-(inicio);
+
+       directionVelInicial.normalize();
+       Vec4 velInicial = directionVelInicial*(velocity);// dRandReal()*30.0+10.0 );
+       //Vec4 vell = velInicial;
+       //vell.x2=0;
+       //printf("\nVelocidade: %.3f",vell.module());
+       dReal massTotal;
+       //if ( pelvisIsTheTarget ) {
+       massTotal = (dReal)den;
+       Object *obj = new Object(this);//position,rotation,properties,type,this);
+       obj->setMaterial(MATERIAL_EMERALD);
+       obj->setType(TYPE_SPHERE);
+       obj->setPosition(inicio);
+       obj->setRotation(Quaternion());
+       obj->setProperties(Vec4(100/1000.,100/1000.,100/1000.));
+       obj->setFMass(massTotal);
+
+       Physics::createObject(obj,space,massTotal,inicio,velInicial);
+       objects_shoot.push_back(obj);
+
+       while ( this->objects_shoot.size() > 10 ) {
+           this->objects_shoot.at(0)->clearPhysics();
+         this->objects_shoot.erase(objects_shoot.begin());
+       }
+}
+
+void Scene::habiliteJump()
+{
+    if(this->characters.size()>0){
+        this->getCharacter(0)->getBalance()->habiliteJump(true);
+    }
+}
+
 bool Scene::isGeometryFootSwing(dGeomID geom)
 {
     std::vector<Object*> obj = objectsScene();
@@ -1122,6 +1279,22 @@ void Scene::createRamp()
 //    joints.push_back(addJointFixed(cont,NULL));
 
     // objects.push_back(addObject(Vec4(0.8,0.1,0.4),Vec4(0.2,0.05,1.3),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2));
+}
+
+void Scene::createCharacter()
+{
+    Character *chara = new Character(this);
+    this->addCharacter(chara);
+    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,1.05,0),Quaternion(1,0,0,0),TYPE_CUBE,1.5,chara,MATERIAL_CHROME);
+    Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),Quaternion(1,0,0,0),TYPE_CUBE,1.5,chara,MATERIAL_BRASS);
+    A->setFoot(false);
+    B->setFoot(false);
+    Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
+    joint->setName("Junta Ball");
+    ControlPD *pd = new ControlPD(joint,Quaternion(1,0,0,0),Vec4(),Vec4());
+    pd->setEnabled(true);
+    chara->controllers.push_back(pd);
+    chara->contructHierarchyBodies();
 }
 
 void Scene::startRecorder(bool b)

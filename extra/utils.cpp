@@ -782,6 +782,9 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         cone.setAttribute("Height",scene->getCharacter(i)->getBalance()->getHeightCone());
         cone.setAttribute("Radius",scene->getCharacter(i)->getBalance()->getRadiusCone());
         cone.setAttribute("Angle",scene->getCharacter(i)->getBalance()->getAngleCone());
+        cone.setAttribute("Limits",scene->getCharacter(i)->getBalance()->getLimitCone());
+        //sensor tolerance
+        cone.setAttribute("SensorTol",scene->getCharacter(i)->getBalance()->getSensorTolerance());
         balanceControl.appendChild(cone);
 
         QDomElement locomotion = doc.createElement("LocomotionParameters");
@@ -1083,6 +1086,8 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 chara->getBalance()->setHeightCone(prop.attribute("Height","").toFloat());
                 chara->getBalance()->setRadiusCone(prop.attribute("Radius","").toFloat());
                 chara->getBalance()->setMCone(prop.attribute("Module","").toFloat());
+                chara->getBalance()->setLimitCone(prop.attribute("Limits","").toFloat());
+                chara->getBalance()->setSensorTolerance(prop.attribute("SensorTol","").toFloat());
                 QDomElement propinfo = sime.firstChildElement("LocomotionParameters").toElement();
                 prop = propinfo.firstChildElement("LocomotionVelocity").toElement();
                 x = prop.attribute("x","").toFloat();

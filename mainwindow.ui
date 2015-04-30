@@ -39,7 +39,16 @@
         </size>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <property name="spacing">
@@ -54,7 +63,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>5</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -263,7 +272,16 @@ QGroupBox{
              <string>Balance Control</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_7">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
               <number>2</number>
              </property>
              <property name="spacing">
@@ -910,7 +928,16 @@ QGroupBox{
                  <property name="spacing">
                   <number>1</number>
                  </property>
-                 <property name="margin">
+                 <property name="leftMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="bottomMargin">
                   <number>2</number>
                  </property>
                  <item>
@@ -952,7 +979,16 @@ QGroupBox{
                  <property name="spacing">
                   <number>1</number>
                  </property>
-                 <property name="margin">
+                 <property name="leftMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="bottomMargin">
                   <number>2</number>
                  </property>
                  <item>
@@ -1133,7 +1169,7 @@ QGroupBox{
              <rect>
               <x>90</x>
               <y>100</y>
-              <width>135</width>
+              <width>136</width>
               <height>19</height>
              </rect>
             </property>
@@ -1257,7 +1293,7 @@ QGroupBox{
              <rect>
               <x>20</x>
               <y>140</y>
-              <width>268</width>
+              <width>274</width>
               <height>29</height>
              </rect>
             </property>
@@ -1390,24 +1426,37 @@ QGroupBox{
              <string>ScreenShots</string>
             </property>
            </widget>
-           <widget class="QDoubleSpinBox" name="toleranciaCOM">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>200</x>
-              <y>180</y>
-              <width>62</width>
-              <height>27</height>
+              <x>20</x>
+              <y>170</y>
+              <width>271</width>
+              <height>29</height>
              </rect>
             </property>
-            <property name="decimals">
-             <number>4</number>
-            </property>
-            <property name="minimum">
-             <double>-0.000100000000000</double>
-            </property>
-            <property name="maximum">
-             <double>1000.000000000000000</double>
-            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_42">
+             <item>
+              <widget class="QLabel" name="label_39">
+               <property name="text">
+                <string>Steps Interpolation:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="stepsInterpolation">
+               <property name="decimals">
+                <number>2</number>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>100000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="tabManipulatorSim">
@@ -2270,7 +2319,16 @@ QGroupBox{
                <property name="spacing">
                 <number>0</number>
                </property>
-               <property name="margin">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
                 <number>0</number>
                </property>
               </layout>
@@ -2280,7 +2338,7 @@ QGroupBox{
           </widget>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
-            <string>Simbicon</string>
+            <string>Robustez</string>
            </attribute>
            <widget class="QWidget" name="layoutWidget_2">
             <property name="geometry">
@@ -2375,6 +2433,70 @@ QGroupBox{
                </property>
                <property name="maximum">
                 <double>500.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>130</y>
+              <width>182</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_43">
+             <item>
+              <widget class="QLabel" name="label_40">
+               <property name="text">
+                <string>Mass Balls:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="densityBall">
+               <property name="minimum">
+                <double>-500.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>500.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.500000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>170</y>
+              <width>185</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_44">
+             <item>
+              <widget class="QLabel" name="label_41">
+               <property name="text">
+                <string>Velocity Balls:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="velocityBall">
+               <property name="minimum">
+                <double>-500.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>500.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>5.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -2477,9 +2599,6 @@ QGroupBox{
   <action name="actionOpen_Simulation">
    <property name="text">
     <string>Open Simulation</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

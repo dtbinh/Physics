@@ -17,7 +17,7 @@ class GLWidget;
 
 #endif
 
-
+class Ray;
 class Scene
 {
 private:
@@ -32,6 +32,9 @@ private:
     int            frame_step;
     bool           status_motion;
     bool           show_grf;
+    Vec4           viewer[3];  //guarda as posições da camera, eye, at, up
+    Vec4           projection;
+
     //interface
     GLWidget *parent;
     //graphics
@@ -43,6 +46,8 @@ private:
     Vec4 externalForce;
     Vec4 propKs;
     Vec4 propKd;
+public:
+    int            width,height;
 
 
 
@@ -54,7 +59,7 @@ public:
     ~Scene();
 
     //Physics
-    void           simulationStep();                         //executa um passo da simulação
+    void           simulationStep(bool balance=true);                         //executa um passo da simulação
     void           restartPhysics();                                //reinicializa a simulação
     void           initPhysics();
     void           stopPhysics();
@@ -80,10 +85,14 @@ public:
 
 
     //Manipulação dos objetos do cenário
+    void                  setViewer(Vec4 eye,Vec4 at,Vec4 up);
+    void                  setProjection(Vec4 p);
+    void                  setWindow(int width,int height);
     Object*               addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
     Joint *               addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara,Vec4 limSup=Vec4(),Vec4 limInf=Vec4());//cria uma junta ball
     Joint *               addJointFixed(Object *parent,Object *child, Character *chara); //cria uma junta fixa
     std::vector<Object*>  objectsScene(); //retorna os objetos do cenário e dos characteres
+    std::vector<Object*>  objectsSceneChara(); //retorna os objetos dos characteres
     Object*               selectedObject();
     std::vector<Joint*>   jointsScene(); //retorna as juntas do cenário
     Joint*                selectedJoint();
@@ -103,6 +112,7 @@ public:
     //extra simulation
     void                  clearObjectShooted();
     void                  createRamp();
+    void                  createCharacter();
     void                  startRecorder(bool b);
 
 
@@ -130,6 +140,8 @@ public:
     int                   getLimitSteps();
 
     void                  setCompensacao(int value);
+    Object*               objectClicked(int width,int height);      //retorna o objeto selecionado no clique da tela
+    Object*               getObject(Ray ray); //calcula a interseção do raio com o objeto
 
 
     void                  setAlphaCharacter(float val); //nao utilizado
@@ -139,7 +151,9 @@ public:
     void                  restartMotionCapture();
     void                  statusMotionCapture(bool b);
     //testes de robustez
-    void                  shotBallsCharacterRandom(Character *chara, int posPlevis, float den=100.); //atirar objetos no personagem
+    void                  shotBallsCharacterRandom(Character *chara, int posPlevis, float den=100.); //atirar objetos no personagem de forma aleatória
+    void                  shotBallsCharacterBody(Object* body, float velocity, float den=100.); //atirar objetos no personagem de acordo com a posição de um corpo, e com determinada velocidade
+    void                  habiliteJump();
     //teste de contato
     bool                  isGeometryFootSwing(dGeomID geom);
 

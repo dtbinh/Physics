@@ -65,7 +65,7 @@ public:
     Object*         getBody(int i);
     int            getPositionBody(Object* obj);
     std::vector<Joint*> getJointChilds(Joint* exclude,Object* obj);
-    std::vector<Object*> getBodiesFoot();
+    std::vector<Object*> getBodiesFoot(Object *nofoot=NULL);
     std::vector<Object*> getChildrens(Object* obj);
     bool           isBodyHierarchy(Joint* joint,Object* obj);
     //bool           isJointHierarchy(Joint* joint,Joint *child);

@@ -26,8 +26,15 @@
 
 //  for malloc
 #include <stdlib.h>
+bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
+
+
+#define SHOTBALL 1
+
+int mode = -1;
+Object *objselshot = NULL;
 
 int manipulate = 0;
 float densidade = 100.;
@@ -308,14 +315,17 @@ GLWidget::GLWidget(QWidget *parent) :
     updateKsProp(scene->getProportionalKsPD());
     updateKdProp(scene->getProportionalKdPD());
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
-
-
+    density = 0.5; //massa
+    velocity = 5.;
+    //scene->createCharacter();
 }
 
 void GLWidget::initializeGL()
 {
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     //glEnable(GL_MULTISAMPLE_ARB);
     //glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
     glEnable(GL_DEPTH_TEST);
@@ -395,6 +405,7 @@ glEnable(GL_BLEND);
     //    glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
 //    glBindTexture(GL_TEXTURE_2D, 1.0);
 //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+    //glutInitContextFlags (GLUT_COMPATIBILITY_PROFILE );
 
 
 }
@@ -413,13 +424,15 @@ void GLWidget::resizeGL(int w, int h)
     glLoadIdentity() ;
     winWidth = w;
     winHeight = h;
+    scene->setProjection(Vec4(30.,ar,0.001,1200000));
+    scene->setWindow(w,h);
     //printf("\nW %d H %d\n",w,h);
 
 }
 void GLWidget::drawScene(){
-
     //determinação da camera
-     const float ar = winWidth>0 ? (float) winWidth / (float) winHeight : 1.0;
+
+    const float ar = winWidth>0 ? (float) winWidth / (float) winHeight : 1.0;
     glViewport(0, 0, winWidth, winHeight);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -433,6 +446,7 @@ void GLWidget::drawScene(){
 
         glTranslated(-0.20,-0.135,-0.6);
         gluLookAt(cam->eye.x(),cam->eye.y(),cam->eye.z(), cam->at.x(),cam->at.y(),cam->at.z(), cam->up.x(),cam->up.y(),cam->up.z());
+        scene->setViewer(cam->eye,cam->at,cam->up);
         glTranslated(cam->eye.x(),cam->eye.y(),cam->eye.z());
         Draw::drawAxisCameraView(0.02);
     glPopMatrix();
@@ -448,7 +462,8 @@ void GLWidget::drawScene(){
     if(cam->axis_z)
         text += "z ";
     if(cam->axis_x || cam->axis_y || cam->axis_z)
-        renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"),2000);
+
+        renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"));
  //   glPushMatrix();
 
     glPopMatrix();
@@ -457,6 +472,7 @@ void GLWidget::drawScene(){
 
     //fim de determinação da camera
     glPushMatrix();
+
     if (shadow) drawShadows();
     if (!sim_pause) if (load_exemple_curve) showCurveExample();
     if (show_character){
@@ -495,7 +511,7 @@ void GLWidget::drawScene(){
     //Draw::drawSkybox(Vec4(0,0,0),Vec4(20,20,20));
 
     //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
-    Draw::drawGroundTexture(10,0);
+    Draw::drawGround(10);
     //if (!showInfo){ Draw::drawGroundTexture(10,0);}
     //else{
         //glClearColor(1,0,0,1);
@@ -523,7 +539,7 @@ void GLWidget::drawParameters()
     QString dados;
     Vec4 out;
     glDisable(GL_LIGHTING);
-    glColor3f(1,1,1);
+    glColor3f(0,0,0);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -627,6 +643,22 @@ void GLWidget::drawParameters()
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
         k++;
     }
+    x -= 20;
+    glRasterPos2f(750, x);
+    dados = QString().sprintf("\nDensity Balls : %3.2f\n", density);
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+        k++;
+    }
+    x -= 20;
+    glRasterPos2f(750, x);
+    dados = QString().sprintf("\nVelocity Balls : %3.2f\n", velocity);
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+        k++;
+    }
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
@@ -691,7 +723,7 @@ void GLWidget::simStep(){
 //    timeval tempo_inicio,tempo_fim;
 //    gettimeofday(&tempo_inicio,NULL);
     if(!sim_pause){
-        scene->simulationStep();
+        scene->simulationStep(enable_balance);
 
     }
 
@@ -757,6 +789,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
 
+    if(mode==SHOTBALL){
+        Object *obj;
+        obj = scene->objectClicked(event->pos().x(),(scene->height)-event->pos().y());
+        objselshot = obj;
+        return;
+    }
     int y = event->pos().y();
     int x = event->pos().x();
     // if the left button is pressed
@@ -782,7 +820,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 void GLWidget::simulationPlayPause()
 {
     sim_pause = !sim_pause;
-
+    //qDebug() << "Pause/Play";
 }
 
 void GLWidget::simulationRestart()
@@ -796,11 +834,23 @@ void GLWidget::simulationRestart()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
+
+    if(event->key() == Qt::Key_Space ){
+        simulationPlayPause();
+    }
+
     if(event->key() == Qt::Key_C ){
         manipulate = SET_CAM;
     }
+    if(event->key() == Qt::Key_L ){
+        enable_balance = !enable_balance;
+    }
     if(event->key() == Qt::Key_O ){
         manipulate = SET_OBJECT;
+        mode = -1;
+    }
+    if(event->key() == Qt::Key_J ){
+        scene->habiliteJump();
     }
 
     if(event->key() == Qt::Key_Z ){
@@ -818,18 +868,24 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
     }
+    if(event->key() == Qt::Key_S ){
+        mode = SHOTBALL;
+        //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
+        //count++;
+    }
     if(event->key() == Qt::Key_B ){
-        if((scene->getSizeCharacter()<1)) return;
+        if((scene->getSizeCharacter()==0)) return;
+        if(mode == SHOTBALL){
+            if(objselshot!=NULL){
+                scene->shotBallsCharacterBody(objselshot,velocity,density);
+                return;
+            }
+        }
+
         srand(time(NULL));
          int x = ( rand() % 8 );
-         printf("Aleatorio: %d\n",x );
-         numOffBalls++;
-         if (numOffBalls>10){
-             densidade = densidade + 25;
-             numOffBalls = 0;
-
-         }
-        scene->shotBallsCharacterRandom(scene->getCharacter(0),x,densidade);
+         scene->shotBallsCharacterBody(scene->getCharacter(0)->getBody(x),velocity,density);
+        //scene->shotBallsCharacterRandom(scene->getCharacter(0),x,density);
         //cam->lockAxisY(!cam->axis_y);
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
@@ -966,7 +1022,7 @@ void GLWidget::drawShadows()
 
 
         /* Draw "top" of floor.  Use blending to blend in reflection (jah foi habilitado o blend). */
-        Draw::drawGroundTexture(10,0);
+        Draw::drawGround(10);
 
         if (true) {
 
@@ -1217,10 +1273,10 @@ void GLWidget::setEndClycle(int v)
     }
 }
 
-void GLWidget::setToleranceCOM(double val)
+void GLWidget::setStepsInterpolation(double val)
 {
     if(!(scene->getSizeCharacter()>0)) return;
-    scene->getCharacter(0)->getBalance()->setLimitCone(val);
+    scene->getCharacter(0)->getBalance()->setStepsInterpolation(val);
 }
 
 void GLWidget::saveSimulationParameters(QString file)
@@ -1325,6 +1381,12 @@ void GLWidget::setKDistanceLocomotion(Vec4 k)
     scene->getCharacter(0)->getBalance()->setKDistanceLocomotion(k);
 }
 
+void GLWidget::setVelocityDensityBalls(float den, float vel)
+{
+    density = den;
+    velocity = vel;
+}
+
 void GLWidget::setAlphaCharacter(int value)
 {
     scene->setAlphaCharacter((float)value/100.0);
@@ -1395,6 +1457,12 @@ void GLWidget::setAngleCone(double val)
     if(!(scene->getSizeCharacter()>0)) return;
     scene->getCharacter(0)->getBalance()->setAngleCone(val);
 
+}
+
+void GLWidget::setToleranceSensor(double val)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    scene->getCharacter(0)->getBalance()->setSensorTolerance(val);
 }
 
 void GLWidget::setAngleBodyBalance(Vec4 v)
@@ -1473,9 +1541,11 @@ void GLWidget::loadSimulationParameters(QString file)
         updateBalanceCone(scene->getCharacter(i)->getBalance()->getMCone(),scene->getCharacter(i)->getBalance()->getAngleCone(),scene->getCharacter(i)->getBalance()->getRadiusCone(),scene->getCharacter(i)->getBalance()->getHeightCone());
 
     }
-    scene->getCharacter(0)->showHierarchies();
+    setToleranceFoot(scene->getCharacter(0)->getBalance()->getSensorTolerance());
+    //scene->getCharacter(0)->showHierarchies();
     //printf("\nMassa total: %.3f",scene->getCharacter(0)->getMassTotal());
-    scene->createRamp();
+    //scene->createRamp();
+
 
 
 

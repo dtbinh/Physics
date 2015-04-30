@@ -1,6 +1,6 @@
 #ifndef DRAW_H
 #define DRAW_H
-#define dDOUBLE
+//#define dDOUBLE
 
 #include <ode/common.h>
 #include <math/quaternion.h>
@@ -11,6 +11,7 @@
 class Matrix4x4;
 #include "extra/material.h"
 #include "math/vec4.h"
+class Mesh;
 
 class Draw
 {
@@ -18,6 +19,7 @@ public:
     Draw();
     static void drawCube(Matrix4x4 *transform,Vec4 properties, Material *mat,float alpha=0);
     static void drawCube(Matrix4x4 *transform,Vec4 properties, int material);
+    static Mesh*getMeshCube(Matrix4x4 *transform,Vec4 properties, Mesh *mesh=NULL);
     static void drawCylinder(Matrix4x4 *transform,Material *mat);
     static void drawSphere(Matrix4x4 *transform,Material *mat, float radius=0);
     static void drawSphere(Vec4 position,int material=0,float size=0.04);

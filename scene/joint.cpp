@@ -12,6 +12,8 @@ Joint::Joint(Character *chara,int type)
         this->character = chara;
         chara->joints.push_back(this);
         this->scene =chara->scene;
+    }else{
+        this->character = NULL;
     }
     this->type = type;
     material = new Material();
@@ -38,6 +40,9 @@ Joint::Joint(int type)
 
 Joint::Joint(dJointID joint, Character *chara, Object *parent, Object *child, int type, Vec4 limSup, Vec4 limInf)
 {
+    if(chara==NULL){
+        this->scene = parent->getScene();
+    }
     this->joint = joint;
     this->parent = parent;
     this->child  = child;
@@ -196,11 +201,13 @@ JointID Joint::getJoint()
 void Joint::setParent(Object *parent)
 {
     this->parent = parent;
+    this->scene = parent->getScene();
 }
 
 Object* Joint::getParent()
 {
     return this->parent;
+
 }
 
 int Joint::getType()
@@ -211,6 +218,7 @@ int Joint::getType()
 void Joint::setChild(Object *child)
 {
     this->child = child;
+    this->scene = child->getScene();
 }
 
 Object* Joint::getChild()
@@ -292,7 +300,6 @@ void Joint::draw()
     }
     case (JOINT_BALL):{
         Vec4 position = Physics::getJointBallAnchor(this);
-
         if (selected) Draw::drawSphereSelected(position);
         else Draw::drawSphere(position,MATERIAL_TURQUOSIE,0.03);
         break;

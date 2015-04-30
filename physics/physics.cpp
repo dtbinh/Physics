@@ -12,18 +12,19 @@
 #include <iostream>
 using namespace std;
 //#endif
-static Scene* scn = NULL;
 
+static Scene* scn = NULL;
+int count_collide = 0;
 
 void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
     //dois corpos ligados por alguma junta nao colidem
       //if (b1 && b2 && dAreConnectedExcluding (b1,b2,dJointTypeContact)) return;
       //so ha colisao se uma das geometrias for tipo plano - no caso, soh ha colisao com o chao (nao ha nenhuma colisao entre os corpos)
 //      if (dGeomGetClass(o1)!=dPlaneClass && dGeomGetClass(o2)!=dPlaneClass) return;
-//        //caso a colisao seja entre as geomFixas (chao, paredes e teto), nao tratar a colisao na simulacao
-//        if (dGeomGetClass(o1)==dPlaneClass && dGeomGetClass(o2)==dPlaneClass) return;
+        //caso a colisao seja entre as geomFixas (chao, paredes e teto), nao tratar a colisao na simulacao
+      if (dGeomGetClass(o1)==dPlaneClass && dGeomGetClass(o2)==dPlaneClass) return;
 //      //duas geometrias pertencentes ao mesmo modelo nao colidem (nem dois objetos - data==Objeto::objetos(FF)) (nem duas geomFixas - data==NULL)
-//      //if (dGeomGetData(o1)==dGeomGetData(o2)) return;
+      //if (dGeomGetData(o1)==dGeomGetData(o2)) return;
 //      //duas geometrias pertencentes ao mesmo modelo nao colidem (nem duas geomFixas - data==NULL)
 //      if (dGeomGetData(o1)==dGeomGetData(o2))
 //        //permite colisao entre box e cilindro, mesmo pertencentes ao mesmo modelo
@@ -35,25 +36,34 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
         dSpaceCollide2 (o1, o2, data,&nearCallback);
 
     }else{
-        Scene *scene = ((Object*)dGeomGetData(o1))->getScene();
+
+        Scene *scene = scn;
+//        if(dGeomGetClass(o1)==dPlaneClass)
+//            scene = ((Object*)dGeomGetData(o2))->getScene();
+//        else if ((dGeomGetClass(o2)==dPlaneClass))
+//            scene = ((Object*)dGeomGetData(o1))->getScene();
 
         dBodyID b1 = dGeomGetBody(o1);
         dBodyID b2 = dGeomGetBody(o2);
 
 
 
-        int numcont = 8;
+        int numcont = 4;
         dContact contact[numcont];
         int i;
-        if (int numc = dCollide (o1,o2,numcont,&contact[0].geom,sizeof(dContact))) {
+        if (int numc = dCollide(o1,o2,numcont,&contact[0].geom,sizeof(dContact))) {
             for(i=0; i<numcont; i++){
 
                 contact[i].surface.mode = dContactBounce; // | dContactSoftCFM;
                 // friction parameter
-                if(scene->isGeometryFootSwing(o1)||scene->isGeometryFootSwing(o2))
-                    contact[i].surface.mu = 0;
-                else
+                if (scene!=NULL){
+                    if(scene->isGeometryFootSwing(o1)||scene->isGeometryFootSwing(o2))
+                        contact[i].surface.mu = 25.0; //locomoção: 25.0; capoeira: 15.0
+                    else
+                        contact[i].surface.mu = dInfinity;
+                }else{
                     contact[i].surface.mu = dInfinity;
+                }
                 // bounce is the amount of "bouncyness".
                 contact[i].surface.bounce = 0.5;
                 // bounce_vel is the minimum incoming velocity to cause a bounce
@@ -63,6 +73,7 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
 
 
             }
+
             dMatrix3 RI;
                 dRSetIdentity (RI);
                 //const dReal ss[3] = {0.02,0.02,0.02};
@@ -79,15 +90,19 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                           else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
                           else noGroundGeom = 3;
                           GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
-                          if(noGroundGeom==1||noGroundGeom==2){
+                          if (scene!=NULL){
+                          if((noGroundGeom==1)||(noGroundGeom==2)){
                               if (scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(true);
-                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(true);
+                              if (scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(true);
+                          }
                           }
 
-//                          if(noGroundGeom==3){
-//                              if(scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(false);
-//                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(false);
-//                          }
+
+                          if(noGroundGeom==3){
+                              //qDebug() << "Colidiu com Objs!";
+                              if(scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(false);
+                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(false);
+                          }
                           fbContact.b1 = scene->getObject(b1);
                           fbContact.b2 = scene->getObject(b2);
                       //put fbContact in vector feedbackContacts
@@ -114,12 +129,21 @@ void Physics::simSingleStep (Scene *scene)
 {
     scene->clearGroundForces();
     std::vector<Object*> objs = scene->objectsScene();
-//    if (scene->getSizeCharacter()>0){
-//        for(int i=0;i<scene->getSizeCharacter();i++)
-//            scene->getCharacter(i)->restartCollideWithGround();
-//    }
     for(unsigned int i=0;i<objs.size();i++)
         dBodyEnable(objs.at(i)->getBody());
+    if(count_collide>=0){
+        if (scene->getSizeCharacter()>0){
+            if(count_collide==500){
+                for(int i=0;i<scene->getSizeCharacter();i++)
+                    scene->getCharacter(i)->restartCollideWithGround();
+                count_collide = 0;
+            }
+            else{
+                count_collide++;
+            }
+        }
+    }
+
     scn = scene;
     dSpaceCollide (scene->getSpace(),0,&nearCallback);
     // step the simulation
@@ -294,8 +318,8 @@ void Physics::createObject(Object *object, dSpaceID space, float mass, Vec4 posi
     case TYPE_SPHERE:{
         object->setBody(dBodyCreate (object->getScene()->getWorld()));
         object->setGeometry(dCreateSphere(space,object->getProperties().x()));
-        dMassSetSphere(object->getMass(),mass,object->getProperties().x());
-        //dMassSetSphereTotal(object->getMass(),mass,object->getProperties().x());
+        //dMassSetSphere(object->getMass(),mass,object->getProperties().x());
+        dMassSetSphereTotal(object->getMass(),mass,object->getProperties().x());
         break;
     }
     case TYPE_CUBE:{

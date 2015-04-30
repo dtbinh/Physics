@@ -7,6 +7,7 @@
 #include "math/quaternion.h"
 #include "extra/ObjMesh.h"
 
+class Ray;
 class Material;
 class Matrix4x4;
 class Matrix;
@@ -45,6 +46,7 @@ private:
     Material     *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
     int          id_material;
     float        fmass;                                                   //massa em float na inicialização
+    Mesh*        mesh;
 
     // --------Strategy Equilibrium
     float        compensable;
@@ -147,6 +149,7 @@ public:
     static Vec4 posEffectorBackward(Vec4 pos,Quaternion rot,Object* obj);
     QString     showInfo();
     void        setRenderMesh(bool b);
+    float        intersectionRay(Ray ray,float t=0);
 
     // --------Strategy Equilibrium
     float       getCompensableFactor();

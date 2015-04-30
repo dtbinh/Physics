@@ -3,8 +3,8 @@
 #include <QGLShaderProgram>
 #include <QTimer>
 #include "scene/scene.h"
+#include <QWidget>
 #include <QGLWidget>
-
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
@@ -33,6 +33,7 @@ signals:
     void setGravity(Vec4 v);
     void setEnableGravity(bool);
     void setAngleDirection(int);
+    void setToleranceFoot(double);
 
 public slots:
 
@@ -51,7 +52,7 @@ public slots:
     void setEditingFrame(int frame);
     void setBeginClycle(int v);
     void setEndClycle(int v);
-    void setToleranceCOM(double val);
+    void setStepsInterpolation(double val);
 
     //slots scene
     void saveSimulationParameters(QString file);
@@ -88,9 +89,13 @@ public slots:
     void setHeightCone(double val);
     void setAngleCone(double val);
 
+    //tolerancia de equilibrio
+    void setToleranceSensor(double val);
 
+    //testes robustez
     void setKVelocityLocomotion(Vec4 k);
     void setKDistanceLocomotion(Vec4 k);
+    void setVelocityDensityBalls(float den,float vel); //atualiza a densidade e velocidade das bolas
 
     //slots personagens
     std::vector<Object*> getObjectsList();
@@ -133,6 +138,7 @@ public:
     bool load_exemple_curve;
     bool screenshot;
     bool rendermesh;
+    float density,velocity;
     int frames;
     float timeBase;
     float FPS;

@@ -1,6 +1,6 @@
 #ifndef GRF_H
 #define GRF_H
-#define dDOUBLE
+//#define dDOUBLE
 #include <ode/ode.h>
 #include "math/vec4.h"
 #include "scene/object.h"

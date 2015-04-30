@@ -211,18 +211,17 @@ int Sensor::getHierarchy2Use(Character *chara)
     if (foots.at(0)->isCollideWithGround()){
         foots.at(0)->getRotationCurrent().toAxisAngle(&ori,&anglex);
         if(fabs(ori.z()*anglex)<45){
-
-       pd += foots.at(0)->getPositionCurrent();
-       contact = foots.at(0);
-       state++;
+            pd += foots.at(0)->getPositionCurrent();
+            contact = foots.at(0);
+            state++;
         }
     }
     if (foots.at(1)->isCollideWithGround()){
         foots.at(1)->getRotationCurrent().toAxisAngle(&ori,&anglex);
         if(fabs(ori.z()*anglex)<45){
-        pd += foots.at(1)->getPositionCurrent();
-        state++;
-        contact = foots.at(1);
+            pd += foots.at(1)->getPositionCurrent();
+            state++;
+            contact = foots.at(1);
         }
     }
 //    for(unsigned int i=0;i<foots.size();i++){
@@ -233,41 +232,47 @@ int Sensor::getHierarchy2Use(Character *chara)
 //            state++;
 //        }
 //    }
-    //caso 1
+    //caso 3
     if(state>1){
         pd /= 2.0;
         pd.x2 = 0.0;
         com.x2 = 0.0;
         //testando o primeiro pé
-        float desired1 = (pd - (foots.at(1)->getPositionCurrent().projXZ())).module();
+        //float desired1 = (pd - (foots.at(1)->getPositionCurrent().projXZ())).module();
         float dcom1 = (com - (foots.at(1)->getPositionCurrent().projXZ())).module();
         bool right_foot = true;
         bool left_foot = true;
-        if (dcom1 - desired1 > tolerance){ // pé esquerdo não esta em contato
+        if (dcom1 > tolerance){ // pé esquerdo não esta em contato
             right_foot = false;
             //return chara->getPositionBody(foots.at(0))+3;
         }
-        float desired2 = (pd - (foots.at(0)->getPositionCurrent().projXZ())).module();
+        //float desired2 = (pd - (foots.at(0)->getPositionCurrent().projXZ())).module();
         float dcom2 = (com - (foots.at(0)->getPositionCurrent().projXZ())).module();
-        if (dcom2 - desired2 > tolerance){ // pé esquerdo não esta em contato
+        if (dcom2> tolerance){ // pé esquerdo não esta em contato
             left_foot = false;
-            //return chara->getPositionBody(foots.at(1))+3;
         }
         if (left_foot && right_foot){
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1,Vec4(0,1,0),2.0);
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2,Vec4(0,1,0),2.0);
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
+            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
+            return ALL_FOOTS_GROUND+3;
+        }
+        else if(!left_foot && !right_foot){
+            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
             return ALL_FOOTS_GROUND+3;
         }
         else if(left_foot && !right_foot){
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2,Vec4(0,1,0),2.0);
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
+            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
             return chara->getPositionBody(foots.at(0))+3;
         }
         else if(!left_foot && right_foot){
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1,Vec4(0,1,0),2.0);
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
+            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
             return chara->getPositionBody(foots.at(1))+3;
         }else{
             return FOOTS_AIR+3;
@@ -276,6 +281,48 @@ int Sensor::getHierarchy2Use(Character *chara)
 
 
     }
+//    if(state>1){
+//        pd /= 2.0;
+//        pd.x2 = 0.0;
+//        com.x2 = 0.0;
+//        //testando o primeiro pé
+//        float desired1 = (pd - (foots.at(1)->getPositionCurrent().projXZ())).module();
+//        float dcom1 = (com - (foots.at(1)->getPositionCurrent().projXZ())).module();
+//        bool right_foot = true;
+//        bool left_foot = true;
+//        if (dcom1 - desired1 > tolerance){ // pé esquerdo não esta em contato
+//            right_foot = false;
+//            //return chara->getPositionBody(foots.at(0))+3;
+//        }
+//        float desired2 = (pd - (foots.at(0)->getPositionCurrent().projXZ())).module();
+//        float dcom2 = (com - (foots.at(0)->getPositionCurrent().projXZ())).module();
+//        if (dcom2 - desired2 > tolerance){ // pé esquerdo não esta em contato
+//            left_foot = false;
+//            //return chara->getPositionBody(foots.at(1))+3;
+//        }
+//        if (left_foot && right_foot){
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
+//            return ALL_FOOTS_GROUND+3;
+//        }
+//        else if(left_foot && !right_foot){
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
+//            return chara->getPositionBody(foots.at(0))+3;
+//        }
+//        else if(!left_foot && right_foot){
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1,Vec4(0,1,0),2.0);
+//            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
+//            return chara->getPositionBody(foots.at(1))+3;
+//        }else{
+//            return FOOTS_AIR+3;
+
+//        }
+
+
+//    }
     //caso 2
 //    if(state>0){
 //        pd /= 2.0;
@@ -328,21 +375,21 @@ int Sensor::getHierarchy2UseMocap(Character *chara)
     foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     if (!foot_l){
         //if (foots.at(0)->posEffectorBackward().y()<height+0.05 || foots.at(0)->posEffectorForward().y()<height+0.05){
-        if (getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(0))/*chara->getGRFSum(foots.at(0)).module()>0*/){
+        if (foots.at(0)->isCollideWithGround()/*getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(0))*//*chara->getGRFSum(foots.at(0)).module()>0*/){
             close_enought_l = true;
         }/*else
             close_enought_l = false;*/
-    }else if (getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(0))/*chara->getGRFSum(foots.at(0)).module()>0*/){
+    }else if (foots.at(0)->isCollideWithGround()/*getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(0))*//*chara->getGRFSum(foots.at(0)).module()>0*/){
 
         close_enought_l =true;
     }
     if (!foot_r){
         //if (foots.at(1)->posEffectorBackward().y()<height+0.05 || foots.at(1)->posEffectorForward().y()<height+0.05){
-        if (getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(1))/*chara->getGRFSum(foots.at(1)).module()>0*/){
+        if (foots.at(1)->isCollideWithGround()/*getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(1))*//*chara->getGRFSum(foots.at(1)).module()>0*/){
             close_enought_r = true;
         }/*else
             close_enought_r = false;*/
-    }else if (getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(1))/*chara->getGRFSum(foots.at(1)).module()>0*/){
+    }else if (foots.at(1)->isCollideWithGround()/*getHierarchy2Use(chara)-3==ALL_FOOTS_GROUND || getHierarchy2Use(chara)-3==chara->getPositionBody(foots.at(1))*//*chara->getGRFSum(foots.at(1)).module()>0*/){
         close_enought_r =true;
     }
     if (foot_l && foot_r && close_enought_l && close_enought_r)

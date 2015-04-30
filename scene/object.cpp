@@ -6,6 +6,23 @@
 #include "scene.h"
 #include "math/matrix.h"
 #include "control/sensor.h"
+#include "math/ray.h"
+
+
+//calculo para interseção ray-plane limitado
+bool tryInterceptionPointFace(Face face, Vec4 point)
+{
+        Vec4 a,b,c,n; //coordenadas do triangulo
+        for(int i=0;i<face.vertexs.size()-2;i++){
+            n.setVec4(face.normals.at(0)->x1,face.normals.at(0)->x2,face.normals.at(0)->x3);
+            a.setVec4(face.vertexs.at(0)->x1,face.vertexs.at(0)->x2,face.vertexs.at(0)->x3);
+            b.setVec4(face.vertexs.at(i+1)->x1,face.vertexs.at(i+1)->x2,face.vertexs.at(i+1)->x3);
+            c.setVec4(face.vertexs.at(i+2)->x1,face.vertexs.at(i+2)->x2,face.vertexs.at(i+2)->x3);
+            if (Vec4::crossProduct((b-a),(point-a))*n >= 0 && Vec4::crossProduct((c-b),(point-b))*n >= 0 && Vec4::crossProduct((a-c),(point-c))*n >= 0) return true;
+
+        }
+        return false;
+}
 
 //----------------------Construtores & Destrutores
 
@@ -145,13 +162,16 @@ QString Object::saveObject() //função a ser pensada...
 
 void Object::setObjFile(QString obj)
 {
+
     this->objFile = obj;
     objMesh = new ObjMesh(obj.toStdString());
 }
 
 QString Object::getObjFile()
 {
-    return this->objFile;
+    QDir qfile;
+    QString relative = qfile.relativeFilePath(objFile);
+    return relative;
 }
 
 //---------------------Physics
@@ -391,9 +411,8 @@ int Object::getIntMaterial()
     return id_material;
 }
 
-Mesh *Object::getMesh() //função a ser pensada, se será necessária...
+Mesh *Object::getMesh()
 {
-    Mesh *mesh = NULL;
     return mesh;
 }
 
@@ -784,6 +803,61 @@ QString Object::showInfo()
 void Object::setRenderMesh(bool b)
 {
     this->rendermesh = b;
+}
+
+float Object::intersectionRay(Ray ray, float t)
+{
+    //considerando que cada objeto é uma caixa
+//    Vec4 bounds[2];
+//    bounds[0] = Vec4(-0.5,-0.5,-0.5);
+//    bounds[1] = Vec4(0.5,0.5,0.5);
+//    Ray copy;
+//    Matrix4x4 transform = getMatrixTransformationODE();
+//    copy.setOrigin(transform.transform_origin_ray(transform,ray.origin));
+//    copy.setDirection(transform.transform_direction_ray(transform,ray.direction));
+//    float tmin, tmax, tymin, tymax, tzmin, tzmax;
+//    tmin = (bounds[copy.sign[0]].x() - copy.origin.x()) * copy.inverse_direction.x();
+//    tmax = (bounds[1-copy.sign[0]].x() - copy.origin.x()) * copy.inverse_direction.x();
+//    tymin = (bounds[copy.sign[1]].y() - copy.origin.y()) * copy.inverse_direction.y();
+//    tymax = (bounds[1-copy.sign[1]].y() - copy.origin.y()) * copy.inverse_direction.y();
+//    if ( (tmin > tymax) || (tymin > tmax) )
+//        return -1;
+//    if (tymin > tmin)
+//        tmin = tymin;
+//    if (tymax < tmax)
+//        tmax = tymax;
+//    tzmin = (bounds[copy.sign[2]].z() - copy.origin.z()) * copy.inverse_direction.z();
+//    tzmax = (bounds[1-copy.sign[2]].z() - copy.origin.z()) * copy.inverse_direction.z();
+//    if ( (tmin > tzmax) || (tzmin > tmax) )
+//        return -1;
+//    if (tzmin > tmin)
+//        tmin = tzmin;
+//    if (tzmax < tmax)
+//        tmax = tzmax;
+//    if (!( (tmin < t) && (tmax > tmin) )) return -1;
+
+    //
+    mesh = new Mesh();
+    mesh = Draw::getMeshCube(getMatrixTransformation(),getProperties(),mesh);
+
+
+    for (int i=0;i<mesh->faces.size();i++){
+        Vec4 p1,n;
+        p1.setVec4(mesh->faces.at(i).vertexs[0]->x1,mesh->faces.at(i).vertexs[0]->x2,mesh->faces.at(i).vertexs[0]->x3);
+        n.setVec4(mesh->faces.at(i).normals[0]->x(),mesh->faces.at(i).normals[0]->y(),mesh->faces.at(i).normals[0]->z());
+        if ((!(fabs(n*(ray.direction))<0.0001))){
+            float t_ = (n*p1 - ray.origin*n)/(n*(ray.direction));
+            if((t_<t) && t_>0){
+                if (tryInterceptionPointFace(mesh->faces.at(i),ray.positionRay(t_))){
+                    t = t_;
+                }
+            }
+        }
+
+
+    }
+    delete mesh;
+    return t;
 }
 
 float Object::getCompensableFactor()

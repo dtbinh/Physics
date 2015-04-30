@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "stdio.h"
+#include <QtCore>
+#include <QtGui>
+#include <QtWidgets/QWidget>
 #include <QFileDialog>
 #include <QString>
 #include <QPalette>
@@ -15,20 +18,25 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
     this->showMaximized();
+    //ui->toleranciaCOM->setVisible(false);
+
+//    ui->actionOpen_Simulation->setShortcut(Qt::Key_0);
     ui->groupBoxCone->setVisible(false);
     ui->widgetPhysics->setObjectSelected(-1);
     connect(ui->checkScreenShot,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setScreenShot(bool)));
     connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
     connect(ui->infoShow,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowInfos(bool)));
     //manipuladores do movimento
-    connect(ui->toleranciaCOM,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setToleranceCOM(double)));
+    connect(ui->stepsInterpolation,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setStepsInterpolation(double)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->iframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
     connect(ui->sensorTolerance,SIGNAL(valueChanged(double)),this,SLOT(adjustTolerance(double)));
+    connect(ui->widgetPhysics,SIGNAL(setToleranceFoot(double)),ui->sensorTolerance,SLOT(setValue(double)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
     connect(ui->checkFrameFootLeft,SIGNAL(clicked(bool)),this,SLOT(checkFrameFootLeft(bool)));
     connect(ui->checkFrameFootRight,SIGNAL(clicked(bool)),this,SLOT(checkFrameFootRight(bool)));
@@ -199,6 +207,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ykFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
     connect(ui->zkFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
 
+    //testes
+    connect(ui->densityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
+    connect(ui->velocityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
 
 
     updateListObjects(ui->widgetPhysics->getObjectsList());
@@ -208,6 +219,32 @@ MainWindow::MainWindow(QWidget *parent) :
     pd_selected = NULL;
     joint_selected = NULL;
     obj_selected = NULL;
+
+    //Shortcuts
+    QShortcut* shortcut = new QShortcut(QKeySequence(tr("Ctrl+O", "File|Open")), this);
+    shortcut->setContext(Qt::ApplicationShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionOpen_Model_triggered()));
+
+    shortcut = new QShortcut(QKeySequence(tr("Ctrl+M", "File|Open")), this);
+    shortcut->setContext(Qt::ApplicationShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionOpen_MoCap_triggered()));
+
+    shortcut = new QShortcut(QKeySequence(tr("Ctrl+R", "")), this);
+    shortcut->setContext(Qt::ApplicationShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionRestart_Simulation_triggered()));
+
+    shortcut = new QShortcut(QKeySequence(tr("Space", "")), this);
+    shortcut->setContext(Qt::ApplicationShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionPlay_Pause_Simulation_triggered()));
+
+    shortcut = new QShortcut(QKeySequence(tr("Ctrl+S", "")), this);
+    shortcut->setContext(Qt::ApplicationShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionSave_Simulation_triggered()));
+
+    shortcut = new QShortcut(QKeySequence(tr("Shift+S", "")), this);
+    shortcut->setContext(Qt::ApplicationShortcut);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionOpen_Simulation_triggered()));
+
 
 
 }
@@ -575,7 +612,8 @@ void MainWindow::setMaxTimeLine(int v)
 
 void MainWindow::adjustTolerance(double t)
 {
-    Sensor::setTolerance(t);
+    ui->widgetPhysics->setToleranceSensor(t);
+    //Sensor::setTolerance(t);
 }
 
 void MainWindow::plusFrameEdition()
@@ -586,6 +624,11 @@ void MainWindow::plusFrameEdition()
 void MainWindow::minusFrameEdition()
 {
     ui->frameEdit->setValue(ui->frameEdit->value()-1);
+}
+
+void MainWindow::setBallsConfiguration()
+{
+    ui->widgetPhysics->setVelocityDensityBalls(ui->densityBall->value(),ui->velocityBall->value());
 }
 
 
@@ -599,20 +642,6 @@ void MainWindow::on_actionRestart_Simulation_triggered()
     ui->widgetPhysics->simulationRestart();
 }
 
-void MainWindow::on_actionOpen_Model_activated()
-{
-    ui->widgetPhysics->stopSimulation();
-    QString mfile = QFileDialog::getOpenFileName(this,"Open Model","../models/");
-    if(!mfile.isEmpty()){
-        ui->widgetPhysics->loadScene(mfile);
-        ui->enableGravity->setChecked(false);
-        ui->gravx->setValue(0);
-        ui->gravy->setValue(0);
-        ui->gravz->setValue(0);
-        ui->groupBoxCone->setVisible(true);
-    }
-    ui->widgetPhysics->startSimulation();
-}
 
 //abrir arquivo de captura de movimento
 void MainWindow::on_actionOpen_MoCap_triggered()
@@ -687,6 +716,17 @@ void MainWindow::on_actionOpen_Simulation_triggered()
         ui->widgetPhysics->setGravity(ui->enableGravity->isChecked());
     }
     ui->widgetPhysics->startSimulation();
+    ui->enableGravity->setChecked(true);
+    ui->infoShow->setChecked(false);
+    ui->kdtoks->setChecked(false); //kd = 1/ks
+    ui->checkBox->setChecked(false); //atualiza automaticamente todos os parametros x,y e z de acordo com x
+    ui->checkMesh->setChecked(false); //mostra a malha sobre as partes do personagem
+
+    //configurações de desenho
+    ui->checkGRF->setChecked(true);
+    ui->checkShowChara->setChecked(true);
+    ui->checkShadow->setChecked(false);
+    ui->checkWireChara->setChecked(false);
 }
 
 void MainWindow::on_checkBox_clicked(bool checked)
@@ -818,3 +858,20 @@ void MainWindow::on_angleBalBodyz_valueChanged(int arg1)
     if(arg1>360) ui->angleBalBodyz->setValue(0);
     if(arg1<-360) ui->angleBalBodyz->setValue(0);
 }
+
+void MainWindow::on_actionOpen_Model_triggered()
+{
+    ui->widgetPhysics->stopSimulation();
+    QString mfile = QFileDialog::getOpenFileName(this,"Open Model","../models/");
+    if(!mfile.isEmpty()){
+        ui->widgetPhysics->loadScene(mfile);
+        ui->enableGravity->setChecked(false);
+        ui->gravx->setValue(0);
+        ui->gravy->setValue(0);
+        ui->gravz->setValue(0);
+        ui->groupBoxCone->setVisible(true);
+    }
+    ui->widgetPhysics->startSimulation();
+}
+
+

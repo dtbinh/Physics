@@ -1,6 +1,6 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
-#define dDOUBLE
+//#define dDOUBLE
 #include "ode/ode.h"
 class Vec4;
 class Quaternion;
