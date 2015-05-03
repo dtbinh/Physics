@@ -64,6 +64,8 @@ namespace Physics{
     void                  initJointBall(Joint* joint, Vec4 anchor);  //criar junta ball
     Vec4                  getAnchorJoint(Joint *joint);
     void                  initJointFixed(Joint*joint);               //criar junta fixed
+    void                  initJointHinge(Joint* joint, Vec4 anchor, Vec4 axis); //criar junta hinge
+    Vec4                  getAxisHingeJoint(Joint *joint);           //retorna o eixo da junta hinge
     Quaternion            getRotationJoint(Joint* joint);            //retorna o quaternion entre os corpos da junta
     Quaternion            getRotationJointInit(Joint* joint);            //retorna o quaternion entre os corpos da junta
     void                  closeJoint(Joint* joint);                  //fecha a junta

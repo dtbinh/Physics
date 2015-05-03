@@ -630,6 +630,18 @@ Joint* Scene::addJointBall(Vec4 anchor, Object *parent, Object *child, Character
     return joint;
 }
 
+Joint* Scene::addJointHinge(Vec4 anchor, Vec4 axis, Object *parent, Object *child, Character *chara)
+{
+    Joint *joint = NULL;
+    if (chara!=NULL){
+        joint = new Joint(chara, JOINT_HINGE);
+        joint->setParent(parent);
+        joint->setChild(child);
+        joint->initJoint(anchor, axis);
+    }
+    return joint;
+}
+
 Joint *Scene::addJointFixed(Object *parent,Object *child,Character *chara)
 {
 
@@ -1285,12 +1297,12 @@ void Scene::createCharacter()
 {
     Character *chara = new Character(this);
     this->addCharacter(chara);
-    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,1.05,0),Quaternion(1,0,0,0),TYPE_CUBE,1.5,chara,MATERIAL_CHROME);
-    Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),Quaternion(1,0,0,0),TYPE_CUBE,1.5,chara,MATERIAL_BRASS);
+    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,1.05,0),Quaternion(1,0,0,0),TYPE_CUBE,3.0,chara,MATERIAL_CHROME);
+    Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),Quaternion(1,0,0,0),TYPE_CUBE,2.5,chara,MATERIAL_EMERALD);
     A->setFoot(false);
     B->setFoot(false);
-    Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
-    joint->setName("Junta Ball");
+    Joint* joint = this->addJointHinge(Vec4(0,0.7,0),Vec4(1.0,0.0,0.0),A,B,chara);
+    //Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
     ControlPD *pd = new ControlPD(joint,Quaternion(1,0,0,0),Vec4(),Vec4());
     pd->setEnabled(true);
     chara->controllers.push_back(pd);

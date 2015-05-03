@@ -501,10 +501,18 @@ void Physics::initJointBall(Joint* joint, Vec4 anchor)
 }
 
 void Physics::initJointFixed(Joint *joint){
+    //The joint group ID is 0 to allocate the joint normally
     joint->setJoint(dJointCreateFixed(joint->scene->getWorld(),0));
     dJointAttach(joint->getJoint(),joint->getParent()->getBody(),joint->getChild()->getBody());
     dJointSetFixed(joint->getJoint());
 
+}
+
+void Physics::initJointHinge(Joint *joint, Vec4 anchor, Vec4 axis){
+    joint->setJoint(dJointCreateHinge(joint->getCharacter()->getScene()->getWorld(), joint->getCharacter()->getJointGroup()));
+    dJointAttach(joint->getJoint(),joint->getParent()->getBody(), joint->getChild()->getBody());
+    dJointSetHingeAnchor(joint->getJoint(),anchor.x(),anchor.y(),anchor.z());
+    dJointSetHingeAxis(joint->getJoint(),axis.x(),axis.y(),axis.z());
 }
 
 Vec4 Physics::getJointBallAnchor( Joint* joint )
@@ -619,4 +627,15 @@ Vec4 Physics::getRelPositionBody(Object *obj){
     dBodyGetMass(obj->getBody(),&mass);
     dBodyGetRelPointPos(obj->getBody(),mass.c[0],mass.c[1],mass.c[2],res);
     return Vec4(res[0],res[1],res[2]);
+}
+
+
+Vec4 Physics::getAxisHingeJoint(Joint *joint)
+{
+    if (joint->type == JOINT_HINGE){
+        dVector3 res;
+        dJointGetHingeAxis(joint->getJoint(), res);
+        return Vec4((float)res[0], (float)res[1], (float)res[2]);
+    }
+    return Vec4();
 }

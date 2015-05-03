@@ -30,6 +30,7 @@ public:
 
 
     Vec4 *initialAnchor;          //posição inicial da ancoragem da junta
+    Vec4 *initialAxis;            //eixo inicial de ancoragem da junta hinge
 
     Character *character;
     Scene *scene;
@@ -55,7 +56,7 @@ public:
 
 
 
-    void          initJoint(Vec4 anchor=Vec4());
+    void          initJoint(Vec4 anchor=Vec4(), Vec4 axis=Vec4());
     void          setJoint(JointID joint);
     JointID       getJoint();
     void          setParent(Object *parent);

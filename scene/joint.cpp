@@ -24,6 +24,7 @@ Joint::Joint(Character *chara,int type)
     //transform = new Matrix4f();
     //transform->setIdentity();
     initialAnchor = new Vec4();
+    initialAxis = new Vec4();
 }
 
 Joint::Joint(int type)
@@ -165,9 +166,10 @@ Matrix Joint::getAd(Object *obj)
     return Ad;
 }
 
-void Joint::initJoint(Vec4 anchor)
+void Joint::initJoint(Vec4 anchor, Vec4 axis)
 {
     this->initialAnchor->setVec4(anchor);
+    this->initialAxis->setVec4(axis);
     switch (this->type){
         case JOINT_FIXED:{
         Physics::initJointFixed(this);
@@ -175,7 +177,8 @@ void Joint::initJoint(Vec4 anchor)
         break;
     }
     case JOINT_HINGE:{
-
+        Physics::initJointHinge(this,anchor,axis);
+        this->name = "Hinge";
         break;
     }
     case JOINT_BALL:{
@@ -236,13 +239,14 @@ void Joint::restartJoint()
     //Physics::closeJoint(this);
     //this->initialAnchor->setVec4(anchor);
     Vec4 anchor = Vec4(this->initialAnchor->x(),this->initialAnchor->y(),this->initialAnchor->z());
+    Vec4 axis = Vec4(this->initialAxis->x(),this->initialAxis->y(),this->initialAxis->z());
     switch (this->type){
         case JOINT_FIXED:{
         Physics::initJointFixed(this);
         break;
     }
     case JOINT_HINGE:{
-
+        Physics::initJointHinge(this,anchor,axis);
         break;
     }
     case JOINT_BALL:{

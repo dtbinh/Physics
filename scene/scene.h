@@ -91,6 +91,7 @@ public:
     Object*               addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
     Joint *               addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara,Vec4 limSup=Vec4(),Vec4 limInf=Vec4());//cria uma junta ball
     Joint *               addJointFixed(Object *parent,Object *child, Character *chara); //cria uma junta fixa
+    Joint *               addJointHinge(Vec4 anchor, Vec4 axis, Object *parent, Object *child, Character *chara); //cria uma junta hinge
     std::vector<Object*>  objectsScene(); //retorna os objetos do cenário e dos characteres
     std::vector<Object*>  objectsSceneChara(); //retorna os objetos dos characteres
     Object*               selectedObject();
