@@ -138,9 +138,19 @@ float Vec4::x()
     return x1;
 }
 
+void Vec4::setX(float x)
+{
+    this->x1 = x;
+}
+
 float Vec4::y()
 {
     return x2;
+}
+
+void Vec4::setY(float y)
+{
+    this->x2 = y;
 }
 
 float Vec4::z()
@@ -148,9 +158,19 @@ float Vec4::z()
     return x3;
 }
 
+void Vec4::setZ(float z)
+{
+    this->x3 = z;
+}
+
 float Vec4::w()
 {
     return x4;
+}
+
+void Vec4::setW(float w)
+{
+    this->x4 = w;
 }
 
 void Vec4::normalize()
