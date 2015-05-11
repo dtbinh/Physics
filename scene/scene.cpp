@@ -1301,12 +1301,57 @@ void Scene::createCharacter()
     Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),Quaternion(1,0,0,0),TYPE_CUBE,2.5,chara,MATERIAL_EMERALD);
     A->setFoot(false);
     B->setFoot(false);
-    Joint* joint = this->addJointHinge(Vec4(0,0.7,0),Vec4(1.0,0.0,0.0),A,B,chara);
+    Joint* joint = this->addJointHinge(Vec4(0,0.7,0),Vec4(1.0,1.0,1.0),A,B,chara);
     //Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
     ControlPD *pd = new ControlPD(joint,Quaternion(1,0,0,0),Vec4(),Vec4());
     pd->setEnabled(true);
     chara->controllers.push_back(pd);
     chara->contructHierarchyBodies();
+}
+
+void Scene::createLuxo()
+{
+    int materialLuxo = MATERIAL_SILVER;
+    Character *luxo = new Character(this);
+    this->addCharacter(luxo);
+
+    Object *lamp = addObject(Vec4(0.05,0.1,0.05),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
+    Object *upperBody = addObject(Vec4(0.05,0.2,0.05), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
+    Object *lowerBody = addObject(Vec4(0.05,0.3,0.05), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
+    Object *feet = addObject(Vec4(1.2,0.01,0.7), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,10,luxo,materialLuxo);
+
+    lamp->setFoot(false);
+    upperBody->setFoot(false);
+    lowerBody->setFoot(false);
+    feet->setFoot(false);
+
+    Joint *upperLamp = addJointHinge(Vec4(0,0.725,0), Vec4(0,0,1), upperBody, lamp, luxo);
+    upperLamp->setName("upperLamp");
+    Joint *lowerUpper = addJointHinge(Vec4(0,0.475,0), Vec4(0,0,1), lowerBody, upperBody, luxo);
+    lowerUpper->setName("lowerUpper");
+    Joint *feetLower = addJointHinge(Vec4(0,0.125,0), Vec4(0,0,1), feet, lowerBody, luxo);
+    feetLower->setName("feetLower");
+
+    ControlPD *upperLampControl = new ControlPD(upperLamp,Quaternion(1,0,0,0),Vec4(),Vec4());
+    ControlPD *lowerUpperControl = new ControlPD(lowerUpper,Quaternion(1,0,0,0),Vec4(),Vec4());
+    ControlPD *feetLowerControl = new ControlPD(feetLower,Quaternion(1,0,0,0),Vec4(),Vec4());
+
+    upperLampControl->setEnabled(true);
+    lowerUpperControl->setEnabled(true);
+    feetLowerControl->setEnabled(true);
+
+    upperLampControl->setKs(Vec4(0.0,0.0,50.0));
+    upperLampControl->setKd(Vec4(0.0,0.0,5.0));
+    lowerUpperControl->setKs(Vec4(0.0,0.0,50.0));
+    lowerUpperControl->setKd(Vec4(0.0,0.0,5.0));
+    feetLowerControl->setKs(Vec4(0.0,0.0,50.0));
+    feetLowerControl->setKd(Vec4(0.0,0.0,5.0));
+
+    luxo->controllers.push_back(upperLampControl);
+    luxo->controllers.push_back(lowerUpperControl);
+    luxo->controllers.push_back(feetLowerControl);
+
+    luxo->contructHierarchyBodies();
 }
 
 void Scene::startRecorder(bool b)
