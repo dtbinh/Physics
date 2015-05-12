@@ -1304,7 +1304,7 @@ void Scene::createCharacter()
     Joint* joint = this->addJointHinge(Vec4(0,0.7,0),Vec4(1.0,0.0,0.0),A,B,chara);
     //Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
     ControlPD *pd = new ControlPD(joint,Quaternion(1,0,0,0),Vec4(),Vec4());
-    pd->setEnabled(true);
+    pd->setEnabled(false);
     chara->controllers.push_back(pd);
     chara->contructHierarchyBodies();
 }

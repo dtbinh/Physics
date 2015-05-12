@@ -317,7 +317,7 @@ GLWidget::GLWidget(QWidget *parent) :
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     density = 0.5; //massa
     velocity = 5.;
-    //scene->createCharacter();
+    scene->createCharacter();
 }
 
 void GLWidget::initializeGL()
