@@ -6,6 +6,11 @@
 #include "character.h"
 #include "graphics/draw.h"
 
+//#ifdef DEBUG_MODE
+#include <iostream>
+using namespace std;
+//#endif
+
 Joint::Joint(Character *chara,int type)
 {
     if(chara!=NULL){
@@ -300,6 +305,28 @@ void Joint::draw()
     //if(this->initialAnchor==Vec4()) return;
     switch (this->type){
     case (JOINT_HINGE):{
+        Vec4 position = Physics::getAnchorJoint(this);
+        Vec4 axis = Physics::getAxisHingeJoint(this);
+        double radius = 0.05;
+        double height = 0.15;
+
+        //Afasta um pouco o cilindro "para trás", para a junta ficar no meio da posição
+        if (axis.x() != 0) {
+           position.setX(position.x() - height/2.0);
+        }
+        if (axis.y() != 0){
+            position.setY(position.y() - height/2.0);
+        }
+        if (axis.z() != 0){
+            position.setZ(position.z() - height/2.0);
+        }
+
+        if (selected) {
+           //Draw::drawCylinderSelected(position);
+           Draw::drawCylinder(position,axis,radius,height,MATERIAL_YELLOW_RUBBER);
+        } else {
+           Draw::drawCylinder(position,axis,radius,height,MATERIAL_RUBY);
+        }
         break;
     }
     case (JOINT_BALL):{

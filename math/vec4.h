@@ -27,9 +27,13 @@ public:
     void                   setVec4(Vec4 p);                        //adiciona um vetor
     void                   setVec4(float x1=0.0,float x2=0.0,float x3=0.0,float x4=1.0);
     float                  x();                                    //retorna parametro x1
+    void                   setX(float x);                          //seta parametro x1
     float                  y();                                    //retorna parametro x2
+    void                   setY(float y);                          //seta parametro x2
     float                  z();                                    //retorna parametro x3
+    void                   setZ(float z);                          //seta parametro x3
     float                  w();                                    //retorna parametro x4
+    void                   setW(float w);                          //seta parametro x4
     void                   normalize();                            //normaliza o vetor
 
     float                  module();                              //retorna o modulo do vetor

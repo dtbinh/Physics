@@ -114,6 +114,7 @@ public:
     void                  clearObjectShooted();
     void                  createRamp();
     void                  createCharacter();
+    void                  createLuxo();
     void                  startRecorder(bool b);
 
 

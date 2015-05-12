@@ -146,6 +146,10 @@ public:
     void bindShader();
     void releaseShader();
 
+
+    //Controle do personagem luxo
+    bool controlLuxo;
+
     //Plane *plane;
     explicit GLWidget(QWidget *parent = 0);
     void initializeGL();

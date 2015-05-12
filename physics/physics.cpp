@@ -309,7 +309,16 @@ void Physics::setDisableJoint(Joint *joint){
 Vec4 Physics::getAnchorJoint(Joint *joint)
 {
     dVector3 pos;
-    dJointGetBallAnchor(joint->getJoint(),pos);
+    switch(joint->type){
+    case(JOINT_BALL):{
+        dJointGetBallAnchor(joint->getJoint(),pos);
+        break;
+    }
+    case(JOINT_HINGE):{
+        dJointGetHingeAnchor(joint->getJoint(),pos);
+    }
+    }
+
     return Vec4(pos[0],pos[1],pos[2]);
 }
 void Physics::createObject(Object *object, dSpaceID space, float mass, Vec4 position, Vec4 Velocity)

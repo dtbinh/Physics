@@ -7,6 +7,13 @@
 #include "physics/physics.h"
 #include "graphics/mesh.h"
 #include "imageloader.h"
+#include <cmath>
+
+//#ifdef DEBUG_MODE
+#include <iostream>
+using namespace std;
+//#endif
+
 #define SEGMENTS 30
 bool idraw_ground = false;
 int idrawGround;
@@ -288,7 +295,7 @@ Mesh *Draw::getMeshCube(Matrix4x4 *transform, Vec4 p, Mesh *mesh)
     return mesh;
 }
 
-void Draw::drawCylinder(Matrix4x4 *transform,Material *mat)
+void Draw::drawCylinder(Matrix4x4 *transform, Material *mat)
 {
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -304,6 +311,60 @@ void Draw::drawCylinder(Matrix4x4 *transform,Material *mat)
         glRotatef(90,0,1,0);
         glTranslatef(position.x(),position.y(),position.z());
         gluCylinder(q, scale.x(),scale.x(),scale.y(), slices, stacks);
+    glPopMatrix();
+    gluDeleteQuadric(q);
+}
+
+void Draw::drawCylinder(Matrix4x4 *transform, int material)
+{
+    Material *mat = new Material();
+    Material::setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+    GLUquadric *q = gluNewQuadric();
+    //transform->showMatrix4x4();
+    Vec4 position = Vec4(transform->get(12),transform->get(13),transform->get(14));
+    Vec4 scale    = transform->getScaleSeted();
+    glPushMatrix();
+        //gluQuadricNormals(q, GLU_SMOOTH);
+        glRotatef(90,0,1,0);
+        glTranslatef(position.x(),position.y(),position.z());
+        gluCylinder(q, scale.x(),scale.x(),scale.y(), slices, stacks);
+    glPopMatrix();
+    gluDeleteQuadric(q);
+
+}
+
+void Draw::drawCylinder(Vec4 position, Vec4 axis, double radius, double height, int material)
+{
+    Material *mat = new Material();
+    Material::setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+    //Pega o eixo em que o cilindro é desenhado, (0,0,1), o eixo em que se deseja que ele seja desenhado, e a projeção no plano xz
+    //Todos normalizados
+    Vec4 normalAxis = axis;
+    normalAxis.normalize();
+    Vec4 drawAxis(0,0,1);
+    Vec4 normalAxisProj = normalAxis.projXZ();
+    normalAxisProj.normalize();
+
+    //Pega os ângulos pelos quais precisamos rotacionar para alinhar (0,0,1) ao eixo da junta
+    double rotY = acos(drawAxis*normalAxisProj)*(180/M_PI);
+    double rotZ = acos(normalAxis*normalAxisProj)*(180/M_PI);
+
+    GLUquadric *q = gluNewQuadric();
+    glPushMatrix();
+        glTranslatef(position.x(),position.y(),position.z());
+        glRotated(rotY,0.0,1.0,0.0);
+        glRotated(rotZ,0.0,0.0,1.0);
+        gluCylinder(q,radius,radius,height,10,10);
     glPopMatrix();
     gluDeleteQuadric(q);
 

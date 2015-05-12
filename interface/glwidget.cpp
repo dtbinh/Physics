@@ -317,7 +317,13 @@ GLWidget::GLWidget(QWidget *parent) :
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     density = 0.5; //massa
     velocity = 5.;
+<<<<<<< HEAD
     scene->createCharacter();
+=======
+    //scene->createCharacter();
+    scene->createLuxo();
+    controlLuxo = false;
+>>>>>>> 8a416f94967683d14240459f7a3ee5872d9d30be
 }
 
 void GLWidget::initializeGL()
@@ -749,16 +755,32 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     int y = event->pos().y();
     int x = event->pos().x();
-    if (lbpressed && !rbpressed) {
-        cam->rotatex(y,last_y);
-        cam->rotatey(x,last_x);
+
+    if (controlLuxo && lbpressed){
+        printf("control\n");
+        ControlPD* controller = scene->getCharacter(0)->getControllersPD().at(1);
+        printf("%s\n", controller->getJoint()->getName().toUtf8().constData());
+        controller->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+        printf("%d\n",x);
+    } else if (controlLuxo && rbpressed) {
+        printf("control\n");
+        ControlPD* controller = scene->getCharacter(0)->getControllersPD().at(2);
+        printf("%s\n", controller->getJoint()->getName().toUtf8().constData());
+        controller->setQuaternionWanted(Quaternion(Vec4(0,0,y)));
+        printf("%d\n",y);
     }
-    if (!lbpressed && rbpressed) {
-        cam->translatex(x,last_x);
-        cam->translatey(y,last_y);
-    }
-    if (lbpressed && rbpressed) {
-        cam->zoom(y,last_y);
+    else {
+        if (lbpressed && !rbpressed) {
+            cam->rotatex(y,last_y);
+            cam->rotatey(x,last_x);
+        }
+        if (!lbpressed && rbpressed) {
+            cam->translatex(x,last_x);
+            cam->translatey(y,last_y);
+        }
+        if (lbpressed && rbpressed) {
+            cam->zoom(y,last_y);
+        }
     }
 
     last_x = x;
@@ -834,7 +856,7 @@ void GLWidget::simulationRestart()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-
+    //printf("%s\n",event->text().toUtf8().constData());
     if(event->key() == Qt::Key_Space ){
         simulationPlayPause();
     }
@@ -994,7 +1016,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         savedCamera[8] = cam->up.z();
     }
 
-
+    if (event->key() == Qt::Key_M){
+        controlLuxo = !controlLuxo;
+    }
 
     updateObjects(scene->objectsScene());
     updateGL();
