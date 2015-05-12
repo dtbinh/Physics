@@ -32,11 +32,12 @@ Scene::Scene(GLWidget *parent)
     this->sim_step = 67;
     this->frame_step = -1;
     this->status_motion = false;
-    this->enableGravity = false;
+    this->enableGravity = true;
     this->externalForce = Vec4();
     this->propKs = Vec4(1,1,1);
     this->propKd = Vec4(1,1,1);
     this->show_grf = true;
+    this->gravity = Vec4(0,-9.8,0);
     motion.clear();
     mocap.clear();
 
@@ -1297,11 +1298,11 @@ void Scene::createCharacter()
 {
     Character *chara = new Character(this);
     this->addCharacter(chara);
-    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,1.05,0),Quaternion(1,0,0,0),TYPE_CUBE,3.0,chara,MATERIAL_CHROME);
+    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.90,0),Quaternion(1,0,0,0),TYPE_CUBE,3.0,chara,MATERIAL_CHROME);
     Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),Quaternion(1,0,0,0),TYPE_CUBE,2.5,chara,MATERIAL_EMERALD);
     A->setFoot(false);
     B->setFoot(false);
-    Joint* joint = this->addJointHinge(Vec4(0,0.7,0),Vec4(1.0,1.0,1.0),A,B,chara);
+    Joint* joint = this->addJointHinge(Vec4(0,0.625,0),Vec4(0.0,0.0,1.0),A,B,chara);
     //Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
     ControlPD *pd = new ControlPD(joint,Quaternion(1,0,0,0),Vec4(),Vec4());
     pd->setEnabled(false);
@@ -1315,6 +1316,57 @@ void Scene::createLuxo()
     Character *luxo = new Character(this);
     this->addCharacter(luxo);
 
+    Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
+    Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
+    Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
+    Object *feet = addObject(Vec4(1.2,0.01,0.7), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,10,luxo,materialLuxo);
+
+    lamp->setFoot(false);
+    upperBody->setFoot(false);
+    lowerBody->setFoot(false);
+    feet->setFoot(true);
+
+    Joint *upperLamp = addJointHinge(Vec4(0,0.725,0), Vec4(0,0,1), upperBody, lamp, luxo);
+    upperLamp->setName("upperLamp");
+    upperLamp->setRadiusHinge(0.025);
+    Joint *lowerUpper = addJointHinge(Vec4(0,0.475,0), Vec4(0,0,1), lowerBody, upperBody, luxo);
+    lowerUpper->setName("lowerUpper");
+    lowerUpper->setRadiusHinge(0.025);
+    Joint *feetLower = addJointHinge(Vec4(0,0.1025,0), Vec4(0,0,1), feet, lowerBody, luxo); //ancora correta dadas as configurações do luxo
+    feetLower->setName("feetLower");
+    feetLower->setRadiusHinge(0.0475);
+    //Joint *feetLower = addJointHinge(Vec4(0,0.0775,0), Vec4(0,0,1), feet, lowerBody, luxo);
+    //feetLower->setName("feetLower");
+
+    ControlPD *upperLampControl = new ControlPD(upperLamp,Quaternion(1,0,0,0),Vec4(),Vec4());
+    ControlPD *lowerUpperControl = new ControlPD(lowerUpper,Quaternion(1,0,0,0),Vec4(),Vec4());
+    ControlPD *feetLowerControl = new ControlPD(feetLower,Quaternion(1,0,0,0),Vec4(),Vec4());
+
+    upperLampControl->setEnabled(true);
+    lowerUpperControl->setEnabled(true);
+    feetLowerControl->setEnabled(true);
+
+
+    //o luxo ficava "dançando" pq as constantes kd estavam muito altas, reduzi todas para 2.0 (antes estava 5.0)
+    upperLampControl->setKs(Vec4(0.0,0.0,50.0));
+    upperLampControl->setKd(Vec4(0.0,0.0,2.0));
+    lowerUpperControl->setKs(Vec4(0.0,0.0,50.0));
+    lowerUpperControl->setKd(Vec4(0.0,0.0,2.0));
+    feetLowerControl->setKs(Vec4(0.0,0.0,50.0));
+    feetLowerControl->setKd(Vec4(0.0,0.0,2.0));
+
+    luxo->controllers.push_back(upperLampControl);
+    luxo->controllers.push_back(lowerUpperControl);
+    luxo->controllers.push_back(feetLowerControl);
+
+    luxo->contructHierarchyBodies();
+}
+void Scene::createLuxo2()
+{
+    int materialLuxo = MATERIAL_SILVER;
+    Character *luxo = new Character(this);
+    this->addCharacter(luxo);
+
     Object *lamp = addObject(Vec4(0.05,0.1,0.05),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
     Object *upperBody = addObject(Vec4(0.05,0.2,0.05), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
     Object *lowerBody = addObject(Vec4(0.05,0.3,0.05), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
@@ -1323,7 +1375,7 @@ void Scene::createLuxo()
     lamp->setFoot(false);
     upperBody->setFoot(false);
     lowerBody->setFoot(false);
-    feet->setFoot(false);
+    feet->setFoot(true);
 
     Joint *upperLamp = addJointHinge(Vec4(0,0.725,0), Vec4(0,0,1), upperBody, lamp, luxo);
     upperLamp->setName("upperLamp");
@@ -1331,6 +1383,7 @@ void Scene::createLuxo()
     lowerUpper->setName("lowerUpper");
     Joint *feetLower = addJointHinge(Vec4(0,0.125,0), Vec4(0,0,1), feet, lowerBody, luxo);
     feetLower->setName("feetLower");
+
 
     ControlPD *upperLampControl = new ControlPD(upperLamp,Quaternion(1,0,0,0),Vec4(),Vec4());
     ControlPD *lowerUpperControl = new ControlPD(lowerUpper,Quaternion(1,0,0,0),Vec4(),Vec4());
@@ -1353,6 +1406,7 @@ void Scene::createLuxo()
 
     luxo->contructHierarchyBodies();
 }
+
 
 void Scene::startRecorder(bool b)
 {

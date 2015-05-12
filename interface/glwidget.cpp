@@ -317,13 +317,13 @@ GLWidget::GLWidget(QWidget *parent) :
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     density = 0.5; //massa
     velocity = 5.;
-<<<<<<< HEAD
-    scene->createCharacter();
-=======
+    //scene->createCharacter();
+
     //scene->createCharacter();
     scene->createLuxo();
+    //scene->createLuxo2();
     controlLuxo = false;
->>>>>>> 8a416f94967683d14240459f7a3ee5872d9d30be
+
 }
 
 void GLWidget::initializeGL()

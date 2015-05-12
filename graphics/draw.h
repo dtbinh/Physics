@@ -23,6 +23,7 @@ public:
     static void drawCylinder(Matrix4x4 *transform, Material *mat);
     static void drawCylinder(Matrix4x4 *transform, int material);
     static void drawCylinder(Vec4 position, Vec4 axis, double radius, double height, int material);
+    static void drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double height, int material);
     static void drawSphere(Matrix4x4 *transform,Material *mat, float radius=0);
     static void drawSphere(Vec4 position,int material=0,float size=0.04);
     static void drawLine(Vec4 p1,Vec4 p2,Vec4 color,float width);

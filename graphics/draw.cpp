@@ -592,6 +592,44 @@ void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color)
 
 }
 
+void Draw::drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double height, int material)
+{
+    Material *mat = new Material();
+
+        Material::setMaterial(mat,material);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+
+
+        //Pega o eixo em que o cilindro é desenhado, (0,0,1), o eixo em que se deseja que ele seja desenhado, e a projeção no plano xz
+        //Todos normalizados
+        Vec4 normalAxis = axis;
+        normalAxis.normalize();
+        Vec4 drawAxis(0,0,1);
+        Vec4 normalAxisProj = normalAxis.projXZ();
+        normalAxisProj.normalize();
+
+        //Pega os ângulos pelos quais precisamos rotacionar para alinhar (0,0,1) ao eixo da junta
+        double rotY = acos(drawAxis*normalAxisProj)*(180/M_PI);
+        double rotZ = acos(normalAxis*normalAxisProj)*(180/M_PI);
+
+        GLUquadric *q = gluNewQuadric();
+        glPushMatrix();
+            glTranslatef(position.x(),position.y(),position.z());
+            glRotated(rotY,0.0,1.0,0.0);
+            glRotated(rotZ,0.0,0.0,1.0);
+    gluClosedCylinder(q,radius,radius,height,25,25);
+    glPopMatrix();
+    gluDeleteQuadric(q);
+    delete mat;
+
+}
+
+
+
+
 void Draw::drawGround(int size)
 {
 

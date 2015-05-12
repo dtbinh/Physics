@@ -27,6 +27,7 @@ public:
     int         type;             //tipo de junta (fixa, hinge, ball,...)
     bool        selected;         //informa qual junta esta selecionada
     QString     name;
+    float       radius_hinge;     //adiciona o raio para a junta do tipo hinge
 
 
     Vec4 *initialAnchor;          //posição inicial da ancoragem da junta
@@ -42,6 +43,7 @@ public:
     void setLimitsAngularInferior(Vec4 inf);
     void setTorqueMax(Vec4 tq);
     void setScene(Scene *scn);
+    void setRadiusHinge(float radius);
     Vec4 getTorqueMax();
     Vec4 getLimitAngularMax();
     Vec4 getLimitAngularMin();

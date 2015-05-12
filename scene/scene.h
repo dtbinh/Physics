@@ -115,6 +115,7 @@ public:
     void                  createRamp();
     void                  createCharacter();
     void                  createLuxo();
+    void                  createLuxo2();
     void                  startRecorder(bool b);
 
 

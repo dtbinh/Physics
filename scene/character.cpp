@@ -69,11 +69,13 @@ void Character::draw()
             if (Sensor::getHierarchy2Use(this)==0){
                 for(int i=0;i<objects.size();i++)
                     if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+
             }
             else{
                 int v = Sensor::getHierarchy2Use(this);
                 v -= 3;
                 if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+
             }
         }
     }
@@ -86,7 +88,7 @@ void Character::draw()
 
     drawCOM();
     drawFootProjected();
-    drawCOMProjected();
+    //drawCOMProjected();
 }
 
 void Character::drawShadows()
@@ -134,8 +136,10 @@ void Character::drawFootProjected()
 //        Draw::drawCOMProjected(Cfoot_,0.05,Vec4(1,1,0));
 //    }
 
+
     bool capture = false;
-    if(this->capMotion->frame_current>0 && this->getMoCap()->status) capture = true;
+    if(this->getMoCap()!=NULL)
+        if(this->capMotion->frame_current>0 && this->getMoCap()->status) capture = true;
     std::vector<Object*> foots;
     for (int i=0;i<this->getNumBodies();i++)
         if (this->getBody(i)->getFoot()) foots.push_back( this->getBody(i));
@@ -145,17 +149,18 @@ void Character::drawFootProjected()
     //int count = 0;
     bool draw = false;
     int stance = Sensor::getStanceFoot(this);
-    if (stance<0 && foots.size()==2){
+
+    if (stance<0 && (foots.size()==2)){
         Cfoot_ = foots.at(0)->getPositionCurrent()+foots.at(1)->getPositionCurrent();
         Cfoot_.x2 = 0;
         count = 2;
         draw = true;
-    }else if(foots.size()>0){
+    }else if(foots.size()>0 && stance>0){
         Cfoot_ = this->getBody(stance)->getPositionCurrent();
         Cfoot_.x2 = 0;
         count = 1;
         draw = true;
-    }
+    }else if(stance<0) return;
     if(draw){
         Cfoot_ /= count;
         Draw::drawTargetProjected(Cfoot_,0.05);

@@ -306,26 +306,39 @@ void Joint::draw()
     switch (this->type){
     case (JOINT_HINGE):{
         Vec4 position = Physics::getAnchorJoint(this);
-        Vec4 axis = Physics::getAxisHingeJoint(this);
-        double radius = 0.05;
-        double height = 0.15;
+        Vec4 axis = Vec4(initialAxis->x(),initialAxis->y(),initialAxis->z());
+        float height;
 
+//        Draw::drawSphere(position,MATERIAL_TURQUOSIE,0.03);
+//        return;
+
+        //coloquei uma função para setar o raio do cilindro, e nesta função criei um metodo para pegar a largura do cilindro
         //Afasta um pouco o cilindro "para trás", para a junta ficar no meio da posição
-        if (axis.x() != 0) {
+        if (axis.x() >= 1) {
+            float z1 = this->getParent()->getProperties().z();
+            float z2 = this->getChild()->getProperties().z();
+            height = fmin(z1,z2);
            position.setX(position.x() - height/2.0);
         }
-        if (axis.y() != 0){
+        if (axis.y() >= 1){
+            float z1 = this->getParent()->getProperties().z();
+            float z2 = this->getChild()->getProperties().z();
+            height = fmin(z1,z2);
             position.setY(position.y() - height/2.0);
         }
-        if (axis.z() != 0){
+        if (axis.z() >= 1){
+            float z1 = this->getParent()->getProperties().z();
+            float z2 = this->getChild()->getProperties().z();
+            height = fmin(z1,z2);
+
             position.setZ(position.z() - height/2.0);
         }
 
         if (selected) {
            //Draw::drawCylinderSelected(position);
-           Draw::drawCylinder(position,axis,radius,height,MATERIAL_YELLOW_RUBBER);
+           Draw::drawCylinderClosed(position,axis,radius_hinge,height,MATERIAL_YELLOW_RUBBER);
         } else {
-           Draw::drawCylinder(position,axis,radius,height,MATERIAL_RUBY);
+           Draw::drawCylinderClosed(position,axis,radius_hinge,height,MATERIAL_RUBY);
         }
         break;
     }
@@ -349,4 +362,9 @@ void Joint::setTorqueMax(Vec4 tq)
 void Joint::setScene(Scene *scn)
 {
     scene = scn;
+}
+
+void Joint::setRadiusHinge(float radius)
+{
+    radius_hinge = radius;
 }
