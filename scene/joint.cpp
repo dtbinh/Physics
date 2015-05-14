@@ -283,7 +283,7 @@ QString Joint::getName()
 
 Vec4 Joint::getPositionCurrent()
 {
-    return Physics::getJointBallAnchor(this);
+    return Physics::getAnchorJoint(this);
 }
 
 QString Joint::showInfo()

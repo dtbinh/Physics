@@ -1319,7 +1319,7 @@ void Scene::createLuxo()
     Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
     Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
     Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
-    Object *feet = addObject(Vec4(1.2,0.01,0.7), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,10,luxo,materialLuxo);
+    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,10,luxo,materialLuxo);
 
     lamp->setFoot(false);
     upperBody->setFoot(false);

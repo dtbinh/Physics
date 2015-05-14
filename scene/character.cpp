@@ -838,6 +838,23 @@ Vec4 Character::getOffset()
     return offset;
 }
 
+int Character::findJointIndex(Joint *searchJoint)
+{
+    std::vector<Joint*> charJoints = this->joints;
+    if (charJoints.size() != 0) {
+        int index = 0;
+        for (std::vector<Joint*>::iterator i = charJoints.begin(); i != charJoints.end(); ++i){
+            if ((*i) == searchJoint){
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    } else {
+        return -1;
+    }
+}
+
 void Character::setSpace(SpaceID space)
 {
     this->space = space;

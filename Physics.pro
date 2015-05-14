@@ -50,7 +50,9 @@ SOURCES += main.cpp\
     math/vector3d.cpp \
     extra/tga.c \
     extra/texture.c \
-    math/ray.cpp
+    math/ray.cpp \
+    control/pose.cpp \
+    control/graphicalpose.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -86,7 +88,9 @@ HEADERS  += mainwindow.h \
     math/vector3d.h \
     extra/tga.h \
     extra/texture.h \
-    math/ray.h
+    math/ray.h \
+    control/pose.h \
+    control/graphicalpose.h
 
 FORMS    += mainwindow.ui
 

@@ -26,6 +26,9 @@
 
 //  for malloc
 #include <stdlib.h>
+
+#include <cmath>
+
 bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
@@ -756,20 +759,27 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int y = event->pos().y();
     int x = event->pos().x();
 
-    if (controlLuxo && lbpressed){
-        printf("control\n");
+    /*if (controlLuxo && lbpressed && !rbpressed){
         ControlPD* controller = scene->getCharacter(0)->getControllersPD().at(1);
-        printf("%s\n", controller->getJoint()->getName().toUtf8().constData());
         controller->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
-        printf("%d\n",x);
-    } else if (controlLuxo && rbpressed) {
-        printf("control\n");
+    } else if (controlLuxo && rbpressed && !lbpressed) {
         ControlPD* controller = scene->getCharacter(0)->getControllersPD().at(2);
-        printf("%s\n", controller->getJoint()->getName().toUtf8().constData());
         controller->setQuaternionWanted(Quaternion(Vec4(0,0,y)));
-        printf("%d\n",y);
-    }
-    else {
+    } else if (controlLuxo && lbpressed && rbpressed){
+        ControlPD* controller = scene->getCharacter(0)->getControllersPD().at(0);
+        controller->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+    }*/
+    if (controlLuxo){
+        if (lbpressed && !rbpressed){
+            ControlPD* controllerUpperLower = scene->getCharacter(0)->getControllersPD().at(1);
+            controllerUpperLower->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+            ControlPD* controllerLowerFeet = scene->getCharacter(0)->getControllersPD().at(2);
+            controllerLowerFeet->setQuaternionWanted(Quaternion(Vec4(0,0,y)));
+        } if (!lbpressed && rbpressed){
+            ControlPD* controllerLampUpper = scene->getCharacter(0)->getControllersPD().at(0);
+            controllerLampUpper->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+        }
+    } else {
         if (lbpressed && !rbpressed) {
             cam->rotatex(y,last_y);
             cam->rotatey(x,last_x);

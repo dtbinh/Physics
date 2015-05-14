@@ -76,8 +76,6 @@ public:
     QString       showInfo();
 
 
-
-
     //void setColor(int color);
     //-------Graphics
 
