@@ -303,7 +303,6 @@ GLWidget::GLWidget(QWidget *parent) :
     simTimer->start(0);
     simTimer->setInterval(0);
 
-
     move = false;
     sim_pause = false;
     capture_pause = true;

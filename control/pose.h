@@ -5,12 +5,14 @@
 #include "scene/joint.h"
 #include "math/vec4.h"
 #include <vector>
+#include <QString>
 
 class Pose
 {
 private:
-    Character* character;
-    std::vector<Vec4> angles;
+    Character*          character;
+    std::vector<Vec4>   angles;
+    QString             name;
 public:
     Pose(Character* character);
     Pose(Character *character, std::vector<Vec4> angles);
@@ -21,6 +23,8 @@ public:
     Vec4                getAngleJoint(Joint* searchJoint);
     void                updateAngle(int updateIndex, Vec4 newAngle); //atualiza o ângulo de uma determinada junta do personagem
     void                updateAngle(Joint* updatedJoint, Vec4 newAngle);
+    void                setName(QString name); //getters e setters para o nome da pose
+    QString             getName();
 };
 
 #endif // POSE_H

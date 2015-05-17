@@ -9,6 +9,8 @@ class GLWidget;
 #include "character.h"
 #include "grf.h"
 #include "extra/material.h"
+#include "control/pose.h"
+#include "control/graphicalpose.h"
 
 #ifndef FEEDBACKCONTACT_H
 #define FEEDBACKCONTACT_H
@@ -42,10 +44,17 @@ private:
     std::vector<Object*> objects_shoot;
     std::vector<Joint*> joints;
     std::vector<Character*> characters;
+    std::vector<Pose*> poses;
+    std::vector<GraphicalPose*> poseControl;
     //manipulators
     Vec4 externalForce;
     Vec4 propKs;
     Vec4 propKd;
+
+
+    //Controle da pose
+    QTime pose_time;
+
 public:
     int            width,height;
 
@@ -117,6 +126,9 @@ public:
     void                  createLuxo();
     void                  createLuxo2();
     void                  startRecorder(bool b);
+    //pose control
+    Pose*                 addPose(Character* character, std::vector<Vec4> angles);
+    GraphicalPose*        addGraphicalPose(Character* character);
 
 
     //equilibrio do personagem

@@ -70,3 +70,13 @@ void Pose::updateAngle(Joint *updatedJoint, Vec4 newAngle)
     }
 }
 
+void Pose::setName(QString name)
+{
+    this->name = name;
+}
+
+QString Pose::getName()
+{
+    return this->name;
+}
+

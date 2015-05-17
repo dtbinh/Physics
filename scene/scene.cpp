@@ -41,6 +41,8 @@ Scene::Scene(GLWidget *parent)
     motion.clear();
     mocap.clear();
 
+    pose_time.start();
+
 //    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(74,0,0)),TYPE_CUBE,1.2);
 //    Object *cont = addObject(Vec4(1.8,0.20,0.5),Vec4(0.2,0.1,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2);
 //    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,2.68),Quaternion(Vec4(-74,0,0)),TYPE_CUBE,1.2);
@@ -248,7 +250,12 @@ void Scene::simulationStep(bool balance)
  objs.clear();
  jts.clear();
 
-
+    int elapsedTime = pose_time.elapsed();
+    //printf("%d elapsed time\n", elapsedTime);
+    for (std::vector<GraphicalPose*>::iterator i = this->poseControl.begin(); i < this->poseControl.end(); i++){
+       (*i)->advanceTime(elapsedTime);
+    }
+    pose_time.start();
 }
 
 void Scene::draw()
@@ -1319,7 +1326,7 @@ void Scene::createLuxo()
     Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
     Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
     Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
-    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,10,luxo,materialLuxo);
+    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,4,luxo,materialLuxo);
 
     lamp->setFoot(false);
     upperBody->setFoot(false);
@@ -1360,6 +1367,51 @@ void Scene::createLuxo()
     luxo->controllers.push_back(feetLowerControl);
 
     luxo->contructHierarchyBodies();
+
+
+    //construindo as poses do Luxo
+    std::vector<Vec4> pose1a;
+    pose1a.push_back(Vec4(0,0,90));
+    pose1a.push_back(Vec4(0,0,25));
+    pose1a.push_back(Vec4(0,0,20));
+    Pose* pose1 = addPose(luxo,pose1a);
+    pose1->setName("pose 1");
+
+    std::vector<Vec4> pose2a;
+    /*pose2a.push_back(Vec4(0,0,100));
+    pose2a.push_back(Vec4(0,0,30));
+    pose2a.push_back(Vec4(0,0,40));*/
+    pose2a.push_back(Vec4(0,0,70));
+    pose2a.push_back(Vec4(0,0,0));
+    pose2a.push_back(Vec4(0,0,80));
+    Pose* pose2 = addPose(luxo,pose2a);
+    pose2->setName("pose 2");
+
+    std::vector<Vec4> pose3a;
+    /*pose3a.push_back(Vec4(0,0,70));
+    pose3a.push_back(Vec4(0,0,5));
+    pose3a.push_back(Vec4(0,0,30));*/
+    pose3a.push_back(Vec4(0,0,-60));
+    pose3a.push_back(Vec4(0,0,0));
+    pose3a.push_back(Vec4(0,0,-70));
+    Pose* pose3 = addPose(luxo,pose3a);
+    pose3->setName("pose3");
+
+    /*std::vector<Vec4> pose4a;
+    pose4a.push_back(Vec4(0,0,40));
+    pose4a.push_back(Vec4(0,0,5));
+    pose4a.push_back(Vec4(0,0,0));
+    Pose* pose4 = addPose(luxo,pose4a);
+    pose4->setName("pose 4");*/
+
+    GraphicalPose* luxoPose = addGraphicalPose(luxo);
+    luxoPose->pushBackPose(pose1, 240);
+    luxoPose->pushBackPose(pose2, 240);
+    luxoPose->pushBackPose(pose3, 240);
+    //luxoPose->pushBackPose(pose4, 240);
+
+    //Necessário para ele não sair voando com o pcg
+    this->setGravity(true);
 }
 void Scene::createLuxo2()
 {
@@ -1423,6 +1475,20 @@ void Scene::startRecorder(bool b)
         initialize = false;
         record = true;
     }
+}
+
+Pose *Scene::addPose(Character *character, std::vector<Vec4> angles)
+{
+    Pose* newPose = new Pose(character, angles);
+    this->poses.push_back(newPose);
+    return newPose;
+}
+
+GraphicalPose *Scene::addGraphicalPose(Character *character)
+{
+    GraphicalPose* newGraphicalPose = new GraphicalPose(character);
+    this->poseControl.push_back(newGraphicalPose);
+    return newGraphicalPose;
 }
 
 

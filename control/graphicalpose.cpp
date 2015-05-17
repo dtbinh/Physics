@@ -1,5 +1,6 @@
 #include "graphicalpose.h"
 #include "pose.h"
+#include "control.h"
 #include <vector>
 
 GraphicalPose::GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeIntervals)
@@ -42,6 +43,48 @@ void GraphicalPose::insertPose(Pose *newPose, double poseInterval, int position)
     if (newPose->getCharacter() == this->character) {
         this->poses.insert(this->poses.begin()+position, newPose);
         this->timeIntervals.insert(this->timeIntervals.begin()+position, poseInterval);
+    }
+}
+
+void GraphicalPose::modifyPose(Pose *modifiedPose, double poseInterval, int position)
+{
+    if ((modifiedPose->getCharacter() == this->character) && (this->poses.size() > position)){
+        this->poses.at(position) = modifiedPose;
+        this->timeIntervals.at(position) = poseInterval;
+    }
+}
+
+Pose *GraphicalPose::getCurrentPose()
+{
+    return this->poses.at(this->current);
+}
+
+void GraphicalPose::advanceTime(double increment)
+{
+    if (this->time+increment > this->timeIntervals.at(this->current)){
+        this->current += 1;
+
+        if (this->current >= this->timeIntervals.size()){
+            this->current = 0;
+        }
+
+        this->time = 0;
+        //printf("current state is: %d\n", this->current);
+        this->setCharacterShape();
+
+    } else {
+        this->time += increment;
+    }
+}
+
+void GraphicalPose::setCharacterShape()
+{
+    Pose* poseActual = this->poses.at(this->current);
+    std::vector<Vec4> poseVectorActual = poseActual->getAngles();
+
+    for (int i = 0; i < poseVectorActual.size(); i++){
+        ControlPD* jointController = this->character->getController(i);
+        jointController->setQuaternionWanted(Quaternion(poseVectorActual.at(i)));
     }
 }
 

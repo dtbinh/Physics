@@ -91,8 +91,8 @@ public:
     Object*        getObjectSelected();
 
     Vec4 getOffset();
-    int            findJointIndex(Joint* searchJoint); //encontra o indice de uma junta caso ela exista no personagem
-
+    int             findJointIndex(Joint* searchJoint); //encontra o indice de uma junta caso ela exista no personagem
+    ControlPD*      getController(int i);
 
 
 

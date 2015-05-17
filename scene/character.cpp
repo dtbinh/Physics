@@ -855,6 +855,11 @@ int Character::findJointIndex(Joint *searchJoint)
     }
 }
 
+ControlPD *Character::getController(int i)
+{
+    return this->controllers.at(i);
+}
+
 void Character::setSpace(SpaceID space)
 {
     this->space = space;
