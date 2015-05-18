@@ -105,7 +105,7 @@ void Scene::restartPhysics()
     }
     if(enableGravity) Physics::setGravity(this,this->gravity);
     else Physics::setGravity(this,Vec4());
-
+    //createLuxo();
     //createCharacter();
 
 }
@@ -1294,7 +1294,7 @@ void Scene::createRamp()
     objects.push_back(cont);
     objects.push_back(ramp2);
     joints.push_back(addJointFixed(ramp,ramp2,NULL));
-    qDebug() << "Criou";
+    //qDebug() << "Criou";
     //joints.push_back(addJointFixed(ramp2,));
 //    joints.push_back(addJointFixed(cont,NULL));
 
@@ -1331,15 +1331,15 @@ void Scene::createLuxo()
     lamp->setFoot(false);
     upperBody->setFoot(false);
     lowerBody->setFoot(false);
-    feet->setFoot(true);
+    feet->setFoot(false);
 
-    Joint *upperLamp = addJointHinge(Vec4(0,0.725,0), Vec4(0,0,1), upperBody, lamp, luxo);
+    Joint *upperLamp = this->addJointHinge(Vec4(0,0.725,0), Vec4(0,0,1), upperBody, lamp, luxo);
     upperLamp->setName("upperLamp");
     upperLamp->setRadiusHinge(0.025);
-    Joint *lowerUpper = addJointHinge(Vec4(0,0.475,0), Vec4(0,0,1), lowerBody, upperBody, luxo);
+    Joint *lowerUpper = this->addJointHinge(Vec4(0,0.475,0), Vec4(0,0,1), lowerBody, upperBody, luxo);
     lowerUpper->setName("lowerUpper");
     lowerUpper->setRadiusHinge(0.025);
-    Joint *feetLower = addJointHinge(Vec4(0,0.1025,0), Vec4(0,0,1), feet, lowerBody, luxo); //ancora correta dadas as configurações do luxo
+    Joint *feetLower = this->addJointHinge(Vec4(0,0.1025,0), Vec4(0,0,1), feet, lowerBody, luxo); //ancora correta dadas as configurações do luxo
     feetLower->setName("feetLower");
     feetLower->setRadiusHinge(0.0475);
     //Joint *feetLower = addJointHinge(Vec4(0,0.0775,0), Vec4(0,0,1), feet, lowerBody, luxo);
