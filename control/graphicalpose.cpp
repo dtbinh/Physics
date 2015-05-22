@@ -59,7 +59,7 @@ Pose *GraphicalPose::getCurrentPose()
     return this->poses.at(this->current);
 }
 
-void GraphicalPose::advanceTime(double increment)
+void GraphicalPose::advanceTimeEnergic(double increment)
 {
     if (this->time+increment > this->timeIntervals.at(this->current)){
         this->current += 1;
