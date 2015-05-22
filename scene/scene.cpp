@@ -253,7 +253,7 @@ void Scene::simulationStep(bool balance)
     int elapsedTime = pose_time.elapsed();
     //printf("%d elapsed time\n", elapsedTime);
     for (std::vector<GraphicalPose*>::iterator i = this->poseControl.begin(); i < this->poseControl.end(); i++){
-       (*i)->advanceTime(elapsedTime);
+       (*i)->advanceTimeEnergic(elapsedTime);
     }
     pose_time.start();
 }
