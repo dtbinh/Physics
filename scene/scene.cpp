@@ -1405,6 +1405,7 @@ void Scene::createLuxo()
     pose4->setName("pose 4");*/
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
+    std::cout << luxoPose->getCumulativeTimeIntervals().size() << " cumulative time intervals size\n";
     luxoPose->pushBackPose(pose1, 240);
     luxoPose->pushBackPose(pose2, 240);
     luxoPose->pushBackPose(pose3, 240);

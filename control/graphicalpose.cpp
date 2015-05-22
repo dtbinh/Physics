@@ -2,12 +2,22 @@
 #include "pose.h"
 #include "control.h"
 #include <vector>
+#include <iostream>
+#include <algorithm>
+#include <iterator>
 
 GraphicalPose::GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeIntervals)
 {
     this->character = poses.at(0)->getCharacter();
     this->poses = poses;
     this->timeIntervals = timeIntervals;
+
+    //Cria o vetor de intervalos de tempo cumulativos
+    double sum = 0;
+    for (int i = 0; i < timeIntervals.size(); i++){
+        this->cumulativeTimeIntervals[i] = sum;
+        sum += timeIntervals.at(i);
+    }
 }
 
 GraphicalPose::GraphicalPose(Character *character)
@@ -30,19 +40,38 @@ std::vector<double> GraphicalPose::getTimeIntervals()
     return this->timeIntervals;
 }
 
+std::vector<double> GraphicalPose::getCumulativeTimeIntervals()
+{
+    return this->cumulativeTimeIntervals;
+}
+
+
 void GraphicalPose::pushBackPose(Pose *newPose, double poseInterval)
 {
     if (newPose->getCharacter() == this->character) {
         this->poses.push_back(newPose);
         this->timeIntervals.push_back(poseInterval);
+
+        double nextCumulativeTime = 0.0;
+        if (cumulativeTimeIntervals.size() > 0) {
+            nextCumulativeTime = this->cumulativeTimeIntervals.at(this->cumulativeTimeIntervals.size()-1) + poseInterval;
+        }
+        this->cumulativeTimeIntervals.push_back(nextCumulativeTime);
     }
 }
 
 void GraphicalPose::insertPose(Pose *newPose, double poseInterval, int position)
 {
-    if (newPose->getCharacter() == this->character) {
+    if ((newPose->getCharacter() == this->character) && (this->poses.size() > position)) {
+
         this->poses.insert(this->poses.begin()+position, newPose);
         this->timeIntervals.insert(this->timeIntervals.begin()+position, poseInterval);
+
+        this->cumulativeTimeIntervals.push_back(0);
+        int arraySize = this->timeIntervals.size();
+        for (int i = position + 1; i < arraySize; ++i){
+            this->cumulativeTimeIntervals.at(i) = this->cumulativeTimeIntervals.at(i-1) + this->timeIntervals.at(i-1);
+        }
     }
 }
 
@@ -51,6 +80,11 @@ void GraphicalPose::modifyPose(Pose *modifiedPose, double poseInterval, int posi
     if ((modifiedPose->getCharacter() == this->character) && (this->poses.size() > position)){
         this->poses.at(position) = modifiedPose;
         this->timeIntervals.at(position) = poseInterval;
+
+        int arraySize = this->timeIntervals.size();
+        for (int i = position + 1; i < arraySize; ++i){
+            this->cumulativeTimeIntervals.at(i) = this->cumulativeTimeIntervals.at(i-1) + this->timeIntervals.at(i-1);
+        }
     }
 }
 
@@ -61,26 +95,35 @@ Pose *GraphicalPose::getCurrentPose()
 
 void GraphicalPose::advanceTimeEnergic(double increment)
 {
-    if (this->time+increment > this->timeIntervals.at(this->current)){
-        this->current += 1;
+    if (this->timeIntervals.size() > 0) {
+        if (this->time+increment > this->timeIntervals.at(this->current)){
+            this->current += 1;
 
-        if (this->current >= this->timeIntervals.size()){
-            this->current = 0;
+            if (this->current >= this->timeIntervals.size()){
+                this->current = 0;
+            }
+
+            this->time = 0;
+            //printf("current state is: %d\n", this->current);
+            this->setCharacterShape();
+
+        } else {
+            this->time += increment;
         }
-
-        this->time = 0;
-        //printf("current state is: %d\n", this->current);
-        this->setCharacterShape();
-
-    } else {
-        this->time += increment;
     }
+}
+
+void GraphicalPose::advanceTime(double increment)
+{
+
 }
 
 void GraphicalPose::setCharacterShape()
 {
-    Pose* poseActual = this->poses.at(this->current);
-    poseActual->setCharacterShape();
+    if (this->poses.size() > 0){
+        Pose* poseActual = this->poses.at(this->current);
+        poseActual->setCharacterShape();
+    }
 }
 
 void GraphicalPose::setCharacterShape(Pose* pose)
