@@ -253,7 +253,7 @@ void Scene::simulationStep(bool balance)
     int elapsedTime = pose_time.elapsed();
     //printf("%d elapsed time\n", elapsedTime);
     for (std::vector<GraphicalPose*>::iterator i = this->poseControl.begin(); i < this->poseControl.end(); i++){
-       (*i)->advanceTimeEnergic(elapsedTime);
+       (*i)->advanceTime(elapsedTime);
     }
     pose_time.start();
 }
@@ -1405,10 +1405,9 @@ void Scene::createLuxo()
     pose4->setName("pose 4");*/
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
-    std::cout << luxoPose->getCumulativeTimeIntervals().size() << " cumulative time intervals size\n";
-    luxoPose->pushBackPose(pose1, 240);
-    luxoPose->pushBackPose(pose2, 240);
-    luxoPose->pushBackPose(pose3, 240);
+    luxoPose->pushBackPose(pose1, 1000);
+    luxoPose->pushBackPose(pose2, 1000);
+    luxoPose->pushBackPose(pose3, 1000);
     //luxoPose->pushBackPose(pose4, 240);
 
     //Necessário para ele não sair voando com o pcg

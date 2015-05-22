@@ -116,6 +116,31 @@ void GraphicalPose::advanceTimeEnergic(double increment)
 void GraphicalPose::advanceTime(double increment)
 {
 
+    //Encontramos o novo tempo do controle
+    double totalTime = this->cumulativeTimeIntervals.back() + this->timeIntervals.back();
+    double newTime = (int)(this->time + increment) % (int)totalTime;
+
+    std::cout << totalTime << " total time e " << newTime << " new time\n";
+
+    //Agora temos que descobrir onde ele está no controle
+    int pos, nextPos;
+    if (newTime > this->cumulativeTimeIntervals.back()) {
+        pos = this->cumulativeTimeIntervals.size() - 1;
+        nextPos = 0;
+    } else {
+        std::vector<double>::iterator greaterValue = std::upper_bound(this->cumulativeTimeIntervals.begin(), this->cumulativeTimeIntervals.end(), newTime);
+        nextPos = greaterValue - this->cumulativeTimeIntervals.begin();
+        pos = nextPos - 1;
+    }
+    //Agora vamos criar uma pose cujos valores são a interpolação dos valores das poses nos locais correspondentes
+    std::cout << pos << " pos " << nextPos << " nextpos \n";
+    Pose* interpolatedPose = this->poses[pos]->interpolateWith(this->poses[nextPos], newTime, this->timeIntervals[pos]);
+    if (interpolatedPose != NULL){
+        this->setCharacterShape(interpolatedPose);
+        this->time = newTime;
+    }
+    delete interpolatedPose;
+    interpolatedPose = NULL;
 }
 
 void GraphicalPose::setCharacterShape()

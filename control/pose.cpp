@@ -90,3 +90,19 @@ void Pose::setCharacterShape()
         jointController->setQuaternionWanted(Quaternion(poseVectorActual.at(i)));
     }
 }
+
+Pose *Pose::interpolateWith(Pose *next, double instant, double interval)
+{
+    std::vector<Vec4> interpolatedAngles;
+
+    for (int i = 0; i < this->angles.size(); i++){
+        Vec4 angle;
+        angle.setX( this->angles[i].x() + (interval - instant) * (next->getAngles()[i].x() - this->angles[i].x())/interval );
+        angle.setY( this->angles[i].y() + (interval - instant) * (next->getAngles()[i].y() - this->angles[i].y())/interval );
+        angle.setZ( this->angles[i].z() + (interval - instant) * (next->getAngles()[i].z() - this->angles[i].z())/interval );
+
+        interpolatedAngles.push_back(angle);
+    }
+
+    return new Pose(this->character, interpolatedAngles);
+}

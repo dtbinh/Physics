@@ -26,6 +26,7 @@ public:
     void                setName(QString name); //getters e setters para o nome da pose
     QString             getName();
     void                setCharacterShape(); //muda a pose do personagem de acordo com os ângulos internos
+    Pose*               interpolateWith(Pose* next, double instant, double interval); //recebe duas poses e retorna uma nova pose que corresponde à interpolação delas no instante x do intervalo
 };
 
 #endif // POSE_H
