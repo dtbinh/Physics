@@ -25,6 +25,7 @@ public:
     void                updateAngle(Joint* updatedJoint, Vec4 newAngle);
     void                setName(QString name); //getters e setters para o nome da pose
     QString             getName();
+    void                setCharacterShape(); //muda a pose do personagem de acordo com os ângulos internos
 };
 
 #endif // POSE_H

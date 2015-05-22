@@ -28,6 +28,8 @@ public:
     Pose*               getCurrentPose(); //retorna o estado atual do controle
     void                advanceTimeEnergic(double increment); //Função que avança o tempo interno que o controle passou na posição atual
     void                setCharacterShape(); //Função que atualiza os controladores do personagem de acordo com a pose corrente
+    void                setCharacterShape(Pose* pose); //Função que atualiza os controladores do personagem de acordo com o argumento pose
+
 };
 
 #endif // GRAPHICALPOSE_H

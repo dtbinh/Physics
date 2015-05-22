@@ -1,6 +1,7 @@
 #include "pose.h"
 #include "scene/character.h"
 #include "scene/joint.h"
+#include "control.h"
 #include "math/vec4.h"
 #include <vector>
 #include <cstdio>
@@ -80,3 +81,12 @@ QString Pose::getName()
     return this->name;
 }
 
+void Pose::setCharacterShape()
+{
+    std::vector<Vec4> poseVectorActual = this->angles;
+
+    for (int i = 0; i < poseVectorActual.size(); i++){
+        ControlPD* jointController = this->character->getController(i);
+        jointController->setQuaternionWanted(Quaternion(poseVectorActual.at(i)));
+    }
+}

@@ -80,11 +80,13 @@ void GraphicalPose::advanceTimeEnergic(double increment)
 void GraphicalPose::setCharacterShape()
 {
     Pose* poseActual = this->poses.at(this->current);
-    std::vector<Vec4> poseVectorActual = poseActual->getAngles();
+    poseActual->setCharacterShape();
+}
 
-    for (int i = 0; i < poseVectorActual.size(); i++){
-        ControlPD* jointController = this->character->getController(i);
-        jointController->setQuaternionWanted(Quaternion(poseVectorActual.at(i)));
+void GraphicalPose::setCharacterShape(Pose* pose)
+{
+    if (pose->getCharacter() == this->character){
+        pose->setCharacterShape();
     }
 }
 
