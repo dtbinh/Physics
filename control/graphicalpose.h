@@ -19,6 +19,7 @@ private:
 public:
     GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeIntervals);
     GraphicalPose(Character* character);
+    ~GraphicalPose();
 
     Character*          getCharacter();
     std::vector<Pose*>  getPoses();

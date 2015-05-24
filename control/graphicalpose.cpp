@@ -25,6 +25,10 @@ GraphicalPose::GraphicalPose(Character *character)
     this->character = character;
 }
 
+GraphicalPose::~GraphicalPose()
+{
+}
+
 Character *GraphicalPose::getCharacter()
 {
     return this->character;
@@ -132,15 +136,18 @@ void GraphicalPose::advanceTime(double increment)
         nextPos = greaterValue - this->cumulativeTimeIntervals.begin();
         pos = nextPos - 1;
     }
+    this->current = pos;
     //Agora vamos criar uma pose cujos valores são a interpolação dos valores das poses nos locais correspondentes
     std::cout << pos << " pos " << nextPos << " nextpos \n";
-    Pose* interpolatedPose = this->poses[pos]->interpolateWith(this->poses[nextPos], newTime, this->timeIntervals[pos]);
+    this->time = newTime;
+
+    //this->poses[pos]->interpolateAndApply(this->poses[nextPos], newTime, this->timeIntervals[pos]);
+    Pose* interpolatedPose = this->poses[pos]->interpolateWith(this->poses[nextPos], newTime-this->cumulativeTimeIntervals[pos], this->timeIntervals[pos]);
     if (interpolatedPose != NULL){
         this->setCharacterShape(interpolatedPose);
-        this->time = newTime;
+        delete interpolatedPose;
+        interpolatedPose = NULL;
     }
-    delete interpolatedPose;
-    interpolatedPose = NULL;
 }
 
 void GraphicalPose::setCharacterShape()
