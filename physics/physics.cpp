@@ -56,14 +56,14 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
 
                 contact[i].surface.mode = dContactBounce; // | dContactSoftCFM;
                 // friction parameter
-                if (scene!=NULL){
-                    if(scene->isGeometryFootSwing(o1)||scene->isGeometryFootSwing(o2))
-                        contact[i].surface.mu = 25.0; //locomoção: 25.0; capoeira: 15.0
-                    else
-                        contact[i].surface.mu = dInfinity;
-                }else{
+//                if (scene!=NULL){
+//                    if(scene->isGeometryFootSwing(o1)||scene->isGeometryFootSwing(o2))
+//                        contact[i].surface.mu = 25.0; //locomoção: 25.0; capoeira: 15.0
+//                    else
+//                        contact[i].surface.mu = dInfinity;
+//                }else{
                     contact[i].surface.mu = dInfinity;
-                }
+//                }
                 // bounce is the amount of "bouncyness".
                 contact[i].surface.bounce = 0.5;
                 // bounce_vel is the minimum incoming velocity to cause a bounce
@@ -85,28 +85,28 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                           dReal* contactPos; //dVector3
                           contactPos = contact[i].geom.pos;
                           dJointFeedback* jtFb = new dJointFeedback();
-                          int noGroundGeom = 0;
-                          if (dGeomGetClass(o1)==dPlaneClass) noGroundGeom = 2; //ou 0, mas nunca sera 0, pois would return antes
-                          else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
-                          else noGroundGeom = 3;
-                          GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
-                          if (scene!=NULL){
-                          if((noGroundGeom==1)||(noGroundGeom==2)){
-                              if (scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(true);
-                              if (scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(true);
-                          }
-                          }
+//                          int noGroundGeom = 0;
+//                          if (dGeomGetClass(o1)==dPlaneClass) noGroundGeom = 2; //ou 0, mas nunca sera 0, pois would return antes
+//                          else if (dGeomGetClass(o2)==dPlaneClass) noGroundGeom = 1;
+//                          else noGroundGeom = 3;
+//                          GRF fbContact(Vec4( contactPos[0],contactPos[1],contactPos[2] ), jtFb, noGroundGeom);
+//                          if (scene!=NULL){
+//                          if((noGroundGeom==1)||(noGroundGeom==2)){
+//                              if (scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(true);
+//                              if (scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(true);
+//                          }
+//                          }
 
 
-                          if(noGroundGeom==3){
-                              //qDebug() << "Colidiu com Objs!";
-                              if(scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(false);
-                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(false);
-                          }
-                          fbContact.b1 = scene->getObject(b1);
-                          fbContact.b2 = scene->getObject(b2);
+//                          if(noGroundGeom==3){
+//                              //qDebug() << "Colidiu com Objs!";
+//                              if(scene->getObject(b1))scene->getObject(b1)->setCollideWithGround(false);
+//                              if(scene->getObject(b2))scene->getObject(b2)->setCollideWithGround(false);
+//                          }
+//                          fbContact.b1 = scene->getObject(b1);
+//                          fbContact.b2 = scene->getObject(b2);
                       //put fbContact in vector feedbackContacts
-                        scene->addGroundForce(fbContact);
+//                        scene->addGroundForce(fbContact);
                       //set dJointFeedback
                         dJointSetFeedback(c,jtFb);
                       //*/
@@ -127,22 +127,22 @@ void Physics::worldStep(WorldID world, float stepSize){
 
 void Physics::simSingleStep (Scene *scene)
 {
-    scene->clearGroundForces();
-    std::vector<Object*> objs = scene->objectsScene();
-    for(unsigned int i=0;i<objs.size();i++)
-        dBodyEnable(objs.at(i)->getBody());
-    if(count_collide>=0){
-        if (scene->getSizeCharacter()>0){
-            if(count_collide==500){
-                for(int i=0;i<scene->getSizeCharacter();i++)
-                    scene->getCharacter(i)->restartCollideWithGround();
-                count_collide = 0;
-            }
-            else{
-                count_collide++;
-            }
-        }
-    }
+//    scene->clearGroundForces();
+//    std::vector<Object*> objs = scene->objectsScene();
+//    for(unsigned int i=0;i<objs.size();i++)
+//        dBodyEnable(objs.at(i)->getBody());
+//    if(count_collide>=0){
+//        if (scene->getSizeCharacter()>0){
+//            if(count_collide==500){
+//                for(int i=0;i<scene->getSizeCharacter();i++)
+//                    scene->getCharacter(i)->restartCollideWithGround();
+//                count_collide = 0;
+//            }
+//            else{
+//                count_collide++;
+//            }
+//        }
+//    }
 
     scn = scene;
     dSpaceCollide (scene->getSpace(),0,&nearCallback);

@@ -13,7 +13,7 @@ GraphicalPose::GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeI
     this->timeIntervals = timeIntervals;
 
     //Cria o vetor de intervalos de tempo cumulativos
-    double sum = 0;
+    double sum = 0.0;
     for (int i = 0; i < timeIntervals.size(); i++){
         this->cumulativeTimeIntervals[i] = sum;
         sum += timeIntervals.at(i);
@@ -56,9 +56,9 @@ void GraphicalPose::pushBackPose(Pose *newPose, double poseInterval)
         this->poses.push_back(newPose);
         this->timeIntervals.push_back(poseInterval);
 
-        double nextCumulativeTime = 0.0;
+        double nextCumulativeTime = 0;
         if (cumulativeTimeIntervals.size() > 0) {
-            nextCumulativeTime = this->cumulativeTimeIntervals.at(this->cumulativeTimeIntervals.size()-1) + poseInterval;
+            nextCumulativeTime = this->cumulativeTimeIntervals.at(this->cumulativeTimeIntervals.size()-1) + this->timeIntervals.at(this->timeIntervals.size()-2);
         }
         this->cumulativeTimeIntervals.push_back(nextCumulativeTime);
     }

@@ -724,12 +724,12 @@ void GLWidget::showCompensableConeFriction()
         setSliderFoot1(slide);
     }
 }
-
+int teste = 0;
 void GLWidget::simStep(){
-//    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
-//    ti = tf = tempo = 0;
-//    timeval tempo_inicio,tempo_fim;
-//    gettimeofday(&tempo_inicio,NULL);
+    double ti,tf,tempo; // ti = tempo inicial // tf = tempo final
+    ti = tf = tempo = 0;
+    timeval tempo_inicio,tempo_fim;
+    gettimeofday(&tempo_inicio,NULL);
     if(!sim_pause){
         scene->simulationStep(enable_balance);
 
@@ -742,11 +742,23 @@ void GLWidget::simStep(){
     //calculateFPS();
 
 
-//    gettimeofday(&tempo_fim,NULL);
-//    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-//    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-//    tempo = (tf - ti) / 1000;
-//    printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
+    gettimeofday(&tempo_fim,NULL);
+    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+    tempo = (tf - ti) / 1000;
+    //printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
+
+    double tempoFalta = (33.33 - tempo);
+    simTimer->setInterval((int)tempoFalta);
+
+    gettimeofday(&tempo_fim,NULL);
+    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+    tempo = (tf - ti) / 1000;
+    //printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
+
+    teste++;
+    //if (teste == 10) exit(EXIT_SUCCESS);
 
 }
 

@@ -105,10 +105,11 @@ Pose *Pose::interpolateWith(Pose *next, double instant, double interval)
     if (thisAngles.size() == nextAngles.size()){
         for (unsigned int i = 0; i < thisAngles.size(); ++i){
             Vec4 angle;
-            angle.setX( thisAngles[i].x() + (interval - instant) * (nextAngles[i].x() - thisAngles[i].x())/interval );
-            angle.setY( thisAngles[i].y() + (interval - instant) * (nextAngles[i].y() - thisAngles[i].y())/interval );
-            angle.setZ( thisAngles[i].z() + (interval - instant) * (nextAngles[i].z() - thisAngles[i].z())/interval );
+            angle.setX( thisAngles[i].x() + (instant) * (nextAngles[i].x() - thisAngles[i].x())/interval );
+            angle.setY( thisAngles[i].y() + (instant) * (nextAngles[i].y() - thisAngles[i].y())/interval );
+            angle.setZ( thisAngles[i].z() + (instant) * (nextAngles[i].z() - thisAngles[i].z())/interval );
 
+            std::cout << "Ângulo pose inicial: " << thisAngles[i].z() << " Ângulo pose final: " << nextAngles[i].z() << " Ângulo desejado: " << angle.z() << "\n";
             interpolatedAngles.push_back(angle);
         }
 
