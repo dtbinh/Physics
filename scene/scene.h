@@ -106,6 +106,8 @@ public:
     Object*               selectedObject();
     std::vector<Joint*>   jointsScene(); //retorna as juntas do cenário
     Joint*                selectedJoint();
+    std::vector<Pose*>    posesScene(); //retorna todas as poses do cenário
+    std::vector<GraphicalPose*> poseControlsScene(); //retorna todos os controles de pose do cenário
     void                  applyForce(Vec4 force);
     void                  clear();
     Object*               getObject(QString name);

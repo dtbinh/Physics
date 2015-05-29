@@ -97,6 +97,11 @@ Pose *GraphicalPose::getCurrentPose()
     return this->poses.at(this->current);
 }
 
+unsigned int GraphicalPose::getCurrent()
+{
+    return this->current;
+}
+
 void GraphicalPose::advanceTimeEnergic(double increment)
 {
     if (this->timeIntervals.size() > 0) {
@@ -124,7 +129,7 @@ void GraphicalPose::advanceTime(double increment)
     double totalTime = this->cumulativeTimeIntervals.back() + this->timeIntervals.back();
     double newTime = (int)(this->time + increment) % (int)totalTime;
 
-    std::cout << totalTime << " total time e " << newTime << " new time\n";
+    //std::cout << totalTime << " total time e " << newTime << " new time\n";
 
     //Agora temos que descobrir onde ele está no controle
     int pos, nextPos;
@@ -138,7 +143,8 @@ void GraphicalPose::advanceTime(double increment)
     }
     this->current = pos;
     //Agora vamos criar uma pose cujos valores são a interpolação dos valores das poses nos locais correspondentes
-    std::cout << pos << " pos " << nextPos << " nextpos \n";
+    //std::cout << pos << " pos " << nextPos << " nextpos \n";
+    //std::cout << this->poses[pos]->getName().toStdString() << " pos " << this->poses[nextPos]->getName().toStdString() << " nextPos\n";
     this->time = newTime;
 
     //this->poses[pos]->interpolateAndApply(this->poses[nextPos], newTime, this->timeIntervals[pos]);

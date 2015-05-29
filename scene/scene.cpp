@@ -716,6 +716,16 @@ Joint *Scene::selectedJoint()
     return NULL;
 }
 
+std::vector<Pose*> Scene::posesScene()
+{
+    return this->poses;
+}
+
+std::vector<GraphicalPose*> Scene::poseControlsScene()
+{
+    return this->poseControl;
+}
+
 void Scene::applyForce(Vec4 force)
 {
     Object *object = selectedObject();
@@ -1386,7 +1396,7 @@ void Scene::createLuxo()
     pose2a.push_back(Vec4(0,0,0));
     pose2a.push_back(Vec4(0,0,80));*/
     Pose* pose2 = addPose(luxo,pose2a);
-    pose2->setName("pose 2");
+    pose2->setName("normal");
 
     std::vector<Vec4> pose3a;
     pose3a.push_back(Vec4(0,0,70));
@@ -1396,20 +1406,20 @@ void Scene::createLuxo()
     pose3a.push_back(Vec4(0,0,0));
     pose3a.push_back(Vec4(0,0,-70));*/
     Pose* pose3 = addPose(luxo,pose3a);
-    pose3->setName("pose3");
+    pose3->setName("pra frente");
 
     std::vector<Vec4> pose4a;
     pose4a.push_back(Vec4(0,0,-90));
     pose4a.push_back(Vec4(0,0,0));
     pose4a.push_back(Vec4(0,0,-60));
     Pose* pose4 = addPose(luxo,pose4a);
-    pose4->setName("pose 4");
+    pose4->setName("pra tras");
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
     //luxoPose->pushBackPose(pose1, 5000);
-    luxoPose->pushBackPose(pose2, 500);
-    luxoPose->pushBackPose(pose3, 500);
-    luxoPose->pushBackPose(pose4, 500);
+    luxoPose->pushBackPose(pose2, 12000);
+    luxoPose->pushBackPose(pose3, 12000);
+    luxoPose->pushBackPose(pose4, 12000);
 
 
     //Necessário para ele não sair voando com o pcg

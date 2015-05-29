@@ -112,6 +112,7 @@ public slots:
     void setShowMoCap(bool b);
     void drawScene();
     void drawParameters();
+    void drawPoseProgression();
 
 
 

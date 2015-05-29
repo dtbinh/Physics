@@ -212,7 +212,7 @@ void ControlPD::evaluate()
 
             //Vec4 tq = limitingTorquePD(Vec4(torque[0],torque[1],torque[2]));
             //Vec4 tq_father = limitingTorquePD(Vec4(-torque[0],-torque[1],-torque[2]));
-            std::cout << "Torque x: " << tq.x() << " Torque y: " << tq.y() << " Torque z: " << tq.z() << "\n";
+            //std::cout << "Torque x: " << tq.x() << " Torque y: " << tq.y() << " Torque z: " << tq.z() << "\n";
             //if (this->joint->getParent()->getFoot()) printf("\nControle PD: tq(%.3f,%.3f,%.3f)",-tq.x(),-tq.y(),-tq.z());
                this->joint->getParent()->addTorque(-tq.x(),-tq.y(),-tq.z());
             //if(this->joint->getChild()->getFoot()) printf("\nControle PD: tq(%.3f,%.3f,%.3f)",tq.x(),tq.y(),tq.z());

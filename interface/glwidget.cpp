@@ -557,7 +557,7 @@ void GLWidget::drawParameters()
     glLoadIdentity();
     int x = 680;
     int k = 0;
-    if (chara->getBalance()->getEnableTorque()){
+    if ((chara->getBalance() != NULL) && (chara->getBalance()->getEnableTorque())){
         glRasterPos2f(750, x);
         out = chara->getBalance()->getKsTorque();
         dados = QString().sprintf("\nTq Ks: %3.2f %3.2f %3.2f", out.x(), out.y(), out.z());
@@ -578,7 +578,7 @@ void GLWidget::drawParameters()
         }
         x -= 20;
     }
-    if (chara->getBalance()->getEnableForce()){
+    if ((chara->getBalance() != NULL) && (chara->getBalance()->getEnableForce())){
         glRasterPos2f(750, x);
         out = chara->getBalance()->getKsForce();
         dados = QString().sprintf("\nFc Ks: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
@@ -598,7 +598,7 @@ void GLWidget::drawParameters()
         }
         x -= 20;
     }
-    if (chara->getBalance()->getEnableMomentum()){
+    if ((chara->getBalance() != NULL) && (chara->getBalance()->getEnableMomentum())){
         glRasterPos2f(750, x);
         out = chara->getBalance()->getKMomentumAngular();
         dados = QString().sprintf("\nMA Ks: %3.2f %3.2f %3.2f\n", out.x(), out.y(), out.z());
@@ -635,21 +635,25 @@ void GLWidget::drawParameters()
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
         k++;
     }
-    x -= 20;
-    glRasterPos2f(750, x);
-    dados = QString().sprintf("\nCone : %3.2f %3.2f %3.2f %3.2f\n", chara->getBalance()->getMCone(),chara->getBalance()->getHeightCone(),chara->getBalance()->getRadiusCone(),chara->getBalance()->getAngleCone());
-    k = 0;
-    while (k<dados.size()){
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
-        k++;
+    if (chara->getBalance() != NULL){
+        x -= 20;
+        glRasterPos2f(750, x);
+        dados = QString().sprintf("\nCone : %3.2f %3.2f %3.2f %3.2f\n", chara->getBalance()->getMCone(),chara->getBalance()->getHeightCone(),chara->getBalance()->getRadiusCone(),chara->getBalance()->getAngleCone());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
     }
-    x -= 20;
-    glRasterPos2f(750, x);
-    dados = QString().sprintf("\nCLim : %3.2f\n", chara->getBalance()->getLimitCone());
-    k = 0;
-    while (k<dados.size()){
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
-        k++;
+    if (chara->getBalance() != NULL) {
+        x -= 20;
+        glRasterPos2f(750, x);
+        dados = QString().sprintf("\nCLim : %3.2f\n", chara->getBalance()->getLimitCone());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12,dados.at(k).toLatin1());
+            k++;
+        }
     }
     x -= 20;
     glRasterPos2f(750, x);
@@ -677,6 +681,68 @@ void GLWidget::drawParameters()
 
 }
 
+void GLWidget::drawPoseProgression()
+{
+    if (! scene->getSizeCharacter()>0) {
+        return;
+    }
+    QString dados;
+    glDisable(GL_LIGHTING);
+    glColor3f(0,0,0);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, winWidth, 0.0, winHeight);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    std::vector<GraphicalPose*> poseControl = this->scene->poseControlsScene();
+    GraphicalPose* currPoseCont;
+    int x = 20;
+    int y = 680;
+    if (poseControl.size() > 0){
+        currPoseCont = poseControl.at(0);
+        std::vector<Pose*> poses = currPoseCont->getPoses();
+
+        for (int i = 0; i < poses.size(); i++){
+
+            glPushAttrib(GL_CURRENT_COLOR);
+
+            if (i == currPoseCont->getCurrent()) {
+                //std::cout << "\ncurrent: " <<  poses.at(i)->getName().toStdString();
+                glColor3f(255,0,0);
+            } else {
+                glColor3f(0,0,0);
+            }
+
+            glRasterPos2f(x,y);
+            dados = QString("\n%1\n").arg(poses.at(i)->getName());
+            //std::cout << dados.toStdString() << "\n";
+
+            for (int k=0; k<dados.size(); k++){
+                glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, dados.at(k).toLatin1());
+            }
+
+            glPopAttrib();
+            y -= 20;
+        }
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+
+}
+
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -686,6 +752,7 @@ void GLWidget::paintGL()
     if(showInfo){
         if (!screenshot) drawFPS();
         drawParameters();
+        drawPoseProgression();
     }
     if (screenshot) setScreenShot();
 

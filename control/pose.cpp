@@ -109,7 +109,7 @@ Pose *Pose::interpolateWith(Pose *next, double instant, double interval)
             angle.setY( thisAngles[i].y() + (instant) * (nextAngles[i].y() - thisAngles[i].y())/interval );
             angle.setZ( thisAngles[i].z() + (instant) * (nextAngles[i].z() - thisAngles[i].z())/interval );
 
-            std::cout << "Ângulo pose inicial: " << thisAngles[i].z() << " Ângulo pose final: " << nextAngles[i].z() << " Ângulo desejado: " << angle.z() << "\n";
+            //std::cout << "Ângulo pose inicial: " << thisAngles[i].z() << " Ângulo pose final: " << nextAngles[i].z() << " Ângulo desejado: " << angle.z() << "\n";
             interpolatedAngles.push_back(angle);
         }
 
@@ -121,23 +121,4 @@ Pose *Pose::interpolateWith(Pose *next, double instant, double interval)
         return new Pose(this->character, interpolatedAngles);
 
     } return NULL;
-}
-
-void Pose::interpolateAndApply(Pose *next, double instant, double interval)
-{
-    std::vector<Vec4> interpolatedAngles;
-
-    for (int i = 0; i < this->angles.size(); i++){
-        Vec4 angle;
-        angle.setX( this->angles[i].x() + (interval - instant) * (next->getAngles()[i].x() - this->angles[i].x())/interval );
-        angle.setY( this->angles[i].y() + (interval - instant) * (next->getAngles()[i].y() - this->angles[i].y())/interval );
-        angle.setZ( this->angles[i].z() + (interval - instant) * (next->getAngles()[i].z() - this->angles[i].z())/interval );
-
-        interpolatedAngles.push_back(angle);
-    }
-
-    for (int i = 0; i < interpolatedAngles.size(); i++){
-        ControlPD* jointController = this->character->getController(i);
-        jointController->setQuaternionWanted(Quaternion(interpolatedAngles.at(i)));
-    }
 }
