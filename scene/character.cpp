@@ -894,3 +894,11 @@ JointGroupID Character::getJointGroup()
 {
     return this->jointGroup;
 }
+
+bool Character::hasEffectorEnabled()
+{
+    for(int i=0;i<objects.size();i++){
+        if (objects.at(i)->isEnableCPDP()) return true;
+    }
+    return false;
+}

@@ -53,7 +53,7 @@ private:
 
 
     //Controle da pose
-    QTime pose_time;
+    //QTime pose_time;
 
 public:
     int            width,height;
@@ -97,7 +97,7 @@ public:
     void                  setViewer(Vec4 eye,Vec4 at,Vec4 up);
     void                  setProjection(Vec4 p);
     void                  setWindow(int width,int height);
-    Object*               addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
+    Object*               addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
     Joint *               addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara,Vec4 limSup=Vec4(),Vec4 limInf=Vec4());//cria uma junta ball
     Joint *               addJointFixed(Object *parent,Object *child, Character *chara); //cria uma junta fixa
     Joint *               addJointHinge(Vec4 anchor, Vec4 axis, Object *parent, Object *child, Character *chara); //cria uma junta hinge
@@ -124,7 +124,6 @@ public:
     void                  createRamp();
     void                  createCharacter();
     void                  createLuxo();
-    void                  createLuxo2();
     void                  startRecorder(bool b);
     //pose control
     Pose*                 addPose(Character* character, std::vector<Vec4> angles);

@@ -61,6 +61,7 @@ public:
     void setStatusMotion(bool b);
     void restart();
     int currentFrame();
+    void setCurrentFrame(int i);
     void clear();
 
 

@@ -105,17 +105,17 @@ Joint::~Joint()
     Physics::closeJoint(this);
 }
 
-Matrix Joint::getAd()
+MatrixF Joint::getAd()
 {
-    Matrix Ad(6,6);
+    MatrixF Ad(6,6);
     //R
-    Matrix R(3,3);
+    MatrixF R(3,3);
     //matriz de rotacao da junta em relacao ao frame global (assume-se que o frame da junta eh o mesmo que o frame global - em relacao a rotacao)
     R = R.identity();
     Vec p = Vec(getPositionCurrent()) - Vec(Vec4());
     //[p]R
-    Matrix pR;
-    Matrix cross_p = Matrix::crossProductMatrix(p);
+    MatrixF pR;
+    MatrixF cross_p = MatrixF::crossProductMatrix(p);
     pR = cross_p * R;
     //Ad
     Ad.setSubmatrix(0,0,R);
@@ -125,17 +125,17 @@ Matrix Joint::getAd()
     return Ad;
 }
 
-Matrix Joint::getAd(Vec4 pos)
+MatrixF Joint::getAd(Vec4 pos)
 {
-    Matrix Ad(6,6);
+    MatrixF Ad(6,6);
     //R
-    Matrix R(3,3);
+    MatrixF R(3,3);
     //matriz de rotacao da junta em relacao ao frame global (assume-se que o frame da junta eh o mesmo que o frame global - em relacao a rotacao)
     R = R.identity();
     Vec p = Vec(getPositionCurrent()) - Vec(pos);
     //[p]R
-    Matrix pR;
-    Matrix cross_p = Matrix::crossProductMatrix(p);
+    MatrixF pR;
+    MatrixF cross_p = MatrixF::crossProductMatrix(p);
     pR = cross_p * R;
     //Ad
     Ad.setSubmatrix(0,0,R);
@@ -144,15 +144,15 @@ Matrix Joint::getAd(Vec4 pos)
     return Ad;
 }
 
-Matrix Joint::getAd(Object *obj)
+MatrixF Joint::getAd(Object *obj)
 {
     // | R p |^-1   | R^t  R^t.(-p) |
     // | 0 1 |    = |  0      1     |
-    Matrix Ad(6,6);
+    MatrixF Ad(6,6);
     //R
-    Matrix R = Physics::getMatrixRotation(obj);
+    MatrixF R = Physics::getMatrixRotation(obj);
     //matriz inversa de R
-    Matrix invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
+    MatrixF invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
     R = invR;
     Vec posJoint = Vec(getPositionCurrent()),     //posição do mundo
          posBody = Vec(obj->getPositionCurrent()), //posição do corpo
@@ -161,8 +161,8 @@ Matrix Joint::getAd(Object *obj)
     p = posBody - posJoint;
     p = R*p;
     //[p]R
-    Matrix pR;
-    Matrix cross_p = Matrix::crossProductMatrix(p);
+    MatrixF pR;
+    MatrixF cross_p = MatrixF::crossProductMatrix(p);
     pR = cross_p * R;
     //Ad
     Ad.setSubmatrix(0,0,R);

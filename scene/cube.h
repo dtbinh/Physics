@@ -32,7 +32,7 @@ public:
     Matrix4x4 *transform;
     QString name;
     Vec4 position; //posição do centro do objeto
-    Quaternion rotation; //rotação do objeto
+    QuaternionQ rotation; //rotação do objeto
     bool selected;
     bool enabled;
     Vec4 properties;
@@ -74,9 +74,9 @@ public:
     Scene*      getScene(){return this->scene;}
     Vec4        getProperties(){return Vec4(this->properties.x(),this->properties.y(),this->properties.z())  ;}
     void setPosition(Vec4 p){this->position = p ;}
-    void setRotation(Quaternion q) {this->rotation = q;}
+    void setRotation(QuaternionQ q) {this->rotation = q;}
     Vec4 getPosition(){return this->position;}
-    Quaternion getRotation(){ return this->rotation ;}
+    QuaternionQ getRotation(){ return this->rotation ;}
     void setProperties(Vec4 v);
 
 

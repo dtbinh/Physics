@@ -3,11 +3,11 @@
 //#define dDOUBLE
 #include "ode/ode.h"
 class Vec4;
-class Quaternion;
-class Matrix;
+class QuaternionQ;
+class MatrixF;
 
-void to_dQuaternion(Quaternion q,dQuaternion qi);
-Matrix getMatrix2dMatrix3(const dReal* R);
+void to_dQuaternion(QuaternionQ q,dQuaternion qi);
+MatrixF getMatrix2dMatrix3(const dReal* R);
 const dReal *getVec42dReal(Vec4 v);
 
 

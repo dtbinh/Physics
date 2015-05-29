@@ -2,7 +2,7 @@
 #include "math/quaternion.h"
 #include "math/matrix.h"
 
-void to_dQuaternion(Quaternion q,dQuaternion qi)
+void to_dQuaternion(QuaternionQ q, dQuaternion qi)
 {
     qi[0] = q.qw();
     qi[1] = q.qx();
@@ -10,9 +10,9 @@ void to_dQuaternion(Quaternion q,dQuaternion qi)
     qi[3] = q.qz();
 }
 
-Matrix getMatrix2dMatrix3(const dReal* R)
+MatrixF getMatrix2dMatrix3(const dReal* R)
 {
-    Matrix mat = Matrix(3,3);
+    MatrixF mat = MatrixF(3,3);
     mat(0,0) = R[0];
     mat(0,1) = R[1];
     mat(0,2) = R[2];

@@ -11,22 +11,22 @@ class Frame
 {
 private:
     std::vector<Vec4> positions;
-    std::vector<Quaternion> orientations;
+    std::vector<QuaternionQ> orientations;
     bool footLeft; //se está ou não em contato com o solo
     bool footRight; //se está ou não em contato com o solo
 public:
     Frame();
-    Frame( std::vector<Vec4> pos, std::vector<Quaternion> quat);
+    Frame( std::vector<Vec4> pos, std::vector<QuaternionQ> quat);
     void appendPosition(Vec4 pos);
-    void appendOrientation(Quaternion quat);
+    void appendOrientation(QuaternionQ quat);
     void setPosition(int i,Vec4 pos);
-    void setOrientation(int i, Quaternion quat);
+    void setOrientation(int i, QuaternionQ quat);
     void setFootRightGround(bool b);
     void setFootLeftGround(bool b);
     bool getFootRightGround();
     bool getFootLeftGround();
     Vec4 getPosition(int i);
-    Quaternion getOrientation(int i);
+    QuaternionQ getOrientation(int i);
     ~Frame();
 
     //retorna o tamanho dos vetores pos e quat, que devem ter tamanhos iguais

@@ -81,7 +81,7 @@ bool Utils::readModelRubens(Scene *scene, const std::string &fileName)
     Vec4 scale;
     float angle,mass;
     Vec4 anchor;
-    Quaternion quat;
+    QuaternionQ quat;
     Character *chara = new Character(scene);
     scene->addCharacter(chara);
 
@@ -449,7 +449,7 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
             //b = bodyGeoms[i];
             //g = b->geom;
             Vec4 pos = chara->getBody(i)->getPositionCurrent();
-            Quaternion q = chara->getBody(i)->getRotationCurrent();
+            QuaternionQ q = chara->getBody(i)->getRotationCurrent();
             //dGeomGetQuaternion (g, q);
             //type = dGeomGetClass (g);
 
@@ -618,7 +618,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             QDomElement bodyProperties = doc.createElement("Properties");
             bodyProperties.setAttribute("Name",scene->getCharacter(i)->getBody(j)->getName());
             Vec4 vec;
-            Quaternion q;
+            QuaternionQ q;
             vec = scene->getCharacter(i)->getBody(j)->getPosition();
             q = scene->getCharacter(i)->getBody(j)->getRotation();
             bodyProperties.setAttribute("Mass",scene->getCharacter(i)->getBody(j)->getFMass());
@@ -688,7 +688,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         QDomElement joint = doc.createElement("Joints");
         for(int j=0;j<scene->getCharacter(i)->getNumJoints();j++){
             Vec4 vec;
-            Quaternion q;
+            QuaternionQ q;
             Joint *jo = scene->getCharacter(i)->getJoint(j);
             ControlPD *cpd = scene->getCharacter(i)->getControllersPD().at(j);
             QDomElement jointProperties = doc.createElement("Joint");
@@ -732,7 +732,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         balanceControl.setAttribute("EnableForce",(int)scene->getCharacter(i)->getBalance()->getEnableForce());
         balanceControl.setAttribute("EnableTorque",(int)scene->getCharacter(i)->getBalance()->getEnableTorque());
         balanceControl.setAttribute("EnableMomentum",(int)scene->getCharacter(i)->getBalance()->getEnableMomentum());
-        Quaternion q = scene->getCharacter(i)->getBalance()->getDesiredQuaternion();
+        QuaternionQ q = scene->getCharacter(i)->getBalance()->getDesiredQuaternion();
         QDomElement quatTq = doc.createElement("QuaternionTorque");
         quatTq.setAttribute("w",q.getScalar());
         quatTq.setAttribute("x",q.getPosX());
@@ -912,7 +912,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     bool bodybalance =  (bool)sime.attribute("BodyBalance","").toInt();
                     QString objfile = sime.attribute("ObjFile","");
                     Vec4 scale,pos;
-                    Quaternion quat;
+                    QuaternionQ quat;
                     sime = body.firstChildElement("Position").toElement();
                     x = sime.attribute("x","").toFloat();
                     y = sime.attribute("y","").toFloat();
@@ -924,7 +924,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     x = sime.attribute("x","").toFloat();
                     y = sime.attribute("y","").toFloat();
                     z = sime.attribute("z","").toFloat();
-                    quat = Quaternion(w,x,y,z);
+                    quat = QuaternionQ(w,x,y,z);
                     sime = body.firstChildElement("Dimension").toElement();
                     x = sime.attribute("x","").toFloat();
                     y = sime.attribute("y","").toFloat();
@@ -1004,7 +1004,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                        x = prop.attribute("x","").toFloat();
                        y = prop.attribute("y","").toFloat();
                        z = prop.attribute("z","").toFloat();
-                       Quaternion quat(w,x,y,z);
+                       QuaternionQ quat(w,x,y,z);
                        prop = sime.firstChildElement("KsPD").toElement();
                        x = prop.attribute("x","").toFloat();
                        y = prop.attribute("y","").toFloat();
@@ -1043,7 +1043,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 x = prop.attribute("x","").toFloat();
                 y = prop.attribute("y","").toFloat();
                 z = prop.attribute("z","").toFloat();
-                Quaternion quat(w,x,y,z);
+                QuaternionQ quat(w,x,y,z);
                 chara->getBalance()->setDeriredQuaternion(quat);
                 prop = sime.firstChildElement("BalanceksTorque").toElement();
                 x = prop.attribute("x","").toFloat();
@@ -1201,7 +1201,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
           //inicializa os vectors pos e quat
           for (int j=0;j<chara->getNumBodies();j++) {
             moCap->getFrameMotion(i)->appendPosition( Vec4(0.0,0.0,0.0) );
-            moCap->getFrameMotion(i)->appendOrientation(Quaternion( 1.0,0.0,0.0,0.0));
+            moCap->getFrameMotion(i)->appendOrientation(QuaternionQ( 1.0,0.0,0.0,0.0));
           }
         }
 
@@ -1235,6 +1235,11 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             pos.x1 = dtmp;
             ss >> dtmp;
             pos.x2 = dtmp;
+//            Caso do chute rodado
+//            if(j==13) //caso o pé esteja invertido
+//                moCap->getFrameMotion(i)->setPosition(j,pos-Vec4(0,0.031,0));
+//            else
+//                moCap->getFrameMotion(i)->setPosition(j,pos);
             moCap->getFrameMotion(i)->setPosition(j,pos);
           }
           //pula duas linhas
@@ -1245,7 +1250,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             getline(istr, stmp);
             ss.clear();
             ss << stmp;
-            Quaternion quat;
+            QuaternionQ quat;
             ss >> dtmp;
             quat.setScalar(dtmp);
             ss >> dtmp;
@@ -1254,9 +1259,14 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             quat.setPosX(dtmp);
             ss >> dtmp;
             quat.setPosY(dtmp);
-            //if(j==13) //caso o pé esteja invertido
-            //    moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,0,180));
-            //else
+//            Caso swing one foot
+//            if (j==3)
+//                moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,180,0));
+//            else
+//            Caso chute rodado            
+//            if(j==13) //caso o pé esteja invertido
+//                moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(-8,10,160));
+//            else
                 moCap->getFrameMotion(i)->setOrientation(j,quat);
           }
           //pula uma linha

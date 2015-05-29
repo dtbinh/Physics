@@ -300,7 +300,7 @@ void MainWindow::updateControlPD()
 
     pd_selected->setKd(kd);
     pd_selected->setKs(ks);
-    pd_selected->setQuaternionWanted(Quaternion(angle));
+    pd_selected->setQuaternionWanted(QuaternionQ(angle));
     pd_selected->setEnabled(ui->enablepd->isChecked());
 }
 
@@ -446,7 +446,7 @@ void MainWindow::updateSelectedObject()
     Vec4 euler(ui->oeulerx->value(),ui->oeulery->value(),ui->oeulerz->value());
     obj_selected->setPosition(pos);
     obj_selected->setProperties(scale);
-    obj_selected->setRotation(Quaternion(euler));
+    obj_selected->setRotation(QuaternionQ(euler));
     obj_selected->setFMass(ui->mass->value());
 
 

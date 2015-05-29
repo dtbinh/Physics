@@ -36,8 +36,8 @@ public:
     static void drawGroundTexture(int size,int texture);
     static void drawCircle2D(Vec4 center,float radius, Vec4 color,float size); //desenha um circulo projetado no eixo xz
     static void drawSkybox(Vec4 min= Vec4(0,0,0), Vec4 max = Vec4(10,10,10) ,int texture=0);
-    static void drawCoffeeCup(Vec4 position, int material,Quaternion q=Quaternion());
-    static void drawObj(Vec4 position, int material,Quaternion q, QString file, ObjMesh *n);
+    static void drawCoffeeCup(Vec4 position, int material,QuaternionQ q=QuaternionQ());
+    static void drawObj(Vec4 position, int material, QuaternionQ q, QString file, ObjMesh *n);
     static void drawObj(Matrix4x4 *transform,int material,ObjMesh *n);
     static void drawSelection(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,1,1));                        //desenha um cubo selecionado o objeto
     static void drawWireframe(Matrix4x4 *transform,Vec4 properties,Vec4 color=Vec4(1,0,0));

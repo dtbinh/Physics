@@ -91,7 +91,7 @@ void Pose::setCharacterShape()
 
     for (int i = 0; i < poseVectorActual.size(); i++){
         ControlPD* jointController = this->character->getController(i);
-        jointController->setQuaternionWanted(Quaternion(poseVectorActual.at(i)));
+        jointController->setQuaternionWanted(QuaternionQ(poseVectorActual.at(i)));
     }
 }
 
@@ -138,6 +138,6 @@ void Pose::interpolateAndApply(Pose *next, double instant, double interval)
 
     for (int i = 0; i < interpolatedAngles.size(); i++){
         ControlPD* jointController = this->character->getController(i);
-        jointController->setQuaternionWanted(Quaternion(interpolatedAngles.at(i)));
+        jointController->setQuaternionWanted(QuaternionQ(interpolatedAngles.at(i)));
     }
 }

@@ -10,22 +10,22 @@
 #include "physics/physics.h"
 #include "vec4.h"
 
-class Quaternion
+class QuaternionQ
 {
    public:
       float w,x,y,z;
    //construtores
-      Quaternion();
-      Quaternion( float w, Vec4 v );
-      Quaternion(float thetaX, float thetaY, float thetaZ);
-      Quaternion( Vec4 euler ); //ordem XYZ
-      Quaternion(float r,float x, float y, float z);
+      QuaternionQ();
+      QuaternionQ( float w, Vec4 v );
+      QuaternionQ(float thetaX, float thetaY, float thetaZ);
+      QuaternionQ( Vec4 euler ); //ordem XYZ
+      QuaternionQ(float r,float x, float y, float z);
       //Quaternion(float r, Vec4 v);
-      ~Quaternion();
+      ~QuaternionQ();
       void setVector(Vec4 v);
 
       //retorna o quaternion que leva de qi para qf
-      static Quaternion deltaQuat( Quaternion quatf, Quaternion quati );
+      static QuaternionQ deltaQuat( QuaternionQ quatf, QuaternionQ quati );
 
       //retorna o modulo do quaternion
       float module();
@@ -35,11 +35,11 @@ class Quaternion
       void normalize();
 
       //retorna o produto escalar entre this e quat
-      float dot(Quaternion quat); //prodesc
+      float dot(QuaternionQ quat); //prodesc
       //retorna -quat
-      Quaternion minusQuaternion(Quaternion quat); //menosq
+      QuaternionQ minusQuaternion(QuaternionQ quat); //menosq
       //calcula o menor arco (entre: this ate q ou this ate -q)
-      Quaternion lessArc(Quaternion q); //menorArco
+      QuaternionQ lessArc(QuaternionQ q); //menorArco
       void setQuaternion(float r,float x, float y, float z);
       float getScalar();
       float getPosX();
@@ -57,14 +57,14 @@ class Quaternion
       Vec4 getVector();
 
       //interpolacao linear esferica
-      Quaternion slerp( Quaternion quat, float t );
-      void setQuaternion(Quaternion quat);
+      QuaternionQ slerp( QuaternionQ quat, float t );
+      void setQuaternion(QuaternionQ quat);
       void setQuaternion(float w, Vec4 quat);
-      Quaternion operator*(float v);
-      friend Quaternion operator+(Quaternion p,Quaternion q);
-      friend Quaternion operator*(Quaternion p,Quaternion q);
-      Quaternion conjugate();
-      static Vec4 getVecRotation(Quaternion q, Vec4 v);
+      QuaternionQ operator*(float v);
+      friend QuaternionQ operator+(QuaternionQ p,QuaternionQ q);
+      friend QuaternionQ operator*(QuaternionQ p,QuaternionQ q);
+      QuaternionQ conjugate();
+      static Vec4 getVecRotation(QuaternionQ q, Vec4 v);
       float normal();
 
 
@@ -92,12 +92,12 @@ class Quaternion
       void fromAxisAngle( Vec4 axis, dReal angle );
       void showQuaternion();
 
-      Quaternion operator /(double k);
+      QuaternionQ operator /(double k);
       //Quaternion operator *(Quaternion q);
-      friend bool operator==(Quaternion p,Quaternion q);
+      friend bool operator==(QuaternionQ p,QuaternionQ q);
 
-      friend Quaternion operator-(Quaternion p,Quaternion q);
-      static float dot(Quaternion p, Quaternion q);
+      friend QuaternionQ operator-(QuaternionQ p,QuaternionQ q);
+      static float dot(QuaternionQ p, QuaternionQ q);
 
 
 

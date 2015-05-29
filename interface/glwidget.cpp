@@ -143,7 +143,7 @@ void GLWidget::drawFPS()
 /************** Fim Camera *****************/
 
 int count = 0;
-Quaternion q;
+QuaternionQ q;
 //bool move = false;
 float angle = 45;
 int last_pox_x,last_pox_y;
@@ -322,9 +322,9 @@ GLWidget::GLWidget(QWidget *parent) :
     //scene->createCharacter();
 
     //scene->createCharacter();
-    scene->createLuxo();
+    //scene->createLuxo();
     //scene->createLuxo2();
-    controlLuxo = false;
+    //controlLuxo = false;
 
 }
 
@@ -735,7 +735,7 @@ void GLWidget::simStep(){
 
     }
 
-    calculateFPSPaint();
+    //calculateFPSPaint();
     update();
 
 
@@ -749,15 +749,20 @@ void GLWidget::simStep(){
     //printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
 
     double tempoFalta = (33.33 - tempo);
-    simTimer->setInterval((int)tempoFalta);
+    if (tempoFalta>0)
+      simTimer->setInterval(tempoFalta);
 
-    gettimeofday(&tempo_fim,NULL);
-    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-    tempo = (tf - ti) / 1000;
-    //printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
+//    gettimeofday(&tempo_fim,NULL);
+//    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//    //ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//    tempo = (tf - ti) / 1000;
+////    gettimeofday(&tempo_fim,NULL);
+////    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+////    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+////    tempo = (tf - ti) / 1000;
+//    printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
 
-    teste++;
+    //teste++;
     //if (teste == 10) exit(EXIT_SUCCESS);
 
 }
@@ -783,12 +788,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (controlLuxo){
         if (lbpressed && !rbpressed){
             ControlPD* controllerUpperLower = scene->getCharacter(0)->getControllersPD().at(1);
-            controllerUpperLower->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+            controllerUpperLower->setQuaternionWanted(QuaternionQ(Vec4(0,0,x)));
             ControlPD* controllerLowerFeet = scene->getCharacter(0)->getControllersPD().at(2);
-            controllerLowerFeet->setQuaternionWanted(Quaternion(Vec4(0,0,y)));
+            controllerLowerFeet->setQuaternionWanted(QuaternionQ(Vec4(0,0,y)));
         } if (!lbpressed && rbpressed){
             ControlPD* controllerLampUpper = scene->getCharacter(0)->getControllersPD().at(0);
-            controllerLampUpper->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+            controllerLampUpper->setQuaternionWanted(QuaternionQ(Vec4(0,0,x)));
         }
     } else {
         if (lbpressed && !rbpressed) {
@@ -1154,7 +1159,7 @@ void GLWidget::showCurveExample()
     }
 
     time_m = time_acumulate[time_acumulate.size()-1]-1+curve_quat_time[curve_quat_time.size()-1];
-    Quaternion q;
+    QuaternionQ q;
     if(time_current<total_time){
             //chama a interpolação de Quaternion Esferica (SQUAD)
             q = Interpolation::KeyFramestoSquad(curve_quat,frame_current,(time_current - time_acumulate[frame_current-1]) /(double)curve_quat_time[frame_current]);

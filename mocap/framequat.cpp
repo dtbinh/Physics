@@ -4,7 +4,7 @@ FrameQuat::FrameQuat()
 {
 }
 
-FrameQuat::FrameQuat( std::vector<Quaternion> quatDes)
+FrameQuat::FrameQuat(std::vector<QuaternionQ> quatDes)
 {
   this->quatDes = quatDes;
 }

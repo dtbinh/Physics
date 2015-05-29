@@ -10,7 +10,7 @@ float grauToRad(float angle){
 
 }
 
-Quaternion::Quaternion()
+QuaternionQ::QuaternionQ()
 {
   this->w = 1.0;
   this->x = 0.0;
@@ -19,43 +19,43 @@ Quaternion::Quaternion()
 }
 //---------------------------------------------------------------------------
 //Construtor
-Quaternion::Quaternion( float w, Vec4 v )
+QuaternionQ::QuaternionQ( float w, Vec4 v )
 {
   this->w = w;
     this->setVector(v);
 }
 
-Quaternion::Quaternion(float thetaX, float thetaY, float thetaZ)
+QuaternionQ::QuaternionQ(float thetaX, float thetaY, float thetaZ)
 {
     thetaX = (thetaX / 2.0) * (M_PI / 180.0);
     thetaY = (thetaY / 2.0) * (M_PI / 180.0);
     thetaZ = (thetaZ / 2.0) * (M_PI / 180.0);
 
-    Quaternion qThetaX(cos(thetaX), sin(thetaX), 0.0, 0.0);
-    Quaternion qThetaY(cos(thetaY), 0.0, sin(thetaY), 0.0);
-    Quaternion qThetaZ(cos(thetaZ), 0.0, 0.0, sin(thetaZ));
+    QuaternionQ qThetaX(cos(thetaX), sin(thetaX), 0.0, 0.0);
+    QuaternionQ qThetaY(cos(thetaY), 0.0, sin(thetaY), 0.0);
+    QuaternionQ qThetaZ(cos(thetaZ), 0.0, 0.0, sin(thetaZ));
 
-    Quaternion q = qThetaZ* qThetaY;
+    QuaternionQ q = qThetaZ* qThetaY;
     q = q*qThetaX;
     q.normalize();
-    Quaternion norm = q;
+    QuaternionQ norm = q;
 
     *this = norm;
 }
 //---------------------------------------------------------------------------
 //Construtor
-Quaternion::Quaternion( Vec4 euler) //ordem XYZ
+QuaternionQ::QuaternionQ( Vec4 euler) //ordem XYZ
 {
   fromEuler( euler );
 }
-//Quaternion::Quaternion(float r, Vec4 v)
+//QuaternionQ::Quaternion(float r, Vec4 v)
 //{
 //    this->w = r;
 //    this->x = v.x();
 //    this->y = v.y();
 //    this->z = v.z();
 //}
-Quaternion::Quaternion(float r, float x, float y, float z)
+QuaternionQ::QuaternionQ(float r, float x, float y, float z)
 {
     this->w = r;
     this->x = x;
@@ -64,11 +64,11 @@ Quaternion::Quaternion(float r, float x, float y, float z)
 }
 //---------------------------------------------------------------------------
 //Destrutor
-Quaternion::~Quaternion()
+QuaternionQ::~QuaternionQ()
 {
 }
 
-void Quaternion::setVector(Vec4 v)
+void QuaternionQ::setVector(Vec4 v)
 {
     this->x = v.x();
     this->y = v.y();
@@ -76,7 +76,7 @@ void Quaternion::setVector(Vec4 v)
 }
 //---------------------------------------------------------------------------
 //retorna o quaternion que leva de qi para qf
-Quaternion Quaternion::deltaQuat( Quaternion quatf, Quaternion quati ) {
+QuaternionQ QuaternionQ::deltaQuat( QuaternionQ quatf, QuaternionQ quati ) {
 //  dQuaternion q,qit,qf; //qit - qi transposto (inverso, conjugado)
 //  //qit
 //    qit[0] = quati.w();
@@ -96,17 +96,17 @@ Quaternion Quaternion::deltaQuat( Quaternion quatf, Quaternion quati ) {
 }
 //---------------------------------------------------------------------------
 //retorna o modulo do quaternion
-float Quaternion::module() {
+float QuaternionQ::module() {
   return sqrt(this->w * this->w + this->x * this->x + this->y * this->y + this->z * this->z);
 }
 //---------------------------------------------------------------------------
 //retorna o quadrado do modulo do quaternion (nao tira a raiz quadrada)
-float Quaternion::module2() {
+float QuaternionQ::module2() {
   return (this->w * this->w + this->x * this->x + this->y * this->y + this->z * this->z);
 }
 //---------------------------------------------------------------------------
 //normaliza o quaternion
-void Quaternion::normalize() {
+void QuaternionQ::normalize() {
   float m = this->module();
 
   if (m > 0.0) {
@@ -120,22 +120,22 @@ void Quaternion::normalize() {
 }
 //---------------------------------------------------------------------------
 //retorna o produto escalar entre this e quat
-float Quaternion::dot(Quaternion quat) {
+float QuaternionQ::dot(QuaternionQ quat) {
     return (this->w*quat.qw() + this->x*quat.qx() + this->y*quat.qy() + this->z*quat.qz());
 }
 //---------------------------------------------------------------------------
 //retorna -quat
-Quaternion Quaternion::minusQuaternion(Quaternion quat) {
+QuaternionQ QuaternionQ::minusQuaternion(QuaternionQ quat) {
 //  quat.w = -quat.w;
 //  quat.xyz.x1 = -quat.xyz.x();
 //  quat.xyz.x2 = -quat.xyz.y();
 //  quat.xyz.x3 = -quat.xyz.z();
 
-  return Quaternion(-quat.qw(),-quat.qx(),-quat.qy(),-quat.qz());
+  return QuaternionQ(-quat.qw(),-quat.qx(),-quat.qy(),-quat.qz());
 }
 //---------------------------------------------------------------------------
 //calcula o menor arco (entre: this ate q ou this ate -q)
-Quaternion Quaternion::lessArc(Quaternion q) {
+QuaternionQ QuaternionQ::lessArc(QuaternionQ q) {
   if ( this->dot(q) >= this->dot(minusQuaternion(q)) ) { //agora foi do jeito que eu tinha calculado - nao sei pq na implementacao de interpolacao de quaternions foi diferente
     return q;
   }
@@ -143,46 +143,46 @@ Quaternion Quaternion::lessArc(Quaternion q) {
     return minusQuaternion(q);
   }
 }
-float Quaternion::getScalar()
+float QuaternionQ::getScalar()
 {
     return this->w;
 }
 
-float Quaternion::getPosX()
+float QuaternionQ::getPosX()
 {
     return this->x;
 }
 
-float Quaternion::getPosY()
+float QuaternionQ::getPosY()
 {
     return this->y;
 }
 
-float Quaternion::getPosZ()
+float QuaternionQ::getPosZ()
 {
     return this->z;
 }
 
-float Quaternion::qw()
+float QuaternionQ::qw()
 {
     return this->w;
 }
 
-float Quaternion::qx()
+float QuaternionQ::qx()
 {
     return this->x;
 }
 
-float Quaternion::qy()
+float QuaternionQ::qy()
 {
     return this->y;
 }
 
-float Quaternion::qz()
+float QuaternionQ::qz()
 {
     return this->z;
 }
-void Quaternion::setQuaternion(float r, float x, float y, float z)
+void QuaternionQ::setQuaternion(float r, float x, float y, float z)
 {
     this->w = r;
     this->x = x;
@@ -191,8 +191,8 @@ void Quaternion::setQuaternion(float r, float x, float y, float z)
 }
 //---------------------------------------------------------------------------
 //interpolacao linear esferica
-Quaternion Quaternion::slerp( Quaternion quat, float t ) {
-  Quaternion qt = Quaternion();
+QuaternionQ QuaternionQ::slerp( QuaternionQ quat, float t ) {
+  QuaternionQ qt = QuaternionQ();
 
   quat = lessArc(quat);
 
@@ -238,7 +238,7 @@ Quaternion Quaternion::slerp( Quaternion quat, float t ) {
   return qt;
 }
 
-void Quaternion::setQuaternion(Quaternion quat)
+void QuaternionQ::setQuaternion(QuaternionQ quat)
 {
     this->w = quat.qw();
     this->x = quat.qx();
@@ -246,16 +246,16 @@ void Quaternion::setQuaternion(Quaternion quat)
     this->z = quat.qz();
 }
 
-void Quaternion::setQuaternion(float w, Vec4 quat)
+void QuaternionQ::setQuaternion(float w, Vec4 quat)
 {
     this->w = w;
     this->x = quat.x();
     this->y = quat.y();
     this->z = quat.z();
 }
-Quaternion Quaternion::operator *(float k)
+QuaternionQ QuaternionQ::operator *(float k)
 {
-    Quaternion res;
+    QuaternionQ res;
     res.setScalar(this->w*k);
     res.setPosX(this->x*k);
     res.setPosY(this->y*k);
@@ -263,37 +263,37 @@ Quaternion Quaternion::operator *(float k)
     return res;
 }
 
-Quaternion Quaternion::conjugate()
+QuaternionQ QuaternionQ::conjugate()
 {
-    return Quaternion(this->getScalar(),this->getVector()*(-1));
+    return QuaternionQ(this->getScalar(),this->getVector()*(-1));
 
 }
-void Quaternion::setScalar(float x)
+void QuaternionQ::setScalar(float x)
 {
     this->w = x;
 }
 
-void Quaternion::setPosX(float x)
+void QuaternionQ::setPosX(float x)
 {
     this->x = x;
 }
 
-void Quaternion::setPosY(float x)
+void QuaternionQ::setPosY(float x)
 {
     this->y = x;
 }
 
-void Quaternion::setPosZ(float x)
+void QuaternionQ::setPosZ(float x)
 {
     this->z = x;
 }
 
-Vec4 Quaternion::getVector()
+Vec4 QuaternionQ::getVector()
 {
     return Vec4(this->x,this->y,this->z);
 }
 
-Matrix4x4 Quaternion::getMatrix()
+Matrix4x4 QuaternionQ::getMatrix()
 {
 
         float x2 = this->x * this->x;
@@ -332,9 +332,9 @@ Matrix4x4 Quaternion::getMatrix()
         return Matrix4x4(rot);
 }
 
-Quaternion operator*(Quaternion q1, Quaternion q2) {
+QuaternionQ operator*(QuaternionQ q1, QuaternionQ q2) {
 
-    Quaternion qr;
+    QuaternionQ qr;
     qr.setScalar(q1.w*q2.w - q1.getPosX()*q2.getPosX() - q1.getPosY()*q2.getPosY() - q1.getPosZ()*q2.getPosZ());
     qr.setPosX(q1.w*q2.getPosX() + q2.w*q1.getPosX() + q1.getPosY()*q2.getPosZ() - q1.getPosZ()*q2.getPosY());
     qr.setPosY(q1.w*q2.getPosY() + q2.w*q1.getPosY() + q1.getPosZ()*q2.getPosX() - q1.getPosX()*q2.getPosZ());
@@ -348,13 +348,13 @@ Quaternion operator*(Quaternion q1, Quaternion q2) {
 //                      p.getScalar()*q.getPosZ() + p.getPosX()*q.getPosY() - p.getPosY()*q.getPosX() + p.getPosZ()*q.getScalar());
 }
 
-Quaternion operator+(Quaternion p, Quaternion q)
+QuaternionQ operator+(QuaternionQ p, QuaternionQ q)
 {
-    return Quaternion(p.qw() + q.qw(), p.qx() + q.qx(), p.qy() + q.qy(), p.qz() + q.qz());
+    return QuaternionQ(p.qw() + q.qw(), p.qx() + q.qx(), p.qy() + q.qy(), p.qz() + q.qz());
 }
 //---------------------------------------------------------------------------
 //converte o quaternion em angulos de Euler (ordem XYZ)
-Vec4 Quaternion::toEuler() {
+Vec4 QuaternionQ::toEuler() {
 //  //quaternion para matriz de rotacao
 ////  dMatrix3 R;
 ////  dQuaternion q;
@@ -449,7 +449,7 @@ Vec4 Quaternion::toEuler() {
 }
 //---------------------------------------------------------------------------
 //converte os angulos de Euler em um quaternion e atribui a this
-void Quaternion::fromEuler( Vec4 euler) {
+void QuaternionQ::fromEuler( Vec4 euler) {
 //  dMatrix3 R;
 //  dQuaternion q;
 //  dRFromEulerAngles (R,(3.14159265359/180.0)*eulerXYZ.x(),(3.14159265359/180.0)*eulerXYZ.y(),(3.14159265359/180.0)*eulerXYZ.z());
@@ -462,11 +462,11 @@ void Quaternion::fromEuler( Vec4 euler) {
         thetaY = (euler.y() / 2.0) * (M_PI / 180.0);
         thetaZ = (euler.z() / 2.0) * (M_PI / 180.0);
 
-        Quaternion qThetaX(cos(thetaX), sin(thetaX), 0.0, 0.0);
-        Quaternion qThetaY(cos(thetaY), 0.0, sin(thetaY), 0.0);
-        Quaternion qThetaZ(cos(thetaZ), 0.0, 0.0, sin(thetaZ));
+        QuaternionQ qThetaX(cos(thetaX), sin(thetaX), 0.0, 0.0);
+        QuaternionQ qThetaY(cos(thetaY), 0.0, sin(thetaY), 0.0);
+        QuaternionQ qThetaZ(cos(thetaZ), 0.0, 0.0, sin(thetaZ));
 
-        Quaternion q = qThetaZ* qThetaY;
+        QuaternionQ q = qThetaZ* qThetaY;
         q = q*qThetaX;
         //Quaternion norm = ;
         q.normalize();
@@ -476,7 +476,7 @@ void Quaternion::fromEuler( Vec4 euler) {
 //---------------------------------------------------------------------------
 //converte o quaternion em eixo e angulo (passados por referencia)
 //baseado no site http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
-void Quaternion::toAxisAngle( Vec4* axis, dReal* angle ) {
+void QuaternionQ::toAxisAngle( Vec4* axis, dReal* angle ) {
   //assume que o quaternion jah esta normalizado
   *angle = 2*acos(this->w);
   dReal s = 1 - this->w*this->w; //0<=s<=1
@@ -508,7 +508,7 @@ void Quaternion::toAxisAngle( Vec4* axis, dReal* angle ) {
 
 //---------------------------------------------------------------------------
 //converte eixo e angulo em um quaternion e atribui a this
-void Quaternion::fromAxisAngle( Vec4 axis, dReal angle ) {
+void QuaternionQ::fromAxisAngle( Vec4 axis, dReal angle ) {
   //grauToRad
   angle = (3.14159265359/180.0)*(angle);
 
@@ -530,13 +530,13 @@ void Quaternion::fromAxisAngle( Vec4 axis, dReal angle ) {
   }
 }
 
-void Quaternion::showQuaternion()
+void QuaternionQ::showQuaternion()
 {
     printf("Quaternion: (%.3f,%.3f,%.3f,%.3f)\n",this->w,this->x,this->y,this->z);
 }
 //---------------------------------------------------------------------------
 //converte Quaternion em dQuaternion
-//void Quaternion::to_dQuaternion( dQuaternion q ) {
+//void QuaternionQ::to_dQuaternion( dQuaternion q ) {
 //  q[0] = this->w;
 //  q[1] = this->x;
 //  q[2] = this->y;
@@ -544,7 +544,7 @@ void Quaternion::showQuaternion()
 //}
 //---------------------------------------------------------------------------
 //converte em Quaternion a partir de dQuaternion
-//void Quaternion::from_dQuaternion( dQuaternion q ) {
+//void QuaternionQ::from_dQuaternion( dQuaternion q ) {
 //  this->w = q[0];
 //  this->x = q[1];
 //  this->y = q[2];
@@ -552,7 +552,7 @@ void Quaternion::showQuaternion()
 //}
 ////---------------------------------------------------------------------------
 ////converte em Quaternion a partir de dQuaternion
-//void Quaternion::from_dQuaternion( const dQuaternion q ) {
+//void QuaternionQ::from_dQuaternion( const dQuaternion q ) {
 //  this->w = q[0];
 //  this->x = q[1];
 //  this->y = q[2];
@@ -560,7 +560,7 @@ void Quaternion::showQuaternion()
 //}
 ////---------------------------------------------------------------------------
 ////convert dVector3 (normalized_axis*angle) to Quaternion
-//void Quaternion::from_dVector3( dVector3 v ) {
+//void QuaternionQ::from_dVector3( dVector3 v ) {
 //  Vec4 v3D( v[0],v[1],v[2] );
 //    dReal angle = v3D.module();
 //    v3D = v3D.unitary();
@@ -568,14 +568,14 @@ void Quaternion::showQuaternion()
 //}
 ////---------------------------------------------------------------------------
 ////convert Vec4 (normalized_axis*angle) to Quaternion
-//void Quaternion::from_Vec4( Vec4 v3D ) {
+//void QuaternionQ::from_Vec4( Vec4 v3D ) {
 //    dReal angle = v3D.module();
 //    v3D = v3D.unitary();
 //  this->fromAxisAngle( v3D, radToGrau(angle) );
 //}
 ////---------------------------------------------------------------------------
 ////convert Quaternion to dVector3 (normalized_axis*angle)
-//void Quaternion::to_dVector3( dVector3 v ) {
+//void QuaternionQ::to_dVector3( dVector3 v ) {
 //  Vec4 axis;
 //  dReal angle;
 //    this->toAxisAngle( &axis, &angle );
@@ -585,7 +585,7 @@ void Quaternion::showQuaternion()
 //}
 ////---------------------------------------------------------------------------
 ////convert Quaternion to Vec4 (normalized_axis*angle)
-//void Quaternion::to_Vec4( Vec4& v3D ) {
+//void QuaternionQ::to_Vec4( Vec4& v3D ) {
 //  Vec4 axis;
 //  dReal angle;
 //    this->toAxisAngle( &axis, &angle );
@@ -593,10 +593,10 @@ void Quaternion::showQuaternion()
 //  v3D = axis*( angle );
 //}
 ////---------------------------------------------------------------------------
-Vec4 Quaternion::getVecRotation(Quaternion q, Vec4 v)
+Vec4 QuaternionQ::getVecRotation(QuaternionQ q, Vec4 v)
 {
-    Quaternion res;
-    Quaternion pos(0,v.x1,v.x2,v.x3);
+    QuaternionQ res;
+    QuaternionQ pos(0,v.x1,v.x2,v.x3);
     q.normalize();
     res = (q)*(pos*((q.conjugate())));
     Vec4 r(res.getPosX(),res.getPosY(),res.getPosZ());
@@ -604,7 +604,7 @@ Vec4 Quaternion::getVecRotation(Quaternion q, Vec4 v)
 
 }
 
-float Quaternion::normal()
+float QuaternionQ::normal()
 {
     float res;
     res = sqrt(this->getScalar()*this->getScalar()+
@@ -614,7 +614,7 @@ float Quaternion::normal()
     return res;
 }
 
-bool operator==(Quaternion p, Quaternion q)
+bool operator==(QuaternionQ p, QuaternionQ q)
 {
     if(p.getScalar()==q.getScalar() && p.getPosX()==q.getPosX() && p.getPosY()==q.getPosX() && p.getPosZ()==q.getPosZ()) return true;
     return false;
@@ -622,12 +622,12 @@ bool operator==(Quaternion p, Quaternion q)
 
 
 
-Quaternion operator-(Quaternion p, Quaternion q)
+QuaternionQ operator-(QuaternionQ p, QuaternionQ q)
 {
-    return Quaternion(p.getScalar() - q.getScalar(), p.getPosX() - q.getPosX(), p.getPosY() - q.getPosY(), p.getPosZ() - q.getPosZ());
+    return QuaternionQ(p.getScalar() - q.getScalar(), p.getPosX() - q.getPosX(), p.getPosY() - q.getPosY(), p.getPosZ() - q.getPosZ());
 }
 
-//Quaternion Quaternion::operator -(Quaternion q)
+//Quaternion QuaternionQ::operator -(Quaternion q)
 //{
 //    Quaternion res;
 //    res.setScalar(this->getScalar()-q.getScalar());
@@ -638,9 +638,9 @@ Quaternion operator-(Quaternion p, Quaternion q)
 //}
 
 
-Quaternion Quaternion::operator /(double k)
+QuaternionQ QuaternionQ::operator /(double k)
 {
-    Quaternion res;
+    QuaternionQ res;
     res.setScalar(this->getScalar()/k);
     res.setPosX(this->getPosX()/k);
     res.setPosY(this->getPosY()/k);
@@ -648,12 +648,12 @@ Quaternion Quaternion::operator /(double k)
     return res;
 }
 
-float Quaternion::dot(Quaternion p, Quaternion q)
+float QuaternionQ::dot(QuaternionQ p, QuaternionQ q)
 {
     return sqrt(p.getScalar()*q.getScalar() + p.getPosX()*q.getPosX() + p.getPosY()*q.getPosY() + p.getPosZ()*q.getPosZ());
 }
 
-//Quaternion Quaternion::operator *(Quaternion q)
+//Quaternion QuaternionQ::operator *(Quaternion q)
 //{
 //    //q1q2 = (s1 , v1)(s2 , v2) = (s1*s2 − v1⋅v 2 , s1v2 + s2v1 + v1 × v2 )
 //    Quaternion res;

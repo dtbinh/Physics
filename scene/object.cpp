@@ -29,7 +29,7 @@ bool tryInterceptionPointFace(Face face, Vec4 point)
 Object::Object()
 {
     this->position   = Vec4();
-    this->rotation   = Quaternion();
+    this->rotation   = QuaternionQ();
     this->selected   = false;
     this->properties = Vec4();
     this->type       = -1;
@@ -77,7 +77,7 @@ Object::Object(Scene *scene)
     this->rendermesh = false;
 }
 
-Object::Object(Vec4 position, Quaternion rotation, Vec4 properties, int type, Scene *scene,QString name)
+Object::Object(Vec4 position, QuaternionQ rotation, Vec4 properties, int type, Scene *scene, QString name)
 {
     this->position   = position;
     this->rotation   = rotation;
@@ -276,15 +276,15 @@ void Object::clearPhysics()
     Physics::closeObject(this);
 }
 
-Matrix Object::getAd()
+MatrixF Object::getAd()
 {
     // | R p |^-1   | R^t  R^t.(-p) |
     // | 0 1 |    = |  0      1     |
-    Matrix Ad(6,6);
+    MatrixF Ad(6,6);
     //R
-    Matrix R = Physics::getMatrixRotation(this);
+    MatrixF R = Physics::getMatrixRotation(this);
     //matriz inversa de R
-    Matrix invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
+    MatrixF invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
     R = invR;
     Vec posWorld, //posição do mundo
         posBody,           //posição do corpo
@@ -294,8 +294,8 @@ Matrix Object::getAd()
     p = posWorld - posBody;
     p = R*p;
     //[p]R
-    Matrix pR;
-    Matrix cross_p = Matrix::crossProductMatrix(p);
+    MatrixF pR;
+    MatrixF cross_p = MatrixF::crossProductMatrix(p);
     pR = cross_p * R;
     //Ad
     Ad.setSubmatrix(0,0,R);
@@ -304,15 +304,15 @@ Matrix Object::getAd()
     return Ad;
 }
 
-Matrix Object::getAd(Character* chara)
+MatrixF Object::getAd(Character* chara)
 {
     // | R p |^-1   | R^t  R^t.(-p) |
     // | 0 1 |    = |  0      1     |
-    Matrix Ad(6,6);
+    MatrixF Ad(6,6);
     //R
-    Matrix R = Physics::getMatrixRotation(this);
+    MatrixF R = Physics::getMatrixRotation(this);
     //matriz inversa de R
-    Matrix invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
+    MatrixF invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
     R = invR;
     Vec posCOM = Vec(chara->getPosCOM()), //posição do mundo
         posBody,           //posição do corpo
@@ -321,8 +321,8 @@ Matrix Object::getAd(Character* chara)
     p = posCOM- posBody;
     p = R*p;
     //[p]R
-    Matrix pR;
-    Matrix cross_p = Matrix::crossProductMatrix(p);
+    MatrixF pR;
+    MatrixF cross_p = MatrixF::crossProductMatrix(p);
     pR = cross_p * R;
     //Ad
     Ad.setSubmatrix(0,0,R);
@@ -331,15 +331,15 @@ Matrix Object::getAd(Character* chara)
     return Ad;
 }
 
-Matrix Object::getAd(Vec4 pos)
+MatrixF Object::getAd(Vec4 pos)
 {
     // | R p |^-1   | R^t  R^t.(-p) |
     // | 0 1 |    = |  0      1     |
-    Matrix Ad(6,6);
+    MatrixF Ad(6,6);
     //R
-    Matrix R = Physics::getMatrixRotation(this);
+    MatrixF R = Physics::getMatrixRotation(this);
     //matriz inversa de R
-    Matrix invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
+    MatrixF invR = R.transpose(); //R^-1 = R^t, pois R eh uma matriz de rotacao
     R = invR;
     Vec posCOM = pos, //posição do mundo
         posBody,           //posição do corpo
@@ -348,8 +348,8 @@ Matrix Object::getAd(Vec4 pos)
     p = posCOM- posBody;
     p = R*p;
     //[p]R
-    Matrix pR;
-    Matrix cross_p = Matrix::crossProductMatrix(p);
+    MatrixF pR;
+    MatrixF cross_p = MatrixF::crossProductMatrix(p);
     pR = cross_p * R;
     //Ad
     Ad.setSubmatrix(0,0,R);
@@ -358,7 +358,7 @@ Matrix Object::getAd(Vec4 pos)
     return Ad;
 }
 
-Matrix Object::getIM()
+MatrixF Object::getIM()
 {
     //tratando o caso da geometria tipo ccylinder
     /* ---- Ainda não considerado no modelo
@@ -368,7 +368,7 @@ Matrix Object::getIM()
         diagI[2] = massBody.I[5];
       }
       */
-    Matrix Ibody = Matrix(6,6);
+    MatrixF Ibody = MatrixF(6,6);
     Ibody(0,0) = mass->I[0];
     Ibody(1,1) = mass->I[1];
     Ibody(2,2) = mass->I[2];
@@ -468,7 +468,7 @@ void Object::draw(bool wire)
 {
 
     //Draw::drawSphere(posEffectorBackward(),MATERIAL_CHROME,0.09);
-    if(has_cup) Draw::drawCoffeeCup(getPositionCurrent(),MATERIAL_WHITE_PLASTIC,Quaternion(Vec4(-90,0,0))*getRotationCurrent().conjugate());
+    if(has_cup) Draw::drawCoffeeCup(getPositionCurrent(),MATERIAL_WHITE_PLASTIC,QuaternionQ(Vec4(-90,0,0))*getRotationCurrent().conjugate());
     if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
     if(show_effector) Draw::drawSphere(getPositionCurrent(),MATERIAL_PEARL,0.02);
     if (show_effector&&show_target){
@@ -541,7 +541,7 @@ void Object::drawShadow()
     }
 }
 
-void Object::draw(Vec4 position, Quaternion q,int mat)
+void Object::draw(Vec4 position, QuaternionQ q, int mat)
 {
    // Draw::drawPoint(posEffectorForward(),0.2,Vec4(0.5,0.5,0.5));
     //if (this->geometry==0) return;
@@ -621,17 +621,17 @@ Vec4 Object::getPosition()
     return this->position;
 }
 
-void Object::setRotation(Quaternion rotation)
+void Object::setRotation(QuaternionQ rotation)
 {
     this->rotation = rotation;
 }
 
-void Object::setRotationCurrent(Quaternion rotation)
+void Object::setRotationCurrent(QuaternionQ rotation)
 {
     Physics::setRotationBody(this,rotation);
 }
 
-Quaternion Object::getRotation()
+QuaternionQ Object::getRotation()
 {
     return this->rotation;
 }
@@ -678,7 +678,7 @@ Vec4 Object::getPositionCurrent()
     return Physics::getPositionBody(this->geometry);
 }
 
-Quaternion Object::getRotationCurrent()
+QuaternionQ Object::getRotationCurrent()
 {
     return Physics::getRotationBody(this);
 }
@@ -703,7 +703,7 @@ Vec4 Object::posEffectorForward()
         posf =  Vec4(0,properties.y()/2.0,0);
     else
         posf =  Vec4(0,0,properties.z()/2.0);
-    return pos + Quaternion::getVecRotation(this->getRotationCurrent(),posf);
+    return pos + QuaternionQ::getVecRotation(this->getRotationCurrent(),posf);
 }
 
 Vec4 Object::posEffectorBackward()
@@ -716,10 +716,10 @@ Vec4 Object::posEffectorBackward()
         posf =  Vec4(0,-properties.y()/2.0,0);
     else
         posf =  Vec4(0,0,-properties.z()/2.0);
-    return pos + Quaternion::getVecRotation(this->getRotationCurrent(),posf);
+    return pos + QuaternionQ::getVecRotation(this->getRotationCurrent(),posf);
 }
 
-Vec4 Object::posEffectorForward(Vec4 pos, Quaternion rot, Object *obj)
+Vec4 Object::posEffectorForward(Vec4 pos, QuaternionQ rot, Object *obj)
 {
     Vec4 properties = obj->getProperties();
     Vec4 posf;
@@ -729,10 +729,10 @@ Vec4 Object::posEffectorForward(Vec4 pos, Quaternion rot, Object *obj)
         posf = Vec4(0,properties.y()/2.0,0);
     else
         posf = Vec4(0,0,properties.z()/2.0);
-    return pos+Quaternion::getVecRotation(rot,posf);
+    return pos+QuaternionQ::getVecRotation(rot,posf);
 }
 
-Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
+Vec4 Object::posEffectorBackward(Vec4 pos, QuaternionQ rot, Object *obj)
 {
     Vec4 posf;
     Vec4 properties = obj->getProperties();
@@ -742,7 +742,7 @@ Vec4 Object::posEffectorBackward(Vec4 pos, Quaternion rot, Object *obj)
         posf = Vec4(0,-properties.y()/2.0,0);
     else
         posf = Vec4(0,0,-properties.z()/2.0);
-    return pos + Quaternion::getVecRotation(rot,posf);
+    return pos + QuaternionQ::getVecRotation(rot,posf);
 }
 
 QString Object::showInfo()
@@ -757,7 +757,7 @@ QString Object::showInfo()
     obj += aux.sprintf("Position: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
     p = getProperties();
     obj += aux.sprintf("Properties: %.3f %.3f %.3f \n",p.x(),p.y(),p.z());
-    Quaternion q = getRotation();
+    QuaternionQ q = getRotation();
     obj += aux.sprintf("Quaternion: %.3f %.3f %.3f %.3f \n",q.getScalar(),q.getPosX(),q.getPosY(),q.getPosZ());
     if(getFoot())
         obj +="Is Foot: true\n";
@@ -933,14 +933,14 @@ Vec4 Object::getKd()
 void Object::evaluate(int val)
 {
     if(has_cup){
-        Vec4 v = Quaternion::getVecRotation(getRotationCurrent()*getRotation().conjugate(),Vec4(0,0,1));
+        Vec4 v = QuaternionQ::getVecRotation(getRotationCurrent()*getRotation().conjugate(),Vec4(0,0,1));
         //Vec4 axis = q.getVector();
         Vec4 newaxis = Vec4(0,0,1)^v;
         float angle = Vec4(0,0,1)*v;
         Vec4 ax;
         dReal ang;
-        Quaternion ql = Quaternion(angle,newaxis);
-        Quaternion qDelta = Quaternion::deltaQuat(Quaternion(Vec4(-180,0,0)), ql );
+        QuaternionQ ql = QuaternionQ(angle,newaxis);
+        QuaternionQ qDelta = QuaternionQ::deltaQuat(QuaternionQ(Vec4(-180,0,0)), ql );
           //indo pelo caminho mais curto
         //qDelta = Quaternion().lessArc(qDelta);
         qDelta.toAxisAngle( &ax, &ang );

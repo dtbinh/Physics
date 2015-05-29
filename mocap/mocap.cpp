@@ -89,7 +89,7 @@ void MoCap::copyFootsProperties()
     Vec4 aux;
     for(unsigned int i=0;i<chara->getBodiesFoot().size();i++){
         Object *foot = chara->getBodiesFoot().at(i);
-        Object *newObj = new Object(Vec4(),Quaternion(),foot->getProperties(),foot->getType(),foot->getScene());
+        Object *newObj = new Object(Vec4(),QuaternionQ(),foot->getProperties(),foot->getType(),foot->getScene());
         aux.setVec4(0,foot->getProperties().y()/2.0,0);
         idfoots.push_back(chara->getIdObject(foot));
         foots.push_back(newObj);
@@ -123,8 +123,13 @@ void MoCap::showMoCap(Vec4 offset, int frame)
 {
     for(int i=0;i<chara->getNumBodies();i++){
         Vec4 position = getFrameMotion(frame)->getPosition(i);
-        Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
-        chara->getBody(i)->draw(position+offset,orientation,MATERIAL_EMERALD);
+        QuaternionQ orientation = getFrameMotion(frame)->getOrientation(i);
+        if(i%2==0 && chara->getBody(i)->getFoot() && (chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround()))
+            chara->getBody(i)->draw(position,orientation,MATERIAL_RUBY);
+        else if (i%2==1 && chara->getBody(i)->getFoot() && chara->getMoCap()->getFrameMotion(frame)->getFootRightGround())
+            chara->getBody(i)->draw(position,orientation,MATERIAL_RUBY);
+        else
+            chara->getBody(i)->draw(position,orientation,MATERIAL_EMERALD);
     }
 }
 
@@ -144,20 +149,20 @@ void MoCap::loadFrameSimulation()
 {
 
         //para cada frame
-        Quaternion q;
+        QuaternionQ q;
         //dQuaternion q;
           //dQFromAxisAndAngle(q,0,0,1,Modelo::grauToRad(90.0));
         //inicializa o vector quatDes
 
         for (unsigned int i=0;i<capMot.size();i++) {
-            std::vector<Quaternion> quatDes;
+            std::vector<QuaternionQ> quatDes;
             for (int k=0;k<this->chara->getNumJoints();k++) {
-                quatDes.push_back(Quaternion());
+                quatDes.push_back(QuaternionQ());
             }
           //calcula angDes
           for( int j=0; j<chara->getNumJoints(); j++ ) {
             //calcula quaternion relativo entre os dois corpos os quais a junta j liga
-              Quaternion q,q1t,q2; //q1t - q1 transposto (inverso, conjugado)
+              QuaternionQ q,q1t,q2; //q1t - q1 transposto (inverso, conjugado)
               //q1t
 
               q1t = getFrameMotion(i)->getOrientation(chara->getIdObject(chara->getJoint(j)->getParent()));
@@ -220,11 +225,11 @@ Vec4 MoCap::positionRelativeCOM(int frame,int foot)
 Vec4 MoCap::velocityAngularBody(int frame, int body)
 {
     //calculando velocidade desejada da junta (em coordenadas locais)
-    Quaternion qIdent;
+    QuaternionQ qIdent;
     Vec4 axis;
     dReal angle;
     //delta entre qDesejado e qDesejadoMaisUm (em coordenadas do corpo prev da junta)
-    Quaternion qDesejado = getFrameMotion(frame)->getOrientation(body); //ja foi calculado acima
+    QuaternionQ qDesejado = getFrameMotion(frame)->getOrientation(body); //ja foi calculado acima
     //indo pelo caminho mais curto
 
     qDesejado = qIdent.lessArc(qDesejado); //ja foi calculado acima
@@ -233,10 +238,10 @@ Vec4 MoCap::velocityAngularBody(int frame, int body)
         prox = beginClycle;
     }
     if(frame+2>=int(capMotFrame.size())) prox = frame;
-    Quaternion qDesejadoMaisUm = getFrameMotion(prox)->getOrientation(body);
+    QuaternionQ qDesejadoMaisUm = getFrameMotion(prox)->getOrientation(body);
     //indo pelo caminho mais curto
     qDesejadoMaisUm = qIdent.lessArc(qDesejadoMaisUm);
-    Quaternion qDeltaVelDesejada = Quaternion::deltaQuat( qDesejadoMaisUm, qDesejado ); //ou o contrario
+    QuaternionQ qDeltaVelDesejada = QuaternionQ::deltaQuat( qDesejadoMaisUm, qDesejado ); //ou o contrario
     //indo pelo caminho mais curto
     qDeltaVelDesejada = qIdent.lessArc(qDeltaVelDesejada);
     qDeltaVelDesejada.toAxisAngle( &axis, &angle );
@@ -355,6 +360,11 @@ int MoCap::currentFrame()
     return frame_current;
 }
 
+void MoCap::setCurrentFrame(int i)
+{
+    frame_current = i;
+}
+
 void MoCap::clear()
 {
     capMot.clear();
@@ -370,7 +380,7 @@ void MoCap::drawShadow(Vec4 offset, int frame)
 //    foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     for(int i=0;i<chara->getNumBodies();i++){
         Vec4 position = getFrameMotion(frame)->getPosition(i);
-        Quaternion orientation = getFrameMotion(frame)->getOrientation(i);
+        QuaternionQ orientation = getFrameMotion(frame)->getOrientation(i);
         //if(i==int(sens-3))
         if(i%2==0 && chara->getBody(i)->getFoot() && (chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround()))
             chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);

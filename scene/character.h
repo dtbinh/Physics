@@ -112,6 +112,7 @@ public:
     void           showHierarchyBodies(Object* begin, Object* end);
 
 
+    bool           hasEffectorEnabled();
 };
 
 #endif // CHARACTER_H

@@ -12,8 +12,8 @@ class Vec;
 class Balance
 {
     Character* chara;
-    Matrix     relationJoints;
-    Matrix     relationJointsB;
+    MatrixF     relationJoints;
+    MatrixF     relationJointsB;
     Vec4       ksTorque;
     Vec4       kdTorque;
     Vec4       ksForce;
@@ -24,12 +24,13 @@ class Balance
 
     Vec4       kmomlin;
     Vec4       kmomang;
-    Quaternion bdesired;
+    QuaternionQ bdesired;
 
     float      compensation;
     bool       enable_force;
     bool       enable_torque;
     bool       enable_momentum;
+    bool       enable_gravitycomp;
     bool       enable_balance;
     int        useHierarchy;
     int        steps;
@@ -59,8 +60,8 @@ public:
     void contructRelationJoints();       //esta função constrói uma matrix de relacionamento entre as juntas e sua hierarquia
                                          //hierarquia, Mat(n,n), onde n é o numero de juntas.
 
-    Matrix getJacobianSum(Object* obj);  //calcula o somatório de todas as jacobianas
-    Matrix getInertiaFactors(Joint* joint);
+    MatrixF getJacobianSum(Object* obj);  //calcula o somatório de todas as jacobianas
+    MatrixF getInertiaFactors(Joint* joint);
     Vec getTwistWrenchTotal(Vec twist,Vec4 com); //retorna os valores que serão aplicados no character com forças e torques virtuais
     Vec getJacobianLocomotion(std::vector<Joint*> joints, Object* effector, Vec twist);
     Vec4 getKsTorque();
@@ -76,10 +77,10 @@ public:
     Vec4 getKMomentumLinear();
     Vec4 getKMomentumAngular();
 
-    Quaternion getDesiredQuaternion();
+    QuaternionQ getDesiredQuaternion();
 
     void setDeriredQuaternion(Vec4 euler);
-    void setDeriredQuaternion(Quaternion quat);
+    void setDeriredQuaternion(QuaternionQ quat);
     void setKMomentumLinear(Vec4 k);
     void setKMomentumAngular(Vec4 k);
     float getCompensation();
@@ -119,11 +120,13 @@ public:
     bool getEnableTorque();
     void setEnableForce(bool b);
     bool getEnableForce();
+    void setEnableGravityCompensation(bool b);
+    bool getEnableGravityCompensation();
     void setEnableMomentum(bool b);
     bool getEnableMomentum();
     Vec4 limitingTorque(Vec4 lim_inf,Vec4 lim_sup, Vec4 torque);
     Vec4 limitingTorque(float x, Vec4 torque);
-    void evaluate(Joint* jDes,float mass_total,int frame = -1,Quaternion qdesired=Quaternion(),Vec4 vel_ang_des=Vec4(), Vec4 velCOM_moCap=Vec4(),Vec4 mom_lin_des=Vec4(),Vec4 mom_ang_des=Vec4()); //executa a rotina de tratamento do equilíbrio
+    void evaluate(Joint* jDes,float mass_total,int frame = -1,QuaternionQ qdesired=QuaternionQ(),Vec4 vel_ang_des=Vec4(), Vec4 velCOM_moCap=Vec4(),Vec4 mom_lin_des=Vec4(),Vec4 mom_ang_des=Vec4()); //executa a rotina de tratamento do equilíbrio
     void evaluateSIMBICON();
     void setEnableBalance(bool b);
 };

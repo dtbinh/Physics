@@ -22,7 +22,7 @@ class Scene;
 class Object;
 class Character;
 class Joint;
-class Matrix;
+class MatrixF;
 
 namespace Physics{
 
@@ -36,15 +36,15 @@ namespace Physics{
 
     //Body Manipulation
     void                  getGeomTransform(dGeomID geom, Matrix4x4* transform); //extrai a matriz de transformação do objeto (Rotation x Translate)
-    void                  createObject(Object *obj, dSpaceID space, float mass, Vec4 position, Quaternion rotation); //cria um objeto físico
+    void                  createObject(Object *obj, dSpaceID space, float mass, Vec4 position, QuaternionQ rotation); //cria um objeto físico
     void                  createObject(Object *obj, dSpaceID space, float mass, Vec4 position, Vec4 Velocity); //cria um objeto físico com velocidade
-    Quaternion            getRotationBody(Object *obj);               //extrai o quaternion de rotação do objeto
+    QuaternionQ            getRotationBody(Object *obj);               //extrai o quaternion de rotação do objeto
     Vec4                  getPositionBody(GeomID g);               //extrai a posição do objeto
 
     void                  setEnableObject(Object *obj);               //habilita o objeto para ser manipulado no mundo
     void                  setDisableObject(Object *obj);              //desabilita o objeto para ser manipulado no mundo
     void                  updateObject(Object *obj); //decrepted
-    Matrix                getMatrixRotation(Object *obj); //extrai a matriz de rotação como instancia da classe Matrix
+    MatrixF getMatrixRotation(Object *obj); //extrai a matriz de rotação como instancia da classe Matrix
 
 
     void                  bodySetTorque(BodyID body, float x, float y, float z);
@@ -52,10 +52,10 @@ namespace Physics{
     void                  bodySetForce(BodyID body, float x, float y, float z);
     void                  bodyAddForce(BodyID body, float x, float y, float z);
     void                  setPositionBody(Object *body,Vec4 pos);
-    void                  setRotationBody(Object *body,Quaternion quat);
+    void                  setRotationBody(Object *body, QuaternionQ quat);
     Vec4                  getAngularVelBody(Object *obj);            //extrai a velocidade angular do objeto em coordenadas globais
     Vec4                  getAngularMomentumBody(Object *obj);            //extrai a velocidade angular do objeto em coordenadas globais
-    Vec4                  getAngularMomentumMoCap(Object* obj,Vec4 vel,Quaternion q);
+    Vec4                  getAngularMomentumMoCap(Object* obj,Vec4 vel,QuaternionQ q);
     Vec4                  getLinearVelBody(Object *obj);            //extrai a velocidade angular do objeto em coordenadas globais
     Vec4                  getRelVelocityBody(Object *obj);           //extrai a velocidade do objeto em coordenadas globais
     Vec4                  getRelPositionBody(Object *obj);           //extraí a posição do objeto em coordenadas globais
@@ -66,8 +66,8 @@ namespace Physics{
     void                  initJointFixed(Joint*joint);               //criar junta fixed
     void                  initJointHinge(Joint* joint, Vec4 anchor, Vec4 axis); //criar junta hinge
     Vec4                  getAxisHingeJoint(Joint *joint);           //retorna o eixo da junta hinge
-    Quaternion            getRotationJoint(Joint* joint);            //retorna o quaternion entre os corpos da junta
-    Quaternion            getRotationJointInit(Joint* joint);            //retorna o quaternion entre os corpos da junta
+    QuaternionQ getRotationJoint(Joint* joint);            //retorna o quaternion entre os corpos da junta
+    QuaternionQ           getRotationJointInit(Joint* joint);            //retorna o quaternion entre os corpos da junta
     void                  closeJoint(Joint* joint);                  //fecha a junta
     void                  setEnableJoint(Joint *joint);              //habilita a junta para ser manipulada no mundo
     void                  setDisableJoint(Joint *joint);             //desabilita a junta para ser manipulada no mundo

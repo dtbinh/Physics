@@ -996,7 +996,7 @@ void Draw::drawSkybox(Vec4 min, Vec4 max, int texture)
         delete mat;
 }
 
-void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
+void Draw::drawCoffeeCup(Vec4 position, int material, QuaternionQ q)
 {
     Material *mat = new Material();
     mat->setMaterial(mat,material);
@@ -1014,7 +1014,7 @@ void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
     delete mat;
 }
 
-void Draw::drawObj(Vec4 position, int material,Quaternion q, QString file,ObjMesh *n)
+void Draw::drawObj(Vec4 position, int material,QuaternionQ q, QString file,ObjMesh *n)
 {
     Material *mat = new Material();
     mat->setMaterial(mat,material);
@@ -1353,7 +1353,7 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     Vec4 k = Vec4( 0.0,0.0,1.0 );
     Vec4 axis = k^from2to;
     float angle = acos(k*from2to);
-    Quaternion quat;
+    QuaternionQ quat;
     quat.fromAxisAngle(axis,angle*180/M_PI);
     if (from2to.z()==-1.0) quat.fromAxisAngle( Vec4(1.0,0.0,0.0), 180.0 );
     dQuaternion dQ;

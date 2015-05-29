@@ -51,9 +51,9 @@ public:
     Vec4 getPositionAnchor();
     ~Joint();
     //----Matrix
-    Matrix getAd();
-    Matrix getAd(Vec4 pos); //calcula matriz Adjunta que muda as coordenadas do frame da junta para o frame do mundo (R=identity) posicionado num dado ponto (em coordenadas globais)
-    Matrix getAd(Object* obj); //calcula matriz Adjunta que muda as coordenadas do frame do objeto para o frame da junta
+    MatrixF getAd();
+    MatrixF getAd(Vec4 pos); //calcula matriz Adjunta que muda as coordenadas do frame da junta para o frame do mundo (R=identity) posicionado num dado ponto (em coordenadas globais)
+    MatrixF getAd(Object* obj); //calcula matriz Adjunta que muda as coordenadas do frame do objeto para o frame da junta
 
 
 
