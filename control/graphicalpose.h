@@ -14,7 +14,8 @@ private:
     std::vector<double> timeIntervals;
     std::vector<double> cumulativeTimeIntervals;
     double              time;
-    unsigned int        current;
+    unsigned int        currentPos;
+    unsigned int        nextPos;
 
 public:
     GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeIntervals);
@@ -29,7 +30,8 @@ public:
     void                insertPose(Pose* newPose, double poseInterval, int position); //Adiciona uma nova pose a uma posição específica da lista de poses, caso o character da pose seja o mesmo que o character do controle de pose
     void                modifyPose(Pose* modifiedPose, double poseInterval, int position); //Modifica a pose na posição position, caso exista
     Pose*               getCurrentPose(); //retorna o estado atual do controle
-    unsigned int        getCurrent(); //retorna o número da pose corrente
+    unsigned int        getCurrentPos(); //retorna o número da pose corrente
+    unsigned int        getNextPos(); //retorna o número da próxima pose
     void                advanceTimeEnergic(double increment); //Função que avança o tempo interno que o controle passou na posição atual
     void                advanceTime(double increment); //Função que interpola a posição desejada em relação ao tempo e faz as modificações adequadas
     void                setCharacterShape(); //Função que atualiza os controladores do personagem de acordo com a pose corrente

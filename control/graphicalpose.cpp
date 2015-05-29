@@ -94,23 +94,30 @@ void GraphicalPose::modifyPose(Pose *modifiedPose, double poseInterval, int posi
 
 Pose *GraphicalPose::getCurrentPose()
 {
-    return this->poses.at(this->current);
+    return this->poses.at(this->currentPos);
 }
 
-unsigned int GraphicalPose::getCurrent()
+unsigned int GraphicalPose::getCurrentPos()
 {
-    return this->current;
+    return this->currentPos;
+}
+
+unsigned int GraphicalPose::getNextPos()
+{
+    return this->nextPos;
 }
 
 void GraphicalPose::advanceTimeEnergic(double increment)
 {
     if (this->timeIntervals.size() > 0) {
-        if (this->time+increment > this->timeIntervals.at(this->current)){
-            this->current += 1;
+        if (this->time+increment > this->timeIntervals.at(this->currentPos)){
+            this->currentPos += 1;
 
-            if (this->current >= this->timeIntervals.size()){
-                this->current = 0;
+            if (this->currentPos >= this->timeIntervals.size()){
+                this->currentPos = 0;
             }
+
+            this->nextPos = this->currentPos + 1;
 
             this->time = 0;
             //printf("current state is: %d\n", this->current);
@@ -141,7 +148,8 @@ void GraphicalPose::advanceTime(double increment)
         nextPos = greaterValue - this->cumulativeTimeIntervals.begin();
         pos = nextPos - 1;
     }
-    this->current = pos;
+    this->currentPos = pos;
+    this->nextPos = nextPos;
     //Agora vamos criar uma pose cujos valores são a interpolação dos valores das poses nos locais correspondentes
     //std::cout << pos << " pos " << nextPos << " nextpos \n";
     //std::cout << this->poses[pos]->getName().toStdString() << " pos " << this->poses[nextPos]->getName().toStdString() << " nextPos\n";
@@ -159,7 +167,7 @@ void GraphicalPose::advanceTime(double increment)
 void GraphicalPose::setCharacterShape()
 {
     if (this->poses.size() > 0){
-        Pose* poseActual = this->poses.at(this->current);
+        Pose* poseActual = this->poses.at(this->currentPos);
         poseActual->setCharacterShape();
     }
 }

@@ -709,9 +709,11 @@ void GLWidget::drawPoseProgression()
 
             glPushAttrib(GL_CURRENT_COLOR);
 
-            if (i == currPoseCont->getCurrent()) {
+            if (i == currPoseCont->getCurrentPos()) {
                 //std::cout << "\ncurrent: " <<  poses.at(i)->getName().toStdString();
                 glColor3f(255,0,0);
+            } else if (i == currPoseCont->getNextPos()) {
+                glColor3f(0,255,0);
             } else {
                 glColor3f(0,0,0);
             }
