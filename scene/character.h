@@ -31,6 +31,7 @@ public:
     float alpha;
     bool wire;
     bool shadow_motion;
+    QString name;
 public:
     //variaveis publicas
     std::vector<bool**> hierarchy; //variavel q guarda os relacionamentos das juntas de acordo com os corpos que
@@ -46,7 +47,7 @@ public:
 
 
     void           restartPhysics();  //reinicializa atributos físicos do personagem
-    Object*        getObject(QString name); //extrai o nome do character
+    Object*        getObject(QString name); //extrai um objeto a partir de um nome
     Vec4           getPosCOM();                //extraí a posição do centro de massa
     Vec4           getVelCOM();                //extraí a velocidade linear no centro de massa
     Vec4           getLinearMomentum();        //extraí momento linear do character
@@ -94,7 +95,8 @@ public:
     int             findJointIndex(Joint* searchJoint); //encontra o indice de uma junta caso ela exista no personagem
     ControlPD*      getController(int i);
 
-
+    QString         getName();
+    void            setName(QString name);
 
 
     //desenho

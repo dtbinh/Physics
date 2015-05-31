@@ -12,6 +12,8 @@
 ControlPD *pd_selected;
 Joint*     joint_selected;
 Object*    obj_selected;
+GraphicalPose* pose_control_selected;
+Pose*       pose_selected;
 bool       updateSimut = false;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -70,6 +72,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
     connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
 
+    //manipuladores de controle de pose
+    connect(ui->widgetPhysics, SIGNAL(updatePoseControls(std::vector<GraphicalPose*>)),this,SLOT(updateListPoseControl(std::vector<GraphicalPose*>)));
+    connect(ui->listWidgetPoseControl, SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedPoseControl(int)));
+    connect(ui->listWidgetPose, SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedPose(int)));
+    connect(ui->poseTimeSelector, SIGNAL(valueChanged(double)),this,SLOT(changePoseTime(double)));
 
     //manipuladores de Objetos
     connect(ui->widgetPhysics,SIGNAL(setForceCharacter()),this,SLOT(applyForce2Object()));
@@ -214,11 +221,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     updateListObjects(ui->widgetPhysics->getObjectsList());
     updateListJoints(ui->widgetPhysics->getJointsList());
+    updateListPoseControl(ui->widgetPhysics->getPoseControlList());
     ui->infoPD->setVisible(false);
     //ui->widgetPhysics->loadScene("/home/danilo/GitHub/ODESys/models/new/biped_3D/biped3D.model");
     pd_selected = NULL;
     joint_selected = NULL;
     obj_selected = NULL;
+    pose_control_selected = NULL;
+    pose_selected = NULL;
 
     //Shortcuts
     QShortcut* shortcut = new QShortcut(QKeySequence(tr("Ctrl+O", "File|Open")), this);
@@ -245,7 +255,7 @@ MainWindow::MainWindow(QWidget *parent) :
     shortcut->setContext(Qt::ApplicationShortcut);
     connect(shortcut, SIGNAL(activated()), this, SLOT(on_actionOpen_Simulation_triggered()));
 
-
+    ui->poseTimeSelector->setMaximum(1000000);
 
 }
 
@@ -275,6 +285,38 @@ void MainWindow::updateListJoints(std::vector<Joint*> joints)
         s.push_back(" - ");
         s.push_back(joints.at(i)->getName());
         ui->listWidgetJoints->addItem(s);
+    }
+}
+
+void MainWindow::updateListPoseControl(std::vector<GraphicalPose *> poseControl)
+{
+    ui->listWidgetPoseControl->clear();
+    for (unsigned int i=0; i < poseControl.size(); i++){
+        QString s;
+        s.setNum(i);
+        s.push_back(" - ");
+        QString name = poseControl.at(i)->getName();
+        if (name == NULL) {
+            name.sprintf("Pose Control %u", i);
+        }
+        s.push_back(name);
+        ui->listWidgetPoseControl->addItem(s);
+    }
+}
+
+void MainWindow::updateListPose(std::vector<Pose *> pose)
+{
+    ui->listWidgetPose->clear();
+    for (unsigned int i=0; i < pose.size(); i++){
+        QString s;
+        s.setNum(i);
+        s.push_back(" - ");
+        QString name = pose.at(i)->getName();
+        if (name == NULL){
+            name.sprintf("Pose %u", i);
+        }
+        s.push_back(name);
+        ui->listWidgetPose->addItem(s);
     }
 }
 
@@ -512,6 +554,27 @@ void MainWindow::showSelectedObject(int i)
 
 }
 
+void MainWindow::showSelectedPoseControl(int i)
+{
+    pose_control_selected = ui->widgetPhysics->getPoseControlList().at(i);
+    pose_selected = pose_control_selected->getPoses().at(0);
+    std::cout << pose_control_selected->getName().toStdString() << "\n";
+    updateListPose(pose_control_selected->getPoses());
+
+    QString charName = pose_control_selected->getCharacter()->getName();
+    if (charName == NULL){
+        charName.sprintf("Character %d", i);
+    }
+    ui->correspChar->setText(ui->correspChar->text() + " " + charName);
+}
+
+void MainWindow::showSelectedPose(int i)
+{
+    pose_selected = pose_control_selected->getPoses().at(i);
+    ui->poseTimeSelector->setValue(pose_control_selected->getTimeIntervals().at(i));
+    //ui->xAngPose->setText(ui->xAngPose->text() + " " + pose_selected);
+}
+
 void MainWindow::setGravity()
 {
     Vec4 g(ui->gravx->value(),ui->gravy->value(),ui->gravz->value());
@@ -590,6 +653,19 @@ void MainWindow::checkEnabledCPDP(bool b)
 void MainWindow::checkHasCoffeeCup(bool b)
 {
     if (obj_selected!=NULL) obj_selected->setCoffeeCup(b);
+}
+
+void MainWindow::changePoseTime(double time)
+{
+    if (pose_control_selected != NULL){
+        if (ui->updateTimeAll->isChecked()){
+            for (int i=0; i<pose_control_selected->getTimeIntervals().size(); i++){
+                pose_control_selected->modifyInterval(time, i);
+            }
+        } else if (pose_selected != NULL){
+            pose_control_selected->modifyInterval(time, ui->listWidgetPose->currentRow());
+        }
+    }
 }
 
 void MainWindow::applyForce2Object()

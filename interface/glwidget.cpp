@@ -297,6 +297,7 @@ GLWidget::GLWidget(QWidget *parent) :
     scene = new Scene(this);
     updateObjects(scene->objectsScene());
     updateJoints(scene->jointsScene());
+    updatePoseControls(scene->poseControlsScene());
     simTimer = new QTimer(this);
     connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
 
@@ -1600,6 +1601,16 @@ std::vector<Joint*> GLWidget::getJointsList()
     return this->scene->jointsScene();
 }
 
+std::vector<GraphicalPose *> GLWidget::getPoseControlList()
+{
+    return this->scene->poseControlsScene();
+}
+
+std::vector<Pose *> GLWidget::getPoseList()
+{
+    return this->scene->posesScene();
+}
+
 void GLWidget::setObjectSelected(int row)
 {
 
@@ -1635,6 +1646,11 @@ void GLWidget::setJointSelected(int row)
     showJoint(jts.at(row));
     jts.clear();
 }
+
+/*void GLWidget::setPoseControlSelected(int row)
+{
+    showPoseControl(scene->poseControlsScene().at(row));
+}*/
 
 void GLWidget::loadSimulationParameters(QString file)
 {

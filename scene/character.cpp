@@ -860,6 +860,16 @@ ControlPD *Character::getController(int i)
     return this->controllers.at(i);
 }
 
+QString Character::getName()
+{
+    return this->name;
+}
+
+void Character::setName(QString name)
+{
+    this->name = name;
+}
+
 void Character::setSpace(SpaceID space)
 {
     this->space = space;

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "scene/object.h"
+#include "control/graphicalpose.h"
 
 namespace Ui {
     class MainWindow;
@@ -18,6 +19,8 @@ public:
 public slots:
     void updateListObjects(std::vector<Object*> objects);
     void updateListJoints(std::vector<Joint*> joints);
+    void updateListPoseControl(std::vector<GraphicalPose*> poseControl);
+    void updateListPose(std::vector<Pose*> pose);
     void updateControlPD();
     void updateControlPDManipulators();
     void updateControlPDManipulators2();
@@ -32,6 +35,8 @@ public slots:
     void updateSelectedObject();
     void updateControlPDPositional();
     void showSelectedObject(int i);
+    void showSelectedPoseControl(int i);
+    void showSelectedPose(int i);
     void setGravity();
     void setGravity(Vec4);
     void setSimbiconDistance();
@@ -45,6 +50,7 @@ public slots:
     void showPropertiesFootFrame(int i);
     void checkEnabledCPDP(bool);
     void checkHasCoffeeCup(bool);
+    void changePoseTime(double);
 
     //void infoSelectedObject(Object*);
     void applyForce2Object();

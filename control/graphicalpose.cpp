@@ -49,6 +49,11 @@ std::vector<double> GraphicalPose::getCumulativeTimeIntervals()
     return this->cumulativeTimeIntervals;
 }
 
+QString GraphicalPose::getName()
+{
+    return this->name;
+}
+
 
 void GraphicalPose::pushBackPose(Pose *newPose, double poseInterval)
 {
@@ -89,6 +94,13 @@ void GraphicalPose::modifyPose(Pose *modifiedPose, double poseInterval, int posi
         for (int i = position + 1; i < arraySize; ++i){
             this->cumulativeTimeIntervals.at(i) = this->cumulativeTimeIntervals.at(i-1) + this->timeIntervals.at(i-1);
         }
+    }
+}
+
+void GraphicalPose::modifyInterval(double poseInterval, int position)
+{
+    if (position < this->timeIntervals.size()){
+        timeIntervals.at(position) = poseInterval;
     }
 }
 
@@ -177,5 +189,10 @@ void GraphicalPose::setCharacterShape(Pose* pose)
     if (pose->getCharacter() == this->character){
         pose->setCharacterShape();
     }
+}
+
+void GraphicalPose::setName(QString name)
+{
+    this->name = name;
 }
 

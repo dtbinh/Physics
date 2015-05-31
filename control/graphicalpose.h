@@ -16,6 +16,7 @@ private:
     double              time;
     unsigned int        currentPos;
     unsigned int        nextPos;
+    QString             name;
 
 public:
     GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeIntervals);
@@ -26,9 +27,11 @@ public:
     std::vector<Pose*>  getPoses();
     std::vector<double> getTimeIntervals();
     std::vector<double> getCumulativeTimeIntervals();
+    QString             getName();
     void                pushBackPose(Pose* newPose, double poseInterval); //Adiciona uma nova pose ao final da lista de poses, caso o character da pose seja o mesmo que o character do controle de pose
     void                insertPose(Pose* newPose, double poseInterval, int position); //Adiciona uma nova pose a uma posição específica da lista de poses, caso o character da pose seja o mesmo que o character do controle de pose
     void                modifyPose(Pose* modifiedPose, double poseInterval, int position); //Modifica a pose na posição position, caso exista
+    void                modifyInterval(double poseInterval, int position);
     Pose*               getCurrentPose(); //retorna o estado atual do controle
     unsigned int        getCurrentPos(); //retorna o número da pose corrente
     unsigned int        getNextPos(); //retorna o número da próxima pose
@@ -36,7 +39,7 @@ public:
     void                advanceTime(double increment); //Função que interpola a posição desejada em relação ao tempo e faz as modificações adequadas
     void                setCharacterShape(); //Função que atualiza os controladores do personagem de acordo com a pose corrente
     void                setCharacterShape(Pose* pose); //Função que atualiza os controladores do personagem de acordo com o argumento pose
-
+    void                setName(QString name);
 };
 
 #endif // GRAPHICALPOSE_H

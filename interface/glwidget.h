@@ -1,4 +1,4 @@
-#ifndef GLWIDGET_H
+﻿#ifndef GLWIDGET_H
 #define GLWIDGET_H
 #include <QGLShaderProgram>
 #include <QTimer>
@@ -16,6 +16,8 @@ class GLWidget : public QGLWidget
 signals:
     void updateObjects(std::vector<Object*>);
     void updateJoints(std::vector<Joint*>);
+    void updatePoseControls(std::vector<GraphicalPose*>);
+    void updatePoses(std::vector<Pose*>);
     void updateKsProp(Vec4);
     void updateKdProp(Vec4);
     void updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4);
@@ -100,10 +102,13 @@ public slots:
     //slots personagens
     std::vector<Object*> getObjectsList();
     std::vector<Joint*> getJointsList();
+    std::vector<GraphicalPose*> getPoseControlList();
+    std::vector<Pose*> getPoseList();
     void setObjectSelected(int row);
     Object* getObject(int row);
     void showCharacter(bool b);
     void setJointSelected(int row);
+    //void setPoseControlSelected(int row);
     void loadScene(QString file);
     void saveCharacter(QString file);
     void setWireCharacter(bool wire);

@@ -81,7 +81,7 @@
               <x>0</x>
               <y>10</y>
               <width>311</width>
-              <height>29</height>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout">
@@ -126,7 +126,7 @@
               <x>0</x>
               <y>40</y>
               <width>310</width>
-              <height>29</height>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -1170,7 +1170,7 @@ QGroupBox{
               <x>90</x>
               <y>100</y>
               <width>136</width>
-              <height>19</height>
+              <height>23</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_22">
@@ -1293,8 +1293,8 @@ QGroupBox{
              <rect>
               <x>20</x>
               <y>140</y>
-              <width>274</width>
-              <height>29</height>
+              <width>279</width>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_35">
@@ -1432,7 +1432,7 @@ QGroupBox{
               <x>20</x>
               <y>170</y>
               <width>271</width>
-              <height>29</height>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_42">
@@ -2336,6 +2336,95 @@ QGroupBox{
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tabPoseControl">
+           <attribute name="title">
+            <string>Pose Control</string>
+           </attribute>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>30</x>
+              <y>10</y>
+              <width>260</width>
+              <height>450</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QLabel" name="label_42">
+                 <property name="text">
+                  <string>Pose Control</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QListWidget" name="listWidgetPoseControl"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <item>
+                <widget class="QLabel" name="label_43">
+                 <property name="text">
+                  <string>Poses</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QListWidget" name="listWidgetPose"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="">
+            <property name="geometry">
+             <rect>
+              <x>40</x>
+              <y>500</y>
+              <width>251</width>
+              <height>101</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <layout class="QVBoxLayout" name="layoutPoseInfo">
+               <item>
+                <widget class="QLabel" name="correspChar">
+                 <property name="text">
+                  <string>Corresponding Character:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="layoutForPoseTime">
+                 <item>
+                  <widget class="QLabel" name="poseTime">
+                   <property name="text">
+                    <string>Pose Time:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="poseTimeSelector"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="updateTimeAll">
+               <property name="text">
+                <string>Update for all poses</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
             <string>Robustez</string>
@@ -2345,8 +2434,8 @@ QGroupBox{
              <rect>
               <x>10</x>
               <y>70</y>
-              <width>306</width>
-              <height>29</height>
+              <width>329</width>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_40">
@@ -2394,8 +2483,8 @@ QGroupBox{
              <rect>
               <x>10</x>
               <y>20</y>
-              <width>308</width>
-              <height>29</height>
+              <width>329</width>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_41">
@@ -2444,7 +2533,7 @@ QGroupBox{
               <x>10</x>
               <y>130</y>
               <width>182</width>
-              <height>29</height>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_43">
@@ -2475,8 +2564,8 @@ QGroupBox{
              <rect>
               <x>10</x>
               <y>170</y>
-              <width>185</width>
-              <height>29</height>
+              <width>192</width>
+              <height>33</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_44">
@@ -2517,7 +2606,7 @@ QGroupBox{
      <x>0</x>
      <y>0</y>
      <width>658</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

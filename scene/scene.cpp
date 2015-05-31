@@ -1332,6 +1332,7 @@ void Scene::createLuxo()
 {
     int materialLuxo = MATERIAL_SILVER;
     Character *luxo = new Character(this);
+    luxo->setName("luxo");
     this->addCharacter(luxo);
 
     Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
@@ -1390,8 +1391,8 @@ void Scene::createLuxo()
 
     std::vector<Vec4> pose2a;
     pose2a.push_back(Vec4(0,0,90));
-    pose2a.push_back(Vec4(0,0,25));
     pose2a.push_back(Vec4(0,0,20));
+    pose2a.push_back(Vec4(0,0,30));
     /*pose2a.push_back(Vec4(0,0,70));
     pose2a.push_back(Vec4(0,0,0));
     pose2a.push_back(Vec4(0,0,80));*/
@@ -1417,9 +1418,9 @@ void Scene::createLuxo()
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
     //luxoPose->pushBackPose(pose1, 5000);
-    luxoPose->pushBackPose(pose2, 12000);
-    luxoPose->pushBackPose(pose3, 12000);
-    luxoPose->pushBackPose(pose4, 12000);
+    luxoPose->pushBackPose(pose2, 1200);
+    luxoPose->pushBackPose(pose3, 1200);
+    luxoPose->pushBackPose(pose4, 1200);
 
 
     //Necessário para ele não sair voando com o pcg
