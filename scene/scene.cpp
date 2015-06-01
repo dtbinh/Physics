@@ -1418,9 +1418,9 @@ void Scene::createLuxo()
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
     //luxoPose->pushBackPose(pose1, 5000);
-    luxoPose->pushBackPose(pose2, 1200);
-    luxoPose->pushBackPose(pose3, 1200);
-    luxoPose->pushBackPose(pose4, 1200);
+    luxoPose->pushBackPose(pose2, 5000);
+    luxoPose->pushBackPose(pose3, 5000);
+    luxoPose->pushBackPose(pose4, 5000);
 
 
     //Necessário para ele não sair voando com o pcg
