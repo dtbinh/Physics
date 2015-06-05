@@ -40,6 +40,7 @@ Scene::Scene(GLWidget *parent)
     this->gravity = Vec4(0,-9.8,0);
     motion.clear();
     mocap.clear();
+    this->rotate_plane = Vec4(0,0,0);
 
     //pose_time.start();
 
@@ -163,9 +164,11 @@ void Scene::simulationStep(bool balance)
                 characters.at(0)->getMoCap()->stepFrame(frame_step);
                 if((characters.at(0)->getMoCap()->sizeFrames()>0)&&(characters.at(0)->getMoCap()->status))
                     for(unsigned int i=0; i<characters.at(0)->getControllersPD().size();i++){
-                        QuaternionQ des = characters.at(0)->getMoCap()->getFrameSimulation(frame_step)->quatDes.at(i);
-                        Object* father = this->getCharacter(0)->getControllersPD().at(i)->getJoint()->getParent();
-                        Object* child = this->getCharacter(0)->getControllersPD().at(i)->getJoint()->getChild();
+                        int j = i;
+                        if(this->getCharacter(0)->has_suitcase && i==this->getCharacter(0)->getControllersPD().size()-1) break;
+                        QuaternionQ des = characters.at(0)->getMoCap()->getFrameSimulation(frame_step)->quatDes.at(j);
+                        Object* father = this->getCharacter(0)->getControllersPD().at(j)->getJoint()->getParent();
+                        Object* child = this->getCharacter(0)->getControllersPD().at(j)->getJoint()->getChild();
 
                         Vec4 veldes = characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(child)) - characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(father));
                         characters.at(0)->getControllersPD().at(i)->setQuaternionWanted(des);
@@ -1270,6 +1273,28 @@ void Scene::habiliteJump()
     if(this->characters.size()>0){
         this->getCharacter(0)->getBalance()->habiliteJump(true);
     }
+}
+
+void Scene::setRotationPlane(Vec4 rot)
+{
+    Physics::closePlane(this->Plane);
+    this->rotate_plane = rot;
+    Vec4 initial_vec(0,1,0,0);
+
+    QuaternionQ qat(rot);
+    initial_vec = qat.getMatrix().vector(initial_vec);
+
+    float rot_ang_z = (Vec4(1,0,0)*initial_vec)/(Vec4(1,0,0).module()*initial_vec.module());
+    float a = acos(rot_ang_z);
+    this->rotate_plane.x3 = 30;//180*a/M_PI;
+
+    initial_vec.showVec4();
+    qDebug() << rotate_plane.z();
+    //exit(1);
+
+    this->Plane = Physics::initPlane(initial_vec,this);
+
+
 }
 
 bool Scene::isGeometryFootSwing(dGeomID geom)

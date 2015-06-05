@@ -14,6 +14,7 @@ Character::Character(Scene *parent)
     this->wire = false;
     this->capMotion = new MoCap(this);
     this->shadow_motion = true;
+    this->has_suitcase = false;
 
 }
 
@@ -54,7 +55,7 @@ void Character::draw()
     if(sensor_use){
         if (Sensor::getHierarchy2UseMocap(this)!=2){
             if (Sensor::getHierarchy2UseMocap(this)==0){
-                for(int i=0;i<objects.size();i++)
+                for(int i=0;i<this->getNumBodies();i++)
                     if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
             }
             else{
@@ -67,7 +68,7 @@ void Character::draw()
     else{
         if (Sensor::getHierarchy2Use(this)!=2){
             if (Sensor::getHierarchy2Use(this)==0){
-                for(int i=0;i<objects.size();i++)
+                for(int i=0;i<this->getNumBodies();i++)
                     if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
 
             }
@@ -88,7 +89,7 @@ void Character::draw()
 
     drawCOM();
     drawFootProjected();
-    //drawCOMProjected();
+    drawCOMProjected();
 }
 
 void Character::drawShadows()
@@ -198,9 +199,11 @@ void Character::restartPhysics()
     Physics::initCharacter(this);
     for(unsigned int i=0;i<objects.size();i++){
         Physics::createObject(objects.at(i),this->getSpace(),objects.at(i)->getFMass(),objects.at(i)->getPosition(),objects.at(i)->getRotation());
+        Physics::setDisableObject(objects.at(i));
     }
     for(unsigned int i=0;i<joints.size();i++){
         joints.at(i)->restartJoint();
+        Physics::setDisableJoint(joints.at(i));
     }
 }
 
@@ -287,12 +290,17 @@ float Character::getMassTotal()
 
 int Character::getNumJoints()
 {
+    if (has_suitcase)
+        return joints.size()-1;
     return joints.size();
 }
 
 int Character::getNumBodies()
 {
-    return objects.size();
+    if(has_suitcase)
+        return objects.size()-1;
+    else
+        return objects.size();
 }
 
 int Character::getIdObject(Object *obj)
@@ -313,7 +321,7 @@ Joint *Character::getParentMoreMass()
 {
     Joint* torso = NULL;
     float mass = 0;
-    for(unsigned int i=0;i<joints.size();i++ )
+    for(unsigned int i=0;i<this->getNumJoints();i++ )
         if (mass<=joints.at(i)->getParent()->getFMass()){
             mass = joints.at(i)->getParent()->getFMass();
             torso = joints.at(i);
@@ -324,7 +332,7 @@ Joint *Character::getParentMoreMass()
 
 Joint* Character::getJointParentBalance()
 {
-    for(unsigned int i=0;i<joints.size();i++ )
+    for(unsigned int i=0;i<this->getNumJoints();i++ )
         if (joints.at(i)->getParent()->getBodyBalance())
             return joints.at(i);
     return NULL;
@@ -345,8 +353,10 @@ Joint *Character::getJoint(Object *parent, Object *child)
 
 Joint *Character::getJoint2ObjectParent(Object *obj)
 {
-    for(int i=0;i<getNumJoints();i++)
+    for(int i=0;i<getNumJoints();i++){
+        //qDebug() << this->getJoint(i)->getName();
         if (getJoint(i)->getParent()==obj) return getJoint(i);
+    }
     return NULL;
 }
 
@@ -366,8 +376,10 @@ int Character::getPositionBody(Object *obj)
 std::vector<Joint*> Character::getJointChilds(Joint *exclude, Object *obj)
 {
     std::vector<Joint*> relation;
-    for(int i=0;i<this->getNumJoints();i++)
+    for(int i=0;i<this->getNumJoints();i++){
+        //qDebug() << this->getJoint(i)->getName();
         if (getJoint(i)->getParent()==obj && getJoint(i)!=exclude) relation.push_back(getJoint(i));
+    }
     return relation;
 
 }
@@ -384,8 +396,10 @@ std::vector<Object*> Character::getBodiesFoot(Object* nofoot)
 std::vector<Object*> Character::getChildrens(Object *obj)
 {
     std::vector<Object*> bodies;
-    for(int i = 0; i<this->getNumJoints();i++)
+    for(int i = 0; i<this->getNumJoints();i++){
+        //qDebug() << this->getJoint(i)->getName();
         if(this->getJoint(i)->getParent()==obj) bodies.push_back(this->getJoint(i)->getChild());
+    }
     return bodies;
 
 }
@@ -422,7 +436,7 @@ void Character::setBalance(Balance *balance)
 void Character::updateKsKdControlPDCoros()
 {
 
-    for(unsigned int i=0;i<controllers.size();i++)
+    for(unsigned int i=0;i<this->getNumJoints();i++)
         controllers.at(i)->updateKsKdCoros(this->getMassTotal());
 }
 
@@ -759,7 +773,7 @@ void Character::showHierarchies()
 
 void Character::restartCollideWithGround()
 {
-    for(int i=0;i<this->objects.size();i++){
+    for(int i=0;i<this->getNumBodies();i++){
         getBody(i)->setCollideWithGround(false);
     }
 }
@@ -860,6 +874,47 @@ ControlPD *Character::getController(int i)
     return this->controllers.at(i);
 }
 
+void Character::setSuitcase(int body, float mass)
+{
+    Object* obj = this->getBody(body);
+    obj->setRotationCurrent(QuaternionQ(1,0,0,0));
+    //qDebug() << obj->getName();
+    float space = 0.1;
+    Vec4 new_prop = Vec4(0.1,0.4,0.5);
+    Vec4 pos = obj->getPositionCurrent();
+    Vec4 ancor;
+    pos -= Vec4(0,obj->getProperties().y()/2.,0);
+    ancor = pos - Vec4(0,space/2.,0);
+    pos -= Vec4(0,space,0);
+    pos -= Vec4(0,new_prop.y()/2.0,0);
+    Object* new_obj = this->scene->addObject(new_prop,pos,QuaternionQ(1,0,0,0),TYPE_CUBE,mass,this,MATERIAL_CHROME);
+    Joint* new_joint = this->scene->addJointHinge(ancor,Vec4(0,0,1),obj,new_obj,this);
+    new_obj->setName("suitcase");
+    new_joint->setRadiusHinge(space/2.);
+    new_obj->setFoot(false);
+    new_joint->setName(obj->getName()+"__suitcase");
+    ControlPD *suit = new ControlPD(new_joint,QuaternionQ(1,0,0,0),Vec4(),Vec4());
+    this->controllers.push_back(suit);
+    this->has_suitcase = true;
+}
+
+void Character::deleteSuitcase()
+{
+    this->has_suitcase = false;
+    Physics::closeObject(objects.at(objects.size()-1));
+    Physics::closeJoint(joints.at(joints.size()-1));
+//    delete scene->objects.back();
+//    scene->objects.pop_back();
+    //delete objects.back();
+    objects.pop_back();
+    //delete joints.back();
+    joints.pop_back();
+    //delete controllers.back();
+    controllers.pop_back();
+
+
+}
+
 void Character::setSpace(SpaceID space)
 {
     this->space = space;
@@ -897,7 +952,7 @@ JointGroupID Character::getJointGroup()
 
 bool Character::hasEffectorEnabled()
 {
-    for(int i=0;i<objects.size();i++){
+    for(int i=0;i<this->getNumBodies();i++){
         if (objects.at(i)->isEnableCPDP()) return true;
     }
     return false;

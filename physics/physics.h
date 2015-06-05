@@ -81,6 +81,8 @@ namespace Physics{
     void initCharacter(Character *chara);
     void closeCharacter(Character *chara);
     void closeObject(Object *obj);
+    void closePlane(dGeomID plane);
+    dGeomID initPlane(Vec4 plane,Scene* scene);
 
 }
 

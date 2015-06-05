@@ -282,7 +282,8 @@ void Physics::initScene(Scene *scene){
     //dWorldSetCFM (scene->world,1e-3);
     dWorldSetCFM (scene->getWorld(),1e-009);
     scene->setSpace(dHashSpaceCreate(0));
-    dCreatePlane (scene->getSpace(),0,1,0,0); //todo remove
+    //scene->Plane = dCreatePlane (scene->getSpace(),0,1,0,0); //todo remove
+    scene->Plane = dCreatePlane (scene->getSpace(),-0.5,0.86,0,0); //todo remove
     scene->setJointGroup(dJointGroupCreate(0));
 
     //juntas ligadas - >ERP:+ligadas
@@ -647,4 +648,20 @@ Vec4 Physics::getAxisHingeJoint(Joint *joint)
         return Vec4((float)res[0], (float)res[1], (float)res[2]);
     }
     return Vec4();
+}
+
+
+void Physics::closePlane(dGeomID plane)
+{
+    dGeomDestroy(plane);
+}
+
+
+dGeomID Physics::initPlane(Vec4 plane, Scene* scene)
+{
+    scene->setSpace(dHashSpaceCreate(0));
+    //scene->Plane = dCreatePlane (scene->getSpace(),0,1,0,0); //todo remove
+    dGeomID g = dCreatePlane(scene->getSpace(),plane.x(),plane.y(),plane.z(),plane.w());
+    scene->setJointGroup(dJointGroupCreate(0));
+    return g;
 }

@@ -37,6 +37,7 @@ private:
     Vec4           viewer[3];  //guarda as posições da camera, eye, at, up
     Vec4           projection;
 
+
     //interface
     GLWidget *parent;
     //graphics
@@ -52,11 +53,15 @@ private:
     Vec4 propKd;
 
 
+
+
     //Controle da pose
     //QTime pose_time;
 
 public:
     int            width,height;
+    dGeomID          Plane;
+    Vec4           rotate_plane;
 
 
 
@@ -168,6 +173,8 @@ public:
     void                  shotBallsCharacterRandom(Character *chara, int posPlevis, float den=100.); //atirar objetos no personagem de forma aleatória
     void                  shotBallsCharacterBody(Object* body, float velocity, float den=100.); //atirar objetos no personagem de acordo com a posição de um corpo, e com determinada velocidade
     void                  habiliteJump();
+    void                  setRotationPlane(Vec4 rot);
+    Vec4                  getRotationPlane();
     //teste de contato
     bool                  isGeometryFootSwing(dGeomID geom);
 
@@ -176,11 +183,11 @@ public:
 
 
     //Graphics
-    void           draw(); //desenha os objetos e/ou juntas com OpenGL
-    void           drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
-    void           drawShadows(); //desenha os objetos e/ou juntas com OpenGL
-    void           loadSceneObjects();
-    void           setRenderMesh(bool b);
+    void                   draw(); //desenha os objetos e/ou juntas com OpenGL
+    void                   drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
+    void                   drawShadows(); //desenha os objetos e/ou juntas com OpenGL
+    void                   loadSceneObjects();
+    void                   setRenderMesh(bool b);
 
 
 };

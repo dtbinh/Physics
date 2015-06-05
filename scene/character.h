@@ -31,6 +31,7 @@ public:
     float alpha;
     bool wire;
     bool shadow_motion;
+    bool has_suitcase;
 public:
     //variaveis publicas
     std::vector<bool**> hierarchy; //variavel q guarda os relacionamentos das juntas de acordo com os corpos que
@@ -93,6 +94,10 @@ public:
     Vec4 getOffset();
     int             findJointIndex(Joint* searchJoint); //encontra o indice de uma junta caso ela exista no personagem
     ControlPD*      getController(int i);
+    void            setSuitcase(int body,float mass);
+    void            deleteSuitcase();
+
+
 
 
 

@@ -319,6 +319,13 @@ GLWidget::GLWidget(QWidget *parent) :
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     density = 0.5; //massa
     velocity = 5.;
+
+
+    scene->setRotationPlane(Vec4(0,0,30));
+
+    //exit(1);
+
+
     //scene->createCharacter();
 
     //scene->createCharacter();
@@ -519,7 +526,7 @@ void GLWidget::drawScene(){
     //Draw::drawSkybox(Vec4(0,0,0),Vec4(20,20,20));
 
     //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
-    Draw::drawGround(10);
+    Draw::drawGround(10,scene->rotate_plane);
     //if (!showInfo){ Draw::drawGroundTexture(10,0);}
     //else{
         //glClearColor(1,0,0,1);
@@ -883,6 +890,14 @@ void GLWidget::simulationRestart()
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     //printf("%s\n",event->text().toUtf8().constData());
+
+    if(event->key() == Qt::Key_P ){
+        if(scene->getCharacter(0)->has_suitcase) scene->getCharacter(0)->deleteSuitcase();
+        else  scene->getCharacter(0)->setSuitcase(3,25.5);
+    }
+
+
+
     if(event->key() == Qt::Key_Space ){
         simulationPlayPause();
     }
@@ -1047,7 +1062,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     }
 
     updateObjects(scene->objectsScene());
-    updateGL();
+    update();
 }
 
 MoCap *GLWidget::pushMotionCapture()
@@ -1592,6 +1607,13 @@ void GLWidget::loadSimulationParameters(QString file)
 
     }
     setToleranceFoot(scene->getCharacter(0)->getBalance()->getSensorTolerance());
+
+
+
+
+
+
+
     //scene->getCharacter(0)->showHierarchies();
     //printf("\nMassa total: %.3f",scene->getCharacter(0)->getMassTotal());
     //scene->createRamp();

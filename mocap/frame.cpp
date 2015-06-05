@@ -62,6 +62,7 @@ Vec4 Frame::getPosition(int i)
 
 QuaternionQ Frame::getOrientation(int i)
 {
+    //if(this->orientations.size()>=i) return QuaternionQ();
     return this->orientations.at(i);
 }
 

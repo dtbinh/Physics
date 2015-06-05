@@ -630,7 +630,7 @@ void Draw::drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double he
 
 
 
-void Draw::drawGround(int size)
+void Draw::drawGround(int size, Vec4 rot)
 {
 
     /*** Anterior
@@ -676,6 +676,11 @@ void Draw::drawGround(int size)
 //    if (!idraw_ground) idraw_ground = true;
 ***/
     //Novo
+    glPushMatrix();
+    //glRotated(rot.x(),1,0,0);
+    //glRotated(rot.y(),0,1,0);
+    glRotated(rot.z(),0,0,1);
+
     glDisable(GL_LIGHTING);
     glLineWidth(3.0);
     glColor3f(0,0,0);
@@ -734,7 +739,7 @@ void Draw::drawGround(int size)
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
 
-    glPushMatrix();
+    //glPushMatrix();
     glBegin(GL_QUADS);
     for(int i=-size;i<=size;i+=2){
         for(int j=-size;j<=size;j+=2){
@@ -746,6 +751,8 @@ void Draw::drawGround(int size)
         }
     }
     glEnd();
+    //glPopMatrix();
+
     glPopMatrix();
 
 
