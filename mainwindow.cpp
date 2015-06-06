@@ -211,6 +211,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->densityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
     connect(ui->velocityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
 
+    //angulo do solo
+    connect(ui->groundx,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
+    connect(ui->groundy,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
+    connect(ui->groundz,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
+
 
     updateListObjects(ui->widgetPhysics->getObjectsList());
     updateListJoints(ui->widgetPhysics->getJointsList());
@@ -629,6 +634,15 @@ void MainWindow::minusFrameEdition()
 void MainWindow::setBallsConfiguration()
 {
     ui->widgetPhysics->setVelocityDensityBalls(ui->densityBall->value(),ui->velocityBall->value());
+}
+
+void MainWindow::setAngleGround()
+{
+    Vec4 ang;
+    ang.setX(ui->groundx->value());
+    ang.setY(ui->groundy->value());
+    ang.setZ(ui->groundz->value());
+    ui->widgetPhysics->updateAngleGround(ang);
 }
 
 

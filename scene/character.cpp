@@ -153,18 +153,18 @@ void Character::drawFootProjected()
 
     if (stance<0 && (foots.size()==2)){
         Cfoot_ = foots.at(0)->getPositionCurrent()+foots.at(1)->getPositionCurrent();
-        Cfoot_.x2 = 0;
+        //Cfoot_.x2 = 0;
         count = 2;
         draw = true;
     }else if(foots.size()>0 && stance>0){
         Cfoot_ = this->getBody(stance)->getPositionCurrent();
-        Cfoot_.x2 = 0;
+        //Cfoot_.x2 = 0;
         count = 1;
         draw = true;
     }else if(stance<0) return;
     if(draw){
         Cfoot_ /= count;
-        Draw::drawTargetProjected(Cfoot_,0.05);
+        Draw::drawTargetProjected(Vec4::projectionPlane(Cfoot_,scene->getRotationPlaneVector(),Vec4()),0.05,Vec4(),scene->getRotationPlane());
     }
 
 }
@@ -172,9 +172,9 @@ void Character::drawFootProjected()
 void Character::drawCOMProjected()
 {
 
-    Vec4 COM_   = this->getPosCOM();
-    COM_ = Vec4(COM_.x(),0,COM_.z());
-    Draw::drawCOMProjected(COM_,0.05,Vec4(1,1,1));
+//    Vec4 COM_   = this->getPosCOM();
+//    COM_ = Vec4(COM_.x(),0,COM_.z());
+    Draw::drawCOMProjected(Vec4::projectionPlane(getPosCOM(),scene->getRotationPlaneVector(),Vec4()),0.05,Vec4(1,1,1),scene->getRotationPlane());
 }
 
 void Character::drawShadowMotion(int frame)

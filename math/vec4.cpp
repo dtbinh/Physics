@@ -124,6 +124,14 @@ Vec4 Vec4::crossProduct(Vec4 a,Vec4 b){
     return r;
 }
 
+Vec4 Vec4::projectionPlane(Vec4 point, Vec4 normal, Vec4 point_plane)
+{
+    Vec4 dir(0,-1,0);
+    float d = point_plane.x()*normal.x() + point_plane.y()*normal.y() + point_plane.z()*normal.z();
+    float t = (- d - (normal.x()*point.x()+normal.y()*point.y()+normal.z()*point.z()))/(normal.x()*dir.x()+normal.y()*dir.y()+normal.z()*dir.z());
+    return point + dir*t;
+}
+
 Vec4 Vec4::operator ^(Vec4 b){
     Vec4 r;
     r.x1 = this->x2*b.x3 - b.x2*this->x3;

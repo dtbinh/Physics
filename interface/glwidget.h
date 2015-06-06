@@ -96,6 +96,7 @@ public slots:
     void setKVelocityLocomotion(Vec4 k);
     void setKDistanceLocomotion(Vec4 k);
     void setVelocityDensityBalls(float den,float vel); //atualiza a densidade e velocidade das bolas
+    void updateAngleGround(Vec4 ang); //atualiza o angulo do solo
 
     //slots personagens
     std::vector<Object*> getObjectsList();

@@ -1284,17 +1284,38 @@ void Scene::setRotationPlane(Vec4 rot)
     QuaternionQ qat(rot);
     initial_vec = qat.getMatrix().vector(initial_vec);
 
-    float rot_ang_z = (Vec4(1,0,0)*initial_vec)/(Vec4(1,0,0).module()*initial_vec.module());
-    float a = acos(rot_ang_z);
-    this->rotate_plane.x3 = 30;//180*a/M_PI;
+    //float rot_ang_z = (Vec4(1,0,0)*initial_vec)/(Vec4(1,0,0).module()*initial_vec.module());
+    //float a = acos(rot_ang_z);
+    //this->rotate_plane.x3 = 30;//180*a/M_PI;
 
-    initial_vec.showVec4();
-    qDebug() << rotate_plane.z();
+    //initial_vec.showVec4();
+    //initial_vec.showVec4();
+    //qDebug() << rotate_plane.z();
     //exit(1);
 
-    this->Plane = Physics::initPlane(initial_vec,this);
+    this->Plane = Physics::initPlane(initial_vec.unitary(),this);
+    restartPhysics();
 
 
+}
+
+Vec4 Scene::getRotationPlane()
+{
+    return this->rotate_plane;
+}
+
+Vec4 Scene::getRotationPlaneVector()
+{
+    Vec4 initial_vec(0,1,0,0);
+
+    QuaternionQ qat(rotate_plane);
+    initial_vec = qat.getMatrix().vector(initial_vec);
+
+    //float rot_ang_z = (Vec4(1,0,0)*initial_vec)/(Vec4(1,0,0).module()*initial_vec.module());
+    //float a = acos(rot_ang_z);
+    //this->rotate_plane.x3 = 30;//180*a/M_PI;
+
+    return initial_vec.unitary();
 }
 
 bool Scene::isGeometryFootSwing(dGeomID geom)

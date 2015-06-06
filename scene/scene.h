@@ -175,6 +175,7 @@ public:
     void                  habiliteJump();
     void                  setRotationPlane(Vec4 rot);
     Vec4                  getRotationPlane();
+    Vec4                  getRotationPlaneVector();
     //teste de contato
     bool                  isGeometryFootSwing(dGeomID geom);
 

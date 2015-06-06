@@ -43,6 +43,8 @@ public:
     //metódos estáticos
     static Vec4            crossProduct(Vec4 a, Vec4 b);          //retorna o resultado do produto vetorial entre dois vetores
 
+    static Vec4            projectionPlane(Vec4 point, Vec4 normal, Vec4 point_plane);
+
 
 };
 

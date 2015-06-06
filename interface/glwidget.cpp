@@ -321,7 +321,7 @@ GLWidget::GLWidget(QWidget *parent) :
     velocity = 5.;
 
 
-    scene->setRotationPlane(Vec4(0,0,30));
+
 
     //exit(1);
 
@@ -1087,7 +1087,7 @@ void GLWidget::drawShadows()
 
 
         /* Draw "top" of floor.  Use blending to blend in reflection (jah foi habilitado o blend). */
-        Draw::drawGround(10);
+        Draw::drawGround(10,scene->getRotationPlane());
 
         if (true) {
 
@@ -1450,6 +1450,16 @@ void GLWidget::setVelocityDensityBalls(float den, float vel)
 {
     density = den;
     velocity = vel;
+}
+
+void GLWidget::updateAngleGround(Vec4 ang)
+{
+    scene->setRotationPlane(ang);
+    Vec4 normal = scene->getRotationPlaneVector();
+    floorPlane[0] = normal.x();
+    floorPlane[1] = normal.y();
+    floorPlane[2] = normal.z();
+    update();
 }
 
 void GLWidget::setAlphaCharacter(int value)

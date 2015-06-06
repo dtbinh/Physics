@@ -6,6 +6,7 @@
 #include "scene/grf.h"
 #include <vector>
 #include "graphics/draw.h"
+#include "scene/scene.h"
 #define ERROR 0.1
 static float tolerance = 50;
 Sensor::Sensor()
@@ -252,26 +253,26 @@ int Sensor::getHierarchy2Use(Character *chara)
             left_foot = false;
         }
         if (left_foot && right_foot){
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+            Draw::drawCircle2D(Vec4::projectionPlane(foots.at(1)->getPositionCurrent(),chara->getScene()->getRotationPlaneVector(),Vec4()),tolerance,Vec4(0,1,0),2.0,chara->getScene()->getRotationPlane());
+            Draw::drawCircle2D(Vec4::projectionPlane(foots.at(0)->getPositionCurrent(),chara->getScene()->getRotationPlaneVector(),Vec4()),tolerance,Vec4(0,1,0),2.0,chara->getScene()->getRotationPlane());
 //            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
 //            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
             return ALL_FOOTS_GROUND+3;
         }
         else if(!left_foot && !right_foot){
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+            Draw::drawCircle2D(Vec4::projectionPlane(foots.at(1)->getPositionCurrent(),chara->getScene()->getRotationPlaneVector(),Vec4()),tolerance,Vec4(0,1,0),2.0,chara->getScene()->getRotationPlane());
+            Draw::drawCircle2D(Vec4::projectionPlane(foots.at(0)->getPositionCurrent(),chara->getScene()->getRotationPlaneVector(),Vec4()),tolerance,Vec4(0,1,0),2.0,chara->getScene()->getRotationPlane());
 //            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
 //            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
             return ALL_FOOTS_GROUND+3;
         }
         else if(left_foot && !right_foot){
-            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+            Draw::drawCircle2D(Vec4::projectionPlane(foots.at(0)->getPositionCurrent(),chara->getScene()->getRotationPlaneVector(),Vec4()),tolerance,Vec4(0,1,0),2.0,chara->getScene()->getRotationPlane());
 //            Draw::drawCircle2D(foots.at(0)->getPositionCurrent().projXZ(),desired2+tolerance,Vec4(1,0,0),2.0);
             return chara->getPositionBody(foots.at(0))+3;
         }
         else if(!left_foot && right_foot){
-            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),tolerance,Vec4(0,1,0),2.0);
+            Draw::drawCircle2D(Vec4::projectionPlane(foots.at(1)->getPositionCurrent(),chara->getScene()->getRotationPlaneVector(),Vec4()),tolerance,Vec4(0,1,0),2.0,chara->getScene()->getRotationPlane());
 //            Draw::drawCircle2D(foots.at(1)->getPositionCurrent().projXZ(),desired1+tolerance,Vec4(1,0,0),2.0);
             return chara->getPositionBody(foots.at(1))+3;
         }else{

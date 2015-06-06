@@ -524,7 +524,7 @@ void Draw::drawCOM(Vec4 position, float size, Vec4 color)
     glDisable(GL_TEXTURE_2D);
 }
 
-void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color)
+void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 {
 
     Material *mat = new Material();
@@ -551,22 +551,28 @@ void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_CLAMP_TO_EDGE);
 
     glPopMatrix();
-    glPushMatrix();
+
+
     //
 
     gluQuadricNormals(quad, GLU_SMOOTH);
     gluQuadricTexture(quad,1);
-    glTranslatef(position.x(),0.005,position.z());
-    glRotatef(90,1.0f,0.0f,0.0f);
+
+    glTranslatef(position.x(),position.y()+0.015,position.z());
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(90+rot.x(),1,0,0);
+    //glRotatef(90,1.0f,0.0f,0.0f);
     //gluQuadricDrawStyle(quad, GLU_FILL);
     gluClosedCylinder(quad,size,size,0.001,25,25);
+
     glPopMatrix();
     delete quad;
     delete mat;
     glDisable(GL_TEXTURE_2D);
 }
 
-void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color)
+void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 {
     Material *mat = new Material();
         Material::setMaterial(mat,MATERIAL_YELLOW_PLASTIC);
@@ -583,10 +589,16 @@ void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color)
 
     glPushMatrix();
 
-    glTranslatef(position.x(),0.01,position.z());
-    glRotatef(90,1.0f,0.0f,0.0f);
+
+    glTranslatef(position.x(),position.y()+0.01,position.z());
+    //glRotatef(90,1.0f,0.0f,0.0f);
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(90+rot.x(),1,0,0);
     gluClosedCylinder(quad,size,size,0.001,25,25);
+
     glPopMatrix();
+
     delete quad;
     delete mat;
 
@@ -677,9 +689,11 @@ void Draw::drawGround(int size, Vec4 rot)
 ***/
     //Novo
     glPushMatrix();
-    //glRotated(rot.x(),1,0,0);
-    //glRotated(rot.y(),0,1,0);
     glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(rot.x(),1,0,0);
+
+
 
     glDisable(GL_LIGHTING);
     glLineWidth(3.0);
@@ -897,8 +911,12 @@ void Draw::drawGroundTexture(int size, int text)
 
 }
 
-void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size)
+void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size, Vec4 rot)
 {
+    glPushMatrix();
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(rot.x(),1,0,0);
     Vec4 vertexs[SEGMENTS];
     float alpha = 2*M_PI / SEGMENTS;
     for (int i = 0;i<SEGMENTS;i++){
@@ -909,12 +927,12 @@ void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size)
     glColor3f(color.x(),color.y(),color.z());
     glBegin(GL_LINE_STRIP);
     for (int i = 0;i<SEGMENTS;i++){
-        glVertex3f(vertexs[i].x(),vertexs[i].y(),vertexs[i].z());
+        glVertex3f(vertexs[i].x(),vertexs[i].y()+0.01,vertexs[i].z());
     }
-    glVertex3f(vertexs[0].x(),vertexs[0].y(),vertexs[0].z());
+    glVertex3f(vertexs[0].x(),vertexs[0].y()+0.01,vertexs[0].z());
     glEnd();
-
     glEnable(GL_LIGHTING);
+    glPopMatrix();
 }
 
 bool sky = true;

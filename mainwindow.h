@@ -58,6 +58,9 @@ public slots:
     //balls shot
     void setBallsConfiguration();
 
+    //modifica disposiçao angular do solo
+    void setAngleGround();
+
 
 private slots:
     void on_actionPlay_Pause_Simulation_triggered();
