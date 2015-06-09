@@ -753,7 +753,7 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
 
     Vec4 gravity;
 
-    if(enable_gravitycomp) gravity = chara->getScene()->getGravity()*mass_total;//*0.8;
+    if(enable_gravitycomp) gravity = chara->getScene()->getGravity()*mass_total*0.9;//*0.8;
 
     Vec wrench;
 
