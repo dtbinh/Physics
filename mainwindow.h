@@ -21,6 +21,7 @@ public slots:
     void updateListJoints(std::vector<Joint*> joints);
     void updateListPoseControl(std::vector<GraphicalPose*> poseControl);
     void updateListPose(std::vector<Pose*> pose);
+    void updateListPoseAngles(std::vector<Joint*> joints);
     void updateControlPD();
     void updateControlPDManipulators();
     void updateControlPDManipulators2();
@@ -37,6 +38,7 @@ public slots:
     void showSelectedObject(int i);
     void showSelectedPoseControl(int i);
     void showSelectedPose(int i);
+    void showSelectedPoseJoint(int i);
     void setGravity();
     void setGravity(Vec4);
     void setSimbiconDistance();
@@ -51,6 +53,7 @@ public slots:
     void checkEnabledCPDP(bool);
     void checkHasCoffeeCup(bool);
     void changePoseTime(double);
+    void changeJointAngle();
 
     //void infoSelectedObject(Object*);
     void applyForce2Object();

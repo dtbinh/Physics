@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>658</width>
-    <height>780</height>
+    <width>735</width>
+    <height>777</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Physics Simulator</string>
@@ -2340,87 +2346,194 @@ QGroupBox{
            <attribute name="title">
             <string>Pose Control</string>
            </attribute>
+           <widget class="QGroupBox" name="groupBox_8">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>360</y>
+              <width>291</width>
+              <height>131</height>
+             </rect>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Pose Control</string>
+            </property>
+            <widget class="QWidget" name="layoutWidget">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>20</y>
+               <width>271</width>
+               <height>101</height>
+              </rect>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <layout class="QVBoxLayout" name="layoutPoseInfo">
+                <item>
+                 <widget class="QLabel" name="correspChar">
+                  <property name="text">
+                   <string>Corresponding Character:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="layoutForPoseTime">
+                  <item>
+                   <widget class="QLabel" name="poseTime">
+                    <property name="text">
+                     <string>Pose Time:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="poseTimeSelector"/>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="updateTimeAll">
+                <property name="text">
+                 <string>Update for all poses</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_13">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>650</y>
+              <width>291</width>
+              <height>61</height>
+             </rect>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Angles</string>
+            </property>
+            <widget class="QWidget" name="layoutWidget">
+             <property name="geometry">
+              <rect>
+               <x>20</x>
+               <y>20</y>
+               <width>261</width>
+               <height>31</height>
+              </rect>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_45">
+              <item>
+               <widget class="QDoubleSpinBox" name="poseJointsAngleX"/>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="poseJointsAngleY"/>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="poseJointsAngleZ"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>30</x>
-              <y>10</y>
-              <width>260</width>
-              <height>450</height>
+              <x>10</x>
+              <y>500</y>
+              <width>291</width>
+              <height>141</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item>
-                <widget class="QLabel" name="label_42">
-                 <property name="text">
-                  <string>Pose Control</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QListWidget" name="listWidgetPoseControl"/>
-               </item>
-              </layout>
+              <widget class="QLabel" name="label_44">
+               <property name="text">
+                <string>Joints</string>
+               </property>
+              </widget>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_6">
-               <item>
-                <widget class="QLabel" name="label_43">
-                 <property name="text">
-                  <string>Poses</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QListWidget" name="listWidgetPose"/>
-               </item>
-              </layout>
+              <widget class="QListWidget" name="listWidgetPoseJoints"/>
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>40</x>
-              <y>500</y>
-              <width>251</width>
-              <height>101</height>
+              <x>10</x>
+              <y>2</y>
+              <width>291</width>
+              <height>141</height>
              </rect>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
-              <layout class="QVBoxLayout" name="layoutPoseInfo">
-               <item>
-                <widget class="QLabel" name="correspChar">
-                 <property name="text">
-                  <string>Corresponding Character:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="layoutForPoseTime">
-                 <item>
-                  <widget class="QLabel" name="poseTime">
-                   <property name="text">
-                    <string>Pose Time:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="poseTimeSelector"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="updateTimeAll">
+              <widget class="QLabel" name="label_42">
                <property name="text">
-                <string>Update for all poses</string>
+                <string>Pose Control</string>
                </property>
               </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="listWidgetPoseControl"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>150</y>
+              <width>291</width>
+              <height>191</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_43">
+               <property name="text">
+                <string>Poses</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="listWidgetPose"/>
              </item>
             </layout>
            </widget>
@@ -2605,7 +2718,7 @@ QGroupBox{
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>658</width>
+     <width>735</width>
      <height>27</height>
     </rect>
    </property>

@@ -14,6 +14,7 @@ Joint*     joint_selected;
 Object*    obj_selected;
 GraphicalPose* pose_control_selected;
 Pose*       pose_selected;
+int         pose_angle_selected;
 bool       updateSimut = false;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -77,6 +78,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->listWidgetPoseControl, SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedPoseControl(int)));
     connect(ui->listWidgetPose, SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedPose(int)));
     connect(ui->poseTimeSelector, SIGNAL(valueChanged(double)),this,SLOT(changePoseTime(double)));
+
+    //manipuladores de ângulos de pose
+    connect(ui->listWidgetJoints, SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedPoseJoint(int)));
+    connect(ui->poseJointsAngleX, SIGNAL(valueChanged(double)), this, SLOT(changeJointAngle()));
+    connect(ui->poseJointsAngleY, SIGNAL(valueChanged(double)), this, SLOT(changeJointAngle()));
+    connect(ui->poseJointsAngleZ, SIGNAL(valueChanged(double)), this, SLOT(changeJointAngle()));
 
     //manipuladores de Objetos
     connect(ui->widgetPhysics,SIGNAL(setForceCharacter()),this,SLOT(applyForce2Object()));
@@ -317,6 +324,22 @@ void MainWindow::updateListPose(std::vector<Pose *> pose)
         }
         s.push_back(name);
         ui->listWidgetPose->addItem(s);
+    }
+}
+
+void MainWindow::updateListPoseAngles(std::vector<Joint *> joints)
+{
+    ui->listWidgetPoseJoints->clear();
+    for (unsigned int i=0; i < joints.size(); i++){
+        QString s;
+        s.setNum(i);
+        s.push_back(" - ");
+        QString name = joints.at(i)->getName();
+        if (name == NULL){
+            name.sprintf("Joint %u", i);
+        }
+        s.push_back(name);
+        ui->listWidgetPoseJoints->addItem(s);
     }
 }
 
@@ -572,7 +595,17 @@ void MainWindow::showSelectedPose(int i)
 {
     pose_selected = pose_control_selected->getPoses().at(i);
     ui->poseTimeSelector->setValue(pose_control_selected->getTimeIntervals().at(i));
+    updateListPoseAngles(pose_selected->getCharacter()->getJoints());
     //ui->xAngPose->setText(ui->xAngPose->text() + " " + pose_selected);
+}
+
+void MainWindow::showSelectedPoseJoint(int i)
+{
+    pose_angle_selected = i;
+    Vec4 angle = pose_selected->getAngles().at(i);
+    ui->poseJointsAngleX->setValue(angle.x());
+    ui->poseJointsAngleY->setValue(angle.y());
+    ui->poseJointsAngleZ->setValue(angle.z());
 }
 
 void MainWindow::setGravity()
@@ -666,6 +699,12 @@ void MainWindow::changePoseTime(double time)
             pose_control_selected->modifyInterval(time, ui->listWidgetPose->currentRow());
         }
     }
+}
+
+void MainWindow::changeJointAngle()
+{
+    Vec4 angle(ui->poseJointsAngleX->value(), ui->poseJointsAngleY->value(), ui->poseJointsAngleZ->value());
+    pose_selected->updateAngle(pose_angle_selected, angle);
 }
 
 void MainWindow::applyForce2Object()
