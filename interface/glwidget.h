@@ -37,10 +37,19 @@ signals:
 
 public slots:
 
+    Scene* getScene();
+
     //slots edição
     void setScreenShot(bool b);
     void setRenderMesh(bool b);
     void setShowInfos(bool b);
+
+    //fricção
+
+    void setFrictionGround(float friction);
+    void setFrictionFootAir(float friction);
+
+
     //slots motion capture
 
     void loadMotionCapture(QString file);

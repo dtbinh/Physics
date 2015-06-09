@@ -36,6 +36,9 @@ private:
     bool           show_grf;
     Vec4           viewer[3];  //guarda as posições da camera, eye, at, up
     Vec4           projection;
+    float          friction_ground;
+    float          friction_foot_air;
+    bool           is_ground_ice;
 
 
     //interface
@@ -162,6 +165,11 @@ public:
     Object*               objectClicked(int width,int height);      //retorna o objeto selecionado no clique da tela
     Object*               getObject(Ray ray); //calcula a interseção do raio com o objeto
 
+    void                  setFrictionGround(float friction);
+    float                 getFrictionGround();
+    void                  setFrictionFootAir(float friction);
+    float                 getFrictionFootAir();
+
 
     void                  setAlphaCharacter(float val); //nao utilizado
     void                  setWireCharacter(bool b); //nao utilizado
@@ -178,6 +186,8 @@ public:
     Vec4                  getRotationPlaneVector();
     //teste de contato
     bool                  isGeometryFootSwing(dGeomID geom);
+
+
 
 
 

@@ -58,11 +58,11 @@ void Physics::nearCallback(void *data, dGeomID o1, dGeomID o2){
                         // friction parameter
                         if (scene!=NULL){
                             if(scene->isGeometryFootSwing(o1)||scene->isGeometryFootSwing(o2))
-                                contact[i].surface.mu = 15.0; //locomoção: 25.0; capoeira: 15.0
+                                contact[i].surface.mu = scene->getFrictionFootAir(); //15.0; //locomoção: 25.0; capoeira: 15.0
                             else
-                                contact[i].surface.mu = dInfinity;
+                                contact[i].surface.mu = scene->getFrictionGround();//dInfinity;
                         }else{
-                            contact[i].surface.mu = dInfinity;
+                            contact[i].surface.mu = scene->getFrictionGround(); //dInfinity;
                         }
                         // bounce is the amount of "bouncyness".
                         contact[i].surface.bounce = 0.5;

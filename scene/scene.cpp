@@ -41,6 +41,8 @@ Scene::Scene(GLWidget *parent)
     motion.clear();
     mocap.clear();
     this->rotate_plane = Vec4(0,0,0);
+    this->friction_ground = 1000;
+    this->friction_foot_air = 15;
 
     //pose_time.start();
 
@@ -106,8 +108,6 @@ void Scene::restartPhysics()
     }
     if(enableGravity) Physics::setGravity(this,this->gravity);
     else Physics::setGravity(this,Vec4());
-    //createLuxo();
-    //createCharacter();
 
 }
 
@@ -1032,6 +1032,29 @@ Object *Scene::getObject(Ray ray)
     }
 
     return objsel;
+}
+
+void Scene::setFrictionGround(float friction)
+{
+    this->friction_ground = friction;
+    if (this->friction_ground<10){ //ice 0.02 ~ 0.09
+        is_ground_ice = true;
+    }
+}
+
+float Scene::getFrictionGround()
+{
+    return this->friction_ground;
+}
+
+void Scene::setFrictionFootAir(float friction)
+{
+    this->friction_foot_air = friction;
+}
+
+float Scene::getFrictionFootAir()
+{
+    return this->friction_foot_air;
 }
 
 void Scene::setAlphaCharacter(float val)

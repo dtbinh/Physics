@@ -61,6 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
+    //ficção
+    connect(ui->frictionFootAir,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionFootAir(float)));
+    connect(ui->frictionGround,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionGround(float)));
 
 
     //manipuladores de junta
@@ -741,6 +744,10 @@ void MainWindow::on_actionOpen_Simulation_triggered()
     ui->checkShowChara->setChecked(true);
     ui->checkShadow->setChecked(false);
     ui->checkWireChara->setChecked(false);
+
+    ui->frictionFootAir->setValue(ui->widgetPhysics->getScene()->getFrictionFootAir());
+    ui->frictionGround->setValue(ui->widgetPhysics->getScene()->getFrictionGround());
+
 }
 
 void MainWindow::on_checkBox_clicked(bool checked)

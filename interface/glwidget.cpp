@@ -1385,6 +1385,11 @@ void GLWidget::setGravity(bool b)
     scene->setGravity(b);
 }
 
+Scene *GLWidget::getScene()
+{
+    return this->scene;
+}
+
 void GLWidget::setProportionalKs(Vec4 ks)
 {
     scene->setProportionalKsPD(ks);
@@ -1606,7 +1611,6 @@ void GLWidget::loadSimulationParameters(QString file)
     updateJoints(scene->jointsScene());
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     setGravity(scene->getGravity());
-    scene->getGravity().showVec4();
     setEnableGravity(scene->hasGravity());
     for(int i=0;i<scene->getSizeCharacter();i++){
         scene->getCharacter(i)->contructHierarchyBodies();
@@ -1649,5 +1653,17 @@ void GLWidget::setRenderMesh(bool b)
 void GLWidget::setShowInfos(bool b)
 {
     showInfo = b;
+}
+
+void GLWidget::setFrictionGround(float friction)
+{
+    this->scene->setFrictionGround(friction);
+    update();
+}
+
+void GLWidget::setFrictionFootAir(float friction)
+{
+    this->scene->setFrictionFootAir(friction);
+    update();
 }
 
