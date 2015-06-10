@@ -1433,6 +1433,12 @@ void GLWidget::setKsRelationshipKs(bool b)
     }
 }
 
+void GLWidget::setGravityCompensation(int value)
+{
+    if(scene->getSizeCharacter()<1) return;
+    scene->getCharacter(0)->getBalance()->setCompensationGravity(value/100.);
+}
+
 void GLWidget::setLimitCone(int val)
 {
     if(scene->getSizeCharacter()<1) return;
@@ -1655,13 +1661,13 @@ void GLWidget::setShowInfos(bool b)
     showInfo = b;
 }
 
-void GLWidget::setFrictionGround(float friction)
+void GLWidget::setFrictionGround(double friction)
 {
     this->scene->setFrictionGround(friction);
     update();
 }
 
-void GLWidget::setFrictionFootAir(float friction)
+void GLWidget::setFrictionFootAir(double friction)
 {
     this->scene->setFrictionFootAir(friction);
     update();

@@ -46,8 +46,8 @@ public slots:
 
     //fricção
 
-    void setFrictionGround(float friction);
-    void setFrictionFootAir(float friction);
+    void setFrictionGround(double friction);
+    void setFrictionFootAir(double friction);
 
 
     //slots motion capture
@@ -90,6 +90,7 @@ public slots:
     void setAngleBodyBalance(Vec4 v);
     void setEnableMomentumBalance(bool b);
     void setKsRelationshipKs(bool b);
+    void setGravityCompensation(int value);
 
     //cone de ficção
     void setLimitCone(int val);

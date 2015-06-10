@@ -47,6 +47,7 @@ class Balance
     float min_jump;
     float max_jump;
     float sensor_tolerance;
+    float grav_comp;
 
 
 
@@ -88,6 +89,10 @@ public:
     //suavidade
     void  setStepsInterpolation(float limit);
     float getStepsInterpolation();
+
+    //compensação da gravidade
+    void  setCompensationGravity(double val); //val [0,1]
+    float getCompensationGravity(); //val [0,1]
 
     //cone de ficção
     void setLimitCone(float v);

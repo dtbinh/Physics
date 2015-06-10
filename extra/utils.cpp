@@ -578,6 +578,9 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         QDomElement info = doc.createElement( "Character" ); //cabeçalho
         QDomElement sim = doc.createElement("Simulation");   //simulação
         sim.setAttribute("Steps",scene->getSimStep());
+        sim.setAttribute("FrictionGround", scene->getFrictionGround());
+        sim.setAttribute("FrictionFootAir", scene->getFrictionFootAir());
+
 
         QDomElement mocap = doc.createElement("MoCap");   //mocap
         mocap.setAttribute("FileMocap",scene->getCharacter(i)->getMoCap()->getAddressFile());
@@ -732,6 +735,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         balanceControl.setAttribute("EnableForce",(int)scene->getCharacter(i)->getBalance()->getEnableForce());
         balanceControl.setAttribute("EnableTorque",(int)scene->getCharacter(i)->getBalance()->getEnableTorque());
         balanceControl.setAttribute("EnableMomentum",(int)scene->getCharacter(i)->getBalance()->getEnableMomentum());
+        balanceControl.setAttribute("GravityCompensation",scene->getCharacter(i)->getBalance()->getCompensationGravity());
         QuaternionQ q = scene->getCharacter(i)->getBalance()->getDesiredQuaternion();
         QDomElement quatTq = doc.createElement("QuaternionTorque");
         quatTq.setAttribute("w",q.getScalar());
@@ -777,6 +781,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         kangBal.setAttribute("z",vec.z());
         balanceControl.appendChild(kangBal);
 
+
         QDomElement cone = doc.createElement("FrictionCone");
         cone.setAttribute("Module",scene->getCharacter(i)->getBalance()->getMCone());
         cone.setAttribute("Height",scene->getCharacter(i)->getBalance()->getHeightCone());
@@ -785,6 +790,8 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         cone.setAttribute("Limits",scene->getCharacter(i)->getBalance()->getLimitCone());
         //sensor tolerance
         cone.setAttribute("SensorTol",scene->getCharacter(i)->getBalance()->getSensorTolerance());
+        //steps
+        cone.setAttribute("StepsInterpolation",scene->getCharacter(i)->getBalance()->getStepsInterpolation());
         balanceControl.appendChild(cone);
 
         QDomElement locomotion = doc.createElement("LocomotionParameters");
@@ -849,6 +856,17 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 QDomElement sime = sim.toElement();
                 int steps = sime.attribute("Steps","").toInt();
                 scene->setSimStep(steps);
+
+                float fric = sime.attribute("FrictionGround","-1").toFloat();
+                if (fric>=0)
+                    scene->setFrictionGround(fric);
+                fric = sime.attribute("FrictionFootAir","-1").toFloat();
+                if (fric>=0)
+                    scene->setFrictionFootAir(fric);
+
+
+
+
                 sim = e.firstChildElement("Gravity");
                 sime = sim.toElement();
                 int b = sime.attribute("Enable","").toInt();
@@ -1033,10 +1051,14 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 bool enablet = (bool)sime.attribute("EnableTorque","").toInt();
                 bool enablef = (bool)sime.attribute("EnableForce","").toInt();
                 bool enablem = (bool)sime.attribute("EnableMomentum","").toInt();
+                float grav = 1.0;
+
+                grav = sime.attribute("GravityCompensation","1.0").toFloat();
 
                 chara->getBalance()->setEnableForce(enablef);
                 chara->getBalance()->setEnableTorque(enablet);
                 chara->getBalance()->setEnableMomentum(enablem);
+                chara->getBalance()->setCompensationGravity(grav);
 
                 QDomElement prop = sime.firstChildElement("QuaternionTorque").toElement();
                 w = prop.attribute("w","").toFloat();
@@ -1087,7 +1109,10 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 chara->getBalance()->setRadiusCone(prop.attribute("Radius","").toFloat());
                 chara->getBalance()->setMCone(prop.attribute("Module","").toFloat());
                 chara->getBalance()->setLimitCone(prop.attribute("Limits","").toFloat());
-                chara->getBalance()->setSensorTolerance(prop.attribute("SensorTol","").toFloat());
+
+                chara->getBalance()->setSensorTolerance(prop.attribute("SensorTol","0.3").toFloat());
+                chara->getBalance()->setStepsInterpolation(prop.attribute("StepsInterpolation","100").toFloat());
+
                 QDomElement propinfo = sime.firstChildElement("LocomotionParameters").toElement();
                 prop = propinfo.firstChildElement("LocomotionVelocity").toElement();
                 x = prop.attribute("x","").toFloat();

@@ -44,6 +44,7 @@ Balance::Balance(Character* chara)
     this->limitsteps = 20.;
     sensor_tolerance = 0.25;
     enable_gravitycomp = true;
+    this->grav_comp = 1.0;
 }
 
 void Balance::contructRelationJointsBodies()
@@ -479,6 +480,16 @@ float Balance::getStepsInterpolation()
     return limitsteps;
 }
 
+void Balance::setCompensationGravity(double val)
+{
+    this->grav_comp = val;
+}
+
+float Balance::getCompensationGravity()
+{
+    return this->grav_comp;
+}
+
 void Balance::setLimitCone(float v)
 {
     this->limit = v;
@@ -753,7 +764,7 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
 
     Vec4 gravity;
 
-    if(enable_gravitycomp) gravity = chara->getScene()->getGravity()*mass_total*0.9;//*0.8;
+    if(enable_gravitycomp) gravity = chara->getScene()->getGravity()*mass_total*(grav_comp);//*0.8;
 
     Vec wrench;
 

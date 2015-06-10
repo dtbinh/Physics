@@ -62,8 +62,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     //ficção
-    connect(ui->frictionFootAir,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionFootAir(float)));
-    connect(ui->frictionGround,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionGround(float)));
+    connect(ui->frictionFootAir,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionFootAir(double)));
+    connect(ui->frictionGround,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionGround(double)));
+
+    //compensação da gravidade
+    connect(ui->gravComp,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setGravityCompensation(int)));
 
 
     //manipuladores de junta
@@ -747,6 +750,11 @@ void MainWindow::on_actionOpen_Simulation_triggered()
 
     ui->frictionFootAir->setValue(ui->widgetPhysics->getScene()->getFrictionFootAir());
     ui->frictionGround->setValue(ui->widgetPhysics->getScene()->getFrictionGround());
+
+    if(ui->widgetPhysics->getScene()->getSizeCharacter()>0){
+        ui->gravComp->setValue((int)(ui->widgetPhysics->getScene()->getCharacter(0)->getBalance()->getCompensationGravity()*100.));
+        ui->stepsInterpolation->setValue(ui->widgetPhysics->getScene()->getCharacter(0)->getBalance()->getStepsInterpolation());
+    }
 
 }
 
