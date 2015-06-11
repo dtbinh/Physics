@@ -63,7 +63,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>3</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -1656,7 +1656,11 @@ QGroupBox{
            </attribute>
            <layout class="QGridLayout" name="gridLayout_12">
             <item row="0" column="0">
-             <widget class="QListWidget" name="listWidgetObjects"/>
+             <widget class="QListWidget" name="listWidgetObjects">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QGroupBox" name="groupBox_9">

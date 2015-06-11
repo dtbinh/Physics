@@ -29,6 +29,15 @@
 
 #include <cmath>
 
+static int stencilReflection = 1, stencilShadow = 1;
+static int  renderReflection = 1;
+
+GLfloat lightZeroPosition[] = {10.0, 14.0, 10.0, 1.0};
+GLfloat lightZeroColor[] = {0.8, 1.0, 0.8, 1.0}; /* green-tinted */
+GLfloat lightOnePosition[] = {-1.0, 1.0, 1.0, 0.0};
+GLfloat lightOneColor[] = {0.6, 0.3, 0.2, 1.0}; /* red-tinted */
+GLfloat skinColor[] = {0.1, 1.0, 0.1, 1.0}, eyeColor[] = {1.0, 0.2, 0.2, 1.0};
+
 bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
@@ -55,6 +64,9 @@ static float last_y = 0.0;
 #define SET_OBJECT 1
 Camera* cam = new Camera();
 static float savedCamera[9];
+
+Vec4 vector_draw_direction;
+
 //variáveis trackball
 
 int 	winWidth, winHeight;
@@ -155,7 +167,9 @@ Vec4 cam_at  = Vec4(0,1,0);
 int ciclo = 0;
 int ciclo_arrow = 0;
 int angle_quat = 0;
-int angle_direction = 0;
+int angle_directiony = 0;
+int angle_directionx = 0;
+int angle_directionz = 0;
 bool shadow = false;
 //variaveis de camera
 //int width,height;
@@ -280,7 +294,7 @@ void stopMotion(int x, int y)
 
 GLfloat floorShadow[4][4];
 GLfloat floorPlane[4] = {0,1.,0,0};
-GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 0.0 };
+GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 1.0 };
 
 //****************
 
@@ -488,7 +502,10 @@ void GLWidget::drawScene(){
     //fim de determinação da camera
     glPushMatrix();
 
-    if (shadow) drawShadows();
+    if (shadow){
+        if (scene->isGroundIce()) drawReflections();
+        else drawShadows();
+    }
     if (!sim_pause) if (load_exemple_curve) showCurveExample();
     if (show_character){
 
@@ -506,6 +523,7 @@ void GLWidget::drawScene(){
         }
         if (ciclo_arrow>0){
             Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
+            //Draw::drawArrow(angle_quat,scene->getCharacter(0)->getPosCOM());
             ciclo_arrow++;
             if(ciclo_arrow>30) ciclo_arrow = 0;
         }
@@ -526,7 +544,7 @@ void GLWidget::drawScene(){
     //Draw::drawSkybox(Vec4(0,0,0),Vec4(20,20,20));
 
     //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
-    Draw::drawGround(10,scene->rotate_plane);
+    Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
     //if (!showInfo){ Draw::drawGroundTexture(10,0);}
     //else{
         //glClearColor(1,0,0,1);
@@ -686,7 +704,7 @@ void GLWidget::drawParameters()
 
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
 
     drawScene();
@@ -983,23 +1001,59 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_F ){
         setForceCharacter();
     }
-    if(event->key() == Qt::Key_Up){
+//    if(event->key() == Qt::Key_Up){
+//        if(manipulate==SET_OBJECT){
+//            Object *obj = scene->getCharacter(0)->getObjectSelected();
+//            if (obj==NULL) return;
+//            Vec4 pos = obj->getTarget();
+//            pos += Vec4(0.05,0,0);
+//            obj->setTarget(pos);
+//            updateObject(obj);
+//        }
+//    }
+//    if(event->key() == Qt::Key_Down){
+//        if(manipulate==SET_OBJECT){
+//            Object *obj = scene->getCharacter(0)->getObjectSelected();
+//            if (obj==NULL) return;
+//            Vec4 pos = obj->getTarget();
+//            pos += Vec4(-0.05,0,0);
+//            obj->setTarget(pos);
+//            updateObject(obj);
+//        }
+
+//    }
+    if(event->key() == Qt::Key_Left && event->modifiers()==Qt::CTRL){
         if(manipulate==SET_OBJECT){
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(0.05,0,0);
+            pos += Vec4(0,0,0.05);
             obj->setTarget(pos);
+            updateObject(obj);
+            return;
+        }else{
+            angle_directionz=angle_directionz+1;
+            setAngleDirectionZ(angle_directionz);
         }
+        update();
+        return;
     }
-    if(event->key() == Qt::Key_Down){
+    if(event->key() == Qt::Key_Right && event->modifiers()==Qt::CTRL){
         if(manipulate==SET_OBJECT){
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(-0.05,0,0);
+            pos += Vec4(0,0,-0.05);
             obj->setTarget(pos);
+            updateObject(obj);
+            return;
+
+        }else{
+            angle_directionz=angle_directionz-1;
+            setAngleDirectionZ(angle_directionz);
         }
+        update();
+        return;
 
     }
 
@@ -1009,11 +1063,13 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(0,0,0.05);
+            pos += Vec4(-0.05,0,0);
             obj->setTarget(pos);
+            updateObject(obj);
+            return;
         }else{
-            angle_direction=angle_direction-1;
-            setAngleDirection(angle_direction);
+            angle_directiony=angle_directiony+1;
+            setAngleDirectionY(angle_directiony);
         }
     }
     if(event->key() == Qt::Key_Right){
@@ -1021,11 +1077,42 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(0,0,-0.05);
+            pos += Vec4(0.05,0,0);
             obj->setTarget(pos);
+            updateObject(obj);
+            return;
         }else{
-            angle_direction=angle_direction+1;
-            setAngleDirection(angle_direction);
+            angle_directiony=angle_directiony-1;
+            setAngleDirectionY(angle_directiony);
+        }
+    }
+
+    if(event->key() == Qt::Key_Up){
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0,0.05,0);
+            obj->setTarget(pos);
+            updateObject(obj);
+            return;
+        }else{
+            angle_directionx=angle_directionx-1;
+            setAngleDirectionX(angle_directionx);
+        }
+    }
+    if(event->key() == Qt::Key_Down){
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0,-0.05,0);
+            obj->setTarget(pos);
+            updateObject(obj);
+            return;
+        }else{
+            angle_directionx=angle_directionx+1;
+            setAngleDirectionX(angle_directionx);
         }
 
     }
@@ -1139,6 +1226,129 @@ void GLWidget::drawShadows()
         glPopMatrix();
 }
 
+void GLWidget::drawReflections()
+{
+    Draw::shadowMatrix(floorShadow, floorPlane, lightPosition7);
+
+      glPushMatrix();
+
+        if (renderReflection) {
+          /* We can eliminate the visual "artifact" of seeing the "flipped"
+             dinosaur underneath the floor by using stencil.  The idea is
+               draw the floor without color or depth update but so that
+               a stencil value of one is where the floor will be.  Later when
+               rendering the dinosaur reflection, we will only update pixels
+               with a stencil value of 1 to make sure the reflection only
+               lives on the floor, not below the floor. */
+
+          /* Don't update color or depth. */
+          glDisable(GL_DEPTH_TEST);
+          glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+          /* Draw 1 into the stencil buffer. */
+          glEnable(GL_STENCIL_TEST);
+          glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+          glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
+
+          /* Now render floor; floor pixels just get their stencil set to 1. */
+          Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
+
+          /* Re-enable update of color and depth. */
+          glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+          glEnable(GL_DEPTH_TEST);
+
+          /* Now, only render where stencil is set to 1. */
+          glStencilFunc(GL_EQUAL, 1, 0xffffffff);  /* draw if ==1 */
+          glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+          glPushMatrix();
+
+            /* The critical reflection step: Reflect dinosaur through the floor
+               (the Y=0 plane) to make a relection. */
+            glScalef(1.0, -1.0, 1.0);
+
+            /* Enable front face culling. */
+            glCullFace(GL_FRONT);
+
+            /* Draw the reflected dinosaur. */
+            scene->drawShadows();
+              //drawReflections();
+
+            /* Re-enable back face culling. */
+            glCullFace(GL_BACK);
+
+          glPopMatrix();
+
+          glDisable(GL_STENCIL_TEST);
+        }
+
+        /* Back face culling will get used to only draw either the top or the
+           bottom floor.  This let's us get a floor with two distinct
+           appearances.  The top floor surface is reflective and kind of red.
+           The bottom floor surface is not reflective and blue. */
+
+        /* Draw "bottom" of floor in blue. */
+        glFrontFace(GL_CW);  /* Switch face orientation. */
+        //retira a transparencia da parte de baixo do chao (tornando-se opaca)
+        //glDisable(GL_LIGHTING);
+        //glColor4f(1.0, 1.0, 1.0, 1.0);
+        Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
+        //glEnable(GL_LIGHTING);
+        glFrontFace(GL_CCW);
+
+        if (1) {
+            /* Draw the floor with stencil value 3.  This helps us only
+               draw the shadow once per floor pixel (and only on the
+               floor pixels). */
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 3, 0xffffffff);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        }
+
+        /* Draw "top" of floor.  Use blending to blend in reflection (jah foi habilitado o blend). */
+        Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
+
+        if (1) {
+
+          /* Render the projected shadow. */
+
+          /* Now, only render where stencil is set above 2 (ie, 3 where
+               the top floor is).  Update stencil with 2 where the shadow
+               gets drawn so we don't redraw (and accidently reblend) the
+               shadow). */
+          glStencilFunc(GL_LESS, 2, 0xffffffff);  /* draw if ==1 */
+          glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+
+          /* To eliminate depth buffer artifacts, we use polygon offset
+             to raise the depth of the projected shadow slightly so
+             that it does not depth buffer alias with the floor. */
+          //glEnable(GL_POLYGON_OFFSET_EXT);
+          glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(-2.0, -1.0);
+
+          /* Render 50% black shadow color on top of whatever the
+             floor appareance is. */
+          glDisable(GL_LIGHTING);  /* Force the 20% black. */
+          glColor4f(0.0, 0.0, 0.0, 0.5);
+
+          glPushMatrix();
+            /* Project the shadow. */
+            glMultMatrixf((GLfloat *) floorShadow);
+            scene->drawShadows();
+          glPopMatrix();
+
+          glEnable(GL_LIGHTING);
+
+          //glDisable(GL_POLYGON_OFFSET_EXT);
+          glDisable(GL_POLYGON_OFFSET_FILL);
+
+          glDisable(GL_STENCIL_TEST);
+        }
+
+      glPopMatrix();
+
+}
+
 void GLWidget::loadCurveExample()
 {
     curve_quat.clear();
@@ -1185,7 +1395,7 @@ void GLWidget::showCurveExample()
     if(time_current>total_time){ time_current = 0;
     }
 
-    setAngleDirection(q.toEuler().y());
+    setAngleDirectionY(q.toEuler().y());
     //time_m = total_time;
 }
 
@@ -1555,9 +1765,12 @@ void GLWidget::setAngleBodyBalance(Vec4 v)
 {
    if(!(scene->getSizeCharacter()>0)) return;
    scene->setAngleBodyBalance(v);
+   vector_draw_direction = v;
    angle_quat = v.y();
    ciclo_arrow = 1;
-   angle_direction = v.y();
+   angle_directiony = v.y();
+   angle_directionx = v.x();
+   angle_directionz = v.z();
 }
 
 
@@ -1671,5 +1884,12 @@ void GLWidget::setFrictionFootAir(double friction)
 {
     this->scene->setFrictionFootAir(friction);
     update();
+}
+
+void GLWidget::updateMotionPosition(int i)
+{
+    scene->getCharacter(0)->getMoCap()->setCurrentFrame(i);
+    scene->setFrameCurrent(i);
+    if(scene->getCharacter(0)->offset.module()==0) scene->getCharacter(0)->getMoCap()->initializePosesModel(i);
 }
 

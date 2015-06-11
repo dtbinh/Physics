@@ -16,6 +16,7 @@ class GLWidget : public QGLWidget
 signals:
     void updateObjects(std::vector<Object*>);
     void updateJoints(std::vector<Joint*>);
+    void updateObject(Object*);
     void updateKsProp(Vec4);
     void updateKdProp(Vec4);
     void updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4);
@@ -32,7 +33,9 @@ signals:
     void setEndClycleWidget(int);
     void setGravity(Vec4 v);
     void setEnableGravity(bool);
-    void setAngleDirection(int);
+    void setAngleDirectionY(int);
+    void setAngleDirectionX(int);
+    void setAngleDirectionZ(int);
     void setToleranceFoot(double);
 
 public slots:
@@ -52,6 +55,7 @@ public slots:
 
     //slots motion capture
 
+    void updateMotionPosition(int pos);
     void loadMotionCapture(QString file);
     void loadFramesConfig(QString file);
     void saveFramesConfig(QString file);
@@ -177,6 +181,7 @@ public:
     //funções extras
     MoCap* pushMotionCapture();
     void drawShadows();
+    void drawReflections();
     void loadCurveExample();
     void showCurveExample();
     void setScreenShot();

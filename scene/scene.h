@@ -169,6 +169,7 @@ public:
     float                 getFrictionGround();
     void                  setFrictionFootAir(float friction);
     float                 getFrictionFootAir();
+    bool                  isGroundIce();
 
 
     void                  setAlphaCharacter(float val); //nao utilizado
@@ -201,6 +202,7 @@ public:
     void                   setRenderMesh(bool b);
 
 
+    void setFrameCurrent(int i);
 };
 
 #endif // SCENE_H

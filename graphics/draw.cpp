@@ -642,7 +642,7 @@ void Draw::drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double he
 
 
 
-void Draw::drawGround(int size, Vec4 rot)
+void Draw::drawGround(int size, Vec4 rot, float reflect)
 {
 
     /*** Anterior
@@ -693,7 +693,11 @@ void Draw::drawGround(int size, Vec4 rot)
     glRotated(rot.y(),0,1,0);
     glRotated(rot.x(),1,0,0);
 
-
+    if(reflect){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(1.0,1.0,1.0, 0.5);
+    }
 
     glDisable(GL_LIGHTING);
     glLineWidth(3.0);
@@ -746,28 +750,40 @@ void Draw::drawGround(int size, Vec4 rot)
     glEnd();
     glEnable(GL_LIGHTING);
     Material *mat = new Material();
-    mat->setMaterial(mat,MATERIAL_BRASS);
+    if(reflect){
+        mat->setMaterial(mat,MATERIAL_ICE);
+    }else{
+        mat->setMaterial(mat,MATERIAL_BRASS);
+    }
+    //const GLfloat whiteTranspMaterial[]={1.0,1.0,1.0,0.5};
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    //glEnable(GL_TEXTURE_2D);
 
+//     glVertex3f(-dim,0.0,+dim);
+//             glVertex3f(+dim,0.0,+dim);
+//             glVertex3f(+dim,0.0,-dim);
+//            ; glVertex3f(-dim,0.0,-dim);
     //glPushMatrix();
     glBegin(GL_QUADS);
     for(int i=-size;i<=size;i+=2){
         for(int j=-size;j<=size;j+=2){
             glNormal3f(0,1,0);
-            glVertex3f(i,0,j);
-            glVertex3f(i,0,j+2);
-            glVertex3f(i+2,0,j+2);
-            glVertex3f(i+2,0,j);
+            glTexCoord2d(0.0,0.0); glVertex3f(i,0,j);
+            glTexCoord2d(10.0,0.0); glVertex3f(i,0,j+2);
+            glTexCoord2d(10.0,10.0); glVertex3f(i+2,0,j+2);
+            glTexCoord2d(0.0,10.0); glVertex3f(i+2,0,j);
         }
     }
     glEnd();
     //glPopMatrix();
 
     glPopMatrix();
+
+    //glDisable(GL_TEXTURE_2D);
 
 
     delete mat;
@@ -1405,6 +1421,56 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     delete mat;
 
 }
+
+void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 direction, float size,int material, Vec4 ground_inclination)
+{
+    glPushMatrix();
+    GLUquadricObj *quad = gluNewQuadric();
+    float larg = size;
+    Vec4 from = origin;
+    Vec4 to = direction*size+origin;
+    Vec4 from2to = to-from;
+    float tam = from2to.module();
+    from2to.normalize();
+    Material *mat = new Material();
+    mat->setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    glPushMatrix();
+    //transformacao
+    Vec4 k = Vec4( 0.0,0.0,1.0 );
+    Vec4 axis = k^from2to;
+    float angle = acos(k*from2to);
+    QuaternionQ quat;
+    quat.fromAxisAngle(axis,angle*180/M_PI);
+    if (from2to.z()==-1.0) quat.fromAxisAngle( Vec4(1.0,0.0,0.0), 180.0 );
+    dQuaternion dQ;
+    to_dQuaternion(quat,dQ);
+    dMatrix3 R;
+    dQtoR(dQ,R);
+    dVector3 pos;
+    pos[0] = from.x(); pos[1] = from.y(); pos[2] = from.z();
+    setTransformODE(pos,R);
+    //desenha seta
+    if (larg == 0.0) {
+        gluClosedCylinder(quad, 0.03*tam, 0.03*tam, tam, 10, 10);
+        glTranslated(0,0,tam);
+        gluClosedCylinder(quad, 0.1*tam, 0.0, 0.2*tam, 10, 10);
+    } else {
+        gluClosedCylinder(quad, 0.03*2.0*larg, 0.03*2.0*larg, tam, 10, 10);
+        glTranslated(0,0,tam);
+        gluClosedCylinder(quad, 0.1*larg, 0.0, 0.2*larg, 10, 10);
+    }
+    glPopMatrix();
+
+    glPopMatrix();
+    gluDeleteQuadric( quad );
+    delete mat;
+
+}
+
 
 void Draw::drawArrow2D(float angle, Vec4 anchor)
 {

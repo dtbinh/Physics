@@ -626,7 +626,28 @@ void Material::setMaterial(Material *mat, int type)
         mat->diffuse[2] = 0.4;
         mat->diffuse[3] = 1.0;
 
+
         mat->shininess = 0.078125;
+        break;
+
+    }
+    case MATERIAL_ICE:{
+        mat->ambient[0] = 0.7;
+        mat->ambient[1] = 0.7;
+        mat->ambient[2] = 1.0;
+        mat->ambient[3] = 0.45;
+
+        mat->specular[0] = 0.0;
+        mat->specular[1] = 0.0;
+        mat->specular[2] = 0.0;
+        mat->specular[3] = 0.0;
+
+        mat->diffuse[0] = 0.7;
+        mat->diffuse[1] = 0.7;
+        mat->diffuse[2] = 1.0;
+        mat->diffuse[3] = 0.45;
+
+        mat->shininess = 0.0;
         break;
 
     }

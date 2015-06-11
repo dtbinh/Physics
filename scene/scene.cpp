@@ -1037,8 +1037,10 @@ Object *Scene::getObject(Ray ray)
 void Scene::setFrictionGround(float friction)
 {
     this->friction_ground = friction;
-    if (this->friction_ground<10){ //ice 0.02 ~ 0.09
+    if (this->friction_ground<2){ //ice 0.02 ~ 0.09
         is_ground_ice = true;
+    }else{
+        is_ground_ice = false;
     }
 }
 
@@ -1055,6 +1057,16 @@ void Scene::setFrictionFootAir(float friction)
 float Scene::getFrictionFootAir()
 {
     return this->friction_foot_air;
+}
+
+void Scene::setFrameCurrent(int i)
+{
+    frame_step = i;
+}
+
+bool Scene::isGroundIce()
+{
+    return is_ground_ice;
 }
 
 void Scene::setAlphaCharacter(float val)

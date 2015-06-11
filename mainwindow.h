@@ -46,10 +46,13 @@ public slots:
     void checkEnabledCPDP(bool);
     void checkHasCoffeeCup(bool);
 
-    //void infoSelectedObject(Object*);
+    void refactorOptions(int);
+
+    void infoSelectedObject(Object*);
     void applyForce2Object();
     void setMaxTimeLine(int v);
     void adjustTolerance(double t);
+
 
     //manipuladores via keyboard
     void plusFrameEdition();

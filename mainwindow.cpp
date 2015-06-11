@@ -22,10 +22,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->showMaximized();
     //ui->toleranciaCOM->setVisible(false);
+//    ui->listWidgetObjects->setBackgroundRole(QPalette(
+//                                                 QColor));
 
 //    ui->actionOpen_Simulation->setShortcut(Qt::Key_0);
     ui->groupBoxCone->setVisible(false);
     ui->widgetPhysics->setObjectSelected(-1);
+
+    connect(ui->Options,SIGNAL(currentChanged(int)),this,SLOT(refactorOptions(int)));
+
     connect(ui->checkScreenShot,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setScreenShot(bool)));
     connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
     connect(ui->infoShow,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowInfos(bool)));
@@ -35,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
+    connect(ui->timeLineMotion,SIGNAL(sliderMoved(int)),ui->widgetPhysics,SLOT(updateMotionPosition(int)));
+
+
     connect(ui->sensorTolerance,SIGNAL(valueChanged(double)),this,SLOT(adjustTolerance(double)));
     connect(ui->widgetPhysics,SIGNAL(setToleranceFoot(double)),ui->sensorTolerance,SLOT(setValue(double)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
@@ -58,6 +66,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->enableGravity,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setGravity(bool)));
     connect(ui->widgetPhysics,SIGNAL(setEnableGravity(bool)),ui->enableGravity,SLOT(setChecked(bool)));
     connect(ui->kdtoks,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setKsRelationshipKs(bool)));
+
+    //objeto
+    connect(ui->widgetPhysics,SIGNAL(updateObject(Object*)),this,SLOT(infoSelectedObject(Object*)));
 
 
 
@@ -129,7 +140,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->checkGRF,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowGRF(bool)));
 
         //manipuladores de equilíbrio
-    connect(ui->widgetPhysics,SIGNAL(setAngleDirection(int)),ui->angleBalBodyy,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirectionY(int)),ui->angleBalBodyy,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirectionX(int)),ui->angleBalBodyx,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirectionZ(int)),ui->angleBalBodyz,SLOT(setValue(int)));
 
     connect(ui->angleBalBodyx,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
     connect(ui->angleBalBodyy,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
@@ -601,6 +614,62 @@ void MainWindow::checkEnabledCPDP(bool b)
 void MainWindow::checkHasCoffeeCup(bool b)
 {
     if (obj_selected!=NULL) obj_selected->setCoffeeCup(b);
+}
+
+void MainWindow::refactorOptions(int index)
+{
+    if (index == 3) {
+        if(obj_selected!=NULL)
+            ui->listWidgetObjects->setCurrentRow(obj_selected->getScene()->getCharacter(0)->getIdObject(obj_selected));
+    }
+}
+
+
+void MainWindow::infoSelectedObject(Object *obj)
+{
+    if(obj==NULL) return;
+    disconnect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
+    disconnect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
+    obj_selected = obj;
+    int i = obj->getScene()->getCharacter(0)->getIdObject(obj);
+
+//    ui->listWidgetObjects->setCurrentRow(i);
+//    ui->listWidgetObjects->setSelectionModel(;);
+    Vec4 targ = obj_selected->getTarget();
+    disconnect(ui->posx_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    disconnect(ui->posy_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    disconnect(ui->posz_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    ui->posx_target->setValue(targ.x());
+    ui->posy_target->setValue(targ.y());
+    ui->posz_target->setValue(targ.z());
+    connect(ui->posx_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posy_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posz_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    //ui->listWidgetObjects->itemClicked(ui->listWidgetObjects->item(i));
+    //ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
+    //ui->listWidgetObjects->setCurrentRow(obj_selected->getScene()->getCharacter(0)->getIdObject(obj_selected));
+    //ui->listWidgetObjects->item(i)->setHidden(true);
+
+
+//    ui->listWidgetObjects->itemPressed(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemClicked(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemEntered(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemSelectionChanged();
+    ui->listWidgetObjects->item(i)->setSelected(true);
+    //qDebug() <<"Nome " << ui->listWidgetObjects->item(i)->text();
+    //ui->listWidgetObjects->item(i)->setBackgroundColor(QColor(1.0,1.0,0));
+    //ui->listWidgetObjects->setFocus();
+
+    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
+    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
+
+    ui->listWidgetObjects->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->listWidgetObjects->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+
+
 }
 
 void MainWindow::applyForce2Object()
