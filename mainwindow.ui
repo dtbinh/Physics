@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>735</width>
-    <height>777</height>
+    <height>779</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -800,7 +800,7 @@ QGroupBox{
                <x>3</x>
                <y>3</y>
                <width>291</width>
-               <height>236</height>
+               <height>246</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -2350,9 +2350,9 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>360</y>
+              <y>190</y>
               <width>291</width>
-              <height>131</height>
+              <height>121</height>
              </rect>
             </property>
             <property name="sizePolicy">
@@ -2407,7 +2407,14 @@ QGroupBox{
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="poseTimeSelector"/>
+                   <widget class="QDoubleSpinBox" name="poseTimeSelector">
+                    <property name="minimum">
+                     <double>1.000000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>10000.000000000000000</double>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -2427,7 +2434,7 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>650</y>
+              <y>420</y>
               <width>291</width>
               <height>61</height>
              </rect>
@@ -2454,19 +2461,40 @@ QGroupBox{
               <rect>
                <x>20</x>
                <y>20</y>
-               <width>261</width>
+               <width>251</width>
                <height>31</height>
               </rect>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_45">
               <item>
-               <widget class="QDoubleSpinBox" name="poseJointsAngleX"/>
+               <widget class="QDoubleSpinBox" name="poseJointsAngleX">
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+               </widget>
               </item>
               <item>
-               <widget class="QDoubleSpinBox" name="poseJointsAngleY"/>
+               <widget class="QDoubleSpinBox" name="poseJointsAngleY">
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+               </widget>
               </item>
               <item>
-               <widget class="QDoubleSpinBox" name="poseJointsAngleZ"/>
+               <widget class="QDoubleSpinBox" name="poseJointsAngleZ">
+                <property name="minimum">
+                 <double>-360.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>360.000000000000000</double>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -2475,9 +2503,9 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>500</y>
+              <y>320</y>
               <width>291</width>
-              <height>141</height>
+              <height>101</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -2499,7 +2527,7 @@ QGroupBox{
               <x>10</x>
               <y>2</y>
               <width>291</width>
-              <height>141</height>
+              <height>81</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -2519,9 +2547,9 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>150</y>
+              <y>90</y>
               <width>291</width>
-              <height>191</height>
+              <height>101</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -2719,7 +2747,7 @@ QGroupBox{
      <x>0</x>
      <y>0</y>
      <width>735</width>
-     <height>27</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

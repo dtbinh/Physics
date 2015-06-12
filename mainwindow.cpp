@@ -15,6 +15,7 @@ Object*    obj_selected;
 GraphicalPose* pose_control_selected;
 Pose*       pose_selected;
 int         pose_angle_selected;
+//Joint*      pose_angle_selected;
 bool       updateSimut = false;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -80,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->poseTimeSelector, SIGNAL(valueChanged(double)),this,SLOT(changePoseTime(double)));
 
     //manipuladores de ângulos de pose
-    connect(ui->listWidgetJoints, SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedPoseJoint(int)));
+    connect(ui->listWidgetPoseJoints, SIGNAL(currentRowChanged(int)), this, SLOT(showSelectedPoseJoint(int)));
     connect(ui->poseJointsAngleX, SIGNAL(valueChanged(double)), this, SLOT(changeJointAngle()));
     connect(ui->poseJointsAngleY, SIGNAL(valueChanged(double)), this, SLOT(changeJointAngle()));
     connect(ui->poseJointsAngleZ, SIGNAL(valueChanged(double)), this, SLOT(changeJointAngle()));
@@ -596,16 +597,20 @@ void MainWindow::showSelectedPose(int i)
     pose_selected = pose_control_selected->getPoses().at(i);
     ui->poseTimeSelector->setValue(pose_control_selected->getTimeIntervals().at(i));
     updateListPoseAngles(pose_selected->getCharacter()->getJoints());
-    //ui->xAngPose->setText(ui->xAngPose->text() + " " + pose_selected);
 }
 
 void MainWindow::showSelectedPoseJoint(int i)
 {
-    pose_angle_selected = i;
-    Vec4 angle = pose_selected->getAngles().at(i);
-    ui->poseJointsAngleX->setValue(angle.x());
-    ui->poseJointsAngleY->setValue(angle.y());
-    ui->poseJointsAngleZ->setValue(angle.z());
+    if (i >= 0){
+        pose_angle_selected = i;
+        //std::cout << " pose joint selected: " << i << "\n";
+        Vec4 angle = pose_selected->getAngles().at(i);
+        //std::cout << "angles are: " << angle.x() << " " << angle.y() << " " << angle.z() << "\n";
+        //std::cout.flush();
+        ui->poseJointsAngleX->setValue(angle.x());
+        ui->poseJointsAngleY->setValue(angle.y());
+        ui->poseJointsAngleZ->setValue(angle.z());
+    }
 }
 
 void MainWindow::setGravity()
@@ -691,6 +696,8 @@ void MainWindow::checkHasCoffeeCup(bool b)
 void MainWindow::changePoseTime(double time)
 {
     if (pose_control_selected != NULL){
+        //std::cout << "valuechanged disparou! p time" << time << "\n";
+        //std::cout.flush();
         if (ui->updateTimeAll->isChecked()){
             for (int i=0; i<pose_control_selected->getTimeIntervals().size(); i++){
                 pose_control_selected->modifyInterval(time, i);
@@ -704,6 +711,8 @@ void MainWindow::changePoseTime(double time)
 void MainWindow::changeJointAngle()
 {
     Vec4 angle(ui->poseJointsAngleX->value(), ui->poseJointsAngleY->value(), ui->poseJointsAngleZ->value());
+    //std::cout << "Angle: " << angle.x() << " " << angle.y() << " " << angle.z() <<"\n";
+    //0std::cout.flush();
     pose_selected->updateAngle(pose_angle_selected, angle);
 }
 

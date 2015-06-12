@@ -1389,27 +1389,27 @@ void Scene::createLuxo()
     pose1a.push_back(Vec4(0,0,-90));
     pose1a.push_back(Vec4(0,0,20));
     Pose* pose1 = addPose(luxo,pose1a);
-    pose1->setName("pose inicial");
+    pose1->setName("pose inicio");
 
     std::vector<Vec4> pose2a;
     pose2a.push_back(Vec4(0,0,-90));
     pose2a.push_back(Vec4(0,0,-110));
     pose2a.push_back(Vec4(0,0,20));
     Pose* pose2 = addPose(luxo,pose2a);
-    pose2->setName("pose intermediária");
+    pose2->setName("pose meio");
 
     std::vector<Vec4> pose3a;
     pose3a.push_back(Vec4(0,0,-90));
     pose3a.push_back(Vec4(0,0,-100));
     pose3a.push_back(Vec4(0,0,20));
     Pose* pose3 = addPose(luxo,pose3a);
-    pose3->setName("pose final");
+    pose3->setName("pose fim");
 
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
-    luxoPose->pushBackPose(pose1, 1200);
-    luxoPose->pushBackPose(pose2, 1200);
-    luxoPose->pushBackPose(pose3, 1200);
+    luxoPose->pushBackPose(pose1, 2000);
+    luxoPose->pushBackPose(pose2, 500);
+    luxoPose->pushBackPose(pose3, 1000);
 
 
 
