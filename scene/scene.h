@@ -181,6 +181,7 @@ public:
     //testes de robustez
     void                  shotBallsCharacterRandom(Character *chara, int posPlevis, float den=100.); //atirar objetos no personagem de forma aleatória
     void                  shotBallsCharacterBody(Object* body, float velocity, float den=100.); //atirar objetos no personagem de acordo com a posição de um corpo, e com determinada velocidade
+    void                  shotBallsCharacterBody(Object* body, float velocity, Vec4 inicio,float mass); //atirar objetos no personagem de acordo com a posição de um corpo, e com determinada velocidade e posição inicial
     void                  habiliteJump();
     void                  setRotationPlane(Vec4 rot);
     Vec4                  getRotationPlane();

@@ -111,6 +111,7 @@ public slots:
     void setKDistanceLocomotion(Vec4 k);
     void setVelocityDensityBalls(float den,float vel); //atualiza a densidade e velocidade das bolas
     void updateAngleGround(Vec4 ang); //atualiza o angulo do solo
+    void setMassSuitcase(double val);
 
     //slots personagens
     std::vector<Object*> getObjectsList();
@@ -158,8 +159,14 @@ public:
     float timeBase;
     float FPS;
     QTime m_time;
+    bool  has_ball_shot;
+    Vec4  ball_shot_debug;
+
+
     void bindShader();
     void releaseShader();
+    float mass_suitcase;
+
 
 
     //Controle do personagem luxo
@@ -178,6 +185,7 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
     //funções extras
     MoCap* pushMotionCapture();
     void drawShadows();

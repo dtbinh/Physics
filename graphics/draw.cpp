@@ -1422,13 +1422,23 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
 
 }
 
-void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 direction, float size,int material, Vec4 ground_inclination)
+void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 dir, float size,int material, Vec4 ground_inclination) //origen COM
 {
+    Vec4 direction = Vec4(0,0,1);
+    Vec4 begin = Vec4(0,0,0.3);
+    if(velocity.module()!=0 && velocity*direction<0){
+        direction = Vec4(0,0,-1);
+        begin = Vec4(0,0,-0.3);
+    }
+
+    QuaternionQ qat(dir);
+    direction = qat.getMatrix().vector(direction);
+
     glPushMatrix();
     GLUquadricObj *quad = gluNewQuadric();
     float larg = size;
-    Vec4 from = origin;
-    Vec4 to = direction*size+origin;
+    Vec4 from = origin+begin;
+    Vec4 to = direction*size+origin+begin;
     Vec4 from2to = to-from;
     float tam = from2to.module();
     from2to.normalize();

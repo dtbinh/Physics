@@ -70,7 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //objeto
     connect(ui->widgetPhysics,SIGNAL(updateObject(Object*)),this,SLOT(infoSelectedObject(Object*)));
 
-
+    //maleta
+    connect(ui->massSuitcase,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setMassSuitcase(double)));
 
     //ficção
     connect(ui->frictionFootAir,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionFootAir(double)));

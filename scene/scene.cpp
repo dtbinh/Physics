@@ -1303,6 +1303,39 @@ void Scene::shotBallsCharacterBody(Object *body, float velocity, float den)
        }
 }
 
+void Scene::shotBallsCharacterBody(Object *body, float velocity, Vec4 inicio, float mass)
+{
+
+    Vec4 posPelvisModel = body->getPositionCurrent();
+
+     //velInicial
+       Vec4 directionVelInicial = posPelvisModel-(inicio);
+
+       directionVelInicial.normalize();
+       Vec4 velInicial = directionVelInicial*(velocity);// dRandReal()*30.0+10.0 );
+       //Vec4 vell = velInicial;
+       //vell.x2=0;
+       //printf("\nVelocidade: %.3f",vell.module());
+       dReal massTotal;
+       //if ( pelvisIsTheTarget ) {
+       massTotal = (dReal)mass;
+       Object *obj = new Object(this);//position,rotation,properties,type,this);
+       obj->setMaterial(MATERIAL_EMERALD);
+       obj->setType(TYPE_SPHERE);
+       obj->setPosition(inicio);
+       obj->setRotation(QuaternionQ());
+       obj->setProperties(Vec4(100/1000.,100/1000.,100/1000.));
+       obj->setFMass(massTotal);
+
+       Physics::createObject(obj,space,massTotal,inicio,velInicial);
+       objects_shoot.push_back(obj);
+
+       while ( this->objects_shoot.size() > 10 ) {
+           this->objects_shoot.at(0)->clearPhysics();
+         this->objects_shoot.erase(objects_shoot.begin());
+       }
+}
+
 void Scene::habiliteJump()
 {
     if(this->characters.size()>0){

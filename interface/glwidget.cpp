@@ -43,7 +43,7 @@ vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
 
 
-#define SHOTBALL 1
+#define SHOTBALL 3
 
 int mode = -1;
 Object *objselshot = NULL;
@@ -334,6 +334,10 @@ GLWidget::GLWidget(QWidget *parent) :
     density = 0.5; //massa
     velocity = 5.;
 
+    mass_suitcase = 1.0;
+    has_ball_shot = false;
+    ball_shot_debug = Vec4();
+
 
 
 
@@ -509,6 +513,9 @@ void GLWidget::drawScene(){
     if (!sim_pause) if (load_exemple_curve) showCurveExample();
     if (show_character){
 
+        if(has_ball_shot){
+            Draw::drawSphere(ball_shot_debug,MATERIAL_COPPER);
+        }
         scene->draw();
 
         if(!capture_pause)
@@ -522,16 +529,18 @@ void GLWidget::drawScene(){
             ciclo = 0;
         }
         if (ciclo_arrow>0){
-            Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
-            //Draw::drawArrow(angle_quat,scene->getCharacter(0)->getPosCOM());
+            //Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
+            if(scene->getCharacter(0)->getMoCap()->status){
+                Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),scene->getCharacter(0)->getVelCOM(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+            }else{
+                Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),Vec4(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+            }
             ciclo_arrow++;
             if(ciclo_arrow>30) ciclo_arrow = 0;
         }
 
         showCompensableConeFriction();
     }
-
-
 
     if (editing_frame)
         if(scene->getSizeCharacter()!=0)
@@ -712,7 +721,7 @@ void GLWidget::paintGL()
         if (!screenshot) drawFPS();
         drawParameters();
     }
-    if (screenshot) setScreenShot();
+
 
     //calculateFPS();
 
@@ -757,11 +766,14 @@ void GLWidget::simStep(){
     gettimeofday(&tempo_inicio,NULL);
     if(!sim_pause){
         scene->simulationStep(enable_balance);
-
+        update();
+        if (screenshot) setScreenShot();
+    }else{
+        update();
     }
 
     //calculateFPSPaint();
-    update();
+    //update();
 
 
     //calculateFPS();
@@ -902,19 +914,34 @@ void GLWidget::simulationRestart()
     numOffBalls = 0;
     densidade = 100;
     sim_pause = true;
+    update();
 }
 
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    //printf("%s\n",event->text().toUtf8().constData());
+    if(event->key() == Qt::Key_R){
+        mode = SHOTBALL;
+        manipulate = SHOTBALL;
+        this->simulationPlayPause();
+        if(has_ball_shot){
+            if(mode == SHOTBALL){
+                if(objselshot!=NULL){
+                    scene->shotBallsCharacterBody(objselshot,velocity,ball_shot_debug,density);
+                }
+            }
+            ball_shot_debug = Vec4();
+        }
+        has_ball_shot = !has_ball_shot;
+        update();
+        return;
+    }
 
     if(event->key() == Qt::Key_P ){
         if(scene->getCharacter(0)->has_suitcase) scene->getCharacter(0)->deleteSuitcase();
-        else  scene->getCharacter(0)->setSuitcase(3,25.5);
+        else  scene->getCharacter(0)->setSuitcase(3,mass_suitcase);
+        updateJoints(scene->jointsScene());
     }
-
-
 
     if(event->key() == Qt::Key_Space ){
         simulationPlayPause();
@@ -929,6 +956,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_O ){
         manipulate = SET_OBJECT;
         mode = -1;
+
     }
     if(event->key() == Qt::Key_J ){
         scene->habiliteJump();
@@ -953,6 +981,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         mode = SHOTBALL;
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
+        return;
     }
     if(event->key() == Qt::Key_B ){
         if((scene->getSizeCharacter()==0)) return;
@@ -1031,7 +1060,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             obj->setTarget(pos);
             updateObject(obj);
             return;
-        }else{
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,0,0.05);
+        }
+        else{
             angle_directionz=angle_directionz+1;
             setAngleDirectionZ(angle_directionz);
         }
@@ -1048,7 +1080,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             updateObject(obj);
             return;
 
-        }else{
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,0,-0.05);
+        }
+        else{
             angle_directionz=angle_directionz-1;
             setAngleDirectionZ(angle_directionz);
         }
@@ -1067,7 +1102,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             obj->setTarget(pos);
             updateObject(obj);
             return;
-        }else{
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(-0.05,0,0);
+        }
+        else{
             angle_directiony=angle_directiony+1;
             setAngleDirectionY(angle_directiony);
         }
@@ -1081,7 +1119,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             obj->setTarget(pos);
             updateObject(obj);
             return;
-        }else{
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0.05,0,0);
+        }
+        else{
             angle_directiony=angle_directiony-1;
             setAngleDirectionY(angle_directiony);
         }
@@ -1096,7 +1137,10 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             obj->setTarget(pos);
             updateObject(obj);
             return;
-        }else{
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,0.05,0);
+        }
+        else{
             angle_directionx=angle_directionx-1;
             setAngleDirectionX(angle_directionx);
         }
@@ -1110,13 +1154,16 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             obj->setTarget(pos);
             updateObject(obj);
             return;
-        }else{
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,-0.05,0);
+        }
+        else{
             angle_directionx=angle_directionx+1;
             setAngleDirectionX(angle_directionx);
         }
 
     }
-    if(event->key() == Qt::Key_C){
+    if(event->key() == Qt::Key_L){
         static int posCam = 0;
         posCam++;
         if (cam->type == CAMERA_FAR) {
@@ -1513,6 +1560,7 @@ void GLWidget::restartMotion()
         scene->restartMotionCapture();
         if(scene->getCharacter(0)->offset.module()==0) scene->getCharacter(0)->getMoCap()->initializePosesModel(1);
     }
+    update();
     //Utils::loadMotionCapture(scene->getCharacter(0)->getMoCap(),scene->getCharacter(0),file.toStdString());
 
 
@@ -1681,6 +1729,17 @@ void GLWidget::updateAngleGround(Vec4 ang)
     floorPlane[1] = normal.y();
     floorPlane[2] = normal.z();
     update();
+}
+
+void GLWidget::setMassSuitcase(double val)
+{
+    mass_suitcase = val;
+    //verifica se exite alguma maleta para reiniciar com o novo peso
+    if(scene->getCharacter(0)->has_suitcase){
+        scene->getCharacter(0)->deleteSuitcase();
+        scene->getCharacter(0)->setSuitcase(3,mass_suitcase);
+    }
+    updateJoints(scene->jointsScene());
 }
 
 void GLWidget::setAlphaCharacter(int value)

@@ -585,6 +585,9 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         QDomElement mocap = doc.createElement("MoCap");   //mocap
         mocap.setAttribute("FileMocap",scene->getCharacter(i)->getMoCap()->getAddressFile());
         mocap.setAttribute("FileMocapLoad",scene->getCharacter(i)->getMoCap()->getAddressFileLoad());
+        mocap.setAttribute("BeginCycle",scene->getCharacter(i)->getMoCap()->getBeginClycle());
+        mocap.setAttribute("EndCycle",scene->getCharacter(i)->getMoCap()->getEndClycle());
+
 
         QDomElement cpdprop = doc.createElement("ControlPDProportional");   //Controle PD Proporcional
         vec = scene->getProportionalKsPD();
@@ -898,6 +901,12 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     file = sime.attribute("FileMocapLoad","");
                     if(!file.isEmpty()){
                         chara->getMoCap()->setAddressFileLoad(file);
+                        int total = chara->getMoCap()->getEndClycle();
+                        QString t_s = QString().sprintf("%d",total);
+                        int begin = sime.attribute("BeginCycle","0").toFloat();
+                        int end = sime.attribute("EndCycle",t_s).toFloat();
+                        chara->getMoCap()->setBeginClycle(begin);
+                        chara->getMoCap()->setEndClycle(end);
                     }
                 }
                 sim = e.firstChildElement("ControlPDProportional");
