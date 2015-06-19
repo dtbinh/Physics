@@ -822,9 +822,15 @@ void MainWindow::on_actionOpen_Simulation_triggered()
     ui->frictionGround->setValue(ui->widgetPhysics->getScene()->getFrictionGround());
 
     if(ui->widgetPhysics->getScene()->getSizeCharacter()>0){
+        Character *chara = ui->widgetPhysics->getScene()->getCharacter(0);
         ui->gravComp->setValue((int)(ui->widgetPhysics->getScene()->getCharacter(0)->getBalance()->getCompensationGravity()*100.));
         ui->stepsInterpolation->setValue(ui->widgetPhysics->getScene()->getCharacter(0)->getBalance()->getStepsInterpolation());
+        if(chara->getMoCap()!=NULL){
+            ui->beginClycle->setValue(chara->getMoCap()->getBeginClycle());
+            ui->endClycle->setValue(chara->getMoCap()->getEndClycle());
+        }
     }
+
 
 }
 

@@ -1,20 +1,20 @@
 <!DOCTYPE SimulationPhysics>
 <SimulationScene>
  <Character>
-  <Simulation Steps="67"/>
+  <Simulation Steps="67" FrictionGround="1000" FrictionFootAir="15"/>
   <Gravity x="0" y="-9.8" Enable="1" z="0"/>
   <Offset x="0" y="0" z="0"/>
-  <MoCap FileMocapLoad="../framesMotCap/capoeira-armada-edited" FileMocap="../mot/capoeira_armada_esquiva.mot"/>
+  <MoCap FileMocapLoad="../framesMotCap/chute-rodado" FileMocap="../mot/capoeira_armada_esquiva.mot" EndCycle="3367" BeginCycle="0"/>
   <ControlPDProportional>
    <ksPDProporcional x="28" y="28" z="28"/>
    <kdPDProporcional x="8.6" y="8.6" z="8.6"/>
   </ControlPDProportional>
   <Bodies>
-   <Properties Name="head" Material="4" Mass="5.64" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/Head.obj">
+   <Properties BodyBalance="0" Material="4" Mass="5.64" ObjFile="../objs/chara/Head.obj" Foot="0" Geometry="1" Name="head">
     <Position x="0" y="1.65" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.17" y="0.2" z="0.17"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -24,11 +24,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="upper_arm_l" Material="4" Mass="3.5" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/ShoulderL.obj">
+   <Properties BodyBalance="0" Material="4" Mass="3.5" ObjFile="../objs/chara/ShoulderL.obj" Foot="0" Geometry="1" Name="upper_arm_l">
     <Position x="0.16" y="1.325" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.35" z="0.1"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -38,11 +38,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="upper_arm_r" Material="4" Mass="3.5" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/ShoulderR.obj">
+   <Properties BodyBalance="0" Material="4" Mass="3.5" ObjFile="../objs/chara/ShoulderR.obj" Foot="0" Geometry="1" Name="upper_arm_r">
     <Position x="-0.16" y="1.325" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.35" z="0.1"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -52,11 +52,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="forearm_l" Material="4" Mass="2.1" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/ArmLHand.obj">
+   <Properties BodyBalance="0" Material="4" Mass="2.1" ObjFile="../objs/chara/ArmLHand.obj" Foot="0" Geometry="1" Name="forearm_l">
     <Position x="0.16" y="1.026" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -66,11 +66,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="forearm_r" Material="4" Mass="2.1" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/ArmRHand.obj">
+   <Properties BodyBalance="0" Material="4" Mass="2.1" ObjFile="../objs/chara/ArmRHand.obj" Foot="0" Geometry="1" Name="forearm_r">
     <Position x="-0.16" y="1.026" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -80,11 +80,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="chest" Material="4" Mass="11.88" BodyBalance="1" Geometry="1" Foot="0" ObjFile="../objs/chara/Torax.obj">
+   <Properties BodyBalance="1" Material="4" Mass="11.88" ObjFile="../objs/chara/Torax.obj" Foot="0" Geometry="1" Name="chest">
     <Position x="0" y="1.44" z="0.03"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.27" y="0.22" z="0.2"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -94,11 +94,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="stomach" Material="4" Mass="10" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/Abdomem.obj">
+   <Properties BodyBalance="0" Material="4" Mass="10" ObjFile="../objs/chara/Abdomem.obj" Foot="0" Geometry="1" Name="stomach">
     <Position x="0" y="1.23" z="0.015"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.25" y="0.2" z="0.2"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -108,11 +108,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="pelvis" Material="4" Mass="9.282" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/Pelvis.obj">
+   <Properties BodyBalance="0" Material="4" Mass="9.282" ObjFile="../objs/chara/Pelvis.obj" Foot="0" Geometry="1" Name="pelvis">
     <Position x="0" y="1.056" z="0.003"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.273" y="0.17" z="0.2"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -122,11 +122,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="thigh_l" Material="4" Mass="6.864" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/LegL.obj">
+   <Properties BodyBalance="0" Material="4" Mass="6.864" ObjFile="../objs/chara/LegL.obj" Foot="0" Geometry="1" Name="thigh_l">
     <Position x="0.125" y="0.75" z="0"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.12" y="0.44" z="0.13"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -136,11 +136,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="thigh_r" Material="4" Mass="6.864" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/LegR.obj">
+   <Properties BodyBalance="0" Material="4" Mass="6.864" ObjFile="../objs/chara/LegR.obj" Foot="0" Geometry="1" Name="thigh_r">
     <Position x="-0.125" y="0.75" z="0"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.12" y="0.44" z="0.13"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -150,11 +150,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="shank_l" Material="4" Mass="4.14" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/ShinL.obj">
+   <Properties BodyBalance="0" Material="4" Mass="4.14" ObjFile="../objs/chara/ShinL.obj" Foot="0" Geometry="1" Name="shank_l">
     <Position x="0.1315" y="0.3" z="0.0015"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.09" y="0.46" z="0.1"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -164,11 +164,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="shank_r" Material="4" Mass="4.14" BodyBalance="0" Geometry="1" Foot="0" ObjFile="../objs/chara/ShinR.obj">
+   <Properties BodyBalance="0" Material="4" Mass="4.14" ObjFile="../objs/chara/ShinR.obj" Foot="0" Geometry="1" Name="shank_r">
     <Position x="-0.1315" y="0.3" z="0.0015"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.09" y="0.46" z="0.1"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -178,11 +178,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="foot_l" Material="4" Mass="1.08" BodyBalance="0" Geometry="1" Foot="1" ObjFile="../objs/chara/FootL.obj">
+   <Properties BodyBalance="0" Material="4" Mass="1.08" ObjFile="../objs/chara/FootL.obj" Foot="1" Geometry="1" Name="foot_l">
     <Position x="0.1375" y="0.0425" z="0.048"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.045" z="0.24"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -192,11 +192,11 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Name="foot_r" Material="4" Mass="1.08" BodyBalance="0" Geometry="1" Foot="1" ObjFile="../objs/chara/FootR.obj">
+   <Properties BodyBalance="0" Material="4" Mass="1.08" ObjFile="../objs/chara/FootR.obj" Foot="1" Geometry="1" Name="foot_r">
     <Position x="-0.1375" y="0.0425" z="0.048"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.1" y="0.045" z="0.24"/>
-    <ControlPDPositional Effector="0" Target="0" Enabled="0">
+    <ControlPDPositional Effector="0" Enabled="0" Target="0">
      <PositionTarget x="0" y="0" z="0"/>
      <KsPositionalPD x="0" y="0" z="0"/>
      <KdPositionalPD x="0" y="0" z="0"/>
@@ -208,87 +208,87 @@
    </Properties>
   </Bodies>
   <Joints>
-   <Joint Name="pelvis__thigh_l" Parent="pelvis" Enable="1" Type="2" Child="thigh_l">
+   <Joint Parent="pelvis" Enable="1" Type="2" Name="pelvis__thigh_l" Child="thigh_l">
     <Anchor x="0.1185" y="0.96" z="0"/>
-    <QuaternionPD w="0.997768" x="0.0149695" y="-0.012323" z="-0.0638981"/>
+    <QuaternionPD w="0.944547" x="-0.284371" y="0.032462" z="0.160965"/>
     <KsPD x="11" y="11" z="11"/>
     <KdPD x="1.1" y="1.1" z="1.1"/>
    </Joint>
-   <Joint Name="thigh_l__shank_l" Parent="thigh_l" Enable="1" Type="2" Child="shank_l">
+   <Joint Parent="thigh_l" Enable="1" Type="2" Name="thigh_l__shank_l" Child="shank_l">
     <Anchor x="0.1315" y="0.54" z="0"/>
-    <QuaternionPD w="0.999966" x="0.00469733" y="-0.00122381" z="0.00673156"/>
+    <QuaternionPD w="0.980169" x="0.188774" y="0.00297108" z="-0.0601943"/>
     <KsPD x="10" y="10" z="10"/>
     <KdPD x="1" y="1" z="1"/>
    </Joint>
-   <Joint Name="shank_l__foot_l" Parent="shank_l" Enable="1" Type="2" Child="foot_l">
+   <Joint Parent="shank_l" Enable="1" Type="2" Name="shank_l__foot_l" Child="foot_l">
     <Anchor x="0.1315" y="0.06" z="0.003"/>
-    <QuaternionPD w="0.999059" x="-0.0253534" y="-0.0196556" z="0.0291645"/>
+    <QuaternionPD w="0.993264" x="-0.038239" y="0.0582725" z="0.092563"/>
     <KsPD x="4" y="4" z="4"/>
     <KdPD x="0.4" y="0.4" z="0.4"/>
    </Joint>
-   <Joint Name="pelvis__thigh_r" Parent="pelvis" Enable="1" Type="2" Child="thigh_r">
+   <Joint Parent="pelvis" Enable="1" Type="2" Name="pelvis__thigh_r" Child="thigh_r">
     <Anchor x="-0.1185" y="0.96" z="0"/>
-    <QuaternionPD w="0.99803" x="0.023135" y="0.0541983" z="-0.0215234"/>
+    <QuaternionPD w="0.931909" x="-0.131042" y="0.0655531" z="-0.331779"/>
     <KsPD x="11" y="11" z="11"/>
     <KdPD x="1.1" y="1.1" z="1.1"/>
    </Joint>
-   <Joint Name="thigh_r__shank_r" Parent="thigh_r" Enable="1" Type="2" Child="shank_r">
+   <Joint Parent="thigh_r" Enable="1" Type="2" Name="thigh_r__shank_r" Child="shank_r">
     <Anchor x="-0.1315" y="0.54" z="0"/>
-    <QuaternionPD w="0.99776" x="0.0152774" y="0.0454648" z="0.0466354"/>
+    <QuaternionPD w="0.986267" x="0.150004" y="0.00918956" z="0.0685005"/>
     <KsPD x="10" y="10" z="10"/>
     <KdPD x="1" y="1" z="1"/>
    </Joint>
-   <Joint Name="shank_r__foot_r" Parent="shank_r" Enable="1" Type="2" Child="foot_r">
+   <Joint Parent="shank_r" Enable="1" Type="2" Name="shank_r__foot_r" Child="foot_r">
     <Anchor x="-0.1315" y="0.06" z="0.003"/>
-    <QuaternionPD w="-0.985252" x="0.00897127" y="0.165791" z="0.0413879"/>
+    <QuaternionPD w="-0.956474" x="-0.147485" y="0.232456" z="0.0967948"/>
     <KsPD x="4" y="4" z="4"/>
     <KdPD x="0.4" y="0.4" z="0.4"/>
    </Joint>
-   <Joint Name="pelvis__stomach" Parent="pelvis" Enable="1" Type="2" Child="stomach">
+   <Joint Parent="pelvis" Enable="1" Type="2" Name="pelvis__stomach" Child="stomach">
     <Anchor x="0" y="1.13" z="0"/>
-    <QuaternionPD w="0.999205" x="0.0264081" y="0.00379002" z="-0.0295978"/>
+    <QuaternionPD w="0.971749" x="0.220336" y="0.0517066" z="0.0669663"/>
     <KsPD x="12.5" y="12.5" z="12.5"/>
     <KdPD x="1.25" y="1.25" z="1.25"/>
    </Joint>
-   <Joint Name="stomach__chest" Parent="stomach" Enable="1" Type="2" Child="chest">
+   <Joint Parent="stomach" Enable="1" Type="2" Name="stomach__chest" Child="chest">
     <Anchor x="0" y="1.33" z="0.03"/>
-    <QuaternionPD w="0.99952" x="0.0274649" y="0.013939" z="0.00321897"/>
+    <QuaternionPD w="0.995346" x="0.00191519" y="-0.0212584" z="0.0939746"/>
     <KsPD x="12.5" y="12.5" z="12.5"/>
     <KdPD x="1.25" y="1.25" z="1.25"/>
    </Joint>
-   <Joint Name="chest__head" Parent="chest" Enable="1" Type="2" Child="head">
+   <Joint Parent="chest" Enable="1" Type="2" Name="chest__head" Child="head">
     <Anchor x="0" y="1.55" z="0.03"/>
-    <QuaternionPD w="0.999593" x="0.000842018" y="0.0242161" z="0.0151316"/>
+    <QuaternionPD w="0.996537" x="0.0215628" y="-0.0366947" z="0.0714402"/>
     <KsPD x="15.5" y="15.5" z="15.5"/>
     <KdPD x="1.55" y="1.55" z="1.55"/>
    </Joint>
-   <Joint Name="chest__upper_arm_l" Parent="chest" Enable="1" Type="2" Child="upper_arm_l">
+   <Joint Parent="chest" Enable="1" Type="2" Name="chest__upper_arm_l" Child="upper_arm_l">
     <Anchor x="0.16" y="1.49" z="0.04"/>
-    <QuaternionPD w="0.987336" x="-0.0726995" y="-0.04214" z="0.134561"/>
+    <QuaternionPD w="0.957549" x="0.0858151" y="-0.126278" z="0.244522"/>
     <KsPD x="6" y="6" z="6"/>
     <KdPD x="0.6" y="0.6" z="0.6"/>
    </Joint>
-   <Joint Name="upper_arm_l__forearm_l" Parent="upper_arm_l" Enable="1" Type="2" Child="forearm_l">
+   <Joint Parent="upper_arm_l" Enable="1" Type="2" Name="upper_arm_l__forearm_l" Child="forearm_l">
     <Anchor x="0.16" y="1.16" z="0.04"/>
-    <QuaternionPD w="0.995311" x="-0.0845693" y="-0.00437028" z="-0.0467404"/>
+    <QuaternionPD w="0.937045" x="-0.325823" y="0.087868" z="0.0898079"/>
     <KsPD x="6" y="6" z="6"/>
     <KdPD x="0.6" y="0.6" z="0.6"/>
    </Joint>
-   <Joint Name="chest__upper_arm_r" Parent="chest" Enable="1" Type="2" Child="upper_arm_r">
+   <Joint Parent="chest" Enable="1" Type="2" Name="chest__upper_arm_r" Child="upper_arm_r">
     <Anchor x="-0.16" y="1.49" z="0.03"/>
-    <QuaternionPD w="0.987361" x="-0.054391" y="-0.010164" z="-0.14851"/>
+    <QuaternionPD w="0.911934" x="-0.0716534" y="-0.00423482" z="-0.40401"/>
     <KsPD x="6" y="6" z="6"/>
     <KdPD x="0.6" y="0.6" z="0.6"/>
    </Joint>
-   <Joint Name="upper_arm_r__forearm_r" Parent="upper_arm_r" Enable="1" Type="2" Child="forearm_r">
+   <Joint Parent="upper_arm_r" Enable="1" Type="2" Name="upper_arm_r__forearm_r" Child="forearm_r">
     <Anchor x="-0.16" y="1.16" z="0.03"/>
-    <QuaternionPD w="0.991463" x="-0.0747658" y="0.0589613" z="0.0890781"/>
+    <QuaternionPD w="-0.360325" x="0.9306" y="0.0598506" z="0.0238079"/>
     <KsPD x="6" y="6" z="6"/>
     <KdPD x="0.6" y="0.6" z="0.6"/>
    </Joint>
   </Joints>
   <BalanceEstrategy>
-   <BalanceControl EnableForce="1" EnableMomentum="1" EnableTorque="1">
+   <BalanceControl EnableTorque="1" EnableMomentum="1" GravityCompensation="1" EnableForce="1">
     <QuaternionTorque w="1" x="0" y="0" z="0"/>
     <BalanceksTorque x="500" y="500" z="500"/>
     <BalancekdTorque x="25" y="25" z="25"/>
@@ -296,7 +296,7 @@
     <BalancekdForce x="400" y="400" z="400"/>
     <BalancekMomentumLinear x="20" y="20" z="20"/>
     <BalancekMomentumAngular x="15" y="55" z="55"/>
-    <FrictionCone Limits="0" SensorTol="0.3" Radius="0.8" Angle="45" Module="550" Height="0.9"/>
+    <FrictionCone SensorTol="0.3" Module="550" Height="0.9" StepsInterpolation="100" Limits="0" Angle="45" Radius="0.8"/>
     <LocomotionParameters>
      <LocomotionVelocity x="0" y="0" z="0"/>
      <LocomotionDistance x="0" y="0" z="0"/>

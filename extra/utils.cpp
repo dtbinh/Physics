@@ -903,8 +903,10 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                         chara->getMoCap()->setAddressFileLoad(file);
                         int total = chara->getMoCap()->getEndClycle();
                         QString t_s = QString().sprintf("%d",total);
-                        int begin = sime.attribute("BeginCycle","0").toFloat();
-                        int end = sime.attribute("EndCycle",t_s).toFloat();
+                        int begin = sime.attribute("BeginCycle","0").toInt();
+                        int end = sime.attribute("EndCycle",t_s).toInt();
+//                        qDebug() << begin;
+//                        qDebug() << end;
                         chara->getMoCap()->setBeginClycle(begin);
                         chara->getMoCap()->setEndClycle(end);
                     }
@@ -1298,9 +1300,9 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
 //                moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,180,0));
 //            else
 //            Caso chute rodado            
-//            if(j==13) //caso o pé esteja invertido
-//                moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(-8,10,160));
-//            else
+            if(j==13) //caso o pé esteja invertido
+                moCap->getFrameMotion(i)->setOrientation(j,quat*QuaternionQ(-8,10,160));
+            else
                 moCap->getFrameMotion(i)->setOrientation(j,quat);
           }
           //pula uma linha

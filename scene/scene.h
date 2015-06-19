@@ -130,6 +130,7 @@ public:
     //extra simulation
     void                  clearObjectShooted();
     void                  createRamp();
+    void                  createArena(); //caixas
     void                  createCharacter();
     void                  createLuxo();
     void                  startRecorder(bool b);

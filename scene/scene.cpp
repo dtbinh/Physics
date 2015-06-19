@@ -1416,6 +1416,28 @@ void Scene::createRamp()
     // objects.push_back(addObject(Vec4(0.8,0.1,0.4),Vec4(0.2,0.05,1.3),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2));
 }
 
+void Scene::createArena()
+{
+    Vec4 offset;
+
+    float dim_unit = 0.3;
+
+    float height_wall = 1.0; //altura
+    float lenght_wall = 0.2; //largura
+    float mass_wall = 20;
+
+    int color_wall = MATERIAL_CHROME;
+
+    Object *wall_left = addObject(Vec4(lenght_wall,height_wall,14*dim_unit),Vec4(-6*dim_unit-lenght_wall/2.0,height_wall/2.0,0.0),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+    //objects.push_back(wall_left);
+    //joints.push_back(addJointFixed(wall_left,wall_left,NULL));
+
+
+//    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),QuaternionQ(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+//    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),QuaternionQ(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+//    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),QuaternionQ(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+}
+
 void Scene::createCharacter()
 {
     Character *chara = new Character(this);

@@ -337,6 +337,7 @@ GLWidget::GLWidget(QWidget *parent) :
     mass_suitcase = 1.0;
     has_ball_shot = false;
     ball_shot_debug = Vec4();
+    scene->createArena();
 
 
 
