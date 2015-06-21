@@ -613,9 +613,29 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         offset.setAttribute("y",scene->getCharacter(i)->getOffset().y());
         offset.setAttribute("z",scene->getCharacter(i)->getOffset().z());
 
+        QDomElement eye = doc.createElement( "Cam_Eye" ); //camera eye
+        eye.setAttribute("x",scene->getCharacter(i)->getScene()->getEye().x());
+        eye.setAttribute("y",scene->getCharacter(i)->getScene()->getEye().y());
+        eye.setAttribute("z",scene->getCharacter(i)->getScene()->getEye().z());
+
+
+        QDomElement at = doc.createElement( "Cam_At" ); //camera at
+        at.setAttribute("x",scene->getCharacter(i)->getScene()->getAt().x());
+        at.setAttribute("y",scene->getCharacter(i)->getScene()->getAt().y());
+        at.setAttribute("z",scene->getCharacter(i)->getScene()->getAt().z());
+
+        QDomElement up = doc.createElement( "Cam_Up" ); //camera up
+        up.setAttribute("x",scene->getCharacter(i)->getScene()->getUp().x());
+        up.setAttribute("y",scene->getCharacter(i)->getScene()->getUp().y());
+        up.setAttribute("z",scene->getCharacter(i)->getScene()->getUp().z());
+
+
         info.appendChild(sim);
         info.appendChild(gravity);
         info.appendChild(offset);
+        info.appendChild(eye);
+        info.appendChild(at);
+        info.appendChild(up);
         info.appendChild(mocap);
         info.appendChild(cpdprop);
 
@@ -848,7 +868,6 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
     QDomNode n = root.firstChild();
     while( !n.isNull() )
     {
-
         QDomElement e = n.toElement();
         if( !e.isNull() ){
             Character *chara = new Character(scene);
@@ -893,6 +912,39 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 z = sime.attribute("z","").toFloat();
                 offset.setVec4(x,y,z);
                 chara->setOffset(offset);
+
+                // configuração de câmera
+                sim = e.firstChildElement("Cam_Eye");
+                if (!sim.isNull()) {
+                    Vec4 eye, at,up;
+                    sime = sim.toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    eye.setVec4(x,y,z);
+
+                    sim = e.firstChildElement("Cam_At");
+                    sime = sim.toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    at.setVec4(x,y,z);
+
+                    sim = e.firstChildElement("Cam_Up");
+                    sime = sim.toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    up.setVec4(x,y,z);
+
+                    chara->getScene()->setViewer(eye,at,up);
+
+
+                }
+
+
+
+
                 sim = e.firstChildElement("MoCap");
                 sime = sim.toElement();
                 QString file = sime.attribute("FileMocap","");
@@ -902,13 +954,13 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     if(!file.isEmpty()){
                         chara->getMoCap()->setAddressFileLoad(file);
                         int total = chara->getMoCap()->getEndClycle();
-                        QString t_s = QString().sprintf("%d",total);
+                        //QString t_s = QString().sprintf("%d",total);
                         int begin = sime.attribute("BeginCycle","0").toInt();
-                        int end = sime.attribute("EndCycle",t_s).toInt();
-//                        qDebug() << begin;
-//                        qDebug() << end;
+                        int end = sime.attribute("EndCycle","0").toInt();
+                        if(!end) end = total;
                         chara->getMoCap()->setBeginClycle(begin);
                         chara->getMoCap()->setEndClycle(end);
+                        //qDebug() << chara->getMoCap()->getEndClycle();
                     }
                 }
                 sim = e.firstChildElement("ControlPDProportional");
@@ -1142,6 +1194,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
             if (!file.isEmpty()){
                 Utils::loadMotionCapture(chara->getMoCap(),chara,file.toStdString());
                 chara->loadMotionFrames();
+                if(chara->getMoCap()->endClycle<=0) chara->getMoCap()->endClycle = chara->getMoCap()->sizeFrames();
                 chara->getMoCap()->copyFootsProperties();
                 file = chara->getMoCap()->getAddressFileLoad();
                 if(!file.isEmpty()){
@@ -1309,7 +1362,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             getline(istr, stmp);
             }
         }
-        moCap->setEndClycle(moCap->sizeFrames());
+        //moCap->setEndClycle(moCap->sizeFrames());
         return true;
 }
 

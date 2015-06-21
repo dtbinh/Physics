@@ -63,7 +63,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -389,30 +389,30 @@ QGroupBox{
                <item>
                 <widget class="QDoubleSpinBox" name="xksTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="yksTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="zksTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -430,30 +430,30 @@ QGroupBox{
                <item>
                 <widget class="QDoubleSpinBox" name="xkdTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="ykdTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="zkdTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -475,6 +475,9 @@ QGroupBox{
                  </property>
                  <property name="maximum">
                   <double>9999.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>25.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -522,20 +525,20 @@ QGroupBox{
                <item>
                 <widget class="QDoubleSpinBox" name="ykdForBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="zkdForBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>

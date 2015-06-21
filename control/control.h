@@ -19,14 +19,24 @@ private:
     QuaternionQ qwanted;
     Vec4       ks;             //constante linear
     Vec4       kd;             //constante derivada
+    Vec4       ks_fall;        //constante ks ao cair
+    Vec4       kd_fall;        //constante kd ao cair
     Vec4       propKs;         //constante linear proporcional setada via classe Scene
     Vec4       propKd;         //constante derivada proporcional setada via classe Scene
     bool       enabled;        //habilita o controle de PD da junta
     MatrixF     inertia;        //matriz de inercia
     Vec4       velDesired;     //velocidade linear desejada
     bool       enable_inertia; //habilita ou não o fator de inercia da junta
+    bool       is_fall; //personagem esta caindo
 
 public:
+    void setFall(bool b);
+    bool isFall();
+    void setKsFall(Vec4 ks_f);
+    Vec4 getKsFall();
+    void setKdFall(Vec4 kd_f);
+    Vec4 getKdFall();
+
     void setInertiaFactors(MatrixF i);
     void resetInertiaFactors();
     ControlPD(Joint *joint,QuaternionQ qwanted,Vec4 ks,Vec4 kd);

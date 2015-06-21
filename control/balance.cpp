@@ -572,6 +572,7 @@ float Balance::getTorqueMaxCompensable(Object *foot, Vec4 torque)
     foot->setCompensableFactor(ratio);
     if(limit/100.>ratio){
         enable_balance = false;
+        this->chara->isFall(true);
     }
     return ratio;
 }

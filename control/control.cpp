@@ -32,6 +32,9 @@ ControlPD::ControlPD(Joint *joint, QuaternionQ qwanted, Vec4 ks, Vec4 kd)
     inertia(0,0) = 1;
     inertia(1,1) = 1;
     inertia(2,2) = 1;
+    this->ks_fall = Vec4(5.,5.,5.);
+    this->kd_fall = Vec4(0.5,0.5,0.5);
+    this->is_fall = false;
 }
 
 void ControlPD::setJoint(Joint *joint)
@@ -167,9 +170,15 @@ void ControlPD::evaluate()
                 for (int j=0;j<12;j++) { ksLocal[j] = 0.0; }
               //dVector3 ksFixedi;
                 //state->getJointKsFixediSaved( i, state->compInertia, ksFixedi );
-                ksLocal[0]  = this->ks.x()*propKs.x()*inertia(0,0);
-                ksLocal[5]  = this->ks.y()*propKs.y()*inertia(1,1);
-                ksLocal[10] = this->ks.z()*propKs.z()*inertia(2,2);
+                if(!is_fall){
+                    ksLocal[0]  = this->ks.x()*propKs.x()*inertia(0,0);
+                    ksLocal[5]  = this->ks.y()*propKs.y()*inertia(1,1);
+                    ksLocal[10] = this->ks.z()*propKs.z()*inertia(2,2);
+                }else{
+                    ksLocal[0]  = this->ks_fall.x()*propKs.x()*inertia(0,0);
+                    ksLocal[5]  = this->ks_fall.y()*propKs.y()*inertia(1,1);
+                    ksLocal[10] = this->ks_fall.z()*propKs.z()*inertia(2,2);
+                }
             //calculando ks em coordenadas globais
               dMatrix3 ksGlobal;
                 //se deltaGlobal = R.deltaLocal, entao ksGlobal = R.ksLocal.R^t
@@ -184,9 +193,15 @@ void ControlPD::evaluate()
               dMatrix3 kdLocal;
                 //zera kdLocal
                 for (int j=0;j<12;j++) { kdLocal[j] = 0.0; }
+                if(!is_fall){
                 kdLocal[0]  = this->kd.x()*propKd.x()*inertia(0,0);
                 kdLocal[5]  = this->kd.y()*propKd.y()*inertia(1,1);
                 kdLocal[10] = this->kd.z()*propKd.z()*inertia(2,2);
+                }else{
+                    kdLocal[0]  = this->kd_fall.x()*propKd.x()*inertia(0,0);
+                    kdLocal[5]  = this->kd_fall.y()*propKd.y()*inertia(1,1);
+                    kdLocal[10] = this->kd_fall.z()*propKd.z()*inertia(2,2);
+                }
             //calculando kd em coordenadas globais
               dMatrix3 kdGlobal;
                 //se deltaGlobal = R.deltaLocal, entao kdGlobal = R.kdLocal.R^t
@@ -513,6 +528,36 @@ Vec4 ControlPD::getTorquePDCOM(Joint *joint, Vec4 ks, Vec4 kd, QuaternionQ qDesi
 //              torque[j] = torqueKs[j] + torqueKd[j];
 //            }
               //            return Vec4(torque[0],torque[1],torque[2]);
+}
+
+void ControlPD::setFall(bool b)
+{
+    this->is_fall = b;
+}
+
+bool ControlPD::isFall()
+{
+    return this->isFall();
+}
+
+void ControlPD::setKsFall(Vec4 ks_f)
+{
+    this->ks_fall = ks_f;
+}
+
+Vec4 ControlPD::getKsFall()
+{
+    return this->ks_fall;
+}
+
+void ControlPD::setKdFall(Vec4 kd_f)
+{
+    this->kd_fall = kd_f;
+}
+
+Vec4 ControlPD::getKdFall()
+{
+    return this->kd_fall;
 }
 
 void ControlPD::setInertiaFactors(MatrixF i)

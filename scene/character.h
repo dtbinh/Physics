@@ -96,6 +96,7 @@ public:
     ControlPD*      getController(int i);
     void            setSuitcase(int body,float mass);
     void            deleteSuitcase();
+    void            isFall(bool b);
 
 
 

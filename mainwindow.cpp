@@ -690,7 +690,6 @@ void MainWindow::setMaxTimeLine(int v)
     ui->timeLineMotion->setMaximum(v);
     ui->frameEdit->setMaximum(v);
     ui->endClycle->setMaximum(v);
-    ui->endClycle->setValue(v);
     ui->beginClycle->setMaximum(v);
 }
 
@@ -831,6 +830,7 @@ void MainWindow::on_actionOpen_Simulation_triggered()
         if(chara->getMoCap()!=NULL){
             ui->beginClycle->setValue(chara->getMoCap()->getBeginClycle());
             ui->endClycle->setValue(chara->getMoCap()->getEndClycle());
+            //qDebug() << chara->getMoCap()->getEndClycle();
         }
     }
 

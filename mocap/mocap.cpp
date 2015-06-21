@@ -16,6 +16,9 @@ MoCap::MoCap()
     file_load = "";
     beginClycle = 0;
     clyclic = true;
+    beginClycle = 0;
+    endClycle = -1;
+
 }
 
 MoCap::MoCap(Character *chara)
@@ -27,6 +30,7 @@ MoCap::MoCap(Character *chara)
     file_load = "";
     beginClycle = 0;
     clyclic = true;
+    endClycle = -1;
 }
 
 void MoCap::setAddressFile(QString file)

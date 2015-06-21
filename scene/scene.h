@@ -103,6 +103,9 @@ public:
 
     //Manipulação dos objetos do cenário
     void                  setViewer(Vec4 eye,Vec4 at,Vec4 up);
+    Vec4                  getEye();
+    Vec4                  getAt();
+    Vec4                  getUp();
     void                  setProjection(Vec4 p);
     void                  setWindow(int width,int height);
     Object*               addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário

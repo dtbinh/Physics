@@ -44,6 +44,11 @@ Scene::Scene(GLWidget *parent)
     this->friction_ground = 1000;
     this->friction_foot_air = 15;
 
+    this->viewer[0] = Vec4(0,1,5);
+    this->viewer[1] = Vec4(0,1,0);
+    this->viewer[2] = Vec4(0,1,0);
+
+
     //pose_time.start();
 
 //    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(74,0,0)),TYPE_CUBE,1.2);
@@ -105,6 +110,7 @@ void Scene::restartPhysics()
         characters.at(i)->restartPhysics();
         if (characters.at(i)->getBodiesFoot().size()>0)
             characters.at(i)->checkContactFoot(true);
+        characters.at(i)->isFall(false);
     }
     if(enableGravity) Physics::setGravity(this,this->gravity);
     else Physics::setGravity(this,Vec4());
@@ -200,7 +206,6 @@ void Scene::simulationStep(bool balance)
                Physics::setEnableObject(objs.at(i));
                if ((objs.at(i)->isSelected()) && !apply){
                    objs.at(i)->appForce(this->externalForce);
-                   qDebug() << "app force: " << this->externalForce.module();
                }
                objs.at(i)->evaluate(1);
 
@@ -617,6 +622,21 @@ void Scene::setViewer(Vec4 eye, Vec4 at, Vec4 up)
     viewer[0] = eye;
     viewer[1] = at;
     viewer[2] = up;
+}
+
+Vec4 Scene::getEye()
+{
+    return viewer[0];
+}
+
+Vec4 Scene::getAt()
+{
+    return viewer[1];
+}
+
+Vec4 Scene::getUp()
+{
+    return viewer[2];
 }
 
 void Scene::setProjection(Vec4 p)
