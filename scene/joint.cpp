@@ -173,8 +173,10 @@ MatrixF Joint::getAd(Object *obj)
 
 void Joint::initJoint(Vec4 anchor, Vec4 axis)
 {
-    this->initialAnchor->setVec4(anchor);
-    this->initialAxis->setVec4(axis);
+    if(this->type!=JOINT_FIXED){
+        this->initialAnchor->setVec4(anchor);
+        this->initialAxis->setVec4(axis);
+    }
     switch (this->type){
         case JOINT_FIXED:{
         Physics::initJointFixed(this);

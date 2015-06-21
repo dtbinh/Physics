@@ -337,7 +337,7 @@ GLWidget::GLWidget(QWidget *parent) :
     mass_suitcase = 1.0;
     has_ball_shot = false;
     ball_shot_debug = Vec4();
-    scene->createArena();
+
 
 
 
@@ -1902,6 +1902,7 @@ void GLWidget::loadSimulationParameters(QString file)
     setToleranceFoot(scene->getCharacter(0)->getBalance()->getSensorTolerance());
 
 
+    scene->createArena();
 
 
 
