@@ -112,6 +112,7 @@ public slots:
     void setVelocityDensityBalls(float den,float vel); //atualiza a densidade e velocidade das bolas
     void updateAngleGround(Vec4 ang); //atualiza o angulo do solo
     void setMassSuitcase(double val);
+    void setFramesForce2Time(double val);
 
     //slots personagens
     std::vector<Object*> getObjectsList();
@@ -128,6 +129,8 @@ public slots:
     void setShowMoCap(bool b);
     void drawScene();
     void drawParameters();
+    void drawForceApply();
+
 
 
 
@@ -166,6 +169,8 @@ public:
     void bindShader();
     void releaseShader();
     float mass_suitcase;
+
+    int  frames_force;
 
 
 

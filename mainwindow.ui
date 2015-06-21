@@ -63,7 +63,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>3</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -2103,7 +2103,7 @@ QGroupBox{
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                  <property name="spacing">
                   <number>0</number>
@@ -2179,6 +2179,25 @@ QGroupBox{
                   </widget>
                  </item>
                 </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QDoubleSpinBox" name="timeApplyForce">
+                 <property name="suffix">
+                  <string> seconds</string>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.200000000000000</double>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -2697,7 +2716,7 @@ QGroupBox{
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>10</x>

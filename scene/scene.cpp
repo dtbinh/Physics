@@ -199,7 +199,8 @@ void Scene::simulationStep(bool balance)
            for(unsigned int i=0;i<objs.size();i++){
                Physics::setEnableObject(objs.at(i));
                if ((objs.at(i)->isSelected()) && !apply){
-                   objs.at(i)->addForce(this->externalForce);
+                   objs.at(i)->appForce(this->externalForce);
+                   qDebug() << "app force: " << this->externalForce.module();
                }
                objs.at(i)->evaluate(1);
 
@@ -249,7 +250,7 @@ void Scene::simulationStep(bool balance)
 //    }
 
 //      printf("Tempo gasto em milissegundos %.3f\n",tempo);
-        apply = true;
+        //apply = true;
  objs.clear();
  jts.clear();
 
@@ -284,7 +285,7 @@ void Scene::draw()
         std::vector<Object*> objs = objectsScene();
         for(unsigned int i=0;i<objs.size();i++)
             if (objs.at(i)->isSelected()){
-                Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);
+                Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.3);
             }
         objs.clear();
     }
@@ -753,7 +754,8 @@ void Scene::addCharacter(Character *chara)
 
 void Scene::setExternalForce(Vec4 force)
 {
-    apply = false;
+    if(force.module()==0) apply = true;
+    else apply = false;
     this->externalForce = force;
 }
 
@@ -1480,7 +1482,7 @@ void Scene::createArena()
 
 
     //boxes
-    float offset_up = dim_brick.y()+0.1; //altura de onde as caixas cairão
+    float offset_up = dim_brick.y()+0.1; //altura de onde as caixas cairão=-
     float dim_box = (units/3.0)*dim_unit-0.03;
     int color_box = MATERIAL_ZINN;
     float mass_box = 35.;

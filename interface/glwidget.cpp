@@ -337,6 +337,7 @@ GLWidget::GLWidget(QWidget *parent) :
     mass_suitcase = 1.0;
     has_ball_shot = false;
     ball_shot_debug = Vec4();
+    frames_force = 6;
 
 
 
@@ -523,9 +524,11 @@ void GLWidget::drawScene(){
             if(scene->getSizeCharacter()!=0)
                 if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
                     motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
-        if (scene->getExternalForce().module()!=0)
+        if (scene->getExternalForce().module()!=0){
+            drawForceApply();
             ciclo++;
-        if (ciclo>30){
+        }
+        if (ciclo>=frames_force){
             scene->setExternalForce(Vec4(0,0,0));
             ciclo = 0;
         }
@@ -708,6 +711,48 @@ void GLWidget::drawParameters()
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glEnable(GL_LIGHTING);
+
+
+}
+
+void GLWidget::drawForceApply()
+{
+
+        if (! scene->getSizeCharacter()>0) return;
+        Character *chara = scene->getCharacter(0);
+        QString dados;
+        Vec4 out;
+        glDisable(GL_LIGHTING);
+        glColor3f(0,0,0);
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadIdentity();
+        gluOrtho2D(0.0, winWidth, 0.0, winHeight);
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadIdentity();
+        int x = 680;
+        int k = 0;
+        if(scene->getExternalForce().module()==0) return;
+        glRasterPos2f(750, x);
+        out = chara->getBalance()->getKsTorque();
+        dados = QString().sprintf("%3.2f N for %3.1f sec",scene->getExternalForce().module(),frames_force/30. );
+        //char* n = (char*)dados.toStdString().data();
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,dados.at(k).toLatin1());
+            k++;
+        }
+
+
+
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
+
 
 
 }
@@ -1743,6 +1788,11 @@ void GLWidget::setMassSuitcase(double val)
     updateJoints(scene->jointsScene());
 }
 
+void GLWidget::setFramesForce2Time(double val)
+{
+    this->frames_force = (int)(val*30.);
+}
+
 void GLWidget::setAlphaCharacter(int value)
 {
     scene->setAlphaCharacter((float)value/100.0);
@@ -1902,7 +1952,7 @@ void GLWidget::loadSimulationParameters(QString file)
     setToleranceFoot(scene->getCharacter(0)->getBalance()->getSensorTolerance());
 
 
-    scene->createArena();
+    //scene->createArena();
 
 
 

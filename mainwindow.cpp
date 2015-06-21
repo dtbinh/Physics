@@ -231,6 +231,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->densityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
     connect(ui->velocityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
 
+    //tempo força
+    connect(ui->timeApplyForce,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFramesForce2Time(double)));
+
     //angulo do solo
     connect(ui->groundx,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
     connect(ui->groundy,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
