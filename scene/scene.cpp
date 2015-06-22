@@ -254,7 +254,9 @@ void Scene::simulationStep(bool balance)
     //std::cout << "Tempo que passou: " << elapsedTime << "\n";
     //printf("%d elapsed time\n", elapsedTime);
     for (std::vector<GraphicalPose*>::iterator i = this->poseControl.begin(); i < this->poseControl.end(); i++){
-       (*i)->advanceTime(elapsedTime);
+       if ((*i)->getAdvancingTime() == true){
+            (*i)->advanceTime(elapsedTime);
+       }
     }
     pose_time.start();
 }
@@ -1340,6 +1342,11 @@ void Scene::createLuxo()
     Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,1.0,luxo,materialLuxo);
     Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
 
+    /*Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.02,luxo,materialLuxo);
+    Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,0.05,luxo,materialLuxo);
+    Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,0.10,luxo,materialLuxo);
+    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,0.30,luxo,materialLuxo);*/
+
     lamp->setFoot(false);
     upperBody->setFoot(false);
     lowerBody->setFoot(false);
@@ -1376,6 +1383,16 @@ void Scene::createLuxo()
     feetLowerControl->setKs(Vec4(40.0,40.0,40.0));
     feetLowerControl->setKd(Vec4(2.0,2.0,2.0));
 
+    /*upperLampControl->setKs(Vec4(0.04,0.04,0.04));
+    upperLampControl->setKd(Vec4(0.001,0.001,0.001));
+
+    lowerUpperControl->setKs(Vec4(0.04,0.04,0.04));
+    lowerUpperControl->setKd(Vec4(0.001,0.001,0.001));
+
+    feetLowerControl->setKs(Vec4(0.05,0.05,0.05));
+    feetLowerControl->setKd(Vec4(0.001,0.001,0.001));*/
+
+
     luxo->controllers.push_back(upperLampControl);
     luxo->controllers.push_back(lowerUpperControl);
     luxo->controllers.push_back(feetLowerControl);
@@ -1386,32 +1403,44 @@ void Scene::createLuxo()
     //construindo as poses do Luxo
     std::vector<Vec4> pose1a;
     pose1a.push_back(Vec4(0,0,-90));
-    pose1a.push_back(Vec4(0,0,-90));
+    pose1a.push_back(Vec4(0,0,-45));
     pose1a.push_back(Vec4(0,0,20));
     Pose* pose1 = addPose(luxo,pose1a);
     pose1->setName("pose inicio");
 
     std::vector<Vec4> pose2a;
     pose2a.push_back(Vec4(0,0,-90));
-    pose2a.push_back(Vec4(0,0,-110));
+    pose2a.push_back(Vec4(0,0,-90));
     pose2a.push_back(Vec4(0,0,20));
     Pose* pose2 = addPose(luxo,pose2a);
     pose2->setName("pose meio");
 
     std::vector<Vec4> pose3a;
     pose3a.push_back(Vec4(0,0,-90));
-    pose3a.push_back(Vec4(0,0,-100));
+    pose3a.push_back(Vec4(0,0,-60));
     pose3a.push_back(Vec4(0,0,20));
     Pose* pose3 = addPose(luxo,pose3a);
     pose3->setName("pose fim");
 
+    std::vector<Vec4> pose4a;
+    pose4a.push_back(Vec4(0,0,-90));
+    pose4a.push_back(Vec4(0,0,-30));
+    pose4a.push_back(Vec4(0,0,60));
+    Pose* pose4 = addPose(luxo,pose4a);
+    pose4->setName("pose fim alternativa");
 
     GraphicalPose* luxoPose = addGraphicalPose(luxo);
     luxoPose->pushBackPose(pose1, 2000);
-    luxoPose->pushBackPose(pose2, 500);
-    luxoPose->pushBackPose(pose3, 1000);
+    luxoPose->pushBackPose(pose2, 2000);
+    luxoPose->pushBackPose(pose3, 2000);
 
+    luxoPose->setActive(true);
+    luxoPose->setAdvancingTime(true);
 
+    GraphicalPose* luxoPose2 = addGraphicalPose(luxo);
+    luxoPose2->pushBackPose(pose1, 2000);
+    luxoPose2->pushBackPose(pose2, 2000);
+    luxoPose2->pushBackPose(pose4, 2000);
 
     //Necessário para ele não sair voando com o pcg
     this->setGravity(true);

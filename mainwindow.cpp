@@ -581,6 +581,10 @@ void MainWindow::showSelectedObject(int i)
 void MainWindow::showSelectedPoseControl(int i)
 {
     pose_control_selected = ui->widgetPhysics->getPoseControlList().at(i);
+    //Quando seleciona um controle de pose, torna ele ativo e começa a avançar o tempo dele
+    pose_control_selected->setActive(true);
+    pose_control_selected->setAdvancingTime(true);
+
     pose_selected = pose_control_selected->getPoses().at(0);
     std::cout << pose_control_selected->getName().toStdString() << "\n";
     updateListPose(pose_control_selected->getPoses());
@@ -589,7 +593,7 @@ void MainWindow::showSelectedPoseControl(int i)
     if (charName == NULL){
         charName.sprintf("Character %d", i);
     }
-    ui->correspChar->setText(ui->correspChar->text() + " " + charName);
+    ui->correspChar->setText("Corresponding Character: " + charName);
 }
 
 void MainWindow::showSelectedPose(int i)

@@ -17,6 +17,8 @@ private:
     unsigned int        currentPos;
     unsigned int        nextPos;
     QString             name;
+    bool                active;
+    bool                advancingTime;
 
 public:
     GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeIntervals);
@@ -40,6 +42,10 @@ public:
     void                setCharacterShape(); //Função que atualiza os controladores do personagem de acordo com a pose corrente
     void                setCharacterShape(Pose* pose); //Função que atualiza os controladores do personagem de acordo com o argumento pose
     void                setName(QString name);
+    bool                getActive() const;
+    void                setActive(bool value);
+    bool                getAdvancingTime() const;
+    void                setAdvancingTime(bool value);
 };
 
 #endif // GRAPHICALPOSE_H

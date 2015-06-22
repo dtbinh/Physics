@@ -11,6 +11,8 @@ GraphicalPose::GraphicalPose(std::vector<Pose*> poses, std::vector<double> timeI
     this->character = poses.at(0)->getCharacter();
     this->poses = poses;
     this->timeIntervals = timeIntervals;
+    this->active = false;
+    this->advancingTime = false;
 
     //Cria o vetor de intervalos de tempo cumulativos
     double sum = 0.0;
@@ -54,6 +56,10 @@ QString GraphicalPose::getName()
     return this->name;
 }
 
+bool GraphicalPose::getActive() const
+{
+    return active;
+}
 
 void GraphicalPose::pushBackPose(Pose *newPose, double poseInterval)
 {
@@ -163,16 +169,15 @@ void GraphicalPose::advanceTime(double increment)
     this->currentPos = pos;
     this->nextPos = nextPos;
     //Agora vamos criar uma pose cujos valores são a interpolação dos valores das poses nos locais correspondentes
-    //std::cout << pos << " pos " << nextPos << " nextpos \n";
-    //std::cout << this->poses[pos]->getName().toStdString() << " pos " << this->poses[nextPos]->getName().toStdString() << " nextPos\n";
     this->time = newTime;
 
-    //this->poses[pos]->interpolateAndApply(this->poses[nextPos], newTime, this->timeIntervals[pos]);
-    Pose* interpolatedPose = this->poses[pos]->interpolateWith(this->poses[nextPos], newTime-this->cumulativeTimeIntervals[pos], this->timeIntervals[pos]);
-    if (interpolatedPose != NULL){
-        this->setCharacterShape(interpolatedPose);
-        delete interpolatedPose;
-        interpolatedPose = NULL;
+    if (this->active == true){
+        Pose* interpolatedPose = this->poses[pos]->interpolateWith(this->poses[nextPos], newTime-this->cumulativeTimeIntervals[pos], this->timeIntervals[pos]);
+        if (interpolatedPose != NULL){
+            this->setCharacterShape(interpolatedPose);
+            delete interpolatedPose;
+            interpolatedPose = NULL;
+        }
     }
 }
 
@@ -196,3 +201,17 @@ void GraphicalPose::setName(QString name)
     this->name = name;
 }
 
+void GraphicalPose::setActive(bool value)
+{
+    active = value;
+}
+
+bool GraphicalPose::getAdvancingTime() const
+{
+    return advancingTime;
+}
+
+void GraphicalPose::setAdvancingTime(bool value)
+{
+    advancingTime = value;
+}
