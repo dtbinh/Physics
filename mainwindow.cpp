@@ -608,13 +608,18 @@ void MainWindow::showSelectedObject(int i)
 
 void MainWindow::showSelectedPoseControl(int i)
 {
+
     pose_control_selected = ui->widgetPhysics->getPoseControlList().at(i);
+    if(pose_control_selected==NULL) return;
     //Quando seleciona um controle de pose, torna ele ativo e começa a avançar o tempo dele
     pose_control_selected->setActive(true);
     pose_control_selected->setAdvancingTime(true);
 
     pose_selected = pose_control_selected->getPoses().at(0);
-    std::cout << pose_control_selected->getName().toStdString() << "\n";
+    pose_selected = pose_control_selected->getPoses().at(0);
+
+    if(pose_selected==NULL) return;
+    //std::cout << pose_control_selected->getName().toStdString() << "\n";
     updateListPose(pose_control_selected->getPoses());
 
     QString charName = pose_control_selected->getCharacter()->getName();
@@ -628,7 +633,7 @@ void MainWindow::showSelectedPose(int i)
 {
     pose_selected = pose_control_selected->getPoses().at(i);
     ui->poseTimeSelector->setValue(pose_control_selected->getTimeIntervals().at(i));
-    updateListPoseAngles(pose_selected->getCharacter()->getJoints());
+    if(pose_selected!=NULL) updateListPoseAngles(pose_selected->getCharacter()->getJoints());
 }
 
 void MainWindow::showSelectedPoseJoint(int i)
