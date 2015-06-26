@@ -18,6 +18,7 @@ signals:
     void updateJoints(std::vector<Joint*>);
     void updatePoseControls(std::vector<GraphicalPose*>);
     void updatePoses(std::vector<Pose*>);
+    void updateObject(Object*);
     void updateKsProp(Vec4);
     void updateKdProp(Vec4);
     void updateBalancePD(Vec4,Vec4,Vec4,Vec4,Vec4,Vec4);
@@ -34,17 +35,29 @@ signals:
     void setEndClycleWidget(int);
     void setGravity(Vec4 v);
     void setEnableGravity(bool);
-    void setAngleDirection(int);
+    void setAngleDirectionY(int);
+    void setAngleDirectionX(int);
+    void setAngleDirectionZ(int);
     void setToleranceFoot(double);
 
 public slots:
+
+    Scene* getScene();
 
     //slots edição
     void setScreenShot(bool b);
     void setRenderMesh(bool b);
     void setShowInfos(bool b);
+
+    //fricção
+
+    void setFrictionGround(double friction);
+    void setFrictionFootAir(double friction);
+
+
     //slots motion capture
 
+    void updateMotionPosition(int pos);
     void loadMotionCapture(QString file);
     void loadFramesConfig(QString file);
     void saveFramesConfig(QString file);
@@ -83,6 +96,7 @@ public slots:
     void setAngleBodyBalance(Vec4 v);
     void setEnableMomentumBalance(bool b);
     void setKsRelationshipKs(bool b);
+    void setGravityCompensation(int value);
 
     //cone de ficção
     void setLimitCone(int val);
@@ -98,6 +112,9 @@ public slots:
     void setKVelocityLocomotion(Vec4 k);
     void setKDistanceLocomotion(Vec4 k);
     void setVelocityDensityBalls(float den,float vel); //atualiza a densidade e velocidade das bolas
+    void updateAngleGround(Vec4 ang); //atualiza o angulo do solo
+    void setMassSuitcase(double val);
+    void setFramesForce2Time(double val);
 
     //slots personagens
     std::vector<Object*> getObjectsList();
@@ -118,7 +135,7 @@ public slots:
     void drawScene();
     void drawParameters();
     void drawPoseProgression();
-
+    void drawForceApply();
 
 
     //slots não utilizados
@@ -149,8 +166,16 @@ public:
     float timeBase;
     float FPS;
     QTime m_time;
+    bool  has_ball_shot;
+    Vec4  ball_shot_debug;
+
+
     void bindShader();
     void releaseShader();
+    float mass_suitcase;
+
+    int  frames_force;
+
 
 
     //Controle do personagem luxo
@@ -169,9 +194,11 @@ public:
     void mouseReleaseEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
     //funções extras
     MoCap* pushMotionCapture();
     void drawShadows();
+    void drawReflections();
     void loadCurveExample();
     void showCurveExample();
     void setScreenShot();

@@ -40,8 +40,16 @@ Scene::Scene(GLWidget *parent)
     this->gravity = Vec4(0,-9.8,0);
     motion.clear();
     mocap.clear();
+    this->rotate_plane = Vec4(0,0,0);
+    this->friction_ground = 1000;
+    this->friction_foot_air = 15;
 
-    pose_time.start();
+    this->viewer[0] = Vec4(0,1,5);
+    this->viewer[1] = Vec4(0,1,0);
+    this->viewer[2] = Vec4(0,1,0);
+
+
+    //pose_time.start();
 
 //    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(74,0,0)),TYPE_CUBE,1.2);
 //    Object *cont = addObject(Vec4(1.8,0.20,0.5),Vec4(0.2,0.1,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2);
@@ -58,7 +66,7 @@ Scene::~Scene(){
     Physics::closeScene(this);
 }
 
-Object* Scene::addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass,Character *character,int material)
+Object* Scene::addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass,Character *character,int material)
 {
     //srand(time(NULL));
     //int r = rand() %22;
@@ -102,11 +110,10 @@ void Scene::restartPhysics()
         characters.at(i)->restartPhysics();
         if (characters.at(i)->getBodiesFoot().size()>0)
             characters.at(i)->checkContactFoot(true);
+        characters.at(i)->isFall(false);
     }
     if(enableGravity) Physics::setGravity(this,this->gravity);
     else Physics::setGravity(this,Vec4());
-    //createLuxo();
-    //createCharacter();
 
 }
 
@@ -137,7 +144,7 @@ void Scene::simulationStep(bool balance)
     Vec4 mom_ang_des= Vec4();
     Joint* jDes = NULL; //junta que é aplicado o torque virtual
     float mass_total= 0;
-    Quaternion qd = Quaternion();
+    QuaternionQ qd = QuaternionQ();
     Vec4 vel_angd = Vec4();
     if(characters.size()>0){
         jDes = characters.at(0)->getJointParentBalance();
@@ -163,9 +170,11 @@ void Scene::simulationStep(bool balance)
                 characters.at(0)->getMoCap()->stepFrame(frame_step);
                 if((characters.at(0)->getMoCap()->sizeFrames()>0)&&(characters.at(0)->getMoCap()->status))
                     for(unsigned int i=0; i<characters.at(0)->getControllersPD().size();i++){
-                        Quaternion des = characters.at(0)->getMoCap()->getFrameSimulation(frame_step)->quatDes.at(i);
-                        Object* father = this->getCharacter(0)->getControllersPD().at(i)->getJoint()->getParent();
-                        Object* child = this->getCharacter(0)->getControllersPD().at(i)->getJoint()->getChild();
+                        int j = i;
+                        if(this->getCharacter(0)->has_suitcase && i==this->getCharacter(0)->getControllersPD().size()-1) break;
+                        QuaternionQ des = characters.at(0)->getMoCap()->getFrameSimulation(frame_step)->quatDes.at(j);
+                        Object* father = this->getCharacter(0)->getControllersPD().at(j)->getJoint()->getParent();
+                        Object* child = this->getCharacter(0)->getControllersPD().at(j)->getJoint()->getChild();
 
                         Vec4 veldes = characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(child)) - characters.at(0)->getMoCap()->velocityAngularBody(frame_step,characters.at(0)->getIdObject(father));
                         characters.at(0)->getControllersPD().at(i)->setQuaternionWanted(des);
@@ -196,7 +205,7 @@ void Scene::simulationStep(bool balance)
            for(unsigned int i=0;i<objs.size();i++){
                Physics::setEnableObject(objs.at(i));
                if ((objs.at(i)->isSelected()) && !apply){
-                   objs.at(i)->addForce(this->externalForce);
+                   objs.at(i)->appForce(this->externalForce);
                }
                objs.at(i)->evaluate(1);
 
@@ -246,7 +255,7 @@ void Scene::simulationStep(bool balance)
 //    }
 
 //      printf("Tempo gasto em milissegundos %.3f\n",tempo);
-        apply = true;
+        //apply = true;
  objs.clear();
  jts.clear();
 
@@ -283,12 +292,12 @@ void Scene::draw()
         std::vector<Object*> objs = objectsScene();
         for(unsigned int i=0;i<objs.size();i++)
             if (objs.at(i)->isSelected()){
-                Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.5);
+                Draw::drawArrow(objs.at(i)->getPositionCurrent(),this->externalForce.unitary(),0.3);
             }
         objs.clear();
     }
 
-    if (show_grf)
+//    if (show_grf)
 //    if (characters.size()>0){
 //        for(int i=0;i<getCharacter(0)->getNumBodies();i++){
 //            if(getCharacter(0)->getBody(i)->getFoot()){
@@ -330,192 +339,192 @@ void Scene::loadSceneObjects()
 {                                    //x   y    z
 
     //srand(time(NULL));
-    addObject(Vec4(0.02,0.02,0.02),Vec4(0,0.020,0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(0.2,0.020,0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(0,0.020,-0.2),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(-0.5,0.020,0.5),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(1.0,0.020,-2.0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(1.70,0.020,-0.70),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(-1.30,0.020,0.20),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
-    addObject(Vec4(0.02,0.02,0.02),Vec4(-2.0,0.020,-1.20),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(0,0.020,0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(0.2,0.020,0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(0,0.020,-0.2),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(-0.5,0.020,0.5),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(1.0,0.020,-2.0),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(1.70,0.020,-0.70),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(-1.30,0.020,0.20),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
+//    addObject(Vec4(0.02,0.02,0.02),Vec4(-2.0,0.020,-1.20),Quaternion(),TYPE_SPHERE,2,0,MATERIAL_COPPER);
 
-    float z = -5;
-    float y = 0.35;
-    float x = 0;
+//    float z = -5;
+//    float y = 0.35;
+//    float x = 0;
 
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(2.34+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(2.87+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(3.38+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(3.91+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(-2.34+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(-2.87+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(-3.38+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-//    addObject(Vec4(0.5,0.5,0.5),Vec4(-3.91+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(2.34+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(2.87+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(3.38+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(3.91+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(-2.34+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(-2.87+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(-3.38+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+////    addObject(Vec4(0.5,0.5,0.5),Vec4(-3.91+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
 
-    z = -4.49;
-    y = 0.35;
-    x = 0.05;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -3.94;
+//    z = -4.49;
+//    y = 0.35;
+//    x = 0.05;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -3.94;
 
-    x = -0.05;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -3.38;
+//    x = -0.05;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -3.38;
 
-    x = -0.02;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -2.85;
+//    x = -0.02;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -2.85;
 
-    x = -0.02;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -2.31;
+//    x = -0.02;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -2.31;
 
-    x = -0.05;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -1.79;
+//    x = -0.05;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -1.79;
 
-    x = 0.02;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -1.25;
+//    x = 0.02;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -1.25;
 
-    x = 0.05;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = -0.74;
+//    x = 0.05;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = -0.74;
 
-    x = -0.01;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    x = -0.01;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
 
 
-    z = -0.2;
+//    z = -0.2;
 
-    x = 0.02;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = 0.34;
+//    x = 0.02;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = 0.34;
 
-    x = 0.03;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = 0.85;
+//    x = 0.03;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = 0.85;
 
-    x = -0.07;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = 1.37;
+//    x = -0.07;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = 1.37;
 
-    x = 0.01;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = 1.88;
+//    x = 0.01;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = 1.88;
 
-    x = 0.05;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    z = 2.4;
+//    x = 0.05;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    z = 2.4;
 
-    x = -0.02;
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
-    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    x = -0.02;
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(0.25+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.27+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-0.78+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.31+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
+//    addObject(Vec4(0.5,0.5,0.5),Vec4(-1.81+x,y,z),Quaternion(),TYPE_CUBE,10,0,MATERIAL_TURQUOSIE);
 
 
 }
@@ -615,6 +624,21 @@ void Scene::setViewer(Vec4 eye, Vec4 at, Vec4 up)
     viewer[0] = eye;
     viewer[1] = at;
     viewer[2] = up;
+}
+
+Vec4 Scene::getEye()
+{
+    return viewer[0];
+}
+
+Vec4 Scene::getAt()
+{
+    return viewer[1];
+}
+
+Vec4 Scene::getUp()
+{
+    return viewer[2];
 }
 
 void Scene::setProjection(Vec4 p)
@@ -762,7 +786,8 @@ void Scene::addCharacter(Character *chara)
 
 void Scene::setExternalForce(Vec4 force)
 {
-    apply = false;
+    if(force.module()==0) apply = true;
+    else apply = false;
     this->externalForce = force;
 }
 
@@ -1043,6 +1068,41 @@ Object *Scene::getObject(Ray ray)
     return objsel;
 }
 
+void Scene::setFrictionGround(float friction)
+{
+    this->friction_ground = friction;
+    if (this->friction_ground<2){ //ice 0.02 ~ 0.09
+        is_ground_ice = true;
+    }else{
+        is_ground_ice = false;
+    }
+}
+
+float Scene::getFrictionGround()
+{
+    return this->friction_ground;
+}
+
+void Scene::setFrictionFootAir(float friction)
+{
+    this->friction_foot_air = friction;
+}
+
+float Scene::getFrictionFootAir()
+{
+    return this->friction_foot_air;
+}
+
+void Scene::setFrameCurrent(int i)
+{
+    frame_step = i;
+}
+
+bool Scene::isGroundIce()
+{
+    return is_ground_ice;
+}
+
 void Scene::setAlphaCharacter(float val)
 {
     if (characters.size()==0) return;
@@ -1114,7 +1174,7 @@ void Scene::shotBallsCharacterRandom(Character *chara,int posPelvis,float den)
        obj->setMaterial(MATERIAL_EMERALD);
        obj->setType(TYPE_SPHERE);
        obj->setPosition(inicio);
-       obj->setRotation(Quaternion());
+       obj->setRotation(QuaternionQ());
        obj->setProperties(Vec4(massTotal/1000.,massTotal/1000.,massTotal/1000.));
        obj->setFMass(massTotal);
 
@@ -1264,7 +1324,40 @@ void Scene::shotBallsCharacterBody(Object *body, float velocity, float den)
        obj->setMaterial(MATERIAL_EMERALD);
        obj->setType(TYPE_SPHERE);
        obj->setPosition(inicio);
-       obj->setRotation(Quaternion());
+       obj->setRotation(QuaternionQ());
+       obj->setProperties(Vec4(100/1000.,100/1000.,100/1000.));
+       obj->setFMass(massTotal);
+
+       Physics::createObject(obj,space,massTotal,inicio,velInicial);
+       objects_shoot.push_back(obj);
+
+       while ( this->objects_shoot.size() > 10 ) {
+           this->objects_shoot.at(0)->clearPhysics();
+         this->objects_shoot.erase(objects_shoot.begin());
+       }
+}
+
+void Scene::shotBallsCharacterBody(Object *body, float velocity, Vec4 inicio, float mass)
+{
+
+    Vec4 posPelvisModel = body->getPositionCurrent();
+
+     //velInicial
+       Vec4 directionVelInicial = posPelvisModel-(inicio);
+
+       directionVelInicial.normalize();
+       Vec4 velInicial = directionVelInicial*(velocity);// dRandReal()*30.0+10.0 );
+       //Vec4 vell = velInicial;
+       //vell.x2=0;
+       //printf("\nVelocidade: %.3f",vell.module());
+       dReal massTotal;
+       //if ( pelvisIsTheTarget ) {
+       massTotal = (dReal)mass;
+       Object *obj = new Object(this);//position,rotation,properties,type,this);
+       obj->setMaterial(MATERIAL_EMERALD);
+       obj->setType(TYPE_SPHERE);
+       obj->setPosition(inicio);
+       obj->setRotation(QuaternionQ());
        obj->setProperties(Vec4(100/1000.,100/1000.,100/1000.));
        obj->setFMass(massTotal);
 
@@ -1284,6 +1377,49 @@ void Scene::habiliteJump()
     }
 }
 
+void Scene::setRotationPlane(Vec4 rot)
+{
+    Physics::closePlane(this->Plane);
+    this->rotate_plane = rot;
+    Vec4 initial_vec(0,1,0,0);
+
+    QuaternionQ qat(rot);
+    initial_vec = qat.getMatrix().vector(initial_vec);
+
+    //float rot_ang_z = (Vec4(1,0,0)*initial_vec)/(Vec4(1,0,0).module()*initial_vec.module());
+    //float a = acos(rot_ang_z);
+    //this->rotate_plane.x3 = 30;//180*a/M_PI;
+
+    //initial_vec.showVec4();
+    //initial_vec.showVec4();
+    //qDebug() << rotate_plane.z();
+    //exit(1);
+
+    this->Plane = Physics::initPlane(initial_vec.unitary(),this);
+    restartPhysics();
+
+
+}
+
+Vec4 Scene::getRotationPlane()
+{
+    return this->rotate_plane;
+}
+
+Vec4 Scene::getRotationPlaneVector()
+{
+    Vec4 initial_vec(0,1,0,0);
+
+    QuaternionQ qat(rotate_plane);
+    initial_vec = qat.getMatrix().vector(initial_vec);
+
+    //float rot_ang_z = (Vec4(1,0,0)*initial_vec)/(Vec4(1,0,0).module()*initial_vec.module());
+    //float a = acos(rot_ang_z);
+    //this->rotate_plane.x3 = 30;//180*a/M_PI;
+
+    return initial_vec.unitary();
+}
+
 bool Scene::isGeometryFootSwing(dGeomID geom)
 {
     std::vector<Object*> obj = objectsScene();
@@ -1300,9 +1436,9 @@ void Scene::createRamp()
 
 
   //  Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.1,1.5),Quaternion(Vec4(75,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
-    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),Quaternion(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
-    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),Quaternion(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
-    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),Quaternion(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),QuaternionQ(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),QuaternionQ(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),QuaternionQ(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
     objects.push_back(ramp);
     objects.push_back(cont);
     objects.push_back(ramp2);
@@ -1314,17 +1450,147 @@ void Scene::createRamp()
     // objects.push_back(addObject(Vec4(0.8,0.1,0.4),Vec4(0.2,0.05,1.3),Quaternion(Vec4(0,0,0)),TYPE_CUBE,1.2));
 }
 
+void Scene::createArena()
+{
+    Vec4 offset;
+
+    float dim_unit = 0.3;
+
+    float height_wall = 0.5; //altura
+    float lenght_wall = 0.2; //largura
+    float mass_wall = 500;
+
+    int units = 12;
+
+    int color_wall = MATERIAL_CHROME;
+
+    //walls
+    Object *wall_left = addObject(Vec4(lenght_wall,height_wall,(units+2)*dim_unit),offset+Vec4(-(units/2.)*dim_unit-lenght_wall/2.0,height_wall/2.0,0.0),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+    Object *wall_top = addObject(Vec4(units*dim_unit,height_wall,lenght_wall),offset+Vec4(0.0,height_wall/2.0,-6*dim_unit-lenght_wall),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+    Object *wall_right = addObject(Vec4(lenght_wall,height_wall,(units+2)*dim_unit),offset+Vec4((units/2.)*dim_unit+lenght_wall/2.0,height_wall/2.0,0.0),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+    Object *wall_bottom = addObject(Vec4(units*dim_unit,height_wall,lenght_wall),offset+Vec4(0.0,height_wall/2.0,6*dim_unit+lenght_wall),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+
+
+    objects.push_back(wall_left);
+    objects.push_back(wall_right);
+    objects.push_back(wall_top);
+    objects.push_back(wall_bottom);
+    joints.push_back(addJointFixed(wall_left,wall_right,NULL));
+    joints.push_back(addJointFixed(wall_top,wall_bottom,NULL));
+
+    //tijolos
+    Vec4 dim_brick(0.05,0.05,0.01);
+    float mass_brick = 10.5;
+    int color_brick = MATERIAL_COPPER;
+    //posição varia de acordo com a dimensão -units*dim_units<= x & y <= units*dim_units
+         //posição varia de acordo com o quadrante -units/4.*dim_units<= x & y <= units/4.*dim_units
+    //primeiro quadrante
+
+    Object *brick1_1 = addObject(dim_brick,offset+Vec4(2*dim_unit,dim_brick.y()/2.0,5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_1 = addObject(dim_brick,offset+Vec4(5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick3_1 = addObject(dim_brick,offset+Vec4(5.5*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick4_1 = addObject(dim_brick,offset+Vec4(1.5*dim_unit,dim_brick.y()/2.0,1.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+    // segundo quadrante
+
+    Object *brick1_2 = addObject(dim_brick,offset+Vec4(-2*dim_unit,dim_brick.y()/2.0,3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_2 = addObject(dim_brick,offset+Vec4(-3*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick3_2 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick4_2 = addObject(dim_brick,offset+Vec4(-0.5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+    //terceiro quadrante
+
+    //Object *brick1_3 = addObject(dim_brick,offset+Vec4(-1.2*dim_unit,dim_brick.y()/2.0,-3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick2_3 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick3_3 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,-0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick4_3 = addObject(dim_brick,offset+Vec4(-5.5*dim_unit,dim_brick.y()/2.0,-4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+    //quarto quadrante
+
+    Object *brick1_4 = addObject(dim_brick,offset+Vec4(1.2*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_4 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick3_4 = addObject(dim_brick,offset+Vec4(3.5*dim_unit,dim_brick.y()/2.0,-5.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick4_4 = addObject(dim_brick,offset+Vec4(2.0*dim_unit,dim_brick.y()/2.0,-3.0*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+
+    //boxes
+    float offset_up = dim_brick.y()+0.1; //altura de onde as caixas cairão=-
+    float dim_box = (units/3.0)*dim_unit-0.01;
+    float dim_box_y = (units/5.0)*dim_unit;
+    int color_box = MATERIAL_ZINN;
+    float mass_box = 35.;
+
+    Object *box_1 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_2 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_3 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+    Object *box_4 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_5 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_6 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+    Object *box_7 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_8 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_9 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+
+
+
+
+
+
+   objects.push_back(box_1);
+   objects.push_back(box_2);
+   objects.push_back(box_3);
+   objects.push_back(box_4);
+   objects.push_back(box_5);
+   objects.push_back(box_6);
+   objects.push_back(box_7);
+   objects.push_back(box_8);
+   objects.push_back(box_9);
+
+
+
+
+    objects.push_back(brick1_1);
+    //objects.push_back(brick2_1);
+    objects.push_back(brick3_1);
+    //objects.push_back(brick4_1);
+
+
+    objects.push_back(brick1_2);
+    //objects.push_back(brick2_2);
+    objects.push_back(brick3_2);
+    //objects.push_back(brick4_2);
+
+    //objects.push_back(brick1_3);
+    objects.push_back(brick2_3);
+    objects.push_back(brick3_3);
+    //objects.push_back(brick4_3);
+
+    objects.push_back(brick1_4);
+    //objects.push_back(brick2_4);
+    //objects.push_back(brick3_4);
+    objects.push_back(brick4_4);
+
+
+//    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),QuaternionQ(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+//    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),QuaternionQ(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+//    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),QuaternionQ(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    this->gravity = Vec4(0,-9.8,0);
+    this->setGravity(true);
+}
+
 void Scene::createCharacter()
 {
     Character *chara = new Character(this);
     this->addCharacter(chara);
-    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.90,0),Quaternion(1,0,0,0),TYPE_CUBE,3.0,chara,MATERIAL_CHROME);
-    Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),Quaternion(1,0,0,0),TYPE_CUBE,2.5,chara,MATERIAL_EMERALD);
+    Object *A = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.90,0),QuaternionQ(1,0,0,0),TYPE_CUBE,3.0,chara,MATERIAL_CHROME);
+    Object *B = addObject(Vec4(0.2,0.5,0.2),Vec4(0,0.35,0),QuaternionQ(1,0,0,0),TYPE_CUBE,2.5,chara,MATERIAL_EMERALD);
     A->setFoot(false);
     B->setFoot(false);
     Joint* joint = this->addJointHinge(Vec4(0,0.625,0),Vec4(0.0,0.0,1.0),A,B,chara);
     //Joint* joint = this->addJointBall(Vec4(0,0.7,0),A,B,chara);
-    ControlPD *pd = new ControlPD(joint,Quaternion(1,0,0,0),Vec4(),Vec4());
+    ControlPD *pd = new ControlPD(joint,QuaternionQ(1,0,0,0),Vec4(),Vec4());
     pd->setEnabled(false);
     chara->controllers.push_back(pd);
     chara->contructHierarchyBodies();
@@ -1337,15 +1603,10 @@ void Scene::createLuxo()
     luxo->setName("luxo");
     this->addCharacter(luxo);
 
-    Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,3.5,luxo,materialLuxo);
-    Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,3.0,luxo,materialLuxo);
-    Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,1.0,luxo,materialLuxo);
-    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
-
-    /*Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.02,luxo,materialLuxo);
-    Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,0.05,luxo,materialLuxo);
-    Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,0.10,luxo,materialLuxo);
-    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,0.30,luxo,materialLuxo);*/
+    Object *lamp = addObject(Vec4(0.05,0.1,0.12),Vec4(0,0.8,0),QuaternionQ(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
+    Object *upperBody = addObject(Vec4(0.05,0.2,0.12), Vec4(0,0.6,0),QuaternionQ(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
+    Object *lowerBody = addObject(Vec4(0.05,0.3,0.12), Vec4(0,0.3,0), QuaternionQ(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
+    Object *feet = addObject(Vec4(1.0,0.01,0.5), Vec4(0,0.05,0), QuaternionQ(1,0,0,0),TYPE_CUBE,4,luxo,materialLuxo);
 
     lamp->setFoot(false);
     upperBody->setFoot(false);
@@ -1364,9 +1625,9 @@ void Scene::createLuxo()
     //Joint *feetLower = addJointHinge(Vec4(0,0.0775,0), Vec4(0,0,1), feet, lowerBody, luxo);
     //feetLower->setName("feetLower");
 
-    ControlPD *upperLampControl = new ControlPD(upperLamp,Quaternion(1,0,0,0),Vec4(),Vec4());
-    ControlPD *lowerUpperControl = new ControlPD(lowerUpper,Quaternion(1,0,0,0),Vec4(),Vec4());
-    ControlPD *feetLowerControl = new ControlPD(feetLower,Quaternion(1,0,0,0),Vec4(),Vec4());
+    ControlPD *upperLampControl = new ControlPD(upperLamp,QuaternionQ(1,0,0,0),Vec4(),Vec4());
+    ControlPD *lowerUpperControl = new ControlPD(lowerUpper,QuaternionQ(1,0,0,0),Vec4(),Vec4());
+    ControlPD *feetLowerControl = new ControlPD(feetLower,QuaternionQ(1,0,0,0),Vec4(),Vec4());
 
     upperLampControl->setEnabled(true);
     lowerUpperControl->setEnabled(true);
@@ -1444,51 +1705,6 @@ void Scene::createLuxo()
 
     //Necessário para ele não sair voando com o pcg
     this->setGravity(true);
-}
-void Scene::createLuxo2()
-{
-    int materialLuxo = MATERIAL_SILVER;
-    Character *luxo = new Character(this);
-    this->addCharacter(luxo);
-
-    Object *lamp = addObject(Vec4(0.05,0.1,0.05),Vec4(0,0.8,0),Quaternion(1,0,0,0),TYPE_CUBE,0.5,luxo,materialLuxo);
-    Object *upperBody = addObject(Vec4(0.05,0.2,0.05), Vec4(0,0.6,0),Quaternion(1,0,0,0),TYPE_CUBE,1,luxo,materialLuxo);
-    Object *lowerBody = addObject(Vec4(0.05,0.3,0.05), Vec4(0,0.3,0), Quaternion(1,0,0,0),TYPE_CUBE,3,luxo,materialLuxo);
-    Object *feet = addObject(Vec4(1.2,0.01,0.7), Vec4(0,0.05,0), Quaternion(1,0,0,0),TYPE_CUBE,10,luxo,materialLuxo);
-
-    lamp->setFoot(false);
-    upperBody->setFoot(false);
-    lowerBody->setFoot(false);
-    feet->setFoot(true);
-
-    Joint *upperLamp = addJointHinge(Vec4(0,0.725,0), Vec4(0,0,1), upperBody, lamp, luxo);
-    upperLamp->setName("upperLamp");
-    Joint *lowerUpper = addJointHinge(Vec4(0,0.475,0), Vec4(0,0,1), lowerBody, upperBody, luxo);
-    lowerUpper->setName("lowerUpper");
-    Joint *feetLower = addJointHinge(Vec4(0,0.125,0), Vec4(0,0,1), feet, lowerBody, luxo);
-    feetLower->setName("feetLower");
-
-
-    ControlPD *upperLampControl = new ControlPD(upperLamp,Quaternion(1,0,0,0),Vec4(),Vec4());
-    ControlPD *lowerUpperControl = new ControlPD(lowerUpper,Quaternion(1,0,0,0),Vec4(),Vec4());
-    ControlPD *feetLowerControl = new ControlPD(feetLower,Quaternion(1,0,0,0),Vec4(),Vec4());
-
-    upperLampControl->setEnabled(true);
-    lowerUpperControl->setEnabled(true);
-    feetLowerControl->setEnabled(true);
-
-    upperLampControl->setKs(Vec4(0.0,0.0,50.0));
-    upperLampControl->setKd(Vec4(0.0,0.0,5.0));
-    lowerUpperControl->setKs(Vec4(0.0,0.0,50.0));
-    lowerUpperControl->setKd(Vec4(0.0,0.0,5.0));
-    feetLowerControl->setKs(Vec4(0.0,0.0,50.0));
-    feetLowerControl->setKd(Vec4(0.0,0.0,5.0));
-
-    luxo->controllers.push_back(upperLampControl);
-    luxo->controllers.push_back(lowerUpperControl);
-    luxo->controllers.push_back(feetLowerControl);
-
-    luxo->contructHierarchyBodies();
 }
 
 

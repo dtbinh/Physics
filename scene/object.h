@@ -10,7 +10,7 @@
 class Ray;
 class Material;
 class Matrix4x4;
-class Matrix;
+class MatrixF;
 class Mesh;
 
 #define TYPE_CUBE      dBoxClass
@@ -40,7 +40,7 @@ private:
 
     // --------Geometry
     Vec4         position;                                                //posição inicial do centro do objeto
-    Quaternion   rotation;                                                //rotação inicial do objeto
+    QuaternionQ   rotation;                                                //rotação inicial do objeto
     Vec4         properties;                                              //propriedades de dimensão do objeto
     int          type;                                                    //tipo do objeto em vinculação com o ODE
     Material     *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
@@ -67,7 +67,7 @@ private:
 public:
     Object();
     Object(Scene *scene);
-    Object(Vec4 position,Quaternion rotation,Vec4 properties,int type,Scene *scene,QString name="");
+    Object(Vec4 position,QuaternionQ rotation,Vec4 properties,int type,Scene *scene,QString name="");
     void setCharacter(Character *chara);
     Character* getCharacter();
     ~Object();
@@ -104,10 +104,10 @@ public:
     Vec4        getRelVelLinear();                                         //retorna a velocidade linear em coordenadas globais
     void        clearPhysics();
     // --------Matrix
-    Matrix      getAd(); //calcula matriz Adjunta que muda as coordenadas do frame do mundo para o frame do corpo
-    Matrix      getAd(Character* chara);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
-    Matrix      getAd(Vec4 pos);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
-    Matrix      getIM(); //calcula a matriz 6x6 de inercia com a massa do objeto
+    MatrixF      getAd(); //calcula matriz Adjunta que muda as coordenadas do frame do mundo para o frame do corpo
+    MatrixF      getAd(Character* chara);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
+    MatrixF      getAd(Vec4 pos);//calcula matriz Adjunta que muda as coordenadas do frame do COM para o frame do corpo
+    MatrixF      getIM(); //calcula a matriz 6x6 de inercia com a massa do objeto
     // --------Control
     void        setBodyBalance(bool b);
     bool        getBodyBalance();
@@ -126,27 +126,27 @@ public:
     void        wireframe();                                               //desenha o objeto como wireframe
     void        draw(bool wire=false);                                                    //desenha o objeto
     void        drawShadow();                                                    //desenha o objeto
-    void        draw(Vec4 position,Quaternion q,int mat=-1);
+    void        draw(Vec4 position,QuaternionQ q,int mat=-1);
     Vec4        getProperties();                                           //extraí propriedades de escala do objeto
     void        setProperties(Vec4 properties);                            //seta propriedades de escala do objeto
     void        setPosition(Vec4 position);                                //seta posição inicial do centro de massa do objeto
     void        setPositionCurrent(Vec4 position);
     Vec4        getPosition();                                             //extraí posição inicial do objeto
-    void        setRotation(Quaternion rotation);                          //seta orientação inicial do objeto
-    void        setRotationCurrent(Quaternion rotation);
-    Quaternion  getRotation();                                             //extraí rotação inicial do objeto
+    void        setRotation(QuaternionQ rotation);                          //seta orientação inicial do objeto
+    void        setRotationCurrent(QuaternionQ rotation);
+    QuaternionQ  getRotation();                                             //extraí rotação inicial do objeto
     int         getType();                                                 //extraí o tipo do objeto
     void        setType(int type);                                         //seta o tipo do objeto
     void        setFMass(float fmass);                                     //seta a massa para o objeto
     float       getFMass();                                                //extraí a massa do objeto
     Vec4        getPositionCurrent();                                      //extraí a posição atual do objeto
-    Quaternion  getRotationCurrent();                                      //extraí a posição atual do objeto
+    QuaternionQ  getRotationCurrent();                                      //extraí a posição atual do objeto
     void        setFoot(bool b);                                           //seta se o objeto é um pé ou não
     bool        getFoot();                                                 //extraí se o objeto é um pé ou não
     Vec4        posEffectorForward();
     Vec4        posEffectorBackward();
-    static Vec4 posEffectorForward(Vec4 pos,Quaternion rot,Object* obj);
-    static Vec4 posEffectorBackward(Vec4 pos,Quaternion rot,Object* obj);
+    static Vec4 posEffectorForward(Vec4 pos,QuaternionQ rot,Object* obj);
+    static Vec4 posEffectorBackward(Vec4 pos,QuaternionQ rot,Object* obj);
     QString     showInfo();
     void        setRenderMesh(bool b);
     float        intersectionRay(Ray ray,float t=0);

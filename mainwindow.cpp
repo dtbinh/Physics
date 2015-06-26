@@ -26,10 +26,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->showMaximized();
     //ui->toleranciaCOM->setVisible(false);
+//    ui->listWidgetObjects->setBackgroundRole(QPalette(
+//                                                 QColor));
 
 //    ui->actionOpen_Simulation->setShortcut(Qt::Key_0);
     ui->groupBoxCone->setVisible(false);
     ui->widgetPhysics->setObjectSelected(-1);
+
+    connect(ui->Options,SIGNAL(currentChanged(int)),this,SLOT(refactorOptions(int)));
+
     connect(ui->checkScreenShot,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setScreenShot(bool)));
     connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
     connect(ui->infoShow,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowInfos(bool)));
@@ -39,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),ui->nframe,SLOT(setNum(int)));
     connect(ui->widgetPhysics,SIGNAL(motionCurrentFrame(int)),ui->timeLineMotion,SLOT(setValue(int)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
+    connect(ui->timeLineMotion,SIGNAL(sliderMoved(int)),ui->widgetPhysics,SLOT(updateMotionPosition(int)));
+
+
     connect(ui->sensorTolerance,SIGNAL(valueChanged(double)),this,SLOT(adjustTolerance(double)));
     connect(ui->widgetPhysics,SIGNAL(setToleranceFoot(double)),ui->sensorTolerance,SLOT(setValue(double)));
     connect(ui->widgetPhysics,SIGNAL(motionTotalFrame(int)),this,SLOT(setMaxTimeLine(int)));
@@ -63,8 +71,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetPhysics,SIGNAL(setEnableGravity(bool)),ui->enableGravity,SLOT(setChecked(bool)));
     connect(ui->kdtoks,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setKsRelationshipKs(bool)));
 
+    //objeto
+    connect(ui->widgetPhysics,SIGNAL(updateObject(Object*)),this,SLOT(infoSelectedObject(Object*)));
 
+    //maleta
+    connect(ui->massSuitcase,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setMassSuitcase(double)));
 
+    //ficção
+    connect(ui->frictionFootAir,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionFootAir(double)));
+    connect(ui->frictionGround,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFrictionGround(double)));
+
+    //compensação da gravidade
+    connect(ui->gravComp,SIGNAL(valueChanged(int)),ui->widgetPhysics,SLOT(setGravityCompensation(int)));
 
 
     //manipuladores de junta
@@ -138,7 +156,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->checkGRF,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setShowGRF(bool)));
 
         //manipuladores de equilíbrio
-    connect(ui->widgetPhysics,SIGNAL(setAngleDirection(int)),ui->angleBalBodyy,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirectionY(int)),ui->angleBalBodyy,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirectionX(int)),ui->angleBalBodyx,SLOT(setValue(int)));
+    connect(ui->widgetPhysics,SIGNAL(setAngleDirectionZ(int)),ui->angleBalBodyz,SLOT(setValue(int)));
 
     connect(ui->angleBalBodyx,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
     connect(ui->angleBalBodyy,SIGNAL(valueChanged(int)),this,SLOT(updateAngleAnchor()));
@@ -225,6 +245,14 @@ MainWindow::MainWindow(QWidget *parent) :
     //testes
     connect(ui->densityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
     connect(ui->velocityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
+
+    //tempo força
+    connect(ui->timeApplyForce,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFramesForce2Time(double)));
+
+    //angulo do solo
+    connect(ui->groundx,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
+    connect(ui->groundy,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
+    connect(ui->groundz,SIGNAL(valueChanged(double)),this,SLOT(setAngleGround()));
 
 
     updateListObjects(ui->widgetPhysics->getObjectsList());
@@ -366,7 +394,7 @@ void MainWindow::updateControlPD()
 
     pd_selected->setKd(kd);
     pd_selected->setKs(ks);
-    pd_selected->setQuaternionWanted(Quaternion(angle));
+    pd_selected->setQuaternionWanted(QuaternionQ(angle));
     pd_selected->setEnabled(ui->enablepd->isChecked());
 }
 
@@ -512,7 +540,7 @@ void MainWindow::updateSelectedObject()
     Vec4 euler(ui->oeulerx->value(),ui->oeulery->value(),ui->oeulerz->value());
     obj_selected->setPosition(pos);
     obj_selected->setProperties(scale);
-    obj_selected->setRotation(Quaternion(euler));
+    obj_selected->setRotation(QuaternionQ(euler));
     obj_selected->setFMass(ui->mass->value());
 
 
@@ -634,14 +662,14 @@ void MainWindow::setGravity(Vec4 v)
 
 void MainWindow::setSimbiconDistance()
 {
-    Vec4 g(ui->xkFor->value(),ui->ykFor->value(),ui->zkFor->value());
-    ui->widgetPhysics->setSimbiconForceParameters(g);
+    Vec4 g(ui->xkDis->value(),ui->ykDis->value(),ui->zkDis->value());
+    ui->widgetPhysics->setSimbiconDistanceParameters(g);
 }
 
 void MainWindow::setSimbiconForce()
 {
-    Vec4 g(ui->xkDis->value(),ui->ykDis->value(),ui->zkDis->value());
-    ui->widgetPhysics->setSimbiconDistanceParameters(g);
+    Vec4 g(ui->xkFor->value(),ui->ykFor->value(),ui->zkFor->value());
+    ui->widgetPhysics->setSimbiconForceParameters(g);
 }
 
 void MainWindow::checkFoot(bool b)
@@ -697,6 +725,7 @@ void MainWindow::checkHasCoffeeCup(bool b)
     if (obj_selected!=NULL) obj_selected->setCoffeeCup(b);
 }
 
+
 void MainWindow::changePoseTime(double time)
 {
     if (pose_control_selected != NULL){
@@ -719,6 +748,62 @@ void MainWindow::changeJointAngle()
     //0std::cout.flush();
     pose_selected->updateAngle(pose_angle_selected, angle);
 }
+void MainWindow::refactorOptions(int index)
+{
+    if (index == 3) {
+        if(obj_selected!=NULL)
+            ui->listWidgetObjects->setCurrentRow(obj_selected->getScene()->getCharacter(0)->getIdObject(obj_selected));
+    }
+}
+
+
+void MainWindow::infoSelectedObject(Object *obj)
+{
+    if(obj==NULL) return;
+    disconnect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
+    disconnect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
+    obj_selected = obj;
+    int i = obj->getScene()->getCharacter(0)->getIdObject(obj);
+
+//    ui->listWidgetObjects->setCurrentRow(i);
+//    ui->listWidgetObjects->setSelectionModel(;);
+    Vec4 targ = obj_selected->getTarget();
+    disconnect(ui->posx_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    disconnect(ui->posy_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    disconnect(ui->posz_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    ui->posx_target->setValue(targ.x());
+    ui->posy_target->setValue(targ.y());
+    ui->posz_target->setValue(targ.z());
+    connect(ui->posx_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posy_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    connect(ui->posz_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
+    //ui->listWidgetObjects->itemClicked(ui->listWidgetObjects->item(i));
+    //ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
+    //ui->listWidgetObjects->setCurrentRow(obj_selected->getScene()->getCharacter(0)->getIdObject(obj_selected));
+    //ui->listWidgetObjects->item(i)->setHidden(true);
+
+
+//    ui->listWidgetObjects->itemPressed(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemClicked(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemEntered(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
+//    ui->listWidgetObjects->itemSelectionChanged();
+    ui->listWidgetObjects->item(i)->setSelected(true);
+    //qDebug() <<"Nome " << ui->listWidgetObjects->item(i)->text();
+    //ui->listWidgetObjects->item(i)->setBackgroundColor(QColor(1.0,1.0,0));
+    //ui->listWidgetObjects->setFocus();
+
+    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
+    connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
+
+    ui->listWidgetObjects->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->listWidgetObjects->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+
+
+
+}
 
 void MainWindow::applyForce2Object()
 {
@@ -734,7 +819,6 @@ void MainWindow::setMaxTimeLine(int v)
     ui->timeLineMotion->setMaximum(v);
     ui->frameEdit->setMaximum(v);
     ui->endClycle->setMaximum(v);
-    ui->endClycle->setValue(v);
     ui->beginClycle->setMaximum(v);
 }
 
@@ -757,6 +841,15 @@ void MainWindow::minusFrameEdition()
 void MainWindow::setBallsConfiguration()
 {
     ui->widgetPhysics->setVelocityDensityBalls(ui->densityBall->value(),ui->velocityBall->value());
+}
+
+void MainWindow::setAngleGround()
+{
+    Vec4 ang;
+    ang.setX(ui->groundx->value());
+    ang.setY(ui->groundy->value());
+    ang.setZ(ui->groundz->value());
+    ui->widgetPhysics->updateAngleGround(ang);
 }
 
 
@@ -855,6 +948,22 @@ void MainWindow::on_actionOpen_Simulation_triggered()
     ui->checkShowChara->setChecked(true);
     ui->checkShadow->setChecked(false);
     ui->checkWireChara->setChecked(false);
+
+    ui->frictionFootAir->setValue(ui->widgetPhysics->getScene()->getFrictionFootAir());
+    ui->frictionGround->setValue(ui->widgetPhysics->getScene()->getFrictionGround());
+
+    if(ui->widgetPhysics->getScene()->getSizeCharacter()>0){
+        Character *chara = ui->widgetPhysics->getScene()->getCharacter(0);
+        ui->gravComp->setValue((int)(ui->widgetPhysics->getScene()->getCharacter(0)->getBalance()->getCompensationGravity()*100.));
+        ui->stepsInterpolation->setValue(ui->widgetPhysics->getScene()->getCharacter(0)->getBalance()->getStepsInterpolation());
+        if(chara->getMoCap()!=NULL){
+            ui->beginClycle->setValue(chara->getMoCap()->getBeginClycle());
+            ui->endClycle->setValue(chara->getMoCap()->getEndClycle());
+            //qDebug() << chara->getMoCap()->getEndClycle();
+        }
+    }
+
+
 }
 
 void MainWindow::on_checkBox_clicked(bool checked)

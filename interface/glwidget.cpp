@@ -29,12 +29,21 @@
 
 #include <cmath>
 
+static int stencilReflection = 1, stencilShadow = 1;
+static int  renderReflection = 1;
+
+GLfloat lightZeroPosition[] = {10.0, 14.0, 10.0, 1.0};
+GLfloat lightZeroColor[] = {0.8, 1.0, 0.8, 1.0}; /* green-tinted */
+GLfloat lightOnePosition[] = {-1.0, 1.0, 1.0, 0.0};
+GLfloat lightOneColor[] = {0.6, 0.3, 0.2, 1.0}; /* red-tinted */
+GLfloat skinColor[] = {0.1, 1.0, 0.1, 1.0}, eyeColor[] = {1.0, 0.2, 0.2, 1.0};
+
 bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
 
 
-#define SHOTBALL 1
+#define SHOTBALL 3
 
 int mode = -1;
 Object *objselshot = NULL;
@@ -55,6 +64,9 @@ static float last_y = 0.0;
 #define SET_OBJECT 1
 Camera* cam = new Camera();
 static float savedCamera[9];
+
+Vec4 vector_draw_direction;
+
 //variáveis trackball
 
 int 	winWidth, winHeight;
@@ -143,7 +155,7 @@ void GLWidget::drawFPS()
 /************** Fim Camera *****************/
 
 int count = 0;
-Quaternion q;
+QuaternionQ q;
 //bool move = false;
 float angle = 45;
 int last_pox_x,last_pox_y;
@@ -155,7 +167,9 @@ Vec4 cam_at  = Vec4(0,1,0);
 int ciclo = 0;
 int ciclo_arrow = 0;
 int angle_quat = 0;
-int angle_direction = 0;
+int angle_directiony = 0;
+int angle_directionx = 0;
+int angle_directionz = 0;
 bool shadow = false;
 //variaveis de camera
 //int width,height;
@@ -280,7 +294,7 @@ void stopMotion(int x, int y)
 
 GLfloat floorShadow[4][4];
 GLfloat floorPlane[4] = {0,1.,0,0};
-GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 0.0 };
+GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 1.0 };
 
 //****************
 
@@ -320,12 +334,25 @@ GLWidget::GLWidget(QWidget *parent) :
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     density = 0.5; //massa
     velocity = 5.;
+
+    mass_suitcase = 1.0;
+    has_ball_shot = false;
+    ball_shot_debug = Vec4();
+    frames_force = 6;
+
+
+
+
+
+    //exit(1);
+
+
     //scene->createCharacter();
 
     //scene->createCharacter();
-    scene->createLuxo();
+    //scene->createLuxo();
     //scene->createLuxo2();
-    controlLuxo = false;
+    //controlLuxo = false;
 
 }
 
@@ -482,32 +509,43 @@ void GLWidget::drawScene(){
     //fim de determinação da camera
     glPushMatrix();
 
-    if (shadow) drawShadows();
+    if (shadow){
+        if (scene->isGroundIce()) drawReflections();
+        else drawShadows();
+    }
     if (!sim_pause) if (load_exemple_curve) showCurveExample();
     if (show_character){
 
+        if(has_ball_shot){
+            Draw::drawSphere(ball_shot_debug,MATERIAL_COPPER);
+        }
         scene->draw();
 
         if(!capture_pause)
             if(scene->getSizeCharacter()!=0)
                 if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
                     motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
-        if (scene->getExternalForce().module()!=0)
+        if (scene->getExternalForce().module()!=0){
+            drawForceApply();
             ciclo++;
-        if (ciclo>30){
+        }
+        if (ciclo>=frames_force){
             scene->setExternalForce(Vec4(0,0,0));
             ciclo = 0;
         }
         if (ciclo_arrow>0){
-            Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
+            //Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
+            if(scene->getCharacter(0)->getMoCap()->status){
+                Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),scene->getCharacter(0)->getVelCOM(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+            }else{
+                Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),Vec4(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+            }
             ciclo_arrow++;
             if(ciclo_arrow>30) ciclo_arrow = 0;
         }
 
         showCompensableConeFriction();
     }
-
-
 
     if (editing_frame)
         if(scene->getSizeCharacter()!=0)
@@ -520,7 +558,7 @@ void GLWidget::drawScene(){
     //Draw::drawSkybox(Vec4(0,0,0),Vec4(20,20,20));
 
     //Draw::drawCoffeeCup(Vec4(0,0.5,0),MATERIAL_COPPER);
-    Draw::drawGround(10);
+    Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
     //if (!showInfo){ Draw::drawGroundTexture(10,0);}
     //else{
         //glClearColor(1,0,0,1);
@@ -731,11 +769,41 @@ void GLWidget::drawPoseProgression()
             y -= 20;
         }
 
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glEnable(GL_LIGHTING);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+
+}
+void GLWidget::drawForceApply()
+{
+    if (! scene->getSizeCharacter()>0) return;
+    Character *chara = scene->getCharacter(0);
+    QString dados;
+    Vec4 out;
+    glDisable(GL_LIGHTING);
+    glColor3f(0,0,0);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, winWidth, 0.0, winHeight);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    int x = 680;
+    int k = 0;
+    if(scene->getExternalForce().module()==0) return;
+    glRasterPos2f(800, x);
+    out = chara->getBalance()->getKsTorque();
+    dados = QString().sprintf("%3.2f N for %3.1f sec",scene->getExternalForce().module(),frames_force/30. );
+    //char* n = (char*)dados.toStdString().data();
+    k = 0;
+    while (k<dados.size()){
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,dados.at(k).toLatin1());
+        k++;
     }
 
     glMatrixMode(GL_MODELVIEW);
@@ -748,7 +816,7 @@ void GLWidget::drawPoseProgression()
 
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
 
     drawScene();
@@ -757,7 +825,7 @@ void GLWidget::paintGL()
         drawParameters();
         drawPoseProgression();
     }
-    if (screenshot) setScreenShot();
+
 
     //calculateFPS();
 
@@ -802,11 +870,14 @@ void GLWidget::simStep(){
     gettimeofday(&tempo_inicio,NULL);
     if(!sim_pause){
         scene->simulationStep(enable_balance);
-
+        update();
+        if (screenshot) setScreenShot();
+    }else{
+        update();
     }
 
-    calculateFPSPaint();
-    update();
+    //calculateFPSPaint();
+    //update();
 
 
     //calculateFPS();
@@ -819,15 +890,20 @@ void GLWidget::simStep(){
     //printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
 
     double tempoFalta = (33.33 - tempo);
-    simTimer->setInterval((int)tempoFalta);
+    if (tempoFalta>0)
+      simTimer->setInterval(tempoFalta);
 
-    gettimeofday(&tempo_fim,NULL);
-    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
-    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
-    tempo = (tf - ti) / 1000;
-    //printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
+//    gettimeofday(&tempo_fim,NULL);
+//    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+//    //ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+//    tempo = (tf - ti) / 1000;
+////    gettimeofday(&tempo_fim,NULL);
+////    tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
+////    ti = (double)tempo_inicio.tv_usec + ((double)tempo_inicio.tv_sec * (1000000.0));
+////    tempo = (tf - ti) / 1000;
+//    printf("Tempo gasto em milissegundos para desenhar %.3f\n",tempo);
 
-    teste++;
+    //teste++;
     //if (teste == 10) exit(EXIT_SUCCESS);
 
 }
@@ -853,12 +929,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (controlLuxo){
         if (lbpressed && !rbpressed){
             ControlPD* controllerUpperLower = scene->getCharacter(0)->getControllersPD().at(1);
-            controllerUpperLower->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+            controllerUpperLower->setQuaternionWanted(QuaternionQ(Vec4(0,0,x)));
             ControlPD* controllerLowerFeet = scene->getCharacter(0)->getControllersPD().at(2);
-            controllerLowerFeet->setQuaternionWanted(Quaternion(Vec4(0,0,y)));
+            controllerLowerFeet->setQuaternionWanted(QuaternionQ(Vec4(0,0,y)));
         } if (!lbpressed && rbpressed){
             ControlPD* controllerLampUpper = scene->getCharacter(0)->getControllersPD().at(0);
-            controllerLampUpper->setQuaternionWanted(Quaternion(Vec4(0,0,x)));
+            controllerLampUpper->setQuaternionWanted(QuaternionQ(Vec4(0,0,x)));
         }
     } else {
         if (lbpressed && !rbpressed) {
@@ -942,12 +1018,35 @@ void GLWidget::simulationRestart()
     numOffBalls = 0;
     densidade = 100;
     sim_pause = true;
+    update();
 }
 
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    //printf("%s\n",event->text().toUtf8().constData());
+    if(event->key() == Qt::Key_R){
+        mode = SHOTBALL;
+        manipulate = SHOTBALL;
+        this->simulationPlayPause();
+        if(has_ball_shot){
+            if(mode == SHOTBALL){
+                if(objselshot!=NULL){
+                    scene->shotBallsCharacterBody(objselshot,velocity,ball_shot_debug,density);
+                }
+            }
+            ball_shot_debug = Vec4();
+        }
+        has_ball_shot = !has_ball_shot;
+        update();
+        return;
+    }
+
+    if(event->key() == Qt::Key_P ){
+        if(scene->getCharacter(0)->has_suitcase) scene->getCharacter(0)->deleteSuitcase();
+        else  scene->getCharacter(0)->setSuitcase(3,mass_suitcase);
+        updateJoints(scene->jointsScene());
+    }
+
     if(event->key() == Qt::Key_Space ){
         simulationPlayPause();
     }
@@ -961,6 +1060,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_O ){
         manipulate = SET_OBJECT;
         mode = -1;
+
     }
     if(event->key() == Qt::Key_J ){
         scene->habiliteJump();
@@ -985,6 +1085,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         mode = SHOTBALL;
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
+        return;
     }
     if(event->key() == Qt::Key_B ){
         if((scene->getSizeCharacter()==0)) return;
@@ -1033,23 +1134,65 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_F ){
         setForceCharacter();
     }
-    if(event->key() == Qt::Key_Up){
+//    if(event->key() == Qt::Key_Up){
+//        if(manipulate==SET_OBJECT){
+//            Object *obj = scene->getCharacter(0)->getObjectSelected();
+//            if (obj==NULL) return;
+//            Vec4 pos = obj->getTarget();
+//            pos += Vec4(0.05,0,0);
+//            obj->setTarget(pos);
+//            updateObject(obj);
+//        }
+//    }
+//    if(event->key() == Qt::Key_Down){
+//        if(manipulate==SET_OBJECT){
+//            Object *obj = scene->getCharacter(0)->getObjectSelected();
+//            if (obj==NULL) return;
+//            Vec4 pos = obj->getTarget();
+//            pos += Vec4(-0.05,0,0);
+//            obj->setTarget(pos);
+//            updateObject(obj);
+//        }
+
+//    }
+    if(event->key() == Qt::Key_Left && event->modifiers()==Qt::CTRL){
         if(manipulate==SET_OBJECT){
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(0.05,0,0);
+            pos += Vec4(0,0,0.05);
             obj->setTarget(pos);
+            updateObject(obj);
+            return;
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,0,0.05);
         }
+        else{
+            angle_directionz=angle_directionz+1;
+            setAngleDirectionZ(angle_directionz);
+        }
+        update();
+        return;
     }
-    if(event->key() == Qt::Key_Down){
+    if(event->key() == Qt::Key_Right && event->modifiers()==Qt::CTRL){
         if(manipulate==SET_OBJECT){
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(-0.05,0,0);
+            pos += Vec4(0,0,-0.05);
             obj->setTarget(pos);
+            updateObject(obj);
+            return;
+
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,0,-0.05);
         }
+        else{
+            angle_directionz=angle_directionz-1;
+            setAngleDirectionZ(angle_directionz);
+        }
+        update();
+        return;
 
     }
 
@@ -1059,11 +1202,16 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(0,0,0.05);
+            pos += Vec4(-0.05,0,0);
             obj->setTarget(pos);
-        }else{
-            angle_direction=angle_direction-1;
-            setAngleDirection(angle_direction);
+            updateObject(obj);
+            return;
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(-0.05,0,0);
+        }
+        else{
+            angle_directiony=angle_directiony+1;
+            setAngleDirectionY(angle_directiony);
         }
     }
     if(event->key() == Qt::Key_Right){
@@ -1071,15 +1219,55 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
             Object *obj = scene->getCharacter(0)->getObjectSelected();
             if (obj==NULL) return;
             Vec4 pos = obj->getTarget();
-            pos += Vec4(0,0,-0.05);
+            pos += Vec4(0.05,0,0);
             obj->setTarget(pos);
-        }else{
-            angle_direction=angle_direction+1;
-            setAngleDirection(angle_direction);
+            updateObject(obj);
+            return;
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0.05,0,0);
+        }
+        else{
+            angle_directiony=angle_directiony-1;
+            setAngleDirectionY(angle_directiony);
+        }
+    }
+
+    if(event->key() == Qt::Key_Up){
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0,0.05,0);
+            obj->setTarget(pos);
+            updateObject(obj);
+            return;
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,0.05,0);
+        }
+        else{
+            angle_directionx=angle_directionx-1;
+            setAngleDirectionX(angle_directionx);
+        }
+    }
+    if(event->key() == Qt::Key_Down){
+        if(manipulate==SET_OBJECT){
+            Object *obj = scene->getCharacter(0)->getObjectSelected();
+            if (obj==NULL) return;
+            Vec4 pos = obj->getTarget();
+            pos += Vec4(0,-0.05,0);
+            obj->setTarget(pos);
+            updateObject(obj);
+            return;
+        }else if(manipulate==SHOTBALL){
+            ball_shot_debug += Vec4(0,-0.05,0);
+        }
+        else{
+            angle_directionx=angle_directionx+1;
+            setAngleDirectionX(angle_directionx);
         }
 
     }
-    if(event->key() == Qt::Key_C){
+    if(event->key() == Qt::Key_L){
         static int posCam = 0;
         posCam++;
         if (cam->type == CAMERA_FAR) {
@@ -1112,7 +1300,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     }
 
     updateObjects(scene->objectsScene());
-    updateGL();
+    update();
 }
 
 MoCap *GLWidget::pushMotionCapture()
@@ -1137,7 +1325,7 @@ void GLWidget::drawShadows()
 
 
         /* Draw "top" of floor.  Use blending to blend in reflection (jah foi habilitado o blend). */
-        Draw::drawGround(10);
+        Draw::drawGround(10,scene->getRotationPlane());
 
         if (true) {
 
@@ -1189,6 +1377,129 @@ void GLWidget::drawShadows()
         glPopMatrix();
 }
 
+void GLWidget::drawReflections()
+{
+    Draw::shadowMatrix(floorShadow, floorPlane, lightPosition7);
+
+      glPushMatrix();
+
+        if (renderReflection) {
+          /* We can eliminate the visual "artifact" of seeing the "flipped"
+             dinosaur underneath the floor by using stencil.  The idea is
+               draw the floor without color or depth update but so that
+               a stencil value of one is where the floor will be.  Later when
+               rendering the dinosaur reflection, we will only update pixels
+               with a stencil value of 1 to make sure the reflection only
+               lives on the floor, not below the floor. */
+
+          /* Don't update color or depth. */
+          glDisable(GL_DEPTH_TEST);
+          glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+          /* Draw 1 into the stencil buffer. */
+          glEnable(GL_STENCIL_TEST);
+          glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+          glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
+
+          /* Now render floor; floor pixels just get their stencil set to 1. */
+          Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
+
+          /* Re-enable update of color and depth. */
+          glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+          glEnable(GL_DEPTH_TEST);
+
+          /* Now, only render where stencil is set to 1. */
+          glStencilFunc(GL_EQUAL, 1, 0xffffffff);  /* draw if ==1 */
+          glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+          glPushMatrix();
+
+            /* The critical reflection step: Reflect dinosaur through the floor
+               (the Y=0 plane) to make a relection. */
+            glScalef(1.0, -1.0, 1.0);
+
+            /* Enable front face culling. */
+            glCullFace(GL_FRONT);
+
+            /* Draw the reflected dinosaur. */
+            scene->drawShadows();
+              //drawReflections();
+
+            /* Re-enable back face culling. */
+            glCullFace(GL_BACK);
+
+          glPopMatrix();
+
+          glDisable(GL_STENCIL_TEST);
+        }
+
+        /* Back face culling will get used to only draw either the top or the
+           bottom floor.  This let's us get a floor with two distinct
+           appearances.  The top floor surface is reflective and kind of red.
+           The bottom floor surface is not reflective and blue. */
+
+        /* Draw "bottom" of floor in blue. */
+        glFrontFace(GL_CW);  /* Switch face orientation. */
+        //retira a transparencia da parte de baixo do chao (tornando-se opaca)
+        //glDisable(GL_LIGHTING);
+        //glColor4f(1.0, 1.0, 1.0, 1.0);
+        Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
+        //glEnable(GL_LIGHTING);
+        glFrontFace(GL_CCW);
+
+        if (1) {
+            /* Draw the floor with stencil value 3.  This helps us only
+               draw the shadow once per floor pixel (and only on the
+               floor pixels). */
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 3, 0xffffffff);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        }
+
+        /* Draw "top" of floor.  Use blending to blend in reflection (jah foi habilitado o blend). */
+        Draw::drawGround(10,scene->rotate_plane,scene->isGroundIce());
+
+        if (1) {
+
+          /* Render the projected shadow. */
+
+          /* Now, only render where stencil is set above 2 (ie, 3 where
+               the top floor is).  Update stencil with 2 where the shadow
+               gets drawn so we don't redraw (and accidently reblend) the
+               shadow). */
+          glStencilFunc(GL_LESS, 2, 0xffffffff);  /* draw if ==1 */
+          glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+
+          /* To eliminate depth buffer artifacts, we use polygon offset
+             to raise the depth of the projected shadow slightly so
+             that it does not depth buffer alias with the floor. */
+          //glEnable(GL_POLYGON_OFFSET_EXT);
+          glEnable(GL_POLYGON_OFFSET_FILL);
+            glPolygonOffset(-2.0, -1.0);
+
+          /* Render 50% black shadow color on top of whatever the
+             floor appareance is. */
+          glDisable(GL_LIGHTING);  /* Force the 20% black. */
+          glColor4f(0.0, 0.0, 0.0, 0.5);
+
+          glPushMatrix();
+            /* Project the shadow. */
+            glMultMatrixf((GLfloat *) floorShadow);
+            scene->drawShadows();
+          glPopMatrix();
+
+          glEnable(GL_LIGHTING);
+
+          //glDisable(GL_POLYGON_OFFSET_EXT);
+          glDisable(GL_POLYGON_OFFSET_FILL);
+
+          glDisable(GL_STENCIL_TEST);
+        }
+
+      glPopMatrix();
+
+}
+
 void GLWidget::loadCurveExample()
 {
     curve_quat.clear();
@@ -1224,7 +1535,7 @@ void GLWidget::showCurveExample()
     }
 
     time_m = time_acumulate[time_acumulate.size()-1]-1+curve_quat_time[curve_quat_time.size()-1];
-    Quaternion q;
+    QuaternionQ q;
     if(time_current<total_time){
             //chama a interpolação de Quaternion Esferica (SQUAD)
             q = Interpolation::KeyFramestoSquad(curve_quat,frame_current,(time_current - time_acumulate[frame_current-1]) /(double)curve_quat_time[frame_current]);
@@ -1235,7 +1546,7 @@ void GLWidget::showCurveExample()
     if(time_current>total_time){ time_current = 0;
     }
 
-    setAngleDirection(q.toEuler().y());
+    setAngleDirectionY(q.toEuler().y());
     //time_m = total_time;
 }
 
@@ -1353,6 +1664,7 @@ void GLWidget::restartMotion()
         scene->restartMotionCapture();
         if(scene->getCharacter(0)->offset.module()==0) scene->getCharacter(0)->getMoCap()->initializePosesModel(1);
     }
+    update();
     //Utils::loadMotionCapture(scene->getCharacter(0)->getMoCap(),scene->getCharacter(0),file.toStdString());
 
 
@@ -1435,6 +1747,11 @@ void GLWidget::setGravity(bool b)
     scene->setGravity(b);
 }
 
+Scene *GLWidget::getScene()
+{
+    return this->scene;
+}
+
 void GLWidget::setProportionalKs(Vec4 ks)
 {
     scene->setProportionalKsPD(ks);
@@ -1478,6 +1795,12 @@ void GLWidget::setKsRelationshipKs(bool b)
     }
 }
 
+void GLWidget::setGravityCompensation(int value)
+{
+    if(scene->getSizeCharacter()<1) return;
+    scene->getCharacter(0)->getBalance()->setCompensationGravity(value/100.);
+}
+
 void GLWidget::setLimitCone(int val)
 {
     if(scene->getSizeCharacter()<1) return;
@@ -1500,6 +1823,32 @@ void GLWidget::setVelocityDensityBalls(float den, float vel)
 {
     density = den;
     velocity = vel;
+}
+
+void GLWidget::updateAngleGround(Vec4 ang)
+{
+    scene->setRotationPlane(ang);
+    Vec4 normal = scene->getRotationPlaneVector();
+    floorPlane[0] = normal.x();
+    floorPlane[1] = normal.y();
+    floorPlane[2] = normal.z();
+    update();
+}
+
+void GLWidget::setMassSuitcase(double val)
+{
+    mass_suitcase = val;
+    //verifica se exite alguma maleta para reiniciar com o novo peso
+    if(scene->getCharacter(0)->has_suitcase){
+        scene->getCharacter(0)->deleteSuitcase();
+        scene->getCharacter(0)->setSuitcase(3,mass_suitcase);
+    }
+    updateJoints(scene->jointsScene());
+}
+
+void GLWidget::setFramesForce2Time(double val)
+{
+    this->frames_force = (int)(val*30.);
 }
 
 void GLWidget::setAlphaCharacter(int value)
@@ -1584,9 +1933,12 @@ void GLWidget::setAngleBodyBalance(Vec4 v)
 {
    if(!(scene->getSizeCharacter()>0)) return;
    scene->setAngleBodyBalance(v);
+   vector_draw_direction = v;
    angle_quat = v.y();
    ciclo_arrow = 1;
-   angle_direction = v.y();
+   angle_directiony = v.y();
+   angle_directionx = v.x();
+   angle_directionz = v.z();
 }
 
 
@@ -1661,7 +2013,6 @@ void GLWidget::loadSimulationParameters(QString file)
     updateJoints(scene->jointsScene());
     updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
     setGravity(scene->getGravity());
-    scene->getGravity().showVec4();
     setEnableGravity(scene->hasGravity());
     for(int i=0;i<scene->getSizeCharacter();i++){
         scene->getCharacter(i)->contructHierarchyBodies();
@@ -1672,6 +2023,17 @@ void GLWidget::loadSimulationParameters(QString file)
 
     }
     setToleranceFoot(scene->getCharacter(0)->getBalance()->getSensorTolerance());
+
+
+    cam->eye = scene->getEye();
+    cam->at = scene->getAt();
+    cam->up = scene->getUp();
+    scene->createArena();
+
+
+
+
+
     //scene->getCharacter(0)->showHierarchies();
     //printf("\nMassa total: %.3f",scene->getCharacter(0)->getMassTotal());
     //scene->createRamp();
@@ -1697,5 +2059,24 @@ void GLWidget::setRenderMesh(bool b)
 void GLWidget::setShowInfos(bool b)
 {
     showInfo = b;
+}
+
+void GLWidget::setFrictionGround(double friction)
+{
+    this->scene->setFrictionGround(friction);
+    update();
+}
+
+void GLWidget::setFrictionFootAir(double friction)
+{
+    this->scene->setFrictionFootAir(friction);
+    update();
+}
+
+void GLWidget::updateMotionPosition(int i)
+{
+    scene->getCharacter(0)->getMoCap()->setCurrentFrame(i);
+    scene->setFrameCurrent(i);
+    if(scene->getCharacter(0)->offset.module()==0) scene->getCharacter(0)->getMoCap()->initializePosesModel(i);
 }
 

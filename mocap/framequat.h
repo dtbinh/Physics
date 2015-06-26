@@ -6,9 +6,9 @@
 class FrameQuat
 {
 public:
-    std::vector<Quaternion> quatDes;
+    std::vector<QuaternionQ> quatDes;
     FrameQuat();
-    FrameQuat( std::vector<Quaternion> quatDes );
+    FrameQuat( std::vector<QuaternionQ> quatDes );
     ~FrameQuat();
 
     //retorna o tamanho do vetor quatDes

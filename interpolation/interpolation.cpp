@@ -18,13 +18,13 @@ QMatrix4x4 Interpolation::LinearEuler(Vec4 p, Vec4 q, double t)
     return mat;
 }
 
-Quaternion Interpolation::Lerp(Quaternion p, Quaternion q, double t)
+QuaternionQ Interpolation::Lerp(QuaternionQ p, QuaternionQ q, double t)
 {
-    Quaternion result =  p*(1.0 - t)+ q*t;
+    QuaternionQ result =  p*(1.0 - t)+ q*t;
     return result;
 }
 
-Quaternion Interpolation::Slerp(Quaternion q1, Quaternion q2, double t)
+QuaternionQ Interpolation::Slerp(QuaternionQ q1, QuaternionQ q2, double t)
 {
     double cosomega;
     double sinomega;
@@ -32,14 +32,14 @@ Quaternion Interpolation::Slerp(Quaternion q1, Quaternion q2, double t)
     double s1, s2;
 
     if((q1-q2).normal() > (q1+q2).normal()) q2 = q2*(-1);
-    cosomega = Quaternion::dot(q1,q2);
+    cosomega = QuaternionQ::dot(q1,q2);
     if((1.0 - cosomega) < 0.000001 )
     {
         return Lerp(q1, q2, t);
     }
     if((1.0 + cosomega) < 0.000001)
     {
-        Quaternion q2a;
+        QuaternionQ q2a;
         q2a.setScalar(-q2.getPosX());
         q2a.setPosX(q2.getScalar());
         q2a.setPosY(-q2.getPosZ());
@@ -47,7 +47,7 @@ Quaternion Interpolation::Slerp(Quaternion q1, Quaternion q2, double t)
         s1 = sin((1.0 - t) * M_PI_2);
         s2 = sin(t * M_PI_2);
         q2a.normalize();
-        Quaternion result =  (q1*s1 + q2a*s2);
+        QuaternionQ result =  (q1*s1 + q2a*s2);
         result.normalize();
         return result;
 
@@ -57,20 +57,20 @@ Quaternion Interpolation::Slerp(Quaternion q1, Quaternion q2, double t)
     s1 = sin((1.0 - t) * omega) / sinomega;
     s2 = sin(t * omega) / sinomega;
 
-    Quaternion result = (q1*s1 + q2*s2);
+    QuaternionQ result = (q1*s1 + q2*s2);
     result.normalize();
     return result;
 
 }
 
-Quaternion Interpolation::LerpQ(Quaternion p, Quaternion q, double t)
+QuaternionQ Interpolation::LerpQ(QuaternionQ p, QuaternionQ q, double t)
 {
-    Quaternion result =  p*(1.0 - t)+ q*t;
+    QuaternionQ result =  p*(1.0 - t)+ q*t;
     result.normalize();
     return result;
 }
 
-Quaternion Interpolation::SlerpQ(Quaternion p, Quaternion q, double t)
+QuaternionQ Interpolation::SlerpQ(QuaternionQ p, QuaternionQ q, double t)
 {
 
 
@@ -80,14 +80,14 @@ Quaternion Interpolation::SlerpQ(Quaternion p, Quaternion q, double t)
     double s1, s2;
 
     if((p-q).normal() > (p+q).normal()) q = q*(-1);
-    cosomega = Quaternion::dot(p,q);
+    cosomega = QuaternionQ::dot(p,q);
     if((1.0 - cosomega) < 0.000001 )
     {
         return LerpQ(p, q, t);
     }
     if((1.0 + cosomega) < 0.000001)
     {
-        Quaternion q2a;
+        QuaternionQ q2a;
         q2a.setScalar(-q.getPosX());
         q2a.setPosX(q.getScalar());
         q2a.setPosY(-q.getPosZ());
@@ -95,7 +95,7 @@ Quaternion Interpolation::SlerpQ(Quaternion p, Quaternion q, double t)
         s1 = sin((1.0 - t) * M_PI_2);
         s2 = sin(t * M_PI_2);
         q2a.normalize();
-        Quaternion result =  (p*s1 + q2a*s2);
+        QuaternionQ result =  (p*s1 + q2a*s2);
         result.normalize();
         return result;
 
@@ -105,60 +105,60 @@ Quaternion Interpolation::SlerpQ(Quaternion p, Quaternion q, double t)
     s1 = sin((1.0 - t) * omega) / sinomega;
     s2 = sin(t * omega) / sinomega;
 
-    Quaternion result = (p*s1 + q*s2);
+    QuaternionQ result = (p*s1 + q*s2);
     result.normalize();
 
     return result;
 }
 
-Quaternion Interpolation::Squad(Quaternion q1, Quaternion q2, Quaternion s1, Quaternion s2, double t)
+QuaternionQ Interpolation::Squad(QuaternionQ q1, QuaternionQ q2, QuaternionQ s1, QuaternionQ s2, double t)
 {
 
-    Quaternion q11= SlerpQ(q1,s1,t),
+    QuaternionQ q11= SlerpQ(q1,s1,t),
                q12= SlerpQ(s1,s2,t),
                q13= SlerpQ(s2,q2,t);
 
     return Slerp(SlerpQ(q11,q12,t), SlerpQ(q12,q13,t),t);
 }
 
-Quaternion Double(Quaternion p,Quaternion q)
+QuaternionQ Double(QuaternionQ p,QuaternionQ q)
 {
-    return q*Quaternion::dot(p,q)*2 - p;
+    return q*QuaternionQ::dot(p,q)*2 - p;
 }
 
-Quaternion Bissect(Quaternion p,Quaternion q)
+QuaternionQ Bissect(QuaternionQ p,QuaternionQ q)
 {
     return (p+q)/(p+q).normal();
 }
 
 
-Quaternion Interpolation::KeyFramestoSquad(QList<Vec4> keys,int frame, double t)
+QuaternionQ Interpolation::KeyFramestoSquad(QList<Vec4> keys,int frame, double t)
 {
     if(frame<=1){
-        Quaternion q1(keys[frame-1].x1,keys[frame-1].x2,keys[frame-1].x3);
-        Quaternion q2(keys[frame].x1,keys[frame].x2,keys[frame].x3);
-        Quaternion q3(keys[frame+1].x1,keys[frame+1].x2,keys[frame+1].x3);
-        Quaternion s1 = q1;
-        Quaternion s11 = Bissect(Double(q1,q2),q3);
-        Quaternion s2 = Double(s11,q2);
+        QuaternionQ q1(keys[frame-1].x1,keys[frame-1].x2,keys[frame-1].x3);
+        QuaternionQ q2(keys[frame].x1,keys[frame].x2,keys[frame].x3);
+        QuaternionQ q3(keys[frame+1].x1,keys[frame+1].x2,keys[frame+1].x3);
+        QuaternionQ s1 = q1;
+        QuaternionQ s11 = Bissect(Double(q1,q2),q3);
+        QuaternionQ s2 = Double(s11,q2);
         return Squad(q1,q2,s1,s2,t);
     }
     if(frame>1 &&frame<=keys.size()-2){
-    Quaternion q0(keys[frame-2].x1,keys[frame-2].x2,keys[frame-2].x3);
-    Quaternion q1(keys[frame-1].x1,keys[frame-1].x2,keys[frame-1].x3);
-    Quaternion q2(keys[frame].x1,keys[frame].x2,keys[frame].x3);
-    Quaternion q3(keys[frame+1].x1,keys[frame+1].x2,keys[frame+1].x3);
-    Quaternion s1 = Bissect(Double(q0,q1),q2);
-    Quaternion s11 = Bissect(Double(q1,q2),q3);
-    Quaternion s2 = Double(s11,q2);
+    QuaternionQ q0(keys[frame-2].x1,keys[frame-2].x2,keys[frame-2].x3);
+    QuaternionQ q1(keys[frame-1].x1,keys[frame-1].x2,keys[frame-1].x3);
+    QuaternionQ q2(keys[frame].x1,keys[frame].x2,keys[frame].x3);
+    QuaternionQ q3(keys[frame+1].x1,keys[frame+1].x2,keys[frame+1].x3);
+    QuaternionQ s1 = Bissect(Double(q0,q1),q2);
+    QuaternionQ s11 = Bissect(Double(q1,q2),q3);
+    QuaternionQ s2 = Double(s11,q2);
     return Squad(q1,q2,s1,s2,t);
     }
     if(frame==keys.size()-1){
-        Quaternion q0(keys[frame-2].x1,keys[frame-2].x2,keys[frame-2].x3);
-        Quaternion q1(keys[frame-1].x1,keys[frame-1].x2,keys[frame-1].x3);
-        Quaternion q2(keys[frame].x1,keys[frame].x2,keys[frame].x3);
-        Quaternion s1 = Bissect(Double(q0,q1),q2);
-        Quaternion s2 = q2;
+        QuaternionQ q0(keys[frame-2].x1,keys[frame-2].x2,keys[frame-2].x3);
+        QuaternionQ q1(keys[frame-1].x1,keys[frame-1].x2,keys[frame-1].x3);
+        QuaternionQ q2(keys[frame].x1,keys[frame].x2,keys[frame].x3);
+        QuaternionQ s1 = Bissect(Double(q0,q1),q2);
+        QuaternionQ s2 = q2;
         return Squad(q1,q2,s1,s2,t);
     }
 }

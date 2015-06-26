@@ -37,16 +37,16 @@ for (unsigned int fc=0;fc<grfs.size();fc++) {
           //Vetor3D groundForce3D;
           //Vetor3D groundTorque3D;
             //cout<<"feedbackContacts[fc].noGroundGeom: "<<feedbackContacts[fc].noGroundGeom<<"\n";
-          if ( grfs[fc].noGroundGeom != 3 ) {
+          if ( grfs[fc].noGroundGeom != 0 ) {
             //groundForce
               dReal* groundforce = NULL; //dVector3
-                if ( grfs[fc].noGroundGeom == 1 ) groundforce = grfs[fc].jtFb->f1;
-                if ( grfs[fc].noGroundGeom == 2 ) groundforce = grfs[fc].jtFb->f2;
+                if ( grfs[fc].noGroundGeom == 1 || grfs[fc].noGroundGeom == 3 ) groundforce = grfs[fc].jtFb->f1;
+                if ( grfs[fc].noGroundGeom == 2 || grfs[fc].noGroundGeom == 3 ) groundforce = grfs[fc].jtFb->f2;
               groundForce = Vec4(groundforce[0],groundforce[1],groundforce[2]);
             //groundTorque
               dReal* groundtorque = NULL; //dVector3
-                if ( grfs[fc].noGroundGeom == 1 ) groundtorque = grfs[fc].jtFb->t1;
-                if ( grfs[fc].noGroundGeom == 2 ) groundtorque = grfs[fc].jtFb->t2;
+                if ( grfs[fc].noGroundGeom == 1 || grfs[fc].noGroundGeom == 3 ) groundtorque = grfs[fc].jtFb->t1;
+                if ( grfs[fc].noGroundGeom == 2 || grfs[fc].noGroundGeom == 3 ) groundtorque = grfs[fc].jtFb->t2;
               groundTorque = Vec4(groundtorque[0],groundtorque[1],groundtorque[2]);
             //print
               /*
@@ -107,7 +107,7 @@ void GRF::drawGRFObject(std::vector<GRF> grfs, Object *obj)
     //para todos os contatos
     for (unsigned int fc=0;fc<grfs.size();fc++) {
         Vec4 groundForce;
-        if( ( grfs[fc].noGroundGeom != 3 )&&(grfs[fc].b1 == obj || grfs[fc].b2 == obj)){
+        if( ( grfs[fc].noGroundGeom != 0 )&&(grfs[fc].b1 == obj || grfs[fc].b2 == obj)){
             //groundForce
             dReal* groundforce = NULL; //dVector3
             if ( grfs[fc].noGroundGeom == 1 ) groundforce = grfs[fc].jtFb->f1;

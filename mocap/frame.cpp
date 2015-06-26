@@ -6,7 +6,7 @@ Frame::Frame()
     this->footLeft = true;
 }
 
-Frame::Frame(std::vector<Vec4> pos, std::vector<Quaternion> quat)
+Frame::Frame(std::vector<Vec4> pos, std::vector<QuaternionQ> quat)
 {
     this->positions = pos;
     this->orientations = quat;
@@ -20,7 +20,7 @@ void Frame::appendPosition(Vec4 pos)
 
 }
 
-void Frame::appendOrientation(Quaternion quat)
+void Frame::appendOrientation(QuaternionQ quat)
 {
     this->orientations.push_back(quat);
 }
@@ -30,7 +30,7 @@ void Frame::setPosition(int i, Vec4 pos)
     this->positions.at(i) = pos;
 }
 
-void Frame::setOrientation(int i, Quaternion quat)
+void Frame::setOrientation(int i, QuaternionQ quat)
 {
     this->orientations.at(i) = quat;
 }
@@ -60,8 +60,9 @@ Vec4 Frame::getPosition(int i)
     return this->positions.at(i);
 }
 
-Quaternion Frame::getOrientation(int i)
+QuaternionQ Frame::getOrientation(int i)
 {
+    //if(this->orientations.size()>=i) return QuaternionQ();
     return this->orientations.at(i);
 }
 

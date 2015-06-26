@@ -36,6 +36,10 @@ private:
     bool           show_grf;
     Vec4           viewer[3];  //guarda as posições da camera, eye, at, up
     Vec4           projection;
+    float          friction_ground;
+    float          friction_foot_air;
+    bool           is_ground_ice;
+
 
     //interface
     GLWidget *parent;
@@ -52,11 +56,15 @@ private:
     Vec4 propKd;
 
 
+
+
     //Controle da pose
-    QTime pose_time;
+    //QTime pose_time;
 
 public:
     int            width,height;
+    dGeomID          Plane;
+    Vec4           rotate_plane;
 
 
 
@@ -95,9 +103,12 @@ public:
 
     //Manipulação dos objetos do cenário
     void                  setViewer(Vec4 eye,Vec4 at,Vec4 up);
+    Vec4                  getEye();
+    Vec4                  getAt();
+    Vec4                  getUp();
     void                  setProjection(Vec4 p);
     void                  setWindow(int width,int height);
-    Object*               addObject(Vec4 properties, Vec4 position, Quaternion rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
+    Object*               addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
     Joint *               addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara,Vec4 limSup=Vec4(),Vec4 limInf=Vec4());//cria uma junta ball
     Joint *               addJointFixed(Object *parent,Object *child, Character *chara); //cria uma junta fixa
     Joint *               addJointHinge(Vec4 anchor, Vec4 axis, Object *parent, Object *child, Character *chara); //cria uma junta hinge
@@ -124,9 +135,9 @@ public:
     //extra simulation
     void                  clearObjectShooted();
     void                  createRamp();
+    void                  createArena(); //caixas
     void                  createCharacter();
     void                  createLuxo();
-    void                  createLuxo2();
     void                  startRecorder(bool b);
     //pose control
     Pose*                 addPose(Character* character, std::vector<Vec4> angles);
@@ -160,6 +171,12 @@ public:
     Object*               objectClicked(int width,int height);      //retorna o objeto selecionado no clique da tela
     Object*               getObject(Ray ray); //calcula a interseção do raio com o objeto
 
+    void                  setFrictionGround(float friction);
+    float                 getFrictionGround();
+    void                  setFrictionFootAir(float friction);
+    float                 getFrictionFootAir();
+    bool                  isGroundIce();
+
 
     void                  setAlphaCharacter(float val); //nao utilizado
     void                  setWireCharacter(bool b); //nao utilizado
@@ -170,7 +187,11 @@ public:
     //testes de robustez
     void                  shotBallsCharacterRandom(Character *chara, int posPlevis, float den=100.); //atirar objetos no personagem de forma aleatória
     void                  shotBallsCharacterBody(Object* body, float velocity, float den=100.); //atirar objetos no personagem de acordo com a posição de um corpo, e com determinada velocidade
+    void                  shotBallsCharacterBody(Object* body, float velocity, Vec4 inicio,float mass); //atirar objetos no personagem de acordo com a posição de um corpo, e com determinada velocidade e posição inicial
     void                  habiliteJump();
+    void                  setRotationPlane(Vec4 rot);
+    Vec4                  getRotationPlane();
+    Vec4                  getRotationPlaneVector();
     //teste de contato
     bool                  isGeometryFootSwing(dGeomID geom);
 
@@ -178,14 +199,17 @@ public:
 
 
 
+
+
     //Graphics
-    void           draw(); //desenha os objetos e/ou juntas com OpenGL
-    void           drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
-    void           drawShadows(); //desenha os objetos e/ou juntas com OpenGL
-    void           loadSceneObjects();
-    void           setRenderMesh(bool b);
+    void                   draw(); //desenha os objetos e/ou juntas com OpenGL
+    void                   drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
+    void                   drawShadows(); //desenha os objetos e/ou juntas com OpenGL
+    void                   loadSceneObjects();
+    void                   setRenderMesh(bool b);
 
 
+    void setFrameCurrent(int i);
 };
 
 #endif // SCENE_H

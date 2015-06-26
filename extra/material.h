@@ -42,6 +42,8 @@
 #define MATERIAL_PLASTIK        28
 #define MATERIAL_BLACK_RUBBER   29
 #define MATERIAL_SILVER         30
+#define MATERIAL_ICE            31
+
 class Material
 {
 public:

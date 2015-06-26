@@ -2,47 +2,54 @@
 #define MATRIX_H
 
 #include <gsl/gsl_matrix.h>
-#include "vecn.h"
 
-class Matrix
+#include "vecn.h"
+#include <eigen3/Eigen/Dense>
+using namespace Eigen;
+
+
+class MatrixF
 {
     public:
-        Matrix();
-        Matrix(unsigned int m, unsigned int n);
-        Matrix(const Matrix& N); // copy constructor
-        ~Matrix();
+        MatrixF();
+        MatrixF(unsigned int m, unsigned int n);
+        MatrixF(const MatrixF& N); // copy constructor
+        ~MatrixF();
 
-        inline unsigned int getNumRows() { return data->size1; }
-        inline unsigned int getNumColumns() { return data->size2; }
+        inline unsigned int getNumRows() { return data_eigen.rows(); /*return data->size1;*/ }
+        inline unsigned int getNumColumns() { return data_eigen.cols(); /*return data->size2;*/ }
 
         void setRow(unsigned int i, Vec& u);
         void getRow(unsigned int i, Vec& u);
         void setColumn(unsigned int j, Vec& u);
         void getColumn(unsigned int j, Vec& u);
-        void set(Matrix& N);
+        void set(MatrixF& N);
         void setDiag(Vec& u);
-        void setSubmatrix(unsigned int i, unsigned int j, Matrix& sub);
-        void getSubmatrix(unsigned int i, unsigned int j, Matrix& sub);
+        void setSubmatrix(unsigned int i, unsigned int j, MatrixF &sub);
+        void getSubmatrix(unsigned int i, unsigned int j, MatrixF& sub);
 
-        Matrix transpose();
-        Matrix identity();
-        Matrix inverse();
+        MatrixF transpose();
+        MatrixF identity();
+        MatrixF inverse();
 
-        static Matrix crossProductMatrix(Vec u);
+        static MatrixF crossProductMatrix(Vec u);
 
         void print(int n_cols_block = 10);
 
 
-        Matrix operator=(Matrix N) { set(N); return *this; }
-        Matrix operator*(Matrix& N);
-        Matrix operator*(double s);
+        MatrixF operator=(MatrixF N) { set(N); return *this; }
+        MatrixF operator*(MatrixF& N);
+        MatrixF operator*(double s);
         Vec operator*(Vec u);
-        Matrix operator+(Matrix& N);
-        Matrix operator-(Matrix& N);
-        inline double& operator()(int i, int j) { return data->data[j + i * data->size2]; }
+        MatrixF operator+(MatrixF& N);
+        MatrixF operator-(MatrixF& N);
+        double& operator()(int i, int j);
 
 
-        gsl_matrix* data;
+        MatrixXd data_eigen;
+
+
+        //gsl_matrix* data;
 };
 
 #endif // MATRIX_H

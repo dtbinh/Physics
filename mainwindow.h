@@ -55,10 +55,13 @@ public slots:
     void changePoseTime(double);
     void changeJointAngle();
 
-    //void infoSelectedObject(Object*);
+    void refactorOptions(int);
+
+    void infoSelectedObject(Object*);
     void applyForce2Object();
     void setMaxTimeLine(int v);
     void adjustTolerance(double t);
+
 
     //manipuladores via keyboard
     void plusFrameEdition();
@@ -66,6 +69,9 @@ public slots:
 
     //balls shot
     void setBallsConfiguration();
+
+    //modifica disposiçao angular do solo
+    void setAngleGround();
 
 
 private slots:

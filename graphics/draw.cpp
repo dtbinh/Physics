@@ -524,7 +524,7 @@ void Draw::drawCOM(Vec4 position, float size, Vec4 color)
     glDisable(GL_TEXTURE_2D);
 }
 
-void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color)
+void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 {
 
     Material *mat = new Material();
@@ -551,22 +551,28 @@ void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_CLAMP_TO_EDGE);
 
     glPopMatrix();
-    glPushMatrix();
+
+
     //
 
     gluQuadricNormals(quad, GLU_SMOOTH);
     gluQuadricTexture(quad,1);
-    glTranslatef(position.x(),0.005,position.z());
-    glRotatef(90,1.0f,0.0f,0.0f);
+
+    glTranslatef(position.x(),position.y()+0.015,position.z());
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(90+rot.x(),1,0,0);
+    //glRotatef(90,1.0f,0.0f,0.0f);
     //gluQuadricDrawStyle(quad, GLU_FILL);
     gluClosedCylinder(quad,size,size,0.001,25,25);
+
     glPopMatrix();
     delete quad;
     delete mat;
     glDisable(GL_TEXTURE_2D);
 }
 
-void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color)
+void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 {
     Material *mat = new Material();
         Material::setMaterial(mat,MATERIAL_YELLOW_PLASTIC);
@@ -583,10 +589,16 @@ void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color)
 
     glPushMatrix();
 
-    glTranslatef(position.x(),0.01,position.z());
-    glRotatef(90,1.0f,0.0f,0.0f);
+
+    glTranslatef(position.x(),position.y()+0.01,position.z());
+    //glRotatef(90,1.0f,0.0f,0.0f);
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(90+rot.x(),1,0,0);
     gluClosedCylinder(quad,size,size,0.001,25,25);
+
     glPopMatrix();
+
     delete quad;
     delete mat;
 
@@ -630,7 +642,7 @@ void Draw::drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double he
 
 
 
-void Draw::drawGround(int size)
+void Draw::drawGround(int size, Vec4 rot, float reflect)
 {
 
     /*** Anterior
@@ -676,6 +688,17 @@ void Draw::drawGround(int size)
 //    if (!idraw_ground) idraw_ground = true;
 ***/
     //Novo
+    glPushMatrix();
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(rot.x(),1,0,0);
+
+    if(reflect){
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(1.0,1.0,1.0, 0.5);
+    }
+
     glDisable(GL_LIGHTING);
     glLineWidth(3.0);
     glColor3f(0,0,0);
@@ -727,26 +750,40 @@ void Draw::drawGround(int size)
     glEnd();
     glEnable(GL_LIGHTING);
     Material *mat = new Material();
-    mat->setMaterial(mat,MATERIAL_BRASS);
+    if(reflect){
+        mat->setMaterial(mat,MATERIAL_ICE);
+    }else{
+        mat->setMaterial(mat,MATERIAL_BRASS);
+    }
+    //const GLfloat whiteTranspMaterial[]={1.0,1.0,1.0,0.5};
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    //glEnable(GL_TEXTURE_2D);
 
-    glPushMatrix();
+//     glVertex3f(-dim,0.0,+dim);
+//             glVertex3f(+dim,0.0,+dim);
+//             glVertex3f(+dim,0.0,-dim);
+//            ; glVertex3f(-dim,0.0,-dim);
+    //glPushMatrix();
     glBegin(GL_QUADS);
     for(int i=-size;i<=size;i+=2){
         for(int j=-size;j<=size;j+=2){
             glNormal3f(0,1,0);
-            glVertex3f(i,0,j);
-            glVertex3f(i,0,j+2);
-            glVertex3f(i+2,0,j+2);
-            glVertex3f(i+2,0,j);
+            glTexCoord2d(0.0,0.0); glVertex3f(i,0,j);
+            glTexCoord2d(10.0,0.0); glVertex3f(i,0,j+2);
+            glTexCoord2d(10.0,10.0); glVertex3f(i+2,0,j+2);
+            glTexCoord2d(0.0,10.0); glVertex3f(i+2,0,j);
         }
     }
     glEnd();
+    //glPopMatrix();
+
     glPopMatrix();
+
+    //glDisable(GL_TEXTURE_2D);
 
 
     delete mat;
@@ -890,8 +927,12 @@ void Draw::drawGroundTexture(int size, int text)
 
 }
 
-void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size)
+void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size, Vec4 rot)
 {
+    glPushMatrix();
+    glRotated(rot.z(),0,0,1);
+    glRotated(rot.y(),0,1,0);
+    glRotated(rot.x(),1,0,0);
     Vec4 vertexs[SEGMENTS];
     float alpha = 2*M_PI / SEGMENTS;
     for (int i = 0;i<SEGMENTS;i++){
@@ -902,12 +943,12 @@ void Draw::drawCircle2D(Vec4 center, float radius, Vec4 color, float size)
     glColor3f(color.x(),color.y(),color.z());
     glBegin(GL_LINE_STRIP);
     for (int i = 0;i<SEGMENTS;i++){
-        glVertex3f(vertexs[i].x(),vertexs[i].y(),vertexs[i].z());
+        glVertex3f(vertexs[i].x(),vertexs[i].y()+0.01,vertexs[i].z());
     }
-    glVertex3f(vertexs[0].x(),vertexs[0].y(),vertexs[0].z());
+    glVertex3f(vertexs[0].x(),vertexs[0].y()+0.01,vertexs[0].z());
     glEnd();
-
     glEnable(GL_LIGHTING);
+    glPopMatrix();
 }
 
 bool sky = true;
@@ -996,7 +1037,7 @@ void Draw::drawSkybox(Vec4 min, Vec4 max, int texture)
         delete mat;
 }
 
-void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
+void Draw::drawCoffeeCup(Vec4 position, int material, QuaternionQ q)
 {
     Material *mat = new Material();
     mat->setMaterial(mat,material);
@@ -1014,7 +1055,7 @@ void Draw::drawCoffeeCup(Vec4 position, int material,Quaternion q)
     delete mat;
 }
 
-void Draw::drawObj(Vec4 position, int material,Quaternion q, QString file,ObjMesh *n)
+void Draw::drawObj(Vec4 position, int material,QuaternionQ q, QString file,ObjMesh *n)
 {
     Material *mat = new Material();
     mat->setMaterial(mat,material);
@@ -1353,7 +1394,7 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     Vec4 k = Vec4( 0.0,0.0,1.0 );
     Vec4 axis = k^from2to;
     float angle = acos(k*from2to);
-    Quaternion quat;
+    QuaternionQ quat;
     quat.fromAxisAngle(axis,angle*180/M_PI);
     if (from2to.z()==-1.0) quat.fromAxisAngle( Vec4(1.0,0.0,0.0), 180.0 );
     dQuaternion dQ;
@@ -1380,6 +1421,66 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     delete mat;
 
 }
+
+void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 dir, float size,int material, Vec4 ground_inclination) //origen COM
+{
+    Vec4 direction = Vec4(0,0,1);
+    Vec4 begin = Vec4(0,0,0.0);
+    if(velocity.module()!=0 && velocity*direction<0){
+        direction = Vec4(0,0,-1);
+        begin = Vec4(0,0,-0.0);
+    }
+
+    QuaternionQ qat(dir);
+    direction = qat.getMatrix().vector(direction);
+
+    glPushMatrix();
+    GLUquadricObj *quad = gluNewQuadric();
+    float larg = size;
+    Vec4 from = origin+begin;
+    Vec4 to = direction*size+origin+begin;
+    Vec4 from2to = to-from;
+    float tam = from2to.module();
+    from2to.normalize();
+    Material *mat = new Material();
+    mat->setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    glPushMatrix();
+    //transformacao
+    Vec4 k = Vec4( 0.0,0.0,1.0 );
+    Vec4 axis = k^from2to;
+    float angle = acos(k*from2to);
+    QuaternionQ quat;
+    quat.fromAxisAngle(axis,angle*180/M_PI);
+    if (from2to.z()==-1.0) quat.fromAxisAngle( Vec4(1.0,0.0,0.0), 180.0 );
+    dQuaternion dQ;
+    to_dQuaternion(quat,dQ);
+    dMatrix3 R;
+    dQtoR(dQ,R);
+    dVector3 pos;
+    pos[0] = from.x(); pos[1] = from.y(); pos[2] = from.z();
+    setTransformODE(pos,R);
+    //desenha seta
+    if (larg == 0.0) {
+        gluClosedCylinder(quad, 0.03*tam, 0.03*tam, tam, 10, 10);
+        glTranslated(0,0,tam);
+        gluClosedCylinder(quad, 0.1*tam, 0.0, 0.2*tam, 10, 10);
+    } else {
+        gluClosedCylinder(quad, 0.03*2.0*larg, 0.03*2.0*larg, tam, 10, 10);
+        glTranslated(0,0,tam);
+        gluClosedCylinder(quad, 0.1*larg, 0.0, 0.2*larg, 10, 10);
+    }
+    glPopMatrix();
+
+    glPopMatrix();
+    gluDeleteQuadric( quad );
+    delete mat;
+
+}
+
 
 void Draw::drawArrow2D(float angle, Vec4 anchor)
 {

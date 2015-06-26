@@ -81,7 +81,7 @@ bool Utils::readModelRubens(Scene *scene, const std::string &fileName)
     Vec4 scale;
     float angle,mass;
     Vec4 anchor;
-    Quaternion quat;
+    QuaternionQ quat;
     Character *chara = new Character(scene);
     scene->addCharacter(chara);
 
@@ -449,7 +449,7 @@ bool Utils::saveModelRubens(Character *chara, const string &fileName)
             //b = bodyGeoms[i];
             //g = b->geom;
             Vec4 pos = chara->getBody(i)->getPositionCurrent();
-            Quaternion q = chara->getBody(i)->getRotationCurrent();
+            QuaternionQ q = chara->getBody(i)->getRotationCurrent();
             //dGeomGetQuaternion (g, q);
             //type = dGeomGetClass (g);
 
@@ -578,10 +578,16 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         QDomElement info = doc.createElement( "Character" ); //cabeçalho
         QDomElement sim = doc.createElement("Simulation");   //simulação
         sim.setAttribute("Steps",scene->getSimStep());
+        sim.setAttribute("FrictionGround", scene->getFrictionGround());
+        sim.setAttribute("FrictionFootAir", scene->getFrictionFootAir());
+
 
         QDomElement mocap = doc.createElement("MoCap");   //mocap
         mocap.setAttribute("FileMocap",scene->getCharacter(i)->getMoCap()->getAddressFile());
         mocap.setAttribute("FileMocapLoad",scene->getCharacter(i)->getMoCap()->getAddressFileLoad());
+        mocap.setAttribute("BeginCycle",scene->getCharacter(i)->getMoCap()->getBeginClycle());
+        mocap.setAttribute("EndCycle",scene->getCharacter(i)->getMoCap()->getEndClycle());
+
 
         QDomElement cpdprop = doc.createElement("ControlPDProportional");   //Controle PD Proporcional
         vec = scene->getProportionalKsPD();
@@ -607,9 +613,29 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         offset.setAttribute("y",scene->getCharacter(i)->getOffset().y());
         offset.setAttribute("z",scene->getCharacter(i)->getOffset().z());
 
+        QDomElement eye = doc.createElement( "Cam_Eye" ); //camera eye
+        eye.setAttribute("x",scene->getCharacter(i)->getScene()->getEye().x());
+        eye.setAttribute("y",scene->getCharacter(i)->getScene()->getEye().y());
+        eye.setAttribute("z",scene->getCharacter(i)->getScene()->getEye().z());
+
+
+        QDomElement at = doc.createElement( "Cam_At" ); //camera at
+        at.setAttribute("x",scene->getCharacter(i)->getScene()->getAt().x());
+        at.setAttribute("y",scene->getCharacter(i)->getScene()->getAt().y());
+        at.setAttribute("z",scene->getCharacter(i)->getScene()->getAt().z());
+
+        QDomElement up = doc.createElement( "Cam_Up" ); //camera up
+        up.setAttribute("x",scene->getCharacter(i)->getScene()->getUp().x());
+        up.setAttribute("y",scene->getCharacter(i)->getScene()->getUp().y());
+        up.setAttribute("z",scene->getCharacter(i)->getScene()->getUp().z());
+
+
         info.appendChild(sim);
         info.appendChild(gravity);
         info.appendChild(offset);
+        info.appendChild(eye);
+        info.appendChild(at);
+        info.appendChild(up);
         info.appendChild(mocap);
         info.appendChild(cpdprop);
 
@@ -618,7 +644,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
             QDomElement bodyProperties = doc.createElement("Properties");
             bodyProperties.setAttribute("Name",scene->getCharacter(i)->getBody(j)->getName());
             Vec4 vec;
-            Quaternion q;
+            QuaternionQ q;
             vec = scene->getCharacter(i)->getBody(j)->getPosition();
             q = scene->getCharacter(i)->getBody(j)->getRotation();
             bodyProperties.setAttribute("Mass",scene->getCharacter(i)->getBody(j)->getFMass());
@@ -688,7 +714,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         QDomElement joint = doc.createElement("Joints");
         for(int j=0;j<scene->getCharacter(i)->getNumJoints();j++){
             Vec4 vec;
-            Quaternion q;
+            QuaternionQ q;
             Joint *jo = scene->getCharacter(i)->getJoint(j);
             ControlPD *cpd = scene->getCharacter(i)->getControllersPD().at(j);
             QDomElement jointProperties = doc.createElement("Joint");
@@ -732,7 +758,8 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         balanceControl.setAttribute("EnableForce",(int)scene->getCharacter(i)->getBalance()->getEnableForce());
         balanceControl.setAttribute("EnableTorque",(int)scene->getCharacter(i)->getBalance()->getEnableTorque());
         balanceControl.setAttribute("EnableMomentum",(int)scene->getCharacter(i)->getBalance()->getEnableMomentum());
-        Quaternion q = scene->getCharacter(i)->getBalance()->getDesiredQuaternion();
+        balanceControl.setAttribute("GravityCompensation",scene->getCharacter(i)->getBalance()->getCompensationGravity());
+        QuaternionQ q = scene->getCharacter(i)->getBalance()->getDesiredQuaternion();
         QDomElement quatTq = doc.createElement("QuaternionTorque");
         quatTq.setAttribute("w",q.getScalar());
         quatTq.setAttribute("x",q.getPosX());
@@ -777,6 +804,7 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         kangBal.setAttribute("z",vec.z());
         balanceControl.appendChild(kangBal);
 
+
         QDomElement cone = doc.createElement("FrictionCone");
         cone.setAttribute("Module",scene->getCharacter(i)->getBalance()->getMCone());
         cone.setAttribute("Height",scene->getCharacter(i)->getBalance()->getHeightCone());
@@ -785,6 +813,8 @@ bool Utils::saveSimulationConfig(Scene *scene, const string &fileName)
         cone.setAttribute("Limits",scene->getCharacter(i)->getBalance()->getLimitCone());
         //sensor tolerance
         cone.setAttribute("SensorTol",scene->getCharacter(i)->getBalance()->getSensorTolerance());
+        //steps
+        cone.setAttribute("StepsInterpolation",scene->getCharacter(i)->getBalance()->getStepsInterpolation());
         balanceControl.appendChild(cone);
 
         QDomElement locomotion = doc.createElement("LocomotionParameters");
@@ -838,7 +868,6 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
     QDomNode n = root.firstChild();
     while( !n.isNull() )
     {
-
         QDomElement e = n.toElement();
         if( !e.isNull() ){
             Character *chara = new Character(scene);
@@ -849,6 +878,17 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 QDomElement sime = sim.toElement();
                 int steps = sime.attribute("Steps","").toInt();
                 scene->setSimStep(steps);
+
+                float fric = sime.attribute("FrictionGround","-1").toFloat();
+                if (fric>=0)
+                    scene->setFrictionGround(fric);
+                fric = sime.attribute("FrictionFootAir","-1").toFloat();
+                if (fric>=0)
+                    scene->setFrictionFootAir(fric);
+
+
+
+
                 sim = e.firstChildElement("Gravity");
                 sime = sim.toElement();
                 int b = sime.attribute("Enable","").toInt();
@@ -872,6 +912,39 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 z = sime.attribute("z","").toFloat();
                 offset.setVec4(x,y,z);
                 chara->setOffset(offset);
+
+                // configuração de câmera
+                sim = e.firstChildElement("Cam_Eye");
+                if (!sim.isNull()) {
+                    Vec4 eye, at,up;
+                    sime = sim.toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    eye.setVec4(x,y,z);
+
+                    sim = e.firstChildElement("Cam_At");
+                    sime = sim.toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    at.setVec4(x,y,z);
+
+                    sim = e.firstChildElement("Cam_Up");
+                    sime = sim.toElement();
+                    x = sime.attribute("x","").toFloat();
+                    y = sime.attribute("y","").toFloat();
+                    z = sime.attribute("z","").toFloat();
+                    up.setVec4(x,y,z);
+
+                    chara->getScene()->setViewer(eye,at,up);
+
+
+                }
+
+
+
+
                 sim = e.firstChildElement("MoCap");
                 sime = sim.toElement();
                 QString file = sime.attribute("FileMocap","");
@@ -880,6 +953,14 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     file = sime.attribute("FileMocapLoad","");
                     if(!file.isEmpty()){
                         chara->getMoCap()->setAddressFileLoad(file);
+                        int total = chara->getMoCap()->getEndClycle();
+                        //QString t_s = QString().sprintf("%d",total);
+                        int begin = sime.attribute("BeginCycle","0").toInt();
+                        int end = sime.attribute("EndCycle","0").toInt();
+                        if(!end) end = total;
+                        chara->getMoCap()->setBeginClycle(begin);
+                        chara->getMoCap()->setEndClycle(end);
+                        //qDebug() << chara->getMoCap()->getEndClycle();
                     }
                 }
                 sim = e.firstChildElement("ControlPDProportional");
@@ -912,7 +993,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     bool bodybalance =  (bool)sime.attribute("BodyBalance","").toInt();
                     QString objfile = sime.attribute("ObjFile","");
                     Vec4 scale,pos;
-                    Quaternion quat;
+                    QuaternionQ quat;
                     sime = body.firstChildElement("Position").toElement();
                     x = sime.attribute("x","").toFloat();
                     y = sime.attribute("y","").toFloat();
@@ -924,7 +1005,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                     x = sime.attribute("x","").toFloat();
                     y = sime.attribute("y","").toFloat();
                     z = sime.attribute("z","").toFloat();
-                    quat = Quaternion(w,x,y,z);
+                    quat = QuaternionQ(w,x,y,z);
                     sime = body.firstChildElement("Dimension").toElement();
                     x = sime.attribute("x","").toFloat();
                     y = sime.attribute("y","").toFloat();
@@ -1004,7 +1085,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                        x = prop.attribute("x","").toFloat();
                        y = prop.attribute("y","").toFloat();
                        z = prop.attribute("z","").toFloat();
-                       Quaternion quat(w,x,y,z);
+                       QuaternionQ quat(w,x,y,z);
                        prop = sime.firstChildElement("KsPD").toElement();
                        x = prop.attribute("x","").toFloat();
                        y = prop.attribute("y","").toFloat();
@@ -1033,17 +1114,21 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 bool enablet = (bool)sime.attribute("EnableTorque","").toInt();
                 bool enablef = (bool)sime.attribute("EnableForce","").toInt();
                 bool enablem = (bool)sime.attribute("EnableMomentum","").toInt();
+                float grav = 1.0;
+
+                grav = sime.attribute("GravityCompensation","1.0").toFloat();
 
                 chara->getBalance()->setEnableForce(enablef);
                 chara->getBalance()->setEnableTorque(enablet);
                 chara->getBalance()->setEnableMomentum(enablem);
+                chara->getBalance()->setCompensationGravity(grav);
 
                 QDomElement prop = sime.firstChildElement("QuaternionTorque").toElement();
                 w = prop.attribute("w","").toFloat();
                 x = prop.attribute("x","").toFloat();
                 y = prop.attribute("y","").toFloat();
                 z = prop.attribute("z","").toFloat();
-                Quaternion quat(w,x,y,z);
+                QuaternionQ quat(w,x,y,z);
                 chara->getBalance()->setDeriredQuaternion(quat);
                 prop = sime.firstChildElement("BalanceksTorque").toElement();
                 x = prop.attribute("x","").toFloat();
@@ -1087,7 +1172,10 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
                 chara->getBalance()->setRadiusCone(prop.attribute("Radius","").toFloat());
                 chara->getBalance()->setMCone(prop.attribute("Module","").toFloat());
                 chara->getBalance()->setLimitCone(prop.attribute("Limits","").toFloat());
-                chara->getBalance()->setSensorTolerance(prop.attribute("SensorTol","").toFloat());
+
+                chara->getBalance()->setSensorTolerance(prop.attribute("SensorTol","0.3").toFloat());
+                chara->getBalance()->setStepsInterpolation(prop.attribute("StepsInterpolation","100").toFloat());
+
                 QDomElement propinfo = sime.firstChildElement("LocomotionParameters").toElement();
                 prop = propinfo.firstChildElement("LocomotionVelocity").toElement();
                 x = prop.attribute("x","").toFloat();
@@ -1106,6 +1194,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
             if (!file.isEmpty()){
                 Utils::loadMotionCapture(chara->getMoCap(),chara,file.toStdString());
                 chara->loadMotionFrames();
+                if(chara->getMoCap()->endClycle<=0) chara->getMoCap()->endClycle = chara->getMoCap()->sizeFrames();
                 chara->getMoCap()->copyFootsProperties();
                 file = chara->getMoCap()->getAddressFileLoad();
                 if(!file.isEmpty()){
@@ -1201,7 +1290,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
           //inicializa os vectors pos e quat
           for (int j=0;j<chara->getNumBodies();j++) {
             moCap->getFrameMotion(i)->appendPosition( Vec4(0.0,0.0,0.0) );
-            moCap->getFrameMotion(i)->appendOrientation(Quaternion( 1.0,0.0,0.0,0.0));
+            moCap->getFrameMotion(i)->appendOrientation(QuaternionQ( 1.0,0.0,0.0,0.0));
           }
         }
 
@@ -1235,6 +1324,11 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             pos.x1 = dtmp;
             ss >> dtmp;
             pos.x2 = dtmp;
+//            Caso do chute rodado
+//            if(j==13) //caso o pé esteja invertido
+//                moCap->getFrameMotion(i)->setPosition(j,pos-Vec4(0,0.031,0));
+//            else
+//                moCap->getFrameMotion(i)->setPosition(j,pos);
             moCap->getFrameMotion(i)->setPosition(j,pos);
           }
           //pula duas linhas
@@ -1245,7 +1339,7 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             getline(istr, stmp);
             ss.clear();
             ss << stmp;
-            Quaternion quat;
+            QuaternionQ quat;
             ss >> dtmp;
             quat.setScalar(dtmp);
             ss >> dtmp;
@@ -1254,16 +1348,21 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             quat.setPosX(dtmp);
             ss >> dtmp;
             quat.setPosY(dtmp);
-            //if(j==13) //caso o pé esteja invertido
-            //    moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,0,180));
-            //else
+//            Caso swing one foot
+//            if (j==3)
+//                moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,180,0));
+//            else
+//            Caso chute rodado            
+//            if(j==13) //caso o pé esteja invertido
+//                moCap->getFrameMotion(i)->setOrientation(j,quat*QuaternionQ(-8,10,160));
+//            else
                 moCap->getFrameMotion(i)->setOrientation(j,quat);
           }
           //pula uma linha
             getline(istr, stmp);
             }
         }
-        moCap->setEndClycle(moCap->sizeFrames());
+        //moCap->setEndClycle(moCap->sizeFrames());
         return true;
 }
 

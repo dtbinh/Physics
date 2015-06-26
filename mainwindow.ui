@@ -117,9 +117,9 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>70</y>
+              <y>140</y>
               <width>131</width>
-              <height>22</height>
+              <height>20</height>
              </rect>
             </property>
             <property name="text">
@@ -191,7 +191,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>100</y>
+              <y>170</y>
               <width>281</width>
               <height>16</height>
              </rect>
@@ -204,7 +204,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>130</y>
+              <y>200</y>
               <width>201</width>
               <height>22</height>
              </rect>
@@ -217,7 +217,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>160</y>
+              <y>230</y>
               <width>181</width>
               <height>22</height>
              </rect>
@@ -230,7 +230,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>190</y>
+              <y>260</y>
               <width>97</width>
               <height>22</height>
              </rect>
@@ -238,6 +238,96 @@
             <property name="text">
              <string>Show Info</string>
             </property>
+           </widget>
+           <widget class="QWidget" name="layoutWidget1_2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>70</y>
+              <width>310</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_45">
+             <item>
+              <widget class="QLabel" name="label_42">
+               <property name="text">
+                <string>Ground</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="groundx">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>-180.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>180.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="groundy">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>-180.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>180.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="groundz">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="minimum">
+                <double>-180.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>180.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>100</y>
+              <width>311</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_46">
+             <item>
+              <widget class="QLabel" name="label_43">
+               <property name="text">
+                <string>Ground Friction:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="frictionGround">
+               <property name="maximum">
+                <double>9999.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="tab">
@@ -250,7 +340,7 @@
               <x>9</x>
               <y>9</y>
               <width>301</width>
-              <height>271</height>
+              <height>281</height>
              </rect>
             </property>
             <property name="font">
@@ -282,7 +372,7 @@ QGroupBox{
               <number>2</number>
              </property>
              <property name="topMargin">
-              <number>2</number>
+              <number>9</number>
              </property>
              <property name="rightMargin">
               <number>2</number>
@@ -305,30 +395,30 @@ QGroupBox{
                <item>
                 <widget class="QDoubleSpinBox" name="xksTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="yksTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="zksTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -346,30 +436,30 @@ QGroupBox{
                <item>
                 <widget class="QDoubleSpinBox" name="xkdTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="ykdTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="zkdTqBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -380,7 +470,7 @@ QGroupBox{
                <item>
                 <widget class="QLabel" name="label_14">
                  <property name="text">
-                  <string>Fc Ks</string>
+                  <string>Fc Ks:</string>
                  </property>
                 </widget>
                </item>
@@ -391,6 +481,9 @@ QGroupBox{
                  </property>
                  <property name="maximum">
                   <double>9999.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>25.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -438,20 +531,20 @@ QGroupBox{
                <item>
                 <widget class="QDoubleSpinBox" name="ykdForBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="zkdForBal">
                  <property name="minimum">
-                  <double>-500.000000000000000</double>
+                  <double>-999.000000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>500.000000000000000</double>
+                  <double>999.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -614,15 +707,36 @@ QGroupBox{
                </item>
               </layout>
              </item>
+             <item row="7" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_48">
+               <item>
+                <widget class="QLabel" name="label_45">
+                 <property name="text">
+                  <string>Gravity Comp:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="gravComp">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </widget>
            <widget class="QGroupBox" name="groupBox_4">
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>287</y>
+              <y>300</y>
               <width>299</width>
-              <height>84</height>
+              <height>71</height>
              </rect>
             </property>
             <property name="font">
@@ -650,6 +764,24 @@ QGroupBox{
              <string>PD control Proportional</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_8">
+             <property name="leftMargin">
+              <number>1</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>1</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <property name="horizontalSpacing">
+              <number>2</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>1</number>
+             </property>
              <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_15">
                <item>
@@ -804,6 +936,9 @@ QGroupBox{
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_3">
+              <property name="spacing">
+               <number>1</number>
+              </property>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <property name="spacing">
@@ -1039,7 +1174,7 @@ QGroupBox{
               <x>10</x>
               <y>380</y>
               <width>301</width>
-              <height>44</height>
+              <height>41</height>
              </rect>
             </property>
             <property name="font">
@@ -1067,6 +1202,21 @@ QGroupBox{
              <string>Character Draw</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
+             <property name="leftMargin">
+              <number>1</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>1</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <property name="spacing">
+              <number>1</number>
+             </property>
              <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_24">
                <property name="spacing">
@@ -1207,9 +1357,9 @@ QGroupBox{
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>230</y>
+              <y>270</y>
               <width>301</width>
-              <height>221</height>
+              <height>171</height>
              </rect>
             </property>
             <property name="font">
@@ -1237,6 +1387,21 @@ QGroupBox{
              <string>Editing Frames</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <property name="leftMargin">
+              <number>3</number>
+             </property>
+             <property name="topMargin">
+              <number>3</number>
+             </property>
+             <property name="rightMargin">
+              <number>3</number>
+             </property>
+             <property name="bottomMargin">
+              <number>3</number>
+             </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_36">
                <item>
@@ -1406,10 +1571,10 @@ QGroupBox{
            <widget class="QCheckBox" name="checkShowMocap">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>200</y>
+              <x>10</x>
+              <y>240</y>
               <width>151</width>
-              <height>22</height>
+              <height>20</height>
              </rect>
             </property>
             <property name="text">
@@ -1464,6 +1629,35 @@ QGroupBox{
              </item>
             </layout>
            </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>200</y>
+              <width>271</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_47">
+             <item>
+              <widget class="QLabel" name="label_44">
+               <property name="text">
+                <string>Friction Foot Air:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="frictionFootAir">
+               <property name="maximum">
+                <double>9999.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>15.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </widget>
           <widget class="QWidget" name="tabManipulatorSim">
            <attribute name="title">
@@ -1471,7 +1665,11 @@ QGroupBox{
            </attribute>
            <layout class="QGridLayout" name="gridLayout_12">
             <item row="0" column="0">
-             <widget class="QListWidget" name="listWidgetObjects"/>
+             <widget class="QListWidget" name="listWidgetObjects">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QGroupBox" name="groupBox_9">
@@ -1914,7 +2112,7 @@ QGroupBox{
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                  <property name="spacing">
                   <number>0</number>
@@ -1990,6 +2188,25 @@ QGroupBox{
                   </widget>
                  </item>
                 </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QDoubleSpinBox" name="timeApplyForce">
+                 <property name="suffix">
+                  <string> seconds</string>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.200000000000000</double>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -2727,6 +2944,38 @@ QGroupBox{
                </property>
                <property name="value">
                 <double>5.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>210</y>
+              <width>183</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_49">
+             <item>
+              <widget class="QLabel" name="label_46">
+               <property name="text">
+                <string>Suitcase Mass:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="massSuitcase">
+               <property name="maximum">
+                <double>999.990000000000009</double>
+               </property>
+               <property name="singleStep">
+                <double>5.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>

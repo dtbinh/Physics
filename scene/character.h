@@ -32,7 +32,8 @@ public:
     bool wire;
     bool shadow_motion;
     QString name;
-public:
+    bool has_suitcase;
+
     //variaveis publicas
     std::vector<bool**> hierarchy; //variavel q guarda os relacionamentos das juntas de acordo com os corpos que
                                          //estão em contato com o solo
@@ -94,6 +95,11 @@ public:
     Vec4 getOffset();
     int             findJointIndex(Joint* searchJoint); //encontra o indice de uma junta caso ela exista no personagem
     ControlPD*      getController(int i);
+    void            setSuitcase(int body,float mass);
+    void            deleteSuitcase();
+    void            isFall(bool b);
+
+
 
     QString         getName();
     void            setName(QString name);
@@ -114,6 +120,7 @@ public:
     void           showHierarchyBodies(Object* begin, Object* end);
 
 
+    bool           hasEffectorEnabled();
 };
 
 #endif // CHARACTER_H

@@ -16,7 +16,7 @@ dReal ControlPD::limitaValor(dReal lim, dReal valor) {
   return valor;
 }
 
-ControlPD::ControlPD(Joint *joint, Quaternion qwanted, Vec4 ks, Vec4 kd)
+ControlPD::ControlPD(Joint *joint, QuaternionQ qwanted, Vec4 ks, Vec4 kd)
 {
     qwanted.normalize();
     this->joint = joint;
@@ -28,10 +28,13 @@ ControlPD::ControlPD(Joint *joint, Quaternion qwanted, Vec4 ks, Vec4 kd)
     this->enabled = true;
     this->enable_inertia = true;
     this->velDesired = Vec4();
-    inertia = Matrix(3,3);
+    inertia = MatrixF(3,3);
     inertia(0,0) = 1;
     inertia(1,1) = 1;
     inertia(2,2) = 1;
+    this->ks_fall = Vec4(5.,5.,5.);
+    this->kd_fall = Vec4(0.5,0.5,0.5);
+    this->is_fall = false;
 }
 
 void ControlPD::setJoint(Joint *joint)
@@ -44,12 +47,12 @@ Joint *ControlPD::getJoint()
     return joint;
 }
 
-void ControlPD::setQuaternionWanted(Quaternion qwanted)
+void ControlPD::setQuaternionWanted(QuaternionQ qwanted)
 {
     this->qwanted = qwanted;
 }
 
-Quaternion ControlPD::getQuaternionWanted()
+QuaternionQ ControlPD::getQuaternionWanted()
 {
     return this->qwanted;
 }
@@ -97,18 +100,18 @@ bool ControlPD::isEnabledInertia()
 void ControlPD::evaluate()
 {
     if (!this->enabled) return;
-    Quaternion qIdent = Quaternion();
+    QuaternionQ qIdent = QuaternionQ();
     //qIdent.normaliza();
             Vec4 axis;
             dReal angle;
-                Quaternion qAtual = Physics::getRotationJoint(this->joint);
+                QuaternionQ qAtual = Physics::getRotationJoint(this->joint);
                 //printf("\n(%.3f,%.3f,%.3f,%.3f)",qAtual.w,qAtual.xyz.x(),qAtual.xyz.y(),qAtual.xyz.z());
                   //indo pelo caminho mais curto
                   qAtual = qIdent.lessArc(qAtual);
-                  Quaternion qDesejado = this->qwanted;
+                  QuaternionQ qDesejado = this->qwanted;
                   //indo pelo caminho mais curto
                   qDesejado = qIdent.lessArc(qDesejado);
-              Quaternion qDelta = Quaternion::deltaQuat( qDesejado, qAtual );
+              QuaternionQ qDelta = QuaternionQ::deltaQuat( qDesejado, qAtual );
                 //indo pelo caminho mais curto
                 qDelta = qIdent.lessArc(qDelta);
               qDelta.toAxisAngle( &axis, &angle );
@@ -167,9 +170,15 @@ void ControlPD::evaluate()
                 for (int j=0;j<12;j++) { ksLocal[j] = 0.0; }
               //dVector3 ksFixedi;
                 //state->getJointKsFixediSaved( i, state->compInertia, ksFixedi );
-                ksLocal[0]  = this->ks.x()*propKs.x()*inertia(0,0);
-                ksLocal[5]  = this->ks.y()*propKs.y()*inertia(1,1);
-                ksLocal[10] = this->ks.z()*propKs.z()*inertia(2,2);
+                if(!is_fall){
+                    ksLocal[0]  = this->ks.x()*propKs.x()*inertia(0,0);
+                    ksLocal[5]  = this->ks.y()*propKs.y()*inertia(1,1);
+                    ksLocal[10] = this->ks.z()*propKs.z()*inertia(2,2);
+                }else{
+                    ksLocal[0]  = this->ks_fall.x()*propKs.x()*inertia(0,0);
+                    ksLocal[5]  = this->ks_fall.y()*propKs.y()*inertia(1,1);
+                    ksLocal[10] = this->ks_fall.z()*propKs.z()*inertia(2,2);
+                }
             //calculando ks em coordenadas globais
               dMatrix3 ksGlobal;
                 //se deltaGlobal = R.deltaLocal, entao ksGlobal = R.ksLocal.R^t
@@ -184,9 +193,15 @@ void ControlPD::evaluate()
               dMatrix3 kdLocal;
                 //zera kdLocal
                 for (int j=0;j<12;j++) { kdLocal[j] = 0.0; }
+                if(!is_fall){
                 kdLocal[0]  = this->kd.x()*propKd.x()*inertia(0,0);
                 kdLocal[5]  = this->kd.y()*propKd.y()*inertia(1,1);
                 kdLocal[10] = this->kd.z()*propKd.z()*inertia(2,2);
+                }else{
+                    kdLocal[0]  = this->kd_fall.x()*propKd.x()*inertia(0,0);
+                    kdLocal[5]  = this->kd_fall.y()*propKd.y()*inertia(1,1);
+                    kdLocal[10] = this->kd_fall.z()*propKd.z()*inertia(2,2);
+                }
             //calculando kd em coordenadas globais
               dMatrix3 kdGlobal;
                 //se deltaGlobal = R.deltaLocal, entao kdGlobal = R.kdLocal.R^t
@@ -212,7 +227,6 @@ void ControlPD::evaluate()
 
             //Vec4 tq = limitingTorquePD(Vec4(torque[0],torque[1],torque[2]));
             //Vec4 tq_father = limitingTorquePD(Vec4(-torque[0],-torque[1],-torque[2]));
-            //std::cout << "Torque x: " << tq.x() << " Torque y: " << tq.y() << " Torque z: " << tq.z() << "\n";
             //if (this->joint->getParent()->getFoot()) printf("\nControle PD: tq(%.3f,%.3f,%.3f)",-tq.x(),-tq.y(),-tq.z());
                this->joint->getParent()->addTorque(-tq.x(),-tq.y(),-tq.z());
             //if(this->joint->getChild()->getFoot()) printf("\nControle PD: tq(%.3f,%.3f,%.3f)",tq.x(),tq.y(),tq.z());
@@ -243,10 +257,10 @@ void ControlPD::setVelocityDesired(Vec4 vel)
     this->velDesired = vel;
 }
 
-Quaternion ControlPD::getOrientation()
+QuaternionQ ControlPD::getOrientation()
 {
-    Quaternion qIdent;
-    Quaternion qAtual = Physics::getRotationJoint(this->joint);
+    QuaternionQ qIdent;
+    QuaternionQ qAtual = Physics::getRotationJoint(this->joint);
     qAtual = qIdent.lessArc(qAtual);
     return qAtual;
 }
@@ -289,20 +303,20 @@ Vec4 ControlPD::limitingTorquePD(Vec4 tq, Joint *j)
     return result;
 }
 
-Vec4 ControlPD::getTorquePD(Joint *joint, Vec4 ks, Vec4 kd, Quaternion qDesired)
+Vec4 ControlPD::getTorquePD(Joint *joint, Vec4 ks, Vec4 kd, QuaternionQ qDesired)
 {
-    Quaternion qIdent = Quaternion();
+    QuaternionQ qIdent = QuaternionQ();
     //qIdent.normaliza();
     Vec4 axis;
     dReal angle;
-    Quaternion qAtual = Physics::getRotationJoint(joint);
+    QuaternionQ qAtual = Physics::getRotationJoint(joint);
     //printf("\n(%.3f,%.3f,%.3f,%.3f)",qAtual.w,qAtual.xyz.x(),qAtual.xyz.y(),qAtual.xyz.z());
     //indo pelo caminho mais curto
     qAtual = qIdent.lessArc(qAtual);
-    Quaternion qDesejado = qDesired;
+    QuaternionQ qDesejado = qDesired;
     //indo pelo caminho mais curto
     qDesejado = qIdent.lessArc(qDesejado);
-    Quaternion qDelta = Quaternion::deltaQuat( qDesejado, qAtual );
+    QuaternionQ qDelta = QuaternionQ::deltaQuat( qDesejado, qAtual );
     //indo pelo caminho mais curto
     qDelta = qIdent.lessArc(qDelta);
     qDelta.toAxisAngle( &axis, &angle );
@@ -400,20 +414,20 @@ Vec4 ControlPD::getTorquePD(Joint *joint, Vec4 ks, Vec4 kd, Quaternion qDesired)
 
 }
 
-Vec4 ControlPD::getTorquePDCOM(Joint *joint, Vec4 ks, Vec4 kd, Quaternion qDesired, Vec4 velocity)
+Vec4 ControlPD::getTorquePDCOM(Joint *joint, Vec4 ks, Vec4 kd, QuaternionQ qDesired, Vec4 velocity)
 {
-    Quaternion qIdent = Quaternion();
+    QuaternionQ qIdent = QuaternionQ();
     //qIdent.normaliza();
             Vec4 axis;
             dReal angle;
-                Quaternion qAtual = joint->getParent()->getRotationCurrent();//Physics::getRotationJointInit(joint);
+                QuaternionQ qAtual = joint->getParent()->getRotationCurrent();//Physics::getRotationJointInit(joint);
                 //printf("\n(%.3f,%.3f,%.3f,%.3f)",qAtual.w,qAtual.xyz.x(),qAtual.xyz.y(),qAtual.xyz.z());
                   //indo pelo caminho mais curto
                   qAtual = qIdent.lessArc(qAtual);
-                  Quaternion qDesejado = qDesired;
+                  QuaternionQ qDesejado = qDesired;
                   //indo pelo caminho mais curto
                   qDesejado = qIdent.lessArc(qDesejado);
-              Quaternion qDelta = Quaternion::deltaQuat( qDesejado, qAtual );
+              QuaternionQ qDelta = QuaternionQ::deltaQuat( qDesejado, qAtual );
                 //indo pelo caminho mais curto
                 qDelta = qIdent.lessArc(qDelta);
               qDelta.toAxisAngle( &axis, &angle );
@@ -515,7 +529,37 @@ Vec4 ControlPD::getTorquePDCOM(Joint *joint, Vec4 ks, Vec4 kd, Quaternion qDesir
               //            return Vec4(torque[0],torque[1],torque[2]);
 }
 
-void ControlPD::setInertiaFactors(Matrix i)
+void ControlPD::setFall(bool b)
+{
+    this->is_fall = b;
+}
+
+bool ControlPD::isFall()
+{
+    return this->isFall();
+}
+
+void ControlPD::setKsFall(Vec4 ks_f)
+{
+    this->ks_fall = ks_f;
+}
+
+Vec4 ControlPD::getKsFall()
+{
+    return this->ks_fall;
+}
+
+void ControlPD::setKdFall(Vec4 kd_f)
+{
+    this->kd_fall = kd_f;
+}
+
+Vec4 ControlPD::getKdFall()
+{
+    return this->kd_fall;
+}
+
+void ControlPD::setInertiaFactors(MatrixF i)
 {
     if(enable_inertia) inertia = i;
     else resetInertiaFactors();
@@ -523,7 +567,7 @@ void ControlPD::setInertiaFactors(Matrix i)
 
 void ControlPD::resetInertiaFactors()
 {
-    inertia = Matrix(3,3);
+    inertia = MatrixF(3,3);
     inertia(0,0) = 1;
     inertia(1,1) = 1;
     inertia(2,2) = 1;
