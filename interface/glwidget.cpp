@@ -350,7 +350,7 @@ GLWidget::GLWidget(QWidget *parent) :
     //scene->createCharacter();
 
     //scene->createCharacter();
-    //scene->createLuxo();
+    scene->createLuxo();
     //scene->createLuxo2();
     //controlLuxo = false;
 
