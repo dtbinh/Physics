@@ -929,7 +929,6 @@ void Character::isFall(bool b)
      for(int i=0;i<this->controllers.size();i++)   {
          this->controllers.at(i)->setFall(b);
      }
->>>>>>> modify-meeting-0806
 }
 
 void Character::setSpace(SpaceID space)
