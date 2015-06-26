@@ -59,7 +59,7 @@ private:
 
 
     //Controle da pose
-    //QTime pose_time;
+    QTime pose_time;
 
 public:
     int            width,height;
