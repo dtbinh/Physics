@@ -609,16 +609,27 @@ void MainWindow::showSelectedObject(int i)
 void MainWindow::showSelectedPoseControl(int i)
 {
 
+
+    ui->listWidgetPose->blockSignals(true);
+    ui->listWidgetPoseJoints->blockSignals(true);
+
+    GraphicalPose* old_pose_control;
+
+    old_pose_control = pose_control_selected;
     pose_control_selected = ui->widgetPhysics->getPoseControlList().at(i);
-    if(pose_control_selected==NULL) return;
+
+
     //Quando seleciona um controle de pose, torna ele ativo e começa a avançar o tempo dele
     pose_control_selected->setActive(true);
     pose_control_selected->setAdvancingTime(true);
+    //Desliga o controle de pose antigo
+    if (old_pose_control != NULL && old_pose_control != pose_control_selected){
+        old_pose_control->setActive(false);
+        old_pose_control->setAdvancingTime(false);
+    }
 
     pose_selected = pose_control_selected->getPoses().at(0);
-    pose_selected = pose_control_selected->getPoses().at(0);
-
-    if(pose_selected==NULL) return;
+    pose_angle_selected = 0;
     //std::cout << pose_control_selected->getName().toStdString() << "\n";
     updateListPose(pose_control_selected->getPoses());
 
@@ -627,6 +638,10 @@ void MainWindow::showSelectedPoseControl(int i)
         charName.sprintf("Character %d", i);
     }
     ui->correspChar->setText("Corresponding Character: " + charName);
+
+
+    ui->listWidgetPose->blockSignals(false);
+    ui->listWidgetPoseJoints->blockSignals(false);
 }
 
 void MainWindow::showSelectedPose(int i)

@@ -29,6 +29,7 @@ Pose::Pose(Character *character, std::vector<Vec4> angles)
 
 Pose::~Pose()
 {
+    std::vector<Vec4>().swap(this->angles);
 }
 
 Character *Pose::getCharacter()
