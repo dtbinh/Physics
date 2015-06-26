@@ -608,7 +608,9 @@ void MainWindow::showSelectedObject(int i)
 
 void MainWindow::showSelectedPoseControl(int i)
 {
-    //Desliga o controle de pose antigo
+
+    ui->listWidgetPose->blockSignals(true);
+    ui->listWidgetPoseJoints->blockSignals(true);
 
     GraphicalPose* old_pose_control;
 
@@ -626,8 +628,7 @@ void MainWindow::showSelectedPoseControl(int i)
 
     pose_selected = pose_control_selected->getPoses().at(0);
     pose_angle_selected = 0;
-    std::cout << pose_control_selected->getName().toStdString() << "\n";
-    std::cout.flush();
+    //std::cout << pose_control_selected->getName().toStdString() << "\n";
     updateListPose(pose_control_selected->getPoses());
 
     QString charName = pose_control_selected->getCharacter()->getName();
@@ -635,6 +636,10 @@ void MainWindow::showSelectedPoseControl(int i)
         charName.sprintf("Character %d", i);
     }
     ui->correspChar->setText("Corresponding Character: " + charName);
+
+
+    ui->listWidgetPose->blockSignals(false);
+    ui->listWidgetPoseJoints->blockSignals(false);
 }
 
 void MainWindow::showSelectedPose(int i)
