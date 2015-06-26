@@ -521,6 +521,13 @@ void Object::draw(bool wire)
 void Object::drawShadow()
 {
     if (this->geometry==0) return;
+    if(has_cup) Draw::drawCoffeeCup(getPositionCurrent(),MATERIAL_WHITE_PLASTIC,QuaternionQ(Vec4(-90,0,0))*getRotationCurrent().conjugate());
+    if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
+//    if (show_effector && show_target){
+//        if(enabled_cpdp) Draw::drawLine(target,getPositionCurrent(),Vec4(0,.9,0),1.4);
+//        else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
+//    }
+
     switch (this->type){
     case TYPE_CUBE:{
         if(objFile.isEmpty() || !rendermesh){

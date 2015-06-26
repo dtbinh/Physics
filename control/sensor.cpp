@@ -149,6 +149,10 @@ bool Sensor::isSwingFoot(Object *obj,Character *chara)
         foots.clear();
         return false;
     }else{
+        int res = getHierarchy2Use(chara);
+        if(res == ALL_FOOTS_GROUND+3) return false;
+        if (res == FOOTS_AIR+3) return false;
+        if(chara->getBody(res-3) != obj) return true;
         //if (chara->getGRFSum(obj).module()>0) return false;
         return false;
     }

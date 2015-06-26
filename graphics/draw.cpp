@@ -1425,10 +1425,10 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
 void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 dir, float size,int material, Vec4 ground_inclination) //origen COM
 {
     Vec4 direction = Vec4(0,0,1);
-    Vec4 begin = Vec4(0,0,0.3);
+    Vec4 begin = Vec4(0,0,0.0);
     if(velocity.module()!=0 && velocity*direction<0){
         direction = Vec4(0,0,-1);
-        begin = Vec4(0,0,-0.3);
+        begin = Vec4(0,0,-0.0);
     }
 
     QuaternionQ qat(dir);

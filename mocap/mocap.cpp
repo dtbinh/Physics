@@ -195,7 +195,7 @@ void MoCap::stepFrame(int value)
     if (!status) return;
     if (value>=int(this->capMotFrame.size())) value = 1;
     frame_current = value;
-    drawShadow(Vec4(-0.5,0,0),value);
+    //drawShadow(Vec4(-0.5,0,0),value);
 }
 
 Vec4 MoCap::positionRelativeCOM(int frame,int foot)
@@ -378,8 +378,8 @@ void MoCap::clear()
 void MoCap::drawShadow(Vec4 offset, int frame)
 {
     //if (!status) return;
-    Vec4 neww(-1.4,0,0);
-    int sens = Sensor::getHierarchy2UseMocap(chara);
+//    Vec4 neww(-1.4,0,0);
+//    int sens = Sensor::getHierarchy2UseMocap(chara);
 //    foot_l = chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround();
 //    foot_r = chara->getMoCap()->getFrameMotion(frame)->getFootRightGround();
     for(int i=0;i<chara->getNumBodies();i++){
@@ -387,13 +387,13 @@ void MoCap::drawShadow(Vec4 offset, int frame)
         QuaternionQ orientation = getFrameMotion(frame)->getOrientation(i);
         //if(i==int(sens-3))
         if(i%2==0 && chara->getBody(i)->getFoot() && (chara->getMoCap()->getFrameMotion(frame)->getFootLeftGround()))
-            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
         else if (i%2==1 && chara->getBody(i)->getFoot() && chara->getMoCap()->getFrameMotion(frame)->getFootRightGround())
-            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_RUBY);
 //        else if(sens==0 && chara->getBody(i)->getFoot())
 //            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_RUBY);
         else
-            chara->getBody(i)->draw(position+neww,orientation,MATERIAL_SILVER_POLIERT);
+            chara->getBody(i)->draw(position+offset,orientation,MATERIAL_SILVER_POLIERT);
 
     }
 }

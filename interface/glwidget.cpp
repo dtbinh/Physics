@@ -1952,7 +1952,7 @@ void GLWidget::loadSimulationParameters(QString file)
     cam->eye = scene->getEye();
     cam->at = scene->getAt();
     cam->up = scene->getUp();
-    //scene->createArena();
+    scene->createArena();
 
 
 

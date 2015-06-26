@@ -22,8 +22,8 @@ Balance::Balance(Character* chara)
     kdForce = Vec4(20,20,20);
     kmomang = Vec4(5,5,5);
     kmomlin = Vec4(5,5,5);
-    kVel = Vec4(3900.5,3900.5,3900.5);
-    kDist = Vec4(3900.5,3900.5,3900.5);
+    kVel = Vec4(0,0,0);
+    kDist = Vec4(0,0,0);
     this->enable_force = true;
     this->enable_torque = true;
     this->enable_momentum = true;
@@ -831,7 +831,6 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
         if(chara->hierarchy[useHierarchy][i][chara->getPositionBody(joint->getChild())]){
 
             if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3|| useHierarchy==id_child+3)){
-
                 joint->getChild()->addTorque((torque)*(1-getTorqueMaxCompensable(joint->getChild(),torque))*factor);
                 torque = torque*(1-getTorqueMaxCompensable(joint->getChild(),torque));
 
@@ -884,12 +883,14 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
 
     //qDebug() << "end!";
 
-    //evaluateSIMBICON();
+    if(this->kDist.module()>0 || this->kVel.module()>0)  evaluateSIMBICON();
 
 }
 
 void Balance::evaluateSIMBICON()
 {
+    qDebug() << "Distancia " << kDist.x() << " " << kDist.y() << " " << kDist.z();
+    qDebug() << "Velocidade " << kVel.x() << " " << kVel.y() << " " << kVel.z();
     //    /****************** Teste de SwingFoot *********************/
 
     Vec wrenchSwing;
@@ -931,10 +932,10 @@ void Balance::evaluateSIMBICON()
         //velCOM_moCap.x2 = 0;
         //Object* pelvis = chara->getBody(7);
         //Quaternion newq(Vec4(0,90,0));
-        Vec4 Fswing = Vec4(20,20,20).mult(dist_) + Vec4(5,5,5).mult(vel_);
-        printf("dist_ (%.3f,%.3f,%.3f)\n",dist_.x(),dist_.y(),dist_.z());
-        printf("vel_ (%.3f,%.3f,%.3f)\n",vel_.x(),vel_.y(),vel_.z());
-        printf("Fswing (%.3f,%.3f,%.3f)\n",Fswing.x(),Fswing.y(),Fswing.z());
+        Vec4 Fswing = kDist.mult(dist_) + kVel.mult(vel_);
+//        printf("dist_ (%.3f,%.3f,%.3f)\n",dist_.x(),dist_.y(),dist_.z());
+//        printf("vel_ (%.3f,%.3f,%.3f)\n",vel_.x(),vel_.y(),vel_.z());
+//        printf("Fswing (%.3f,%.3f,%.3f)\n",Fswing.x(),Fswing.y(),Fswing.z());
         Vec wrench = Vec(Vec4(),Fswing);
         int l1,l2;
 //        if(foot_swing==2){

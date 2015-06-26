@@ -557,14 +557,14 @@ void MainWindow::setGravity(Vec4 v)
 
 void MainWindow::setSimbiconDistance()
 {
-    Vec4 g(ui->xkFor->value(),ui->ykFor->value(),ui->zkFor->value());
-    ui->widgetPhysics->setSimbiconForceParameters(g);
+    Vec4 g(ui->xkDis->value(),ui->ykDis->value(),ui->zkDis->value());
+    ui->widgetPhysics->setSimbiconDistanceParameters(g);
 }
 
 void MainWindow::setSimbiconForce()
 {
-    Vec4 g(ui->xkDis->value(),ui->ykDis->value(),ui->zkDis->value());
-    ui->widgetPhysics->setSimbiconDistanceParameters(g);
+    Vec4 g(ui->xkFor->value(),ui->ykFor->value(),ui->zkFor->value());
+    ui->widgetPhysics->setSimbiconForceParameters(g);
 }
 
 void MainWindow::checkFoot(bool b)

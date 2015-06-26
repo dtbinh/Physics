@@ -295,7 +295,7 @@ void Scene::draw()
         objs.clear();
     }
 
-    if (show_grf)
+//    if (show_grf)
 //    if (characters.size()>0){
 //        for(int i=0;i<getCharacter(0)->getNumBodies();i++){
 //            if(getCharacter(0)->getBody(i)->getFoot()){
@@ -1446,7 +1446,7 @@ void Scene::createArena()
 
     float height_wall = 0.5; //altura
     float lenght_wall = 0.2; //largura
-    float mass_wall = 200;
+    float mass_wall = 500;
 
     int units = 12;
 
@@ -1475,49 +1475,50 @@ void Scene::createArena()
     //primeiro quadrante
 
     Object *brick1_1 = addObject(dim_brick,offset+Vec4(2*dim_unit,dim_brick.y()/2.0,5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick2_1 = addObject(dim_brick,offset+Vec4(5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_1 = addObject(dim_brick,offset+Vec4(5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
     Object *brick3_1 = addObject(dim_brick,offset+Vec4(5.5*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick4_1 = addObject(dim_brick,offset+Vec4(1.5*dim_unit,dim_brick.y()/2.0,1.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick4_1 = addObject(dim_brick,offset+Vec4(1.5*dim_unit,dim_brick.y()/2.0,1.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
 
     // segundo quadrante
 
     Object *brick1_2 = addObject(dim_brick,offset+Vec4(-2*dim_unit,dim_brick.y()/2.0,3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick2_2 = addObject(dim_brick,offset+Vec4(-3*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_2 = addObject(dim_brick,offset+Vec4(-3*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
     Object *brick3_2 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick4_2 = addObject(dim_brick,offset+Vec4(-0.5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick4_2 = addObject(dim_brick,offset+Vec4(-0.5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
 
     //terceiro quadrante
 
-    Object *brick1_3 = addObject(dim_brick,offset+Vec4(-1.2*dim_unit,dim_brick.y()/2.0,-3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick1_3 = addObject(dim_brick,offset+Vec4(-1.2*dim_unit,dim_brick.y()/2.0,-3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
     Object *brick2_3 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
     Object *brick3_3 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,-0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick4_3 = addObject(dim_brick,offset+Vec4(-5.5*dim_unit,dim_brick.y()/2.0,-4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick4_3 = addObject(dim_brick,offset+Vec4(-5.5*dim_unit,dim_brick.y()/2.0,-4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
 
     //quarto quadrante
 
     Object *brick1_4 = addObject(dim_brick,offset+Vec4(1.2*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick2_4 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
-    Object *brick3_4 = addObject(dim_brick,offset+Vec4(3.5*dim_unit,dim_brick.y()/2.0,-5.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_4 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick3_4 = addObject(dim_brick,offset+Vec4(3.5*dim_unit,dim_brick.y()/2.0,-5.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
     Object *brick4_4 = addObject(dim_brick,offset+Vec4(2.0*dim_unit,dim_brick.y()/2.0,-3.0*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
 
 
     //boxes
     float offset_up = dim_brick.y()+0.1; //altura de onde as caixas cairão=-
-    float dim_box = (units/3.0)*dim_unit-0.03;
+    float dim_box = (units/3.0)*dim_unit-0.01;
+    float dim_box_y = (units/5.0)*dim_unit;
     int color_box = MATERIAL_ZINN;
     float mass_box = 35.;
 
-    Object *box_1 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
-    Object *box_2 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
-    Object *box_3 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_1 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_2 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_3 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
 
-    Object *box_4 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
-    Object *box_5 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
-    Object *box_6 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_4 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_5 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_6 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
 
-    Object *box_7 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
-    Object *box_8 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
-    Object *box_9 = addObject(Vec4(dim_box,dim_box,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_7 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_8 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+    Object *box_9 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
 
 
 
@@ -1539,24 +1540,24 @@ void Scene::createArena()
 
 
     objects.push_back(brick1_1);
-    objects.push_back(brick2_1);
+    //objects.push_back(brick2_1);
     objects.push_back(brick3_1);
-    objects.push_back(brick4_1);
+    //objects.push_back(brick4_1);
 
 
     objects.push_back(brick1_2);
-    objects.push_back(brick2_2);
+    //objects.push_back(brick2_2);
     objects.push_back(brick3_2);
-    objects.push_back(brick4_2);
+    //objects.push_back(brick4_2);
 
-    objects.push_back(brick1_3);
+    //objects.push_back(brick1_3);
     objects.push_back(brick2_3);
     objects.push_back(brick3_3);
-    objects.push_back(brick4_3);
+    //objects.push_back(brick4_3);
 
     objects.push_back(brick1_4);
-    objects.push_back(brick2_4);
-    objects.push_back(brick3_4);
+    //objects.push_back(brick2_4);
+    //objects.push_back(brick3_4);
     objects.push_back(brick4_4);
 
 
