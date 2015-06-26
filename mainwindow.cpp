@@ -609,6 +609,7 @@ void MainWindow::showSelectedObject(int i)
 void MainWindow::showSelectedPoseControl(int i)
 {
 
+
     ui->listWidgetPose->blockSignals(true);
     ui->listWidgetPoseJoints->blockSignals(true);
 
@@ -616,6 +617,7 @@ void MainWindow::showSelectedPoseControl(int i)
 
     old_pose_control = pose_control_selected;
     pose_control_selected = ui->widgetPhysics->getPoseControlList().at(i);
+
 
     //Quando seleciona um controle de pose, torna ele ativo e começa a avançar o tempo dele
     pose_control_selected->setActive(true);
@@ -646,7 +648,7 @@ void MainWindow::showSelectedPose(int i)
 {
     pose_selected = pose_control_selected->getPoses().at(i);
     ui->poseTimeSelector->setValue(pose_control_selected->getTimeIntervals().at(i));
-    updateListPoseAngles(pose_selected->getCharacter()->getJoints());
+    if(pose_selected!=NULL) updateListPoseAngles(pose_selected->getCharacter()->getJoints());
 }
 
 void MainWindow::showSelectedPoseJoint(int i)

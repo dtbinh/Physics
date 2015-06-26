@@ -816,6 +816,7 @@ void GLWidget::drawForceApply()
 
 void GLWidget::paintGL()
 {
+    //GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glLoadIdentity();
 
@@ -826,6 +827,8 @@ void GLWidget::paintGL()
         drawPoseProgression();
     }
 
+    //glutSwapBuffers();
+    //glutSwapBuffers();
 
     //calculateFPS();
 
@@ -1570,6 +1573,8 @@ void GLWidget::setScreenShot()
           SCREENSHOT_Take(0, 0, winWidth, winHeight, temp_str.c_str(), SCREENSHOT_PPM);
         }
       }
+      qDebug()<< "width: " << winWidth <<"height: "<< winHeight;
+
 }
 
 void GLWidget::calculateFPSPaint()
@@ -2028,7 +2033,7 @@ void GLWidget::loadSimulationParameters(QString file)
     cam->eye = scene->getEye();
     cam->at = scene->getAt();
     cam->up = scene->getUp();
-    scene->createArena();
+    //scene->createArena();
 
 
 

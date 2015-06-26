@@ -236,6 +236,8 @@ int SCREENSHOT_Take(int x, int y, int width, int height,
 	int ret = 0;
 	/* Reserve some memory */
 	image = (unsigned char*)malloc(sizeof(unsigned char)*width*height*3*2);
+
+
 	if (!image) {
 		fprintf(stderr,
 			"Unable to allocate image buffer\n");
@@ -244,8 +246,8 @@ int SCREENSHOT_Take(int x, int y, int width, int height,
 		switch(format) {
 		case SCREENSHOT_PPM:
           //std::cout << x << ", " << y << ", " << width << ", " << height << "\n";
-			glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, image);
-			ret = SCREENSHOT_WritePPM(fname, image, width, height);
+            glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, image);
+            ret = SCREENSHOT_WritePPM(fname, image, width, height);
 			break;
 		case SCREENSHOT_TGA:
 //vbz			glReadPixels(x, y, width, height, GL_BGR, GL_UNSIGNED_BYTE, image);
