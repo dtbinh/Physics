@@ -37,7 +37,7 @@ for (unsigned int fc=0;fc<grfs.size();fc++) {
           //Vetor3D groundForce3D;
           //Vetor3D groundTorque3D;
             //cout<<"feedbackContacts[fc].noGroundGeom: "<<feedbackContacts[fc].noGroundGeom<<"\n";
-          if ( grfs[fc].noGroundGeom != 0 ) {
+          if ( grfs[fc].noGroundGeom != 0 && grfs[fc].noGroundGeom != 3) {
             //groundForce
               dReal* groundforce = NULL; //dVector3
                 if ( grfs[fc].noGroundGeom == 1 || grfs[fc].noGroundGeom == 3 ) groundforce = grfs[fc].jtFb->f1;

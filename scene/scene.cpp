@@ -1325,7 +1325,7 @@ void Scene::shotBallsCharacterBody(Object *body, float velocity, float den)
        obj->setType(TYPE_SPHERE);
        obj->setPosition(inicio);
        obj->setRotation(QuaternionQ());
-       obj->setProperties(Vec4(100/1000.,100/1000.,100/1000.));
+       obj->setProperties(Vec4(den*100/1000./2.,den*100/1000./2.,den*100/1000./2.));
        obj->setFMass(massTotal);
 
        Physics::createObject(obj,space,massTotal,inicio,velInicial);
@@ -1358,7 +1358,7 @@ void Scene::shotBallsCharacterBody(Object *body, float velocity, Vec4 inicio, fl
        obj->setType(TYPE_SPHERE);
        obj->setPosition(inicio);
        obj->setRotation(QuaternionQ());
-       obj->setProperties(Vec4(100/1000.,100/1000.,100/1000.));
+       obj->setProperties(Vec4(mass*100/1000./2.,mass*100/1000./2.,mass*100/1000./2.));
        obj->setFMass(massTotal);
 
        Physics::createObject(obj,space,massTotal,inicio,velInicial);

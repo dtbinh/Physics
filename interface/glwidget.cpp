@@ -350,7 +350,7 @@ GLWidget::GLWidget(QWidget *parent) :
     //scene->createCharacter();
 
     //scene->createCharacter();
-    scene->createLuxo();
+    //scene->createLuxo();
     //scene->createLuxo2();
     //controlLuxo = false;
 
@@ -1573,7 +1573,7 @@ void GLWidget::setScreenShot()
           SCREENSHOT_Take(0, 0, winWidth, winHeight, temp_str.c_str(), SCREENSHOT_PPM);
         }
       }
-      qDebug()<< "width: " << winWidth <<"height: "<< winHeight;
+      //qDebug()<< "width: " << winWidth <<"height: "<< winHeight;
 
 }
 
