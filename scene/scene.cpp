@@ -1341,7 +1341,6 @@ void Scene::shotBallsCharacterBody(Object *body, float velocity, Vec4 inicio, fl
 {
 
     Vec4 posPelvisModel = body->getPositionCurrent();
-
      //velInicial
        Vec4 directionVelInicial = posPelvisModel-(inicio);
 

@@ -1100,7 +1100,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         }
 
         srand(time(NULL));
-         int x = ( rand() % 8 );
+         int x = ( rand() % scene->getCharacter(0)->getNumBodies() );
          scene->shotBallsCharacterBody(scene->getCharacter(0)->getBody(x),velocity,density);
         //scene->shotBallsCharacterRandom(scene->getCharacter(0),x,density);
         //cam->lockAxisY(!cam->axis_y);
