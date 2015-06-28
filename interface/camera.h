@@ -5,6 +5,9 @@
 #define CAMERA_FAR 0
 #define CAMERA_GAME 1
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 class Camera
 {
 public:
@@ -34,6 +37,9 @@ public:
    void lockAxisX(bool b);
    void lockAxisY(bool b);
    void lockAxisZ(bool b);
+
+   glm::mat4 GetViewMatrix();
+
 };
 
 #endif // CAMERA_H

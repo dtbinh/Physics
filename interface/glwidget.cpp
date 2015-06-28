@@ -21,6 +21,12 @@
 #include <fstream>
 #include <iostream>
 #include "math/vector3d.h"
+
+// GLM Mathematics
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 //  To use functions with variables arguments
 #include <stdarg.h>
 
@@ -152,6 +158,71 @@ void GLWidget::drawFPS()
 
 }
 
+void GLWidget::prepareShaderProgram()
+{
+    // Load and compile the vertex shader
+    if ( !m_program.addShaderFromSourceFile( QOpenGLShader::Vertex, "../shaders/basic.vert" ) )
+        qCritical() << "Could not compile vertex shader. Log:" << m_program.log();
+
+    // Load and compile the fragment shader
+    if ( !m_program.addShaderFromSourceFile( QOpenGLShader::Fragment, "../shaders/basic.frag" ) )
+        qCritical() << "Could not compile fragment shader. Log:" << m_program.log();
+
+    // Link the shaders together into a complete shader program (pipeline)
+    if ( !m_program.link() )
+        qCritical() << "Could not link shader program. Log:" << m_program.log();
+}
+
+void GLWidget::prepareVertexBuffers()
+{
+
+    // The data for our triangle
+    float positionData[] = {
+        -0.8f, -0.8f, 1.0f,
+         0.8f, -0.8f, 1.0f,
+         0.0f,  0.8f, 1.0f
+    };
+    float colorData[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+
+    //
+    // Populate the buffer objects
+    //
+
+    // The vertex positions
+    m_vertexPositionBuffer.create();
+    m_vertexPositionBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_vertexPositionBuffer.bind();
+    m_vertexPositionBuffer.allocate( positionData, 3 * 3 * sizeof( float ) );
+
+    // The vertex colors
+    m_vertexColorBuffer.create();
+    m_vertexColorBuffer.setUsagePattern( QOpenGLBuffer::StaticDraw );
+    m_vertexColorBuffer.bind();
+    m_vertexColorBuffer.allocate( colorData, 3 * 3 * sizeof( float ) );
+
+    //
+    // Associate our VBO's with input attribute variables in the vertex shader
+    //
+
+    // Make sure our shader is the currently active one
+    m_program.bind();
+
+    // Bind the position buffer, switch it "on", tell OpenGL what the data format is
+    m_vertexPositionBuffer.bind();
+    m_program.enableAttributeArray( "vertexPosition" );
+    m_program.setAttributeBuffer( "vertexPosition", GL_FLOAT, 0, 3 );
+
+    // Bind the color buffer, switch it "on", tell OpenGL what the data format is
+    m_vertexColorBuffer.bind();
+    m_program.enableAttributeArray( "vertexColor" );
+    m_program.setAttributeBuffer( "vertexColor", GL_FLOAT, 0, 3 );
+}
+
+
 /************** Fim Camera *****************/
 
 int count = 0;
@@ -163,7 +234,7 @@ int id_material;
 int state_key;
 //Vec4 eye,at;
 Vec4 cam_eye = Vec4(2,2,2);
-Vec4 cam_at  = Vec4(0,1,0);
+Vec4 cam_at  = Vec4(0,0,0);
 int ciclo = 0;
 int ciclo_arrow = 0;
 int angle_quat = 0;
@@ -176,169 +247,64 @@ bool shadow = false;
 
 
 
-
-float 	angletrack = 0.0, axis[3], trans[3];
-bool 	trackingMouse  = false;
-bool 	redrawContinue = false;
-bool    trackballMove  = false;
-
-
-
-/*----------------------------------------------------------------------*/
-/*
-** These functions implement a simple trackball-like motion control.
-*/
-
-float lastPos[3] = {0.0, 0.0, 0.0};
-int curx, cury;
-int startX, startY;
-
-void trackball_ptov(int x, int y, int width, int height, float v[3])
-{
-    float d, a;
-
-    /* project x, y onto a hemi-sphere centered within width, height */
-    //
-    //	+-----------------------+	+
-    //	|			|			|	|
-    //	|			|	+		|	|
-    //	|			|			|	|
-    //	|-----------------------|	|	height
-    //	|			|			|	|
-    //	|			|			|	|
-    //	|			|			|	|
-    //	|			|			|	|
-    //	+-----------------------+	+
-    //
-    //	+------width------------+
-    //
-    //  v[0] = (x - w/2)/(w/2)			in the range [-1, 1]
-    //  v[1] = ((h -y) - h/2)/(h/2)		in the range [-1, 1]
-
-    v[0] = (2.0*x  - width) / width;
-    v[1] = (height - 2.0*y) / height;
-
-    d = (float) sqrt(v[0]*v[0] + v[1]*v[1]);
-
-    if (d < sqrt(2.0))
-    {
-        v[2] = sqrt(2.0 - d*d);
-    }
-    else
-    {
-        v[2] = 0.0;
-    }
-
-    //v[2] = (float) cos((M_PI/2.0) * ((d < 1.0) ? d : 1.0));
-
-    a = 1.0 / (float) sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-    v[0] *= a;
-    v[1] *= a;
-    v[2] *= a;
-}
-
-
-void mouseMotion(int x, int y,int winWidth,int winHeight)
-{
-    float curPos[3], dx, dy, dz;
-
-    trackball_ptov(x, y, winWidth, winHeight, curPos);
-    if(trackingMouse)
-    {
-        dx = curPos[0] - lastPos[0];
-        dy = curPos[1] - lastPos[1];
-        dz = curPos[2] - lastPos[2];
-
-        if (dx || dy || dz)
-        {
-            angletrack = 90.0 * sqrt(dx*dx + dy*dy + dz*dz);
-
-            axis[0] = lastPos[1]*curPos[2] - lastPos[2]*curPos[1];
-            axis[1] = lastPos[2]*curPos[0] - lastPos[0]*curPos[2];
-            axis[2] = lastPos[0]*curPos[1] - lastPos[1]*curPos[0];
-
-            lastPos[0] = curPos[0];
-            lastPos[1] = curPos[1];
-            lastPos[2] = curPos[2];
-        }
-    }
-}
-
-void startMotion(int x, int y,int winHeight,int winWidth)
-{
-
-    trackingMouse  = true;
-    redrawContinue = false;
-    startX	= x; startY = y;
-    curx	= x; cury	= y;
-    trackball_ptov(x, y, winWidth, winHeight, lastPos);
-    trackballMove  = true;
-}
-
-void stopMotion(int x, int y)
-{
-
-    trackingMouse = false;
-
-    if (startX != x || startY != y)
-    {
-        redrawContinue	= true;
-    }
-    else
-    {
-        angletrack		= 0.0;
-        redrawContinue	= false;
-        trackballMove	= false;
-    }
-}
-
 GLfloat floorShadow[4][4];
 GLfloat floorPlane[4] = {0,1.,0,0};
 GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 1.0 };
 
-//****************
-
 
 GLWidget::GLWidget(QWidget *parent) :
-    QGLWidget(QGLFormat(QGL::SampleBuffers),parent)
+    QGLWidget(QGLFormat(QGL::SampleBuffers),parent),
+          m_program(),
+          m_vertexPositionBuffer( QOpenGLBuffer::VertexBuffer ),
+          m_vertexColorBuffer( QOpenGLBuffer::VertexBuffer )
 {
-    setFocusPolicy(Qt::StrongFocus);
-    glEnable(GL_LINE_SMOOTH);
+
+    QGLFormat glFormat;
+    glFormat.setVersion( 3, 3 );
+    glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+    glFormat.setSampleBuffers( true );
+
+    this->setFormat(glFormat);
+
+
+
+//    setFocusPolicy(Qt::StrongFocus);
+   glEnable(GL_LINE_SMOOTH);
     glEnable(GL_POLYGON_SMOOTH);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+////    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
     glEnable(GL_MULTISAMPLE);
-    glEnable(GL_STENCIL_FUNC);
+////    glEnable(GL_STENCIL_FUNC);
     scene = new Scene(this);
-    updateObjects(scene->objectsScene());
-    updateJoints(scene->jointsScene());
-    updatePoseControls(scene->poseControlsScene());
+//    updateObjects(scene->objectsScene());
+//    updateJoints(scene->jointsScene());
+//    updatePoseControls(scene->poseControlsScene());
     simTimer = new QTimer(this);
     connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
 
-    simTimer->start(0);
-    simTimer->setInterval(0);
+//    //simTimer->start(0);
+//    //simTimer->setInterval(0);
 
-    move = false;
-    sim_pause = false;
-    capture_pause = true;
-    editing_frame = false;
-    frame_edit = 0;
-    show_character = true;
-    load_exemple_curve = false;
-    showInfo = false;
-    screenshot = false;
-    frames = 0;
-    time_current = 0;
-    updateKsProp(scene->getProportionalKsPD());
-    updateKdProp(scene->getProportionalKdPD());
-    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
-    density = 0.5; //massa
-    velocity = 5.;
+//    move = false;
+//    sim_pause = false;
+//    capture_pause = true;
+//    editing_frame = false;
+//    frame_edit = 0;
+//    show_character = true;
+//    load_exemple_curve = false;
+//    showInfo = false;
+//    screenshot = false;
+//    frames = 0;
+//    time_current = 0;
+//    updateKsProp(scene->getProportionalKsPD());
+//    updateKdProp(scene->getProportionalKdPD());
+//    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
+//    density = 0.5; //massa
+//    velocity = 5.;
 
-    mass_suitcase = 1.0;
-    has_ball_shot = false;
-    ball_shot_debug = Vec4();
-    frames_force = 6;
+//    mass_suitcase = 1.0;
+//    has_ball_shot = false;
+//    ball_shot_debug = Vec4();
+//    frames_force = 6;
 
 
 
@@ -358,111 +324,121 @@ GLWidget::GLWidget(QWidget *parent) :
 
 void GLWidget::initializeGL()
 {
+    // Create a vertex array object (VAO) - more on this later!
+    m_vao.create();
+    m_vao.bind();
+
+    // Load, compile and link the shader program
+    prepareShaderProgram();
+
+    // Prepare our geometry and associate it with shader program inputs
+    prepareVertexBuffers();
 
 
-    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    //glEnable(GL_MULTISAMPLE_ARB);
-    //glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
-    glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+//    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+//    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+//    //glEnable(GL_MULTISAMPLE_ARB);
+//    //glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+//    glEnable(GL_DEPTH_TEST);
+//    //glEnable(GL_CULL_FACE);
 
-    glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
-    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);				// Black Background
-    glClearDepth(1.0f);									// Depth Buffer Setup
-    glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
-    glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
-    glShadeModel(GL_SMOOTH);
-    //glEnable(GL_COLOR_MATERIAL);
+//    glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
+//    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);				// Black Background
+//    glClearDepth(1.0f);									// Depth Buffer Setup
+//    glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
+//    glDepthFunc(GL_LEQUAL);								// The Type Of Depth Testing To Do
+//    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);	// Really Nice Perspective Calculations
+//    glShadeModel(GL_SMOOTH);
+//    //glEnable(GL_COLOR_MATERIAL);
 
-    static GLfloat light1pos[4] = {  -0.892, 0.3, 0.9, 0.0 };
-    static GLfloat light1diffuse[] = { 0.8f, 0.8f, 0.8, 1.0f };
-    static GLfloat light1specular[] = { 0.5f, 0.5f, 0.5f, 0.0f };
+//    static GLfloat light1pos[4] = {  -0.892, 0.3, 0.9, 0.0 };
+//    static GLfloat light1diffuse[] = { 0.8f, 0.8f, 0.8, 1.0f };
+//    static GLfloat light1specular[] = { 0.5f, 0.5f, 0.5f, 0.0f };
 
-    static GLfloat light2pos[4] = { 9.588, 9.46, 9.248, 0.0 };
-    static GLfloat light2diffuse[] = { 0.498f, 0.5f, 0.6, 1.0f };
-    static GLfloat light2specular[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+//    static GLfloat light2pos[4] = { 9.588, 9.46, 9.248, 0.0 };
+//    static GLfloat light2diffuse[] = { 0.498f, 0.5f, 0.6, 1.0f };
+//    static GLfloat light2specular[] = { 0.2f, 0.2f, 0.2f, 0.0f };
 
-    static GLfloat light3pos[4] = { 0.216, -0.392, -0.216, 0.0 };
-    static GLfloat light3diffuse[] = { 0.798f, 0.838f, 1.0, 1.0f };
-    static GLfloat light3specular[] = { 0.06f, 0.0f, 0.0f, 0.0f };
+//    static GLfloat light3pos[4] = { 0.216, -0.392, -0.216, 0.0 };
+//    static GLfloat light3diffuse[] = { 0.798f, 0.838f, 1.0, 1.0f };
+//    static GLfloat light3specular[] = { 0.06f, 0.0f, 0.0f, 0.0f };
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_LIGHT1);
-    glEnable(GL_LIGHT2);
+//    glEnable(GL_LIGHTING);
+//    glEnable(GL_LIGHT0);
+//    glEnable(GL_LIGHT1);
+//    glEnable(GL_LIGHT2);
 
-    glLightfv(GL_LIGHT0, GL_POSITION, light1pos);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light1diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light1specular);
+//    glLightfv(GL_LIGHT0, GL_POSITION, light1pos);
+//    glLightfv(GL_LIGHT0, GL_DIFFUSE, light1diffuse);
+//    glLightfv(GL_LIGHT0, GL_SPECULAR, light1specular);
 
-    glLightfv(GL_LIGHT1, GL_POSITION, light2pos);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, light2diffuse);
-    glLightfv(GL_LIGHT1, GL_SPECULAR, light2specular);
+//    glLightfv(GL_LIGHT1, GL_POSITION, light2pos);
+//    glLightfv(GL_LIGHT1, GL_DIFFUSE, light2diffuse);
+//    glLightfv(GL_LIGHT1, GL_SPECULAR, light2specular);
 
-    glLightfv(GL_LIGHT2, GL_POSITION, light3pos);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, light3diffuse);
-    glLightfv(GL_LIGHT2, GL_SPECULAR, light3specular);
-//    mainShader=new shader("vertex.vs","fragment.frag");
-//        quadRenderShader=new shader("quadRender.vs","quadRender.frag");
-//        simpleShader=new shader("simpleShader.vs","simpleShader.frag");
-//        shadowShader=new shader("shadowShader.vs","shadowShader.frag");
-#ifdef SHADERS_ENABLED
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/vertex.vs");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/fragment.frag");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/quadRender.vs");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/quadRender.frag");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/simpleShader.vs");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/simpleShader.frag");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/shadowShader.vs");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/shadowShader.frag");
-    //printf("In\n");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/phong.vert");
-//    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/phong.frag");
-#endif
+//    glLightfv(GL_LIGHT2, GL_POSITION, light3pos);
+//    glLightfv(GL_LIGHT2, GL_DIFFUSE, light3diffuse);
+//    glLightfv(GL_LIGHT2, GL_SPECULAR, light3specular);
+////    mainShader=new shader("vertex.vs","fragment.frag");
+////        quadRenderShader=new shader("quadRender.vs","quadRender.frag");
+////        simpleShader=new shader("simpleShader.vs","simpleShader.frag");
+////        shadowShader=new shader("shadowShader.vs","shadowShader.frag");
+//#ifdef SHADERS_ENABLED
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/vertex.vs");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/fragment.frag");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/quadRender.vs");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/quadRender.frag");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/simpleShader.vs");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/simpleShader.frag");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/shadowShader.vs");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/shadowShader.frag");
+//    //printf("In\n");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Vertex, "../shaders/phong.vert");
+////    shaderProgram.addShaderFromSourceFile(QGLShader::Fragment, "../shaders/phong.frag");
+//#endif
 
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    glEnable(GL_DEPTH_TEST);
-    glShadeModel(GL_SMOOTH);
-    glEnable(GL_DEPTH_FUNC);
-    glEnable (GL_LINE_SMOOTH);
-    glEnable (GL_POINT_SMOOTH);
-glEnable(GL_TEXTURE_2D);
-glEnable(GL_BLEND);
-    glCullFace(GL_FRONT);
+//    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+//    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+//    glEnable(GL_DEPTH_TEST);
+//    glShadeModel(GL_SMOOTH);
+//    glEnable(GL_DEPTH_FUNC);
+//    glEnable (GL_LINE_SMOOTH);
+//    glEnable (GL_POINT_SMOOTH);
+//glEnable(GL_TEXTURE_2D);
+//glEnable(GL_BLEND);
+//    glCullFace(GL_FRONT);
 
-    //glEnable(GL_COLOR_MATERIAL);
-//    glEnable(GL_NORMALIZE);
-//    glEnable(GL_RESCALE_NORMAL);
-    //glLineWidth(1.2);
-    glDepthFunc(1.0);
-    //    glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
-//    glBindTexture(GL_TEXTURE_2D, 1.0);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-    //glutInitContextFlags (GLUT_COMPATIBILITY_PROFILE );
+//    //glEnable(GL_COLOR_MATERIAL);
+////    glEnable(GL_NORMALIZE);
+////    glEnable(GL_RESCALE_NORMAL);
+//    //glLineWidth(1.2);
+//    glDepthFunc(1.0);
+//    //    glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+////    glBindTexture(GL_TEXTURE_2D, 1.0);
+////    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+//    //glutInitContextFlags (GLUT_COMPATIBILITY_PROFILE );
 
 
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
-    const float ar = w>0 ? (float) w / (float) h : 1.0;
+//    glViewport( 0, 0, w, qMax( h, 1 ) );
+//    const float ar = w>0 ? (float) w / (float) h : 1.0;
 
     glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
-    gluPerspective(30.,ar,0.001,1200000.);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+//    gluPerspective(30.,ar,0.001,1200000.);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity() ;
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity() ;
     winWidth = w;
     winHeight = h;
-    scene->setProjection(Vec4(30.,ar,0.001,1200000));
-    scene->setWindow(w,h);
-    //printf("\nW %d H %d\n",w,h);
+//    scene->setProjection(Vec4(30.,ar,0.001,1200000));
+//    scene->setWindow(w,h);
+//    //printf("\nW %d H %d\n",w,h);
 
 }
 void GLWidget::drawScene(){
@@ -816,16 +792,47 @@ void GLWidget::drawForceApply()
 
 void GLWidget::paintGL()
 {
-    //GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glLoadIdentity();
+    // Clear the color buffer
+    glClear( GL_COLOR_BUFFER_BIT );
 
-    drawScene();
-    if(showInfo){
-        if (!screenshot) drawFPS();
-        drawParameters();
-        drawPoseProgression();
-    }
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // Make our shader program current
+
+
+    m_program.bind();
+
+    glm::mat4 view;
+    view = cam->GetViewMatrix();
+    // Projection
+    glm::mat4 projection;
+    projection = glm::perspective(45.f, (GLfloat)winWidth/(GLfloat)winHeight, 0.1f, 1000.0f);
+    // Get the uniform locations
+    GLint modelLoc = glGetUniformLocation(m_program.programId(), "model");
+    GLint viewLoc = glGetUniformLocation(m_program.programId(), "view");
+    GLint projLoc = glGetUniformLocation(m_program.programId(), "projection");
+
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+
+    // Draw the triangle! Woot!
+    glDrawArrays( GL_TRIANGLES, 0, 3 );
+
+    m_program.release();
+
+    //qDebug() << "update";
+
+//    //GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+//    glLoadIdentity();
+
+//    drawScene();
+//    if(showInfo){
+//        if (!screenshot) drawFPS();
+//        drawParameters();
+//        drawPoseProgression();
+//    }
 
     //glutSwapBuffers();
     //glutSwapBuffers();
@@ -871,13 +878,13 @@ void GLWidget::simStep(){
     ti = tf = tempo = 0;
     timeval tempo_inicio,tempo_fim;
     gettimeofday(&tempo_inicio,NULL);
-    if(!sim_pause){
-        scene->simulationStep(enable_balance);
+//    if(!sim_pause){
+//        scene->simulationStep(enable_balance);
+//        update();
+//        if (screenshot) setScreenShot();
+//    }else{
         update();
-        if (screenshot) setScreenShot();
-    }else{
-        update();
-    }
+//    }
 
     //calculateFPSPaint();
     //update();
@@ -955,6 +962,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
     last_x = x;
     last_y = y;
+    update();
 
 
 }
@@ -1002,6 +1010,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
         last_x = x;
         last_y = y;
+        update();
 
 
 }

@@ -438,3 +438,11 @@ void Camera::lockAxisZ(bool b)
     axis_z = b;
 }
 
+glm::mat4 Camera::GetViewMatrix()
+{
+    glm::vec3 eye(this->eye.x(),this->eye.y(),this->eye.z());
+    glm::vec3 at(this->at.x(),this->at.y(),this->at.z());
+    glm::vec3 up(this->up.x(),this->up.y(),this->up.z());
+    return glm::lookAt(eye, at, up);
+}
+

@@ -8,6 +8,8 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
+#include <QGLBuffer>
+#include <QGLShaderProgram>
 
 class Plane;
 class GLWidget : public QGLWidget
@@ -204,7 +206,15 @@ public:
     void setScreenShot();
     void calculateFPSPaint();
     void drawFPS();
+private:
+    void prepareShaderProgram();
+    void prepareVertexBuffers();
 
+
+    QOpenGLShaderProgram m_program;
+    QOpenGLBuffer m_vertexPositionBuffer;
+    QOpenGLBuffer m_vertexColorBuffer;
+    QOpenGLVertexArrayObject m_vao;
 
 
 #ifdef SHADERS_ENABLED
@@ -219,6 +229,7 @@ public slots:
 
 private slots:
     void simStep();
+
 
 
 
