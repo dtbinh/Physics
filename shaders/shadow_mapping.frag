@@ -1,4 +1,4 @@
-#version 330 core
+#version 330
 out vec4 FragColor;
 
 in VS_OUT {
@@ -56,9 +56,9 @@ void main()
 {           
     vec3 color = texture(diffuseTexture, fs_in.TexCoords).rgb;
     vec3 normal = normalize(fs_in.Normal);
-    vec3 lightColor = vec3(0.4);
+    vec3 lightColor = vec3(0.3);
     // Ambient
-    vec3 ambient = 0.2 * color;
+    vec3 ambient = 0.3 * color;
     // Diffuse
     vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
@@ -72,10 +72,7 @@ void main()
     vec3 specular = spec * lightColor;    
     // Calculate shadow
     float shadow = shadows ? ShadowCalculation(fs_in.FragPosLightSpace) : 0.0;                      
-    shadow = min(shadow, 0.75); // reduce shadow strength a little: allow some diffuse/specular light in shadowed regions
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
     
     FragColor = vec4(lighting, 1.0f);
 }
-
-

@@ -7,6 +7,8 @@
 #include <QQuaternion>
 #include <QVector3D>
 #include <QSharedPointer>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class CameraPrivate;
 
@@ -135,6 +137,9 @@ public slots:
     void rotatex(float, float);
     void rotatey(float, float);
     void rotatez(float, float);
+
+    glm::mat4 GetViewMatrix();
+
 
 
 protected:

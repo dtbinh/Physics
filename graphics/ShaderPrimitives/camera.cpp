@@ -549,6 +549,18 @@ void Camera::rotatez(float, float)
 
 }
 
+glm::mat4 Camera::GetViewMatrix()
+{
+    Q_D( Camera );
+    QVector3D eye = d->m_position;
+    QVector3D at  = d->m_viewCenter;
+    QVector3D up  = d->m_upVector;
+    glm::vec3 eyel(eye.x(),eye.y(),eye.z());
+    glm::vec3 atl(at.x(),at.y(),at.z());
+    glm::vec3 upl(up.x(),up.y(),up.z());
+    return glm::lookAt(eyel, atl, upl);
+}
+
 void Camera::setStandardUniforms( const QOpenGLShaderProgramPtr& program, const QMatrix4x4& mm ) const
 {
     QMatrix4x4 modelViewMatrix = viewMatrix() * mm;

@@ -123,7 +123,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas -fopenmp -lGLEW
+LIBS += -lode -lGLU -lglut -lGL -lgsl -lgslcblas -fopenmp -lGLEW -lSOIL
 
 CONFIG += release
 
