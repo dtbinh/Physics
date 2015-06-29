@@ -11,7 +11,7 @@
 class Matrix4x4;
 #include "extra/materialobj.h"
 #include "math/vec4.h"
-class Mesh;
+class MeshObj;
 
 class Draw
 {
@@ -19,7 +19,7 @@ public:
     Draw();
     static void drawCube(Matrix4x4 *transform, Vec4 properties, MaterialObj *mat, float alpha=0);
     static void drawCube(Matrix4x4 *transform,Vec4 properties, int material);
-    static Mesh*getMeshCube(Matrix4x4 *transform,Vec4 properties, Mesh *mesh=NULL);
+    static MeshObj*getMeshCube(Matrix4x4 *transform, Vec4 properties, MeshObj *mesh=NULL);
     static void drawCylinder(Matrix4x4 *transform, MaterialObj *mat);
     static void drawCylinder(Matrix4x4 *transform, int material);
     static void drawCylinder(Vec4 position, Vec4 axis, double radius, double height, int material);

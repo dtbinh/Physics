@@ -1,14 +1,14 @@
-#ifndef PLANE_H
-#define PLANE_H
+#ifndef PLANEOBJ_H
+#define PLANEOBJ_H
 
 #include "math/matrix4x4.h"
-#include "graphics/mesh.h"
+#include "graphics/meshobj.h"
 #include <vector>
 
-class Plane
+class PlaneObj
 {
 public:
-    Mesh* mesh;
+    MeshObj* mesh;
     Vec4 vertexs[4];
     Vec4 initvertexs[4];
     Vec4 normals[1];
@@ -19,7 +19,7 @@ public:
     bool enabled;
 
 public:
-    Plane();
+    PlaneObj();
     void draw();
     void aplyTransform(Matrix4x4 t);
     void refreshNormals();
@@ -27,7 +27,7 @@ public:
     void setMaterial(int material);
     void wireframe();
     void changeCoords(Matrix4x4 matrix);
-    Mesh* getMesh();
+    MeshObj* getMesh();
     void setName(QString nm);
     QString getName();
     int getIdMaterial();
@@ -41,10 +41,10 @@ public:
     int getNumVertexs(){return 1;}
     void setTransform(Matrix4x4 m);
     QString saveObject();
-    ~Plane();
+    ~PlaneObj();
 
 
 
 };
 
-#endif // PLANE_H
+#endif // PLANEOBJ_H

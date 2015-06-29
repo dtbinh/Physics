@@ -1,8 +1,8 @@
-#include "plane.h"
+#include "planeobj.h"
 
 #define ERRORN 0.0001
 
-Plane::Plane()
+PlaneObj::PlaneObj()
 {
     //default: side = 1.0
     //configurar o cubo no quadrante positivo do eixo global no canto
@@ -20,7 +20,7 @@ Plane::Plane()
 
     transform.setIdentity();
     refreshNormals();
-    mesh = new Mesh();
+    mesh = new MeshObj();
 
     Face face;
     face.vertexs.push_back(&vertexs[0]);
@@ -40,7 +40,7 @@ Plane::Plane()
 }
 
 //calculo das normais dos vertices
-void Plane::refreshNormals()
+void PlaneObj::refreshNormals()
 {
     //normais a face
 
@@ -58,7 +58,7 @@ void Plane::refreshNormals()
 //    normals[7] = ((normal[1]+normal[3]+normal[5])).unitary();
 }
 
-void Plane::draw()
+void PlaneObj::draw()
 {
 
     if(isEnabled()){
@@ -82,7 +82,7 @@ void Plane::draw()
 
 }
 
-void Plane::wireframe()
+void PlaneObj::wireframe()
 {
     for (int i=0;i<4;i++){
         //transform.transpose();
@@ -96,7 +96,7 @@ void Plane::wireframe()
 
 
 
-void Plane::aplyTransform(Matrix4x4 t)
+void PlaneObj::aplyTransform(Matrix4x4 t)
 {
     transform = transform.multMatrix(transform,t);
     transform = t;
@@ -104,19 +104,19 @@ void Plane::aplyTransform(Matrix4x4 t)
     //refreshNormals();
 }
 
-void Plane::setIdentityTransform()
+void PlaneObj::setIdentityTransform()
 {
         transform.setIdentity();
 }
 
 
 
-void Plane::setMaterial(int material)
+void PlaneObj::setMaterial(int material)
 {
     mesh->setMaterial(material);
 }
 
-void Plane::changeCoords(Matrix4x4 matrix)
+void PlaneObj::changeCoords(Matrix4x4 matrix)
 {
     //transform.showMatrix4x4();
     transform = transform.multMatrix(transform,matrix);
@@ -130,58 +130,58 @@ void Plane::changeCoords(Matrix4x4 matrix)
     refreshNormals();
 }
 
-Mesh * Plane::getMesh()
+MeshObj * PlaneObj::getMesh()
 {
     return mesh;
 }
 
-void Plane::setName(QString nm)
+void PlaneObj::setName(QString nm)
 {
     name = nm;
 }
 
-QString Plane::getName()
+QString PlaneObj::getName()
 {
     return name;
 }
 
-int Plane::getIdMaterial()
+int PlaneObj::getIdMaterial()
 {
    return mesh->getMaterial();
 }
 
 
-void Plane::setSelected(bool b)
+void PlaneObj::setSelected(bool b)
 {
     selected = b;
 }
 
-bool Plane::isSelected()
+bool PlaneObj::isSelected()
 {
     return selected;
 }
 
-void Plane::setEnabled(bool b)
+void PlaneObj::setEnabled(bool b)
 {
     enabled = b;
 }
 
-bool Plane::isEnabled()
+bool PlaneObj::isEnabled()
 {
     return enabled;
 }
 
-Matrix4x4 Plane::getMatrixTransformation()
+Matrix4x4 PlaneObj::getMatrixTransformation()
 {
     return transform;
 }
 
-void Plane::setTransform(Matrix4x4 m)
+void PlaneObj::setTransform(Matrix4x4 m)
 {
     transform = m;
 }
 
-QString Plane::saveObject()
+QString PlaneObj::saveObject()
 {
     QString obj;
     QString aux;
@@ -211,7 +211,7 @@ QString Plane::saveObject()
 
 }
 
-Plane::~Plane()
+PlaneObj::~PlaneObj()
 {
     delete []mesh;
 }

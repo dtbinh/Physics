@@ -24,10 +24,8 @@ SOURCES += main.cpp\
     scene/object.cpp \
     scene/character.cpp \
     scene/joint.cpp \
-    graphics/mesh.cpp \
     math/matrix4x4.cpp \
     math/quaternion.cpp \
-    graphics/plane.cpp \
     control/control.cpp \
     physics/functions.cpp \
     extra/utils.cpp \
@@ -61,7 +59,13 @@ SOURCES += main.cpp\
     extra/materialobj.cpp \
     interface/cameraold.cpp \
     graphics/ShaderPrimitives/sphere.cpp \
-    graphics/ShaderPrimitives/cylinder.cpp
+    graphics/ShaderPrimitives/cylinder.cpp \
+    graphics/ShaderPrimitives/plane.cpp \
+    graphics/ShaderPrimitives/objloader.cpp \
+    graphics/ShaderPrimitives/mesh.cpp \
+    graphics/ShaderPrimitives/axisalignedboundingbox.cpp \
+    graphics/planeobj.cpp \
+    graphics/meshobj.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -74,7 +78,6 @@ HEADERS  += mainwindow.h \
     scene/object.h \
     scene/character.h \
     scene/joint.h \
-    graphics/plane.h \
     control/control.h \
     physics/functions.h \
     extra/utils.h \
@@ -110,7 +113,13 @@ HEADERS  += mainwindow.h \
     extra/materialobj.h \
     interface/cameraold.h \
     graphics/ShaderPrimitives/sphere.h \
-    graphics/ShaderPrimitives/cylinder.h
+    graphics/ShaderPrimitives/cylinder.h \
+    graphics/ShaderPrimitives/plane.h \
+    graphics/ShaderPrimitives/objloader.h \
+    graphics/ShaderPrimitives/mesh.h \
+    graphics/ShaderPrimitives/axisalignedboundingbox.h \
+    graphics/planeobj.h \
+    graphics/meshobj.h
 
 FORMS    += mainwindow.ui
 

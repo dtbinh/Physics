@@ -11,7 +11,7 @@ class Ray;
 class MaterialObj;
 class Matrix4x4;
 class MatrixF;
-class Mesh;
+class MeshObj;
 
 #define TYPE_CUBE      dBoxClass
 #define TYPE_CYLINDER  dCylinderClass
@@ -46,7 +46,7 @@ private:
     MaterialObj  *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
     int          id_material;
     float        fmass;                                                   //massa em float na inicialização
-    Mesh*        mesh;
+    MeshObj*        mesh;
 
     // --------Strategy Equilibrium
     float        compensable;
@@ -119,7 +119,7 @@ public:
     // --------Geometry
     void        setMaterial(int);                                          //aplica um determinado material pré-determinado ao objeto
     int         getIntMaterial();
-    Mesh*       getMesh();                                                 //extraí a malha do objeto
+    MeshObj *getMesh();                                                 //extraí a malha do objeto
     Matrix4x4*  getMatrixTransformation();                                 //extraí a matriz de transformação do objeto (corrente)
     Matrix4x4   getMatrixTransformationODE();                                 //extraí a matriz de transformação do objeto (corrente)
     void        setMaterial(Vec4 amb,Vec4 diff,Vec4 spe,float shininess);  //inclui propriedades de material ao objeto

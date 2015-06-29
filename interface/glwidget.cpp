@@ -863,6 +863,11 @@ void GLWidget::paintGL()
     transform->translate(0,0,2.5);
     mate->setMaterial(mate,MATERIAL_EMERALD);
     scene->drawSphere(transform,mate);
+    transform->setIdentity();
+    transform->scale(20.0,1.0,20.0);
+    transform->translate(0.0,-1.0,0.0);
+    mate->setMaterial(mate,MATERIAL_TURQUOSIE);
+    scene->drawPlane(transform,mate);
     delete transform;
     delete mate;
 

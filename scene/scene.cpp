@@ -24,6 +24,7 @@
 #include "graphics/ShaderPrimitives/cube.h"
 #include "graphics/ShaderPrimitives/sphere.h"
 #include "graphics/ShaderPrimitives/cylinder.h"
+#include "graphics/ShaderPrimitives/plane.h"
 
 
 bool apply = true;
@@ -104,6 +105,10 @@ void Scene::initializeShaders()
     m_cylinder = new Cylinder(this);
     m_cylinder->setMaterial( material );
     m_cylinder->create();
+
+    m_plane = new Plane(this);
+    m_plane->setMaterial( material );
+    m_plane->create();
 
 }
 
@@ -341,6 +346,80 @@ void Scene::drawCylinder(Matrix4x4 *transform, MaterialObj *mat)
 
     // Let the mesh setup the remainder of its state and draw itself
     m_cylinder->render();
+}
+
+void Scene::drawPlane()
+{
+    m_plane->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_plane->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", m_camera->viewMatrix() * QVector4D( 5.0f, 5.0f, 5.0f, 1.0f ) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+    // Set the material properties
+    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.1f, 0.3f ) );
+    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.9f ) );
+    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+    shader->setUniformValue( "material.shininess", 20.0f );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_plane->render();
+}
+
+void Scene::drawPlane(Matrix4x4 *transform, MaterialObj *mat)
+{
+    m_plane->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_plane->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    Vec4 translate = transform->getTranslateSeted();
+    Vec4 scale     = transform->getScaleSeted();
+    Vec4 rotate  = transform->getRotationSeted();
+
+    m_modelMatrix.scale(scale.x(),scale.y(),scale.z());
+    m_modelMatrix.rotate(rotate.x(),rotate.y(),rotate.z());
+    m_modelMatrix.translate(translate.x(),translate.y(),translate.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( 5.0f, 5.0f, -5.0f, 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128 );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_plane->render();
 }
 
 Object* Scene::addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass,Character *character,int material)
@@ -1655,7 +1734,7 @@ void Scene::habiliteJump()
 
 void Scene::setRotationPlane(Vec4 rot)
 {
-    Physics::closePlane(this->Plane);
+    Physics::closePlane(this->PlanePhysics);
     this->rotate_plane = rot;
     Vec4 initial_vec(0,1,0,0);
 
@@ -1671,7 +1750,7 @@ void Scene::setRotationPlane(Vec4 rot)
     //qDebug() << rotate_plane.z();
     //exit(1);
 
-    this->Plane = Physics::initPlane(initial_vec.unitary(),this);
+    this->PlanePhysics = Physics::initPlane(initial_vec.unitary(),this);
     restartPhysics();
 
 

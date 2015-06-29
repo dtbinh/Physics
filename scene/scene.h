@@ -29,6 +29,7 @@ class Cube;
 class Cylinder;
 class Sphere;
 class Camera;
+class Plane;
 class Scene : public QGLWidget
 {
 private:
@@ -56,6 +57,7 @@ private:
     Cube           *m_cube;
     Sphere         *m_sphere;
     Cylinder       *m_cylinder;
+    Plane          *m_plane;
     QMatrix4x4     m_modelMatrix;
 
 
@@ -81,7 +83,7 @@ private:
 
 public:
     int            width,height;
-    dGeomID          Plane;
+    dGeomID        PlanePhysics;
     Vec4           rotate_plane;
 
 
@@ -103,6 +105,8 @@ public:
     void        drawSphere(Matrix4x4* transform, MaterialObj *mat);
     void        drawCylinder();
     void        drawCylinder(Matrix4x4* transform, MaterialObj *mat);
+    void        drawPlane();
+    void        drawPlane(Matrix4x4* transform, MaterialObj *mat);
 
 
 

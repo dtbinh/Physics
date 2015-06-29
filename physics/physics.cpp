@@ -283,7 +283,7 @@ void Physics::initScene(Scene *scene){
     dWorldSetCFM (scene->getWorld(),1e-009);
     scene->setSpace(dHashSpaceCreate(0));
     //scene->Plane = dCreatePlane (scene->getSpace(),0,1,0,0); //todo remove
-    scene->Plane = dCreatePlane (scene->getSpace(),scene->getRotationPlaneVector().x(),scene->getRotationPlaneVector().y(),scene->getRotationPlaneVector().z(),0); //todo remove
+    scene->PlanePhysics = dCreatePlane (scene->getSpace(),scene->getRotationPlaneVector().x(),scene->getRotationPlaneVector().y(),scene->getRotationPlaneVector().z(),0); //todo remove
     scene->setJointGroup(dJointGroupCreate(0));
 
     //juntas ligadas - >ERP:+ligadas

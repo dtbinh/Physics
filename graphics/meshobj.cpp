@@ -1,8 +1,8 @@
-#include "mesh.h"
+#include "meshobj.h"
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
-Mesh::Mesh()
+MeshObj::MeshObj()
 {
     faces.clear();
 //    displayListId = -1;
@@ -13,7 +13,7 @@ Mesh::Mesh()
 
 }
 
-void Mesh::draw()
+void MeshObj::draw()
 {
 //    if (displayListId!=-1){
 //        glCallList(displayListId);
@@ -80,19 +80,19 @@ void Mesh::draw()
 
 
 
-void Mesh::setMaterial(int type)
+void MeshObj::setMaterial(int type)
 {
 
     id_material = type;
 }
 
-void Mesh::setMaterials()
+void MeshObj::setMaterials()
 {
    MaterialObj::setMaterialOpenGL(id_material);
 
 }
 
-Vec4 Mesh::getNormalFace(Face face)
+Vec4 MeshObj::getNormalFace(Face face)
 {
     if (face.vertexs.size()<3){
         return Vec4();
@@ -110,12 +110,12 @@ Vec4 Mesh::getNormalFace(Face face)
 
 }
 
-int Mesh::getMaterial()
+int MeshObj::getMaterial()
 {
     return id_material;
 }
 
-void Mesh::drawNormalVertex()
+void MeshObj::drawNormalVertex()
 {
 
     glPushMatrix();

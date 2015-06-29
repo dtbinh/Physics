@@ -14,7 +14,7 @@ struct Face{
 };
 
 
-class Mesh
+class MeshObj
 {
 public:
     std::vector<Vec4> normals;
@@ -22,7 +22,7 @@ public:
     int id_material;
 
 public:
-    Mesh();
+    MeshObj();
     void draw();
     //void drawNormalFace(); //tentar fazer depois
     void setMaterial(int type=0);          //setar a propriedade de material do mesh

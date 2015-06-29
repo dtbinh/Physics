@@ -1,7 +1,7 @@
 #include "object.h"
 #include "graphics/draw.h"
 #include "math/matrix4x4.h"
-#include "graphics/mesh.h"
+#include "graphics/meshobj.h"
 #include "extra/materialobj.h"
 #include "scene.h"
 #include "math/matrix.h"
@@ -411,7 +411,7 @@ int Object::getIntMaterial()
     return id_material;
 }
 
-Mesh *Object::getMesh()
+MeshObj *Object::getMesh()
 {
     return mesh;
 }
@@ -844,7 +844,7 @@ float Object::intersectionRay(Ray ray, float t)
 //    if (!( (tmin < t) && (tmax > tmin) )) return -1;
 
     //
-    mesh = new Mesh();
+    mesh = new MeshObj();
     mesh = Draw::getMeshCube(getMatrixTransformation(),getProperties(),mesh);
 
 

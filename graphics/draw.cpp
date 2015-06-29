@@ -5,7 +5,7 @@
 #include "GL/glut.h"
 #include "math/quaternion.h"
 #include "physics/physics.h"
-#include "graphics/mesh.h"
+#include "graphics/meshobj.h"
 #include "imageloader.h"
 #include <cmath>
 
@@ -211,7 +211,7 @@ void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
 
 }
 
-Mesh *Draw::getMeshCube(Matrix4x4 *transform, Vec4 p, Mesh *mesh)
+MeshObj *Draw::getMeshCube(Matrix4x4 *transform, Vec4 p, MeshObj *mesh)
 {
     Vec4 vertexs[8];
     Vec4 normals[6];
@@ -1055,7 +1055,7 @@ void Draw::drawCoffeeCup(Vec4 position, int material, QuaternionQ q)
     delete mat;
 }
 
-void Draw::drawObj(Vec4 position, int material,QuaternionQ q, QString file,ObjMesh *n)
+void Draw::drawObj(Vec4 position, int material, QuaternionQ q, QString file, ObjMesh *n)
 {
     MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,material);
