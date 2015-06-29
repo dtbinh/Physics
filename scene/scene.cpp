@@ -1,6 +1,5 @@
 #include "scene.h"
 #include "object.h"
-#include "cube.h"
 #include "interface/glwidget.h"
 #include "control/sensor.h"
 #include "character.h"
@@ -15,6 +14,18 @@
 #include "mocap/frame.h"
 #include "extra/utils.h"
 #include "math/ray.h"
+#include "extra/materialobj.h"
+
+//shaders
+#include <QOpenGLContext>
+#include <QOpenGLShaderProgram>
+#include "graphics/ShaderPrimitives/abstractscene.h"
+#include "graphics/ShaderPrimitives/camera.h"
+#include "graphics/ShaderPrimitives/cube.h"
+#include "graphics/ShaderPrimitives/sphere.h"
+#include "graphics/ShaderPrimitives/cylinder.h"
+
+
 bool apply = true;
 QList<QList <Vec4> > motion;
 QList<QList <Vec4> > mocap;
@@ -26,6 +37,16 @@ bool record = false;
 
 Scene::Scene(GLWidget *parent)
 {
+    //this->setContext(parent->context());//,parent->context(),false);
+    QGLFormat glFormat;
+    glFormat.setVersion( 3, 3 );
+    glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
+    glFormat.setSampleBuffers( true );
+    glFormat.setSamples(32);
+
+    this->setFormat(glFormat);
+
+
     this->sim_status = true;
     this->parent = parent;
     Physics::initScene(this);
@@ -49,6 +70,8 @@ Scene::Scene(GLWidget *parent)
     this->viewer[2] = Vec4(0,1,0);
 
 
+
+
     //pose_time.start();
 
 //    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(0.2,0.1,1.5),Quaternion(Vec4(74,0,0)),TYPE_CUBE,1.2);
@@ -64,6 +87,260 @@ Scene::Scene(GLWidget *parent)
 
 Scene::~Scene(){
     Physics::closeScene(this);
+}
+
+void Scene::initializeShaders()
+{
+    // Create a material that performs multi-texturing
+    MaterialPtr material = createMaterial();
+    m_cube = new Cube(this);
+    m_cube->setMaterial( material );
+    m_cube->create();
+
+    m_sphere = new Sphere(this);
+    m_sphere->setMaterial( material );
+    m_sphere->create();
+
+    m_cylinder = new Cylinder(this);
+    m_cylinder->setMaterial( material );
+    m_cylinder->create();
+
+}
+
+MaterialPtr Scene::createMaterial()
+{
+    // Create a material and set the shaders
+    MaterialPtr material( new Material );
+    material->setShaders( "../shaders/phong.vert",
+                          "../shaders/phong.frag" );
+    return material;
+}
+
+void Scene::setCamera(Camera *cam)
+{
+    this->m_camera = cam;
+}
+
+void Scene::drawCube()
+{
+    m_cube->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", QVector4D( 5.0f, 5.0f, 5.0f, 1.0f ) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+    // Set the material properties
+    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.1f, 0.3f ) );
+    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.9f ) );
+    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+    shader->setUniformValue( "material.shininess", 20.0f );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_cube->render();
+}
+
+void Scene::drawCube(Matrix4x4 *transform, MaterialObj *mat)
+{
+    m_cube->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    Vec4 translate = transform->getTranslateSeted();
+    Vec4 scale     = transform->getScaleSeted();
+    Vec4 rotate  = transform->getRotationSeted();
+
+    m_modelMatrix.scale(scale.x(),scale.y(),scale.z());
+    m_modelMatrix.rotate(rotate.x(),rotate.y(),rotate.z());
+    m_modelMatrix.translate(translate.x(),translate.y(),translate.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( 5.0f, 5.0f, -5.0f, 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_cube->render();
+}
+
+void Scene::drawSphere()
+{
+    m_sphere->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_sphere->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", QVector4D( 5.0f, 5.0f, 5.0f, 1.0f ) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+    // Set the material properties
+    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.1f, 0.3f ) );
+    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.9f ) );
+    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+    shader->setUniformValue( "material.shininess", 20.0f );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_sphere->render();
+}
+
+void Scene::drawSphere(Matrix4x4 *transform, MaterialObj *mat)
+{
+    m_sphere->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    Vec4 translate = transform->getTranslateSeted();
+    Vec4 scale     = transform->getScaleSeted();
+    Vec4 rotate  = transform->getRotationSeted();
+
+    m_modelMatrix.scale(scale.x(),scale.y(),scale.z());
+    m_modelMatrix.rotate(rotate.x(),rotate.y(),rotate.z());
+    m_modelMatrix.translate(translate.x(),translate.y(),translate.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( 5.0f, 5.0f, -5.0f, 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128 );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_sphere->render();
+}
+
+void Scene::drawCylinder()
+{
+    m_cylinder->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cylinder->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", QVector4D( 5.0f, 5.0f, 5.0f, 1.0f ) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+    // Set the material properties
+    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.1f, 0.3f ) );
+    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.9f ) );
+    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+    shader->setUniformValue( "material.shininess", 20.0f );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_cylinder->render();
+}
+
+void Scene::drawCylinder(Matrix4x4 *transform, MaterialObj *mat)
+{
+    m_cylinder->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cylinder->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    Vec4 translate = transform->getTranslateSeted();
+    Vec4 scale     = transform->getScaleSeted();
+    Vec4 rotate  = transform->getRotationSeted();
+
+    m_modelMatrix.scale(scale.x(),scale.y(),scale.z());
+    m_modelMatrix.rotate(rotate.x(),rotate.y(),rotate.z());
+    m_modelMatrix.translate(translate.x(),translate.y(),translate.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( 5.0f, 5.0f, -5.0f, 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128 );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_cylinder->render();
 }
 
 Object* Scene::addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass,Character *character,int material)

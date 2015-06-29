@@ -88,7 +88,7 @@ void Mesh::setMaterial(int type)
 
 void Mesh::setMaterials()
 {
-   Material::setMaterialOpenGL(id_material);
+   MaterialObj::setMaterialOpenGL(id_material);
 
 }
 

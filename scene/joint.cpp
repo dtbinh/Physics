@@ -1,7 +1,7 @@
 #include "joint.h"
 #include "math/vec4.h"
 #include "math/quaternion.h"
-#include "extra/material.h"
+#include "extra/materialobj.h"
 #include "object.h"
 #include "character.h"
 #include "graphics/draw.h"
@@ -21,7 +21,7 @@ Joint::Joint(Character *chara,int type)
         this->character = NULL;
     }
     this->type = type;
-    material = new Material();
+    material = new MaterialObj();
 
     this->selected = false;
     //this->parent = new Object();
@@ -35,7 +35,7 @@ Joint::Joint(Character *chara,int type)
 Joint::Joint(int type)
 {
     this->type = type;
-    material = new Material();
+    material = new MaterialObj();
     this->selected = false;
     //this->parent = new Object();
     //this->child = new Object();

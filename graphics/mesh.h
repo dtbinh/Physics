@@ -2,7 +2,7 @@
 #define STRUCTURE_H
 #include "math/vec4.h"
 #include "math/matrix4x4.h"
-#include "extra/material.h"
+#include "extra/materialobj.h"
 #include <vector>
 
 

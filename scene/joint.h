@@ -9,7 +9,7 @@
 
 class Object;
 class Character;
-class Material;
+class MaterialObj;
 
 
 class Joint
@@ -19,7 +19,7 @@ public:
     JointID     joint;            //id da junta
     Object*     parent;           //pai da junta
     Object*     child;            //filho da junta
-    Material*   material;         //material utilizado para desenho da junta
+    MaterialObj *material;         //material utilizado para desenho da junta
     Vec4        limSupA;           //guarda os limites superiores angular
     Vec4        limInfA;           //guarda os limites inferiores angular
     Vec4        tqMax;            //guarda o torque máximo

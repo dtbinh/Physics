@@ -1,6 +1,6 @@
-#include "camera.h"
+#include "cameraold.h"
 
-Camera::Camera()
+CameraOld::CameraOld()
 {
     eye = Vec4();
     at =  Vec4();
@@ -26,7 +26,7 @@ Camera::Camera()
     type = CAMERA_FAR;
 }
 
-Camera::Camera(Vec4 e, Vec4 c, Vec4 u)
+CameraOld::CameraOld(Vec4 e, Vec4 c, Vec4 u)
 {
     this->eye = Vec4();
     this->at =  Vec4();
@@ -39,7 +39,7 @@ Camera::Camera(Vec4 e, Vec4 c, Vec4 u)
     type = CAMERA_FAR;
 }
 
-Camera::Camera(float ex, float ey, float ez, float cx, float cy, float cz, float ux, float uy, float uz)
+CameraOld::CameraOld(float ex, float ey, float ez, float cx, float cy, float cz, float ux, float uy, float uz)
 {
     this->eye = Vec4();
     this->at =  Vec4();
@@ -61,11 +61,11 @@ Camera::Camera(float ex, float ey, float ez, float cx, float cy, float cz, float
 
 }
 
-Camera::~Camera()
+CameraOld::~CameraOld()
 {
 }
 
-void Camera::zoom(float win_y, float last_y)
+void CameraOld::zoom(float win_y, float last_y)
 {
     if(type==CAMERA_FAR){
         //vetor do olho(eye) ao centro(center)
@@ -85,7 +85,7 @@ void Camera::zoom(float win_y, float last_y)
     }
 }
 
-void Camera::translatex(float win_x, float last_x)
+void CameraOld::translatex(float win_x, float last_x)
 {
     if(type==CAMERA_FAR){
         Vec4 Vec = at - eye;
@@ -120,7 +120,7 @@ void Camera::translatex(float win_x, float last_x)
     }
 }
 
-void Camera::translatey(float win_y, float last_y)
+void CameraOld::translatey(float win_y, float last_y)
 {
     if(type==CAMERA_FAR){
         //vetor do olho(eye) ao centro(center)
@@ -153,7 +153,7 @@ void Camera::translatey(float win_y, float last_y)
     }
 }
 
-void Camera::rotatex(float win_y, float last_y)
+void CameraOld::rotatex(float win_y, float last_y)
 {
     if(type==CAMERA_FAR){
         float y = at.y();
@@ -237,85 +237,85 @@ void Camera::rotatex(float win_y, float last_y)
     }
 }
 
-void Camera::rotatey(float win_x, float last_x)
+void CameraOld::rotatey(float win_x, float last_x)
 {
 
     if(type==CAMERA_FAR){
         float y = at.y();
         float x = at.x();
         float z = at.z();
-    Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
-    at = at*2 - eye;
-    eye = aux;//.recebe(aux);
+        Vec4 aux = at;//Vetor3D(c.x, c.y, c.z);
+        at = at*2 - eye;
+        eye = aux;//.recebe(aux);
 
-    //vetor do olho(eye) ao centro(center)
-    Vec4 Vec = at-eye;
-    GLfloat moduloVecant = Vec.module();
-    //vetor no sentido positivo da direcao x
-    Vec4 Xpos = Vec^(up);
-    Xpos.normalize();
+        //vetor do olho(eye) ao centro(center)
+        Vec4 Vec = at-eye;
+        GLfloat moduloVecant = Vec.module();
+        //vetor no sentido positivo da direcao x
+        Vec4 Xpos = Vec^(up);
+        Xpos.normalize();
 
-    at = at-(Xpos*( ((1.0/30.0)*moduloVecant)*(last_x - win_x)/5.0 ));
+        at = at-(Xpos*( ((1.0/30.0)*moduloVecant)*(last_x - win_x)/5.0 ));
 
-    Vec = at -(eye);
-    GLfloat moduloVec = Vec.module();
-      Vec = Vec*( moduloVecant/moduloVec );
-    at = eye+(Vec);
-    if(axis_y){
-        at.x2 = y;
-    }
-    if(axis_x){
-        at.x1 = x;
-    }
-    if(axis_z){
-        at.x3 = z;
-    }
-    //novo-----------------------------------
-    //atualizando u
-    Vec4 u;
-    if (up.y()>=0.0) {
-      u = Vec4(0.0,1.0,0.0);
-    } else {
-      u = Vec4(0.0,-1.0,0.0);
-    }
-    Vec4 XposUp = Vec^(u);
-    up = XposUp^(Vec);
-    up.normalize();
-    //fim_novo-------------------------------
+        Vec = at -(eye);
+        GLfloat moduloVec = Vec.module();
+        Vec = Vec*( moduloVecant/moduloVec );
+        at = eye+(Vec);
+        if(axis_y){
+            at.x2 = y;
+        }
+        if(axis_x){
+            at.x1 = x;
+        }
+        if(axis_z){
+            at.x3 = z;
+        }
+        //novo-----------------------------------
+        //atualizando u
+        Vec4 u;
+        if (up.y()>=0.0) {
+            u = Vec4(0.0,1.0,0.0);
+        } else {
+            u = Vec4(0.0,-1.0,0.0);
+        }
+        Vec4 XposUp = Vec^(u);
+        up = XposUp^(Vec);
+        up.normalize();
+        //fim_novo-------------------------------
 
-    aux = eye;//.recebe(e);
-    eye = eye*(2.0)-(at);
-    at = aux;//.recebe(aux);
+        aux = eye;//.recebe(e);
+        eye = eye*(2.0)-(at);
+        at = aux;//.recebe(aux);
 
     }else{
         float y = at.y();
         float x = at.x();
         float z = at.z();
         //vetor do olho(eye) ao centro(center)
-          Vec4 Vec = at-(eye);
-          //vetor no sentido positivo da direcao x
-          Vec4 Xpos = Vec^(up);
+        Vec4 Vec = at-(eye);
+        //vetor no sentido positivo da direcao x
+        Vec4 Xpos = Vec^(up);
 
-          at = at-( Xpos*( (last_x - win_x)/100.0 ) );
+        at = at-( Xpos*( (last_x - win_x)/100.0 ) );
 
-          //Vec normalizado
-          Vec4 N = at-(eye);
-          N.normalize();
-          at = eye+(N);
-          if(axis_y){
-              at.x2 = y;
-          }
-          if(axis_x){
-              at.x1 = x;
-          }
-          if(axis_z){
-              at.x3 = z;
-          }
+        //Vec normalizado
+        Vec4 N = at-(eye);
+        N.normalize();
+        at = eye+(N);
+        if(axis_y){
+            at.x2 = y;
+        }
+        if(axis_x){
+            at.x1 = x;
+        }
+        if(axis_z){
+            at.x3 = z;
+        }
     }
 
 }
 
-void Camera::rotatez(float win_x, float last_x)
+void CameraOld::rotatez(float win_x, float last_x)
 {
     if(type==CAMERA_FAR){
         float y = at.y();
@@ -383,7 +383,7 @@ void Camera::rotatez(float win_x, float last_x)
     }
 }
 
-Vec4 Camera::getPickedPoint(float x, float y)
+Vec4 CameraOld::getPickedPoint(float x, float y)
 {
     //calculando a base da camera
     //vetor do centro(center) ao olho(eye) - Zpos
@@ -406,7 +406,7 @@ Vec4 Camera::getPickedPoint(float x, float y)
     return Vec4(dx,dy,dz);
 }
 
-void Camera::adapteVetorAtDist2Game()
+void CameraOld::adapteVetorAtDist2Game()
 {
     Vec4 Vec = at - eye;
     //normalizando o Vec
@@ -415,7 +415,7 @@ void Camera::adapteVetorAtDist2Game()
     at = eye + Vec;
 }
 
-void Camera::adapteVetorAtGame2Dist(float r)
+void CameraOld::adapteVetorAtGame2Dist(float r)
 {
     //vetor do olho(eye) ao centro(center)
     Vec4 Vec = at - eye;
@@ -423,22 +423,22 @@ void Camera::adapteVetorAtGame2Dist(float r)
     at = eye + Vec*r;
 }
 
-void Camera::lockAxisX(bool b)
+void CameraOld::lockAxisX(bool b)
 {
     axis_x = b;
 }
 
-void Camera::lockAxisY(bool b)
+void CameraOld::lockAxisY(bool b)
 {
     axis_y = b;
 }
 
-void Camera::lockAxisZ(bool b)
+void CameraOld::lockAxisZ(bool b)
 {
     axis_z = b;
 }
 
-glm::mat4 Camera::GetViewMatrix()
+glm::mat4 CameraOld::GetViewMatrix()
 {
     glm::vec3 eye(this->eye.x(),this->eye.y(),this->eye.z());
     glm::vec3 at(this->at.x(),this->at.y(),this->at.z());

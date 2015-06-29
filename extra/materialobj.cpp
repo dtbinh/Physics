@@ -1,11 +1,11 @@
-#include "material.h"
+#include "materialobj.h"
 #include <math/vec4.h>
-Material::Material()
+MaterialObj::MaterialObj()
 {
 
 }
 
-void Material::setMaterial(Material *mat, int type)
+void MaterialObj::setMaterial(MaterialObj *mat, int type)
 {
     switch (type){
     case MATERIAL_GOLD:{
@@ -655,7 +655,7 @@ void Material::setMaterial(Material *mat, int type)
     }
 }
 
-void Material::setMaterial(Material *mat, Vec4 ambient, Vec4 diffuse, Vec4 specular, float shininess)
+void MaterialObj::setMaterial(MaterialObj *mat, Vec4 ambient, Vec4 diffuse, Vec4 specular, float shininess)
 {
     mat->ambient[0] = ambient.x();
     mat->ambient[1] = ambient.y();
@@ -675,9 +675,9 @@ void Material::setMaterial(Material *mat, Vec4 ambient, Vec4 diffuse, Vec4 specu
     mat->shininess = shininess;
 }
 
-void Material::setMaterialOpenGL(int type)
+void MaterialObj::setMaterialOpenGL(int type)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     setMaterial(mat,type);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -685,19 +685,39 @@ void Material::setMaterialOpenGL(int type)
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
 }
 
-Material* Material::getMaterial(int type)
+MaterialObj* MaterialObj::getMaterial(int type)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     setMaterial(mat,type);
     return mat;
 }
 
-QColor Material::getColorMaterial(int type)
+QColor MaterialObj::getColorMaterial(int type)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     setMaterial(mat,type);
     Vec4 colorvec((mat->diffuse[0]),(mat->diffuse[1]),(mat->diffuse[2]));
     QColor color;
     color.setRgb(((int)(colorvec.x()*255)%256),((int)(colorvec.y()*255)%256),((int)(colorvec.z()*255)%256));
     return color;
+}
+
+Vec4 MaterialObj::ambientMaterial()
+{
+    return Vec4(ambient[0],ambient[1],ambient[2],ambient[3]);
+}
+
+Vec4 MaterialObj::specularMaterial()
+{
+    return Vec4(specular[0],specular[1],specular[2],specular[3]);
+}
+
+Vec4 MaterialObj::diffuseMaterial()
+{
+    return Vec4(diffuse[0],diffuse[1],diffuse[2],diffuse[3]);
+}
+
+float MaterialObj::shininessMaterial()
+{
+    return shininess;
 }

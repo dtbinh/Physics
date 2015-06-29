@@ -6,7 +6,7 @@
 #include "control/control.h"
 #include "scene/object.h"
 #include "control/sensor.h"
-#include "extra/material.h"
+#include "extra/materialobj.h"
 #include "scene/scene.h"
 MoCap::MoCap()
 {

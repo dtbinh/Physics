@@ -8,9 +8,13 @@ class GLWidget;
 #include "control/control.h"
 #include "character.h"
 #include "grf.h"
-#include "extra/material.h"
+
 #include "control/pose.h"
 #include "control/graphicalpose.h"
+
+#include "graphics/ShaderPrimitives/material.h"
+
+
 
 #ifndef FEEDBACKCONTACT_H
 #define FEEDBACKCONTACT_H
@@ -20,7 +24,12 @@ class GLWidget;
 #endif
 
 class Ray;
-class Scene
+class MaterialObj;
+class Cube;
+class Cylinder;
+class Sphere;
+class Camera;
+class Scene : public QGLWidget
 {
 private:
     //physics
@@ -39,6 +48,15 @@ private:
     float          friction_ground;
     float          friction_foot_air;
     bool           is_ground_ice;
+    Camera         *m_camera;
+
+
+
+    //shaders
+    Cube           *m_cube;
+    Sphere         *m_sphere;
+    Cylinder       *m_cylinder;
+    QMatrix4x4     m_modelMatrix;
 
 
     //interface
@@ -75,6 +93,19 @@ public:
     Scene(GLWidget *parent);
     ~Scene();
 
+    //Shaders
+    void        initializeShaders();
+    MaterialPtr createMaterial();
+    void        setCamera(Camera *cam);
+    void        drawCube();
+    void        drawCube(Matrix4x4* transform, MaterialObj *mat);
+    void        drawSphere();
+    void        drawSphere(Matrix4x4* transform, MaterialObj *mat);
+    void        drawCylinder();
+    void        drawCylinder(Matrix4x4* transform, MaterialObj *mat);
+
+
+
     //Physics
     void           simulationStep(bool balance=true);                         //executa um passo da simulação
     void           restartPhysics();                                //reinicializa a simulação
@@ -108,7 +139,7 @@ public:
     Vec4                  getUp();
     void                  setProjection(Vec4 p);
     void                  setWindow(int width,int height);
-    Object*               addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass=1.0, Character *character=0,int material=MATERIAL_ZINN);//adiciona um objeto ao cenário
+    Object*               addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,int type,float mass=1.0, Character *character=0,int material=0);//adiciona um objeto ao cenário
     Joint *               addJointBall(Vec4 anchor, Object *parent, Object *child, Character *chara,Vec4 limSup=Vec4(),Vec4 limInf=Vec4());//cria uma junta ball
     Joint *               addJointFixed(Object *parent,Object *child, Character *chara); //cria uma junta fixa
     Joint *               addJointHinge(Vec4 anchor, Vec4 axis, Object *parent, Object *child, Character *chara); //cria uma junta hinge

@@ -1,17 +1,21 @@
 ﻿#ifndef GLWIDGET_H
 #define GLWIDGET_H
-#include <QGLShaderProgram>
 #include <QTimer>
-#include "scene/scene.h"
 #include <QWidget>
+#include "scene/scene.h"
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
-#include <QGLBuffer>
-#include <QGLShaderProgram>
+#include <QOpenGLContext>
+#include <QOpenGLShaderProgram>
+#include "graphics/ShaderPrimitives/abstractscene.h"
+#include "graphics/ShaderPrimitives/material.h"
 
-class Plane;
+#include <QMatrix4x4>
+
+class Cube;
+class Camera;
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -160,6 +164,7 @@ public:
     int  frame_edit;
     QList<Vec4> curve_quat;
     QList<int>  curve_quat_time;
+
     bool load_exemple_curve;
     bool screenshot;
     bool rendermesh;
@@ -207,6 +212,7 @@ public:
     void calculateFPSPaint();
     void drawFPS();
 private:
+    MaterialPtr createMaterial();
     void prepareShaderProgram();
     void prepareVertexBuffers();
 
@@ -215,6 +221,19 @@ private:
     QOpenGLBuffer m_vertexPositionBuffer;
     QOpenGLBuffer m_vertexColorBuffer;
     QOpenGLVertexArrayObject m_vao;
+
+    float m_vx;
+    float m_vy;
+    float m_vz;
+    bool m_viewCenterFixed;
+    float m_panAngle;
+    float m_tiltAngle;
+
+    // Cube related members
+    QMatrix4x4 m_modelMatrix;
+    Cube* m_cube;
+    Cube* m_cube2;
+    Camera* m_camera;
 
 
 #ifdef SHADERS_ENABLED

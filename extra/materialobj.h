@@ -1,5 +1,5 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#ifndef MATERIALOBJ_H
+#define MATERIALOBJ_H
 #include <GL/glut.h>
 #include "math/vec4.h"
 #include <QColor>
@@ -44,10 +44,10 @@
 #define MATERIAL_SILVER         30
 #define MATERIAL_ICE            31
 
-class Material
+class MaterialObj
 {
 public:
-    Material();
+    MaterialObj();
 
 public:
  float ambient[4];
@@ -55,13 +55,17 @@ public:
  float specular[4];
  float shininess;
 
- void static setMaterial(Material *mat,int type);
- void static setMaterial(Material *mat,Vec4 ambient,Vec4 diffuse,Vec4 specular, float shininess);
+ void static setMaterial(MaterialObj *mat,int type);
+ void static setMaterial(MaterialObj *mat,Vec4 ambient,Vec4 diffuse,Vec4 specular, float shininess);
  void static setMaterialOpenGL(int type);
- Material* getMaterial(int type);
+ MaterialObj* getMaterial(int type);
  QColor static getColorMaterial(int type);
+ Vec4 ambientMaterial();
+ Vec4 specularMaterial();
+ Vec4 diffuseMaterial();
+ float shininessMaterial();
 
 
 };
 
-#endif // MATERIAL_H
+#endif // MATERIALOBJ_H

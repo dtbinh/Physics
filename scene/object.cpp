@@ -2,7 +2,7 @@
 #include "graphics/draw.h"
 #include "math/matrix4x4.h"
 #include "graphics/mesh.h"
-#include "extra/material.h"
+#include "extra/materialobj.h"
 #include "scene.h"
 #include "math/matrix.h"
 #include "control/sensor.h"
@@ -33,10 +33,10 @@ Object::Object()
     this->selected   = false;
     this->properties = Vec4();
     this->type       = -1;
-    Material::setMaterial(this->material,0);
+    MaterialObj::setMaterial(this->material,0);
     this->id_material = -1;
     this->mass  = new Mass();
-    this->material = new Material();
+    this->material = new MaterialObj();
     this->isFoot = false;
     this->bodyBalance = false;
     this->compensable = 0.0;
@@ -59,7 +59,7 @@ Object::Object(Scene *scene)
     this->id_material = -1;
     this->scene = scene;
     this->mass  = new Mass();
-    this->material = new Material();
+    this->material = new MaterialObj();
     this->properties = Vec4();
     this->selected = false;
     this->isFoot = false;
@@ -85,8 +85,8 @@ Object::Object(Vec4 position, QuaternionQ rotation, Vec4 properties, int type, S
     this->properties = properties;
     this->type       = type;
     this->mass  = new Mass();
-    this->material = new Material();
-    Material::setMaterial(this->material,0);
+    this->material = new MaterialObj();
+    MaterialObj::setMaterial(this->material,0);
     this->scene      = scene;
     this->name       = name;
     this->isFoot = false;
@@ -402,7 +402,7 @@ bool Object::isCollideWithGround()
 
 void Object::setMaterial(int m)
 {
-    Material::setMaterial(this->material,m);
+    MaterialObj::setMaterial(this->material,m);
     id_material = m;
 }
 
@@ -456,7 +456,7 @@ Matrix4x4 Object::getMatrixTransformationODE()
 
 void Object::setMaterial(Vec4 amb, Vec4 diff, Vec4 spe, float shininess)
 {
-    Material::setMaterial(this->material,amb,diff,spe,shininess);
+    MaterialObj::setMaterial(this->material,amb,diff,spe,shininess);
 }
 
 void Object::wireframe()

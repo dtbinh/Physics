@@ -1,16 +1,20 @@
+#version 330
 
-	// Used for shadow lookup
-	varying vec4 ShadowCoord;
-varying vec4 p;
-varying vec3 n;
+layout (location = 0) in vec3 vertexPosition;
+layout (location = 1) in vec3 vertexNormal;
 
-void main(void)
+out vec3 position;
+out vec3 normal;
+
+uniform mat4 modelViewMatrix;
+uniform mat3 normalMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 mvp;
+
+void main()
 {
-    ShadowCoord= gl_TextureMatrix[7] * gl_Vertex;
-    gl_Position = ftransform();
-    gl_FrontColor = gl_Color;
+    normal = normalize( normalMatrix * vertexNormal );
+    position = vec3( modelViewMatrix * vec4( vertexPosition, 1.0 ) );
 
-    p = gl_ModelViewMatrix * gl_Vertex;
-    n = gl_NormalMatrix * gl_Normal;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( vertexPosition, 1.0 );
 }
-

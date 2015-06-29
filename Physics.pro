@@ -6,7 +6,7 @@
 
 
 
-QT       += core gui opengl widgets
+QT       += core gui opengl widgets openglextensions
 
 TARGET = ODESys
 TEMPLATE = app
@@ -25,7 +25,6 @@ SOURCES += main.cpp\
     scene/character.cpp \
     scene/joint.cpp \
     graphics/mesh.cpp \
-    extra/material.cpp \
     math/matrix4x4.cpp \
     math/quaternion.cpp \
     graphics/plane.cpp \
@@ -40,7 +39,6 @@ SOURCES += main.cpp\
     mocap/mocap.cpp \
     control/sensor.cpp \
     mocap/framequat.cpp \
-    interface/camera.cpp \
     extra/ObjMesh.cpp \
     interpolation/interpolation.cpp \
     graphics/shadows.cpp \
@@ -49,10 +47,21 @@ SOURCES += main.cpp\
     extra/text.cpp \
     math/vector3d.cpp \
     extra/tga.c \
-    extra/texture.c \
     math/ray.cpp \
     control/pose.cpp \
-    control/graphicalpose.cpp
+    control/graphicalpose.cpp \
+    graphics/shader.cpp \
+    graphics/ShaderPrimitives/cube.cpp \
+    graphics/ShaderPrimitives/kdgeometryshader.cpp \
+    graphics/ShaderPrimitives/texture.cpp \
+    graphics/ShaderPrimitives/sampler.cpp \
+    graphics/ShaderPrimitives/abstractscene.cpp \
+    graphics/ShaderPrimitives/material.cpp \
+    graphics/ShaderPrimitives/camera.cpp \
+    extra/materialobj.cpp \
+    interface/cameraold.cpp \
+    graphics/ShaderPrimitives/sphere.cpp \
+    graphics/ShaderPrimitives/cylinder.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -65,7 +74,6 @@ HEADERS  += mainwindow.h \
     scene/object.h \
     scene/character.h \
     scene/joint.h \
-    extra/material.h \
     graphics/plane.h \
     control/control.h \
     physics/functions.h \
@@ -78,7 +86,6 @@ HEADERS  += mainwindow.h \
     mocap/mocap.h \
     control/sensor.h \
     mocap/framequat.h \
-    interface/camera.h \
     extra/ObjMesh.h \
     interpolation/interpolation.h \
     graphics/shadows.h \
@@ -90,7 +97,20 @@ HEADERS  += mainwindow.h \
     extra/texture.h \
     math/ray.h \
     control/pose.h \
-    control/graphicalpose.h
+    control/graphicalpose.h \
+    graphics/shader.h \
+    graphics/ShaderPrimitives/cube.h \
+    graphics/ShaderPrimitives/kdgeometryshader.h \
+    graphics/ShaderPrimitives/sampler.h \
+    graphics/ShaderPrimitives/texture.h \
+    graphics/ShaderPrimitives/abstractscene.h \
+    graphics/ShaderPrimitives/material.h \
+    graphics/ShaderPrimitives/camera.h \
+    graphics/ShaderPrimitives/camera_p.h \
+    extra/materialobj.h \
+    interface/cameraold.h \
+    graphics/ShaderPrimitives/sphere.h \
+    graphics/ShaderPrimitives/cylinder.h
 
 FORMS    += mainwindow.ui
 

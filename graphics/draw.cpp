@@ -1,6 +1,6 @@
 #include "draw.h"
 #include "math/matrix4x4.h"
-#include "extra/material.h"
+#include "extra/materialobj.h"
 #include "GL/glu.h"
 #include "GL/glut.h"
 #include "math/quaternion.h"
@@ -55,7 +55,7 @@ Draw::Draw()
     delete image;
 }
 
-void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
+void Draw::drawCube(Matrix4x4 *transform,Vec4 p, MaterialObj *mat, float)
 {
     Vec4 vertexs[8];
     Vec4 normals[6];
@@ -135,8 +135,8 @@ void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
 void Draw::drawCube(Matrix4x4 *transform, Vec4 p, int material)
 {
 
-    Material *mat = new Material();
-    Material::setMaterial(mat,material);
+    MaterialObj *mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,material);
     Vec4 vertexs[8];
     Vec4 normals[6];
 
@@ -295,7 +295,7 @@ Mesh *Draw::getMeshCube(Matrix4x4 *transform, Vec4 p, Mesh *mesh)
     return mesh;
 }
 
-void Draw::drawCylinder(Matrix4x4 *transform, Material *mat)
+void Draw::drawCylinder(Matrix4x4 *transform, MaterialObj *mat)
 {
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -317,8 +317,8 @@ void Draw::drawCylinder(Matrix4x4 *transform, Material *mat)
 
 void Draw::drawCylinder(Matrix4x4 *transform, int material)
 {
-    Material *mat = new Material();
-    Material::setMaterial(mat,material);
+    MaterialObj *mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -340,8 +340,8 @@ void Draw::drawCylinder(Matrix4x4 *transform, int material)
 
 void Draw::drawCylinder(Vec4 position, Vec4 axis, double radius, double height, int material)
 {
-    Material *mat = new Material();
-    Material::setMaterial(mat,material);
+    MaterialObj *mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -370,7 +370,7 @@ void Draw::drawCylinder(Vec4 position, Vec4 axis, double radius, double height, 
 
 }
 
-void Draw::drawSphere(Matrix4x4 *transform,Material *mat,float radius)
+void Draw::drawSphere(Matrix4x4 *transform,MaterialObj *mat,float radius)
 {
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
@@ -396,8 +396,8 @@ void Draw::drawSphere(Matrix4x4 *transform,Material *mat,float radius)
 
 void Draw::drawSphere(Vec4 position, int material, float size)
 {
-    Material *mat = new Material();
-    Material::setMaterial(mat,material);
+    MaterialObj *mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -434,8 +434,8 @@ void Draw::drawLine(Vec4 p1, Vec4 p2, Vec4 color, float width)
 void Draw::drawSphereSelected(Vec4 position)
 {
 
-    Material *mat = new Material();
-    Material::setMaterial(mat,MATERIAL_RED_PLASTIC);
+    MaterialObj *mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,MATERIAL_RED_PLASTIC);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -477,8 +477,8 @@ bool yes = true;
 void Draw::drawCOM(Vec4 position, float size, Vec4 color)
 {
     //return;
-    Material *mat = new Material();
-        Material::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+    MaterialObj *mat = new MaterialObj();
+        MaterialObj::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -527,8 +527,8 @@ void Draw::drawCOM(Vec4 position, float size, Vec4 color)
 void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 {
 
-    Material *mat = new Material();
-        Material::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
+    MaterialObj *mat = new MaterialObj();
+        MaterialObj::setMaterial(mat,MATERIAL_WHITE_PLASTIC);
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -574,8 +574,8 @@ void Draw::drawCOMProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 
 void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 {
-    Material *mat = new Material();
-        Material::setMaterial(mat,MATERIAL_YELLOW_PLASTIC);
+    MaterialObj *mat = new MaterialObj();
+        MaterialObj::setMaterial(mat,MATERIAL_YELLOW_PLASTIC);
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -606,9 +606,9 @@ void Draw::drawTargetProjected(Vec4 position, float size, Vec4 color, Vec4 rot)
 
 void Draw::drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double height, int material)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
 
-        Material::setMaterial(mat,material);
+        MaterialObj::setMaterial(mat,material);
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
@@ -749,7 +749,7 @@ void Draw::drawGround(int size, Vec4 rot, float reflect)
 
     glEnd();
     glEnable(GL_LIGHTING);
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     if(reflect){
         mat->setMaterial(mat,MATERIAL_ICE);
     }else{
@@ -890,7 +890,7 @@ void Draw::drawGroundTexture(int size, int text)
 
 //    glEnd();
     glEnable(GL_LIGHTING);
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -974,7 +974,7 @@ void Draw::drawSkybox(Vec4 min, Vec4 max, int texture)
     z = z - length / 2;
 
     glEnable(GL_LIGHTING);
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,MATERIAL_WHITE_PLASTIC);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -1039,7 +1039,7 @@ void Draw::drawSkybox(Vec4 min, Vec4 max, int texture)
 
 void Draw::drawCoffeeCup(Vec4 position, int material, QuaternionQ q)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -1057,7 +1057,7 @@ void Draw::drawCoffeeCup(Vec4 position, int material, QuaternionQ q)
 
 void Draw::drawObj(Vec4 position, int material,QuaternionQ q, QString file,ObjMesh *n)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -1075,7 +1075,7 @@ void Draw::drawObj(Vec4 position, int material,QuaternionQ q, QString file,ObjMe
 
 void Draw::drawObj(Matrix4x4 *transform, int material, ObjMesh *n)
 {
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -1383,7 +1383,7 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
     Vec4 from2to = to-from;
     float tam = from2to.module();
     from2to.normalize();
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -1442,7 +1442,7 @@ void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 dir, float size,int mate
     Vec4 from2to = to-from;
     float tam = from2to.module();
     from2to.normalize();
-    Material *mat = new Material();
+    MaterialObj *mat = new MaterialObj();
     mat->setMaterial(mat,material);
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);

@@ -1,5 +1,5 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAMERAOLD_H
+#define CAMERAOLD_H
 #include "math/vec4.h"
 
 #define CAMERA_FAR 0
@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class Camera
+class CameraOld
 {
 public:
 
@@ -19,10 +19,10 @@ public:
 
    int type;
 
-   Camera();
-   Camera(Vec4 e, Vec4 c, Vec4 u);
-   Camera(float ex, float ey, float ez, float cx, float cy, float cz, float ux, float uy, float uz);
-   ~Camera();
+   CameraOld();
+   CameraOld(Vec4 e, Vec4 c, Vec4 u);
+   CameraOld(float ex, float ey, float ez, float cx, float cy, float cz, float ux, float uy, float uz);
+   ~CameraOld();
 
    //vetor Vec e u sempre perpendiculares e u sempre unitario
    void zoom(float, float);
@@ -42,4 +42,4 @@ public:
 
 };
 
-#endif // CAMERA_H
+#endif // CAMERAOLD_H

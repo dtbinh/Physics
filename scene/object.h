@@ -8,7 +8,7 @@
 #include "extra/ObjMesh.h"
 
 class Ray;
-class Material;
+class MaterialObj;
 class Matrix4x4;
 class MatrixF;
 class Mesh;
@@ -18,7 +18,7 @@ class Mesh;
 #define TYPE_SPHERE    dSphereClass
 
 
-class Object
+class Object: public QObject
 {
 private:
     // --------Scene
@@ -43,7 +43,7 @@ private:
     QuaternionQ   rotation;                                                //rotação inicial do objeto
     Vec4         properties;                                              //propriedades de dimensão do objeto
     int          type;                                                    //tipo do objeto em vinculação com o ODE
-    Material     *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
+    MaterialObj  *material;                                               //tipo de material do objeto para calculo de desenho e iluminação
     int          id_material;
     float        fmass;                                                   //massa em float na inicialização
     Mesh*        mesh;

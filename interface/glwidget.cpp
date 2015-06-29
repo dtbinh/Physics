@@ -1,4 +1,5 @@
 #include "glwidget.h"
+#include "scene/scene.h"
 #include "scene/object.h"
 #include "graphics/draw.h"
 #include "math/quaternion.h"
@@ -11,7 +12,7 @@
 #include <GL/glu.h>                       // Header File For The GLu32 Library
 #include <GL/glut.h>
 #include <GL/glext.h>                     // Header File For The GLaux Library
-#include "camera.h"
+#include "cameraold.h"
 #include "interpolation/interpolation.h"
 #include "extra/screenshot.h"
 #include "extra/text.h"
@@ -21,11 +22,17 @@
 #include <fstream>
 #include <iostream>
 #include "math/vector3d.h"
+#include "extra/materialobj.h"
+#include "graphics/ShaderPrimitives/cube.h"
+#include "graphics/ShaderPrimitives/material.h"
+#include "graphics/ShaderPrimitives/camera.h"
+
 
 // GLM Mathematics
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 //  To use functions with variables arguments
 #include <stdarg.h>
@@ -49,6 +56,8 @@ vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
 
 
+
+
 #define SHOTBALL 3
 
 int mode = -1;
@@ -68,7 +77,7 @@ static float last_x = 0.0;
 static float last_y = 0.0;
 #define SET_CAM 0
 #define SET_OBJECT 1
-Camera* cam = new Camera();
+CameraOld* cam = new CameraOld();
 static float savedCamera[9];
 
 Vec4 vector_draw_direction;
@@ -156,6 +165,15 @@ void GLWidget::drawFPS()
       glEnable(GL_LIGHTING);
 
 
+}
+
+MaterialPtr GLWidget::createMaterial()
+{
+    // Create a material and set the shaders
+    MaterialPtr material( new Material );
+    material->setShaders( "../shaders/phong.vert",
+                          "../shaders/phong.frag" );
+    return material;
 }
 
 void GLWidget::prepareShaderProgram()
@@ -254,17 +272,24 @@ GLfloat lightPosition7[4] = {   9.588, 9.46, 9.248, 1.0 };
 
 GLWidget::GLWidget(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers),parent),
-          m_program(),
-          m_vertexPositionBuffer( QOpenGLBuffer::VertexBuffer ),
-          m_vertexColorBuffer( QOpenGLBuffer::VertexBuffer )
+          m_camera( new Camera( this ) )
 {
 
     QGLFormat glFormat;
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
     glFormat.setSampleBuffers( true );
+    glFormat.setSamples(32);
 
     this->setFormat(glFormat);
+
+    // Initialize the camera position and orientation
+    m_camera->setPosition( QVector3D( 5.0f, 5.0f, 5.0f ) );
+    m_camera->setViewCenter( QVector3D( 0.0f, 0.0f, 0.0f ) );
+    m_camera->setUpVector( QVector3D( 0.0f, 1.0f, 0.0f ) );
+
+
+
 
 
 
@@ -275,11 +300,16 @@ GLWidget::GLWidget(QWidget *parent) :
     glEnable(GL_MULTISAMPLE);
 ////    glEnable(GL_STENCIL_FUNC);
     scene = new Scene(this);
+    scene->setCamera(m_camera);
+    //scene->initializeShaders();
+
+
 //    updateObjects(scene->objectsScene());
 //    updateJoints(scene->jointsScene());
 //    updatePoseControls(scene->poseControlsScene());
     simTimer = new QTimer(this);
     connect(simTimer, SIGNAL(timeout()), this, SLOT(simStep()));
+
 
 //    //simTimer->start(0);
 //    //simTimer->setInterval(0);
@@ -324,15 +354,34 @@ GLWidget::GLWidget(QWidget *parent) :
 
 void GLWidget::initializeGL()
 {
-    // Create a vertex array object (VAO) - more on this later!
-    m_vao.create();
-    m_vao.bind();
+    // Create a material that performs multi-texturing
+    MaterialPtr material = createMaterial();
 
-    // Load, compile and link the shader program
-    prepareShaderProgram();
+    // Create a cube and set the material on it
+    m_cube = new Cube( this );
+    m_cube->setMaterial( material );
+    m_cube->create();
 
-    // Prepare our geometry and associate it with shader program inputs
-    prepareVertexBuffers();
+
+    // Enable depth testing
+    glEnable( GL_DEPTH_TEST );
+
+    // Set the clear color to white
+    glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
+    m_modelMatrix.setToIdentity();
+    scene->initializeShaders();
+
+
+
+//    // Create a vertex array object (VAO) - more on this later!
+//    m_vao.create();
+//    m_vao.bind();
+
+//    // Load, compile and link the shader program
+//    prepareShaderProgram();
+
+//    // Prepare our geometry and associate it with shader program inputs
+//    prepareVertexBuffers();
 
 
 //    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -439,6 +488,8 @@ void GLWidget::resizeGL(int w, int h)
 //    scene->setProjection(Vec4(30.,ar,0.001,1200000));
 //    scene->setWindow(w,h);
 //    //printf("\nW %d H %d\n",w,h);
+    float aspect = static_cast<float>( w ) / static_cast<float>( h );
+    m_camera->setPerspectiveProjection( 30.0f, aspect, 0.1, 10000.0f );
 
 }
 void GLWidget::drawScene(){
@@ -792,34 +843,114 @@ void GLWidget::drawForceApply()
 
 void GLWidget::paintGL()
 {
-    // Clear the color buffer
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // Make our shader program current
+    // Clear the buffer with the current clearing color
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-    m_program.bind();
+    Matrix4x4 *transform = new Matrix4x4();
+    MaterialObj* mate = new MaterialObj();
+    mate->setMaterial(mate,MATERIAL_RUBY);
+    //transform->scale(0.5,0.5,0.5);
+    transform->setIdentity();
+    scene->drawCylinder(transform,mate);
+    transform->setIdentity();
+    transform->scale(2,1.0,1.5);
+    transform->translate(-2,1,0);
+    mate->setMaterial(mate,MATERIAL_COPPER);
+    scene->drawCube(transform,mate);
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(0,0,2.5);
+    mate->setMaterial(mate,MATERIAL_EMERALD);
+    scene->drawSphere(transform,mate);
+    delete transform;
+    delete mate;
 
-    glm::mat4 view;
-    view = cam->GetViewMatrix();
-    // Projection
-    glm::mat4 projection;
-    projection = glm::perspective(45.f, (GLfloat)winWidth/(GLfloat)winHeight, 0.1f, 1000.0f);
-    // Get the uniform locations
-    GLint modelLoc = glGetUniformLocation(m_program.programId(), "model");
-    GLint viewLoc = glGetUniformLocation(m_program.programId(), "view");
-    GLint projLoc = glGetUniformLocation(m_program.programId(), "projection");
+//    m_cube->material()->bind();
+//    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
 
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+//    m_modelMatrix.setToIdentity();
+//    m_modelMatrix.translate(0,0,0.5);
+//    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+//    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+//    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+//    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+//    shader->setUniformValue( "normalMatrix", normalMatrix );
+//    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+//    shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+//    shader->setUniformValue( "light.position", QVector4D( 5.0f, 5.0f, 5.0f, 1.0f ) );
+//    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+//    // Set the material properties
+//    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.1f, 0.3f ) );
+//    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.9f ) );
+//    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+//    shader->setUniformValue( "material.shininess", 20.0f );
+
+//    // Let the mesh setup the remainder of its state and draw itself
+//    m_cube->render();
+
+//    m_cube->material()->bind();
+
+
+//    m_modelMatrix.setToIdentity();
+//    m_modelMatrix.translate(0.5,1.5,-0.5);
+//    modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+//    normalMatrix = modelViewMatrix.normalMatrix();
+//    mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+//    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+//    shader->setUniformValue( "normalMatrix", normalMatrix );
+//    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+//    shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+//    shader->setUniformValue( "light.position", QVector4D( 5.0f, 5.0f, 5.0f, 1.0f ) );
+//    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+//    // Set the material properties
+//    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.9f, 0.3f ) );
+//    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.0f ) );
+//    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+//    shader->setUniformValue( "material.shininess", 20.0f );
+
+//    m_cube->render();
 
 
 
-    // Draw the triangle! Woot!
-    glDrawArrays( GL_TRIANGLES, 0, 3 );
+//    // Clear the color buffer
+//    glClear( GL_COLOR_BUFFER_BIT );
 
-    m_program.release();
+//    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    // Make our shader program current
+
+
+//    m_program.bind();
+
+
+//    glm::mat4 view;
+//    view = cam->GetViewMatrix();
+//    // Projection
+//    glm::mat4 projection;
+//    projection = glm::perspective(45.f, (GLfloat)winWidth/(GLfloat)winHeight, 0.1f, 1000.0f);
+//    // Get the uniform locations
+//    GLint modelLoc = glGetUniformLocation(m_program.programId(), "model");
+//    GLint viewLoc = glGetUniformLocation(m_program.programId(), "view");
+//    GLint projLoc = glGetUniformLocation(m_program.programId(), "projection");
+
+//    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+//    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+
+
+//    // Draw the triangle! Woot!
+//    glDrawArrays( GL_TRIANGLES, 0, 3 );
+
+
+//    m_program.release();
 
     //qDebug() << "update";
 
@@ -950,13 +1081,20 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         if (lbpressed && !rbpressed) {
             cam->rotatex(y,last_y);
             cam->rotatey(x,last_x);
+
+            m_camera->rotatex(y,last_y);
+            m_camera->rotatey(x,last_x);
         }
         if (!lbpressed && rbpressed) {
             cam->translatex(x,last_x);
             cam->translatey(y,last_y);
+
+            m_camera->translatex(x,last_x);
+            m_camera->translatey(y,last_y);
         }
         if (lbpressed && rbpressed) {
             cam->zoom(y,last_y);
+            m_camera->zoom(y,last_y);
         }
     }
 
@@ -1284,14 +1422,14 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         posCam++;
         if (cam->type == CAMERA_FAR) {
             delete cam;
-            if (posCam%5==0) cam = new Camera(); //CameraDistante(0,1,5, 0,1,0, 0,1,0);
-            if (posCam%5==1) cam = new Camera(5,1,0, 0,1,0, 0,1,0);
-            if (posCam%5==2) cam = new Camera(0,1,-5, 0,1,0, 0,1,0);
-            if (posCam%5==3) cam = new Camera(-5,1,0, 0,1,0, 0,1,0);
-            if (posCam%5==4) cam = new Camera(savedCamera[0],savedCamera[1],savedCamera[2],savedCamera[3],savedCamera[4],savedCamera[5],savedCamera[6],savedCamera[7],savedCamera[8]);
+            if (posCam%5==0) cam = new CameraOld(); //CameraDistante(0,1,5, 0,1,0, 0,1,0);
+            if (posCam%5==1) cam = new CameraOld(5,1,0, 0,1,0, 0,1,0);
+            if (posCam%5==2) cam = new CameraOld(0,1,-5, 0,1,0, 0,1,0);
+            if (posCam%5==3) cam = new CameraOld(-5,1,0, 0,1,0, 0,1,0);
+            if (posCam%5==4) cam = new CameraOld(savedCamera[0],savedCamera[1],savedCamera[2],savedCamera[3],savedCamera[4],savedCamera[5],savedCamera[6],savedCamera[7],savedCamera[8]);
         } else if (cam->type == CAMERA_GAME) {
             delete cam;
-            cam = new Camera();
+            cam = new CameraOld();
         }
     }
     if(event->key() == Qt::Key_S){
