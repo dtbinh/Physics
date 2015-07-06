@@ -65,7 +65,10 @@ SOURCES += main.cpp\
     graphics/ShaderPrimitives/mesh.cpp \
     graphics/ShaderPrimitives/axisalignedboundingbox.cpp \
     graphics/planeobj.cpp \
-    graphics/meshobj.cpp
+    graphics/meshobj.cpp \
+    render/shader_program.cpp \
+    render/shadow_map_fbo.cpp \
+    extra/utility.cpp
 
 HEADERS  += mainwindow.h \
     math/vec4.h \
@@ -119,7 +122,10 @@ HEADERS  += mainwindow.h \
     graphics/ShaderPrimitives/mesh.h \
     graphics/ShaderPrimitives/axisalignedboundingbox.h \
     graphics/planeobj.h \
-    graphics/meshobj.h
+    graphics/meshobj.h \
+    render/shader_program.h \
+    render/shadow_map_fbo.h \
+    extra/utility.h
 
 FORMS    += mainwindow.ui
 

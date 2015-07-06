@@ -38,6 +38,7 @@ public:
     void setAxisZ(Vec4 az);                            //seta um vetor na linha relativa ao eixo de rotação z
     void setTranslate(Vec4 tl);                        //setar uma translação a matriz
     Vec4 getRotationSeted();                           //extrai o vetor com os angulos em graus
+    Vec4 getRotationSetedQuaternion();                 //extrai o vetor com a configuração do quaterion de rotação
     Vec4 getScaleSeted();                              //extrai o vetor de escala aplicada
     Vec4 getTranslateSeted();                          //extrai o vetor de translação aplicada
     Vec4 vector(Vec4 p);                               //retorna o vetor aplicado a uma matriz de translação

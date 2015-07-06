@@ -2,35 +2,20 @@
 
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
+layout (location = 2) in vec2 vertexTexCoord;
 
 out vec3 position;
 out vec3 normal;
+out vec2 texCoord;
 
 uniform mat4 modelViewMatrix;
 uniform mat3 normalMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 mvp;
 
-uniform mat4 g_MV_matrix;
-uniform mat4 g_light_MVP_matrix;
-uniform mat4 g_model_matrix;
-uniform mat4 g_projection_matrix;
-
-attribute vec3 a_position;
-attribute vec2 a_texcoord;
-attribute vec3 a_normal_line;
-attribute ivec4 a_bone_ID;
-attribute vec4 a_bone_weight;
-attribute vec3 a_tangent;
-
-varying vec2 v_texcoord;
-varying vec3 v_normal_line;
-varying vec3 v_world_position;
-varying vec4 v_light_space_postion;
-varying vec3 v_tangent;
-
 void main()
 {
+    texCoord = vertexTexCoord;
     normal = normalize( normalMatrix * vertexNormal );
     position = vec3( modelViewMatrix * vec4( vertexPosition, 1.0 ) );
 

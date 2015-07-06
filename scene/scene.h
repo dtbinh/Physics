@@ -98,15 +98,24 @@ public:
     //Shaders
     void        initializeShaders();
     MaterialPtr createMaterial();
+    MaterialPtr createMaterial(QString vs, QString fs);
+    MaterialPtr createTextureMaterial(const QString &fileName);
     void        setCamera(Camera *cam);
     void        drawCube();
     void        drawCube(Matrix4x4* transform, MaterialObj *mat);
+    void        drawCubeShader(Matrix4x4* transform);
+    void        drawCubeShader2(Matrix4x4* transform,MaterialObj *mat);
+
+
+
     void        drawSphere();
     void        drawSphere(Matrix4x4* transform, MaterialObj *mat);
     void        drawCylinder();
     void        drawCylinder(Matrix4x4* transform, MaterialObj *mat);
     void        drawPlane();
     void        drawPlane(Matrix4x4* transform, MaterialObj *mat);
+    void        drawPlaneShader(Matrix4x4* transform);
+    void        drawPlaneShader2(Matrix4x4* transform,MaterialObj *mat);
 
 
 

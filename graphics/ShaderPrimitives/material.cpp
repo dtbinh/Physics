@@ -213,4 +213,6 @@ void Material::initialize()
         m_funcs.compat->initializeOpenGLFunctions();
         m_funcsType = Compatibility;
     }
+
+
 }

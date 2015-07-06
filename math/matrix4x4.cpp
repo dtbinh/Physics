@@ -422,6 +422,21 @@ Vec4 Matrix4x4::getRotationSeted()
     return Vec4(rotx,roty,rotz);
 }
 
+Vec4 Matrix4x4::getRotationSetedQuaternion()
+{
+    float phi = rotx*M_PI/360.;
+    float theta = roty*M_PI/360.;
+    float psi = rotz*M_PI/360.;
+
+    Vec4 result;
+    result.x1 = cos(phi/2)*cos(theta/2)*cos(psi/2) + sin(phi/2)*sin(theta/2)*sin(psi/2);
+    result.x2 = sin(phi/2)*cos(theta/2)*cos(psi/2) - cos(phi/2)*sin(theta/2)*sin(psi/2);
+    result.x3 = cos(phi/2)*sin(theta/2)*cos(psi/2) + sin(phi/2)*cos(theta/2)*sin(psi/2);
+    result.x4 = cos(phi/2)*cos(theta/2)*sin(psi/2) - sin(phi/2)*sin(theta/2)*cos(psi/2);
+
+    return result;
+}
+
 Vec4 Matrix4x4::getScaleSeted()
 {
     return Vec4(scale_m[0],scale_m[5],scale_m[10]);

@@ -213,6 +213,11 @@ public:
     void drawFPS();
 private:
     MaterialPtr createMaterial();
+    void renderScene();
+    void renderSceneShadow();
+    void renderSceneWithShadow();
+    void RenderQuad();
+    void configureShaderAndMatrices();
     void prepareShaderProgram();
     void prepareVertexBuffers();
 
@@ -228,6 +233,11 @@ private:
     bool m_viewCenterFixed;
     float m_panAngle;
     float m_tiltAngle;
+
+    //shadow mapping
+
+    GLuint depthMapFBO;
+    GLuint depthMap;
 
     // Cube related members
     QMatrix4x4 m_modelMatrix;

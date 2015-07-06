@@ -26,7 +26,7 @@
 #include "graphics/ShaderPrimitives/cube.h"
 #include "graphics/ShaderPrimitives/material.h"
 #include "graphics/ShaderPrimitives/camera.h"
-
+#include "graphics/shader.h"
 
 // GLM Mathematics
 #include <glm/glm.hpp>
@@ -41,6 +41,10 @@
 #include <stdlib.h>
 
 #include <cmath>
+// Options
+GLboolean shadows = true;
+
+const GLuint SHADOW_WIDTH = 2*1024, SHADOW_HEIGHT = 2*1024;
 
 static int stencilReflection = 1, stencilShadow = 1;
 static int  renderReflection = 1;
@@ -54,6 +58,11 @@ GLfloat skinColor[] = {0.1, 1.0, 0.1, 1.0}, eyeColor[] = {1.0, 0.2, 0.2, 1.0};
 bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
+
+
+Shader debugDepthQuad("../shaders/debug_quad.vert", "../shaders/debug_quad_depth.frag");
+Shader simpleDepthShader("../shaders/shadow_mapping_depth.vert", "../shaders/shadow_mapping_depth.frag");
+Shader shader("../shaders/shadow_mapping.vs", "../shaders/shadow_mapping.frag");
 
 
 
@@ -176,6 +185,172 @@ MaterialPtr GLWidget::createMaterial()
     return material;
 }
 
+void GLWidget::renderScene()
+{
+    Matrix4x4 *transform = new Matrix4x4();
+    MaterialObj* mate = new MaterialObj();
+    mate->setMaterial(mate,MATERIAL_RUBY);
+    //transform->scale(0.5,0.5,0.5);
+    transform->setIdentity();
+//    scene->drawCylinder(transform,mate);
+//    transform->setIdentity();
+//    transform->scale(2,1.0,1.5);
+//    transform->translate(-2,1,0);
+    mate->setMaterial(mate,MATERIAL_COPPER);
+    scene->drawCube(transform,mate);
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(0,0,2.5);
+//    mate->setMaterial(mate,MATERIAL_EMERALD);
+//    scene->drawSphere(transform,mate);
+    transform->setIdentity();
+    transform->scale(20.0,1.0,20.0);
+    transform->translate(0.0,-1.0,0.0);
+    mate->setMaterial(mate,MATERIAL_GOLD);
+    scene->drawPlane(transform,mate);
+    delete transform;
+    delete mate;
+}
+
+void GLWidget::renderSceneShadow()
+{
+    Matrix4x4 *transform = new Matrix4x4();
+    MaterialObj* mate = new MaterialObj();
+    mate->setMaterial(mate,MATERIAL_RUBY);
+    //transform->scale(0.5,0.5,0.5);
+    transform->setIdentity();
+//    scene->drawCylinder(transform,mate);
+//    transform->setIdentity();
+//    transform->scale(2,1.0,1.5);
+//    transform->translate(-2,1,0);
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(0,1.5,0);
+    mate->setMaterial(mate,MATERIAL_RUBY);
+    scene->drawCubeShader(transform);
+
+
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(2,0,1);
+    mate->setMaterial(mate,MATERIAL_TURQUOSIE);
+    scene->drawCubeShader(transform);
+
+    transform->setIdentity();
+
+    //transform->scale(0.5,0.5,0.5);
+    //transform->setTranslate(Vec4(-1,0,2,1.0));
+
+    transform->scale(0.5,0.5,0.5);
+    transform->setRotationX(60);
+    transform->setRotationZ(60);
+    transform->setTranslate(Vec4(-1,0,2,1.0));
+
+    //transform->setRotationX(60);
+    //transform->setRotationZ(60);
+
+    mate->setMaterial(mate,MATERIAL_TURQUOSIE);
+    scene->drawCubeShader(transform);
+
+
+//    mate->setMaterial(mate,MATERIAL_EMERALD);
+//    scene->drawSphere(transform,mate);
+    transform->setIdentity();
+    transform->scale(25.0,1.0,25.0);
+    transform->translate(0.0,-0.5,0.0);
+    mate->setMaterial(mate,MATERIAL_GOLD);
+    scene->drawPlaneShader(transform);
+    delete transform;
+    delete mate;
+}
+
+void GLWidget::renderSceneWithShadow()
+{
+    Matrix4x4 *transform = new Matrix4x4();
+    MaterialObj* mate = new MaterialObj();
+    mate->setMaterial(mate,MATERIAL_RUBY);
+    //transform->scale(0.5,0.5,0.5);
+    transform->setIdentity();
+//    scene->drawCylinder(transform,mate);
+//    transform->setIdentity();
+//    transform->scale(2,1.0,1.5);
+//    transform->translate(-2,1,0);
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(0,1.5,0);
+    mate->setMaterial(mate,MATERIAL_RUBY);
+    scene->drawCubeShader2(transform,mate);
+
+
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(2,0,1);
+    mate->setMaterial(mate,MATERIAL_TURQUOSIE);
+    scene->drawCubeShader2(transform,mate);
+
+    transform->setIdentity();
+
+    transform->scale(0.5,0.5,0.5);
+    transform->setRotationX(60);
+    transform->setRotationZ(60);
+    transform->setTranslate(Vec4(-1,0,2,1.0));
+
+
+    //transform->setRotationX(60.f);
+    //transform->setRotationZ(60);
+
+
+
+
+    mate->setMaterial(mate,MATERIAL_TURQUOSIE);
+    scene->drawCubeShader2(transform,mate);
+
+
+//    mate->setMaterial(mate,MATERIAL_EMERALD);
+//    scene->drawSphere(transform,mate);
+    transform->setIdentity();
+    transform->scale(25.0,1.0,25.0);
+    transform->translate(0.0,-0.5,0.0);
+    mate->setMaterial(mate,MATERIAL_GOLD);
+    scene->drawPlaneShader2(transform,mate);
+    delete transform;
+    delete mate;
+}
+
+GLuint quadVAO = 0;
+GLuint quadVBO;
+void GLWidget::RenderQuad()
+{
+    if (quadVAO == 0)
+    {
+        GLfloat quadVertices[] = {
+            // Positions        // Texture Coords
+            -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+        };
+        // Setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+
+void GLWidget::configureShaderAndMatrices()
+{
+
+}
+
 void GLWidget::prepareShaderProgram()
 {
     // Load and compile the vertex shader
@@ -279,7 +454,7 @@ GLWidget::GLWidget(QWidget *parent) :
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
     glFormat.setSampleBuffers( true );
-    glFormat.setSamples(32);
+    glFormat.setSamples(16);
 
     this->setFormat(glFormat);
 
@@ -289,11 +464,7 @@ GLWidget::GLWidget(QWidget *parent) :
     m_camera->setUpVector( QVector3D( 0.0f, 1.0f, 0.0f ) );
 
 
-
-
-
-
-//    setFocusPolicy(Qt::StrongFocus);
+    setFocusPolicy(Qt::StrongFocus);
    glEnable(GL_LINE_SMOOTH);
     glEnable(GL_POLYGON_SMOOTH);
 ////    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
@@ -355,12 +526,12 @@ GLWidget::GLWidget(QWidget *parent) :
 void GLWidget::initializeGL()
 {
     // Create a material that performs multi-texturing
-    MaterialPtr material = createMaterial();
+//    MaterialPtr material = createMaterial();
 
-    // Create a cube and set the material on it
-    m_cube = new Cube( this );
-    m_cube->setMaterial( material );
-    m_cube->create();
+//    // Create a cube and set the material on it
+//    m_cube = new Cube( this );
+//    m_cube->setMaterial( material );
+//    m_cube->create();
 
 
     // Enable depth testing
@@ -371,6 +542,47 @@ void GLWidget::initializeGL()
     m_modelMatrix.setToIdentity();
     scene->initializeShaders();
 
+
+    glGenFramebuffers(1, &depthMapFBO);
+
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
+//        // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+//         GLuint FramebufferName = 0;
+//         glGenFramebuffers(1, &FramebufferName);
+//         glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+
+//         // Depth texture. Slower than a depth buffer, but you can sample it later in your shader
+//         GLuint depthTexture;
+//         glGenTextures(1, &depthTexture);
+//         glBindTexture(GL_TEXTURE_2D, depthTexture);
+//         glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT16, 1024, 1024, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+//         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+
+//         glDrawBuffer(GL_NONE); // No color buffer is drawn to.
+
+//         // Always check that our framebuffer is ok
+//         if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE);
 
 
 //    // Create a vertex array object (VAO) - more on this later!
@@ -490,6 +702,8 @@ void GLWidget::resizeGL(int w, int h)
 //    //printf("\nW %d H %d\n",w,h);
     float aspect = static_cast<float>( w ) / static_cast<float>( h );
     m_camera->setPerspectiveProjection( 30.0f, aspect, 0.1, 10000.0f );
+    scene->setWindow(w,h);
+
 
 }
 void GLWidget::drawScene(){
@@ -847,29 +1061,75 @@ void GLWidget::paintGL()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 
-    Matrix4x4 *transform = new Matrix4x4();
-    MaterialObj* mate = new MaterialObj();
-    mate->setMaterial(mate,MATERIAL_RUBY);
-    //transform->scale(0.5,0.5,0.5);
-    transform->setIdentity();
-    scene->drawCylinder(transform,mate);
-    transform->setIdentity();
-    transform->scale(2,1.0,1.5);
-    transform->translate(-2,1,0);
-    mate->setMaterial(mate,MATERIAL_COPPER);
-    scene->drawCube(transform,mate);
-    transform->setIdentity();
-    transform->scale(1.0,1.0,1.0);
-    transform->translate(0,0,2.5);
-    mate->setMaterial(mate,MATERIAL_EMERALD);
-    scene->drawSphere(transform,mate);
-    transform->setIdentity();
-    transform->scale(20.0,1.0,20.0);
-    transform->translate(0.0,-1.0,0.0);
-    mate->setMaterial(mate,MATERIAL_TURQUOSIE);
-    scene->drawPlane(transform,mate);
-    delete transform;
-    delete mate;
+//    // 1. Render depth of scene to texture (from light's perspective)
+//    // - Get light projection/view matrix.
+//    glm::mat4 lightProjection, lightView;
+//    glm::mat4 lightSpaceMatrix;
+//    GLfloat near_plane = 1.0f, far_plane = 7.5f;
+//    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+//    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(1.0));
+//    lightSpaceMatrix = lightProjection * lightView;
+//    // - render scene from light's point of view
+    //simpleDepthShader.Use();
+//    glUniformMatrix4fv(glGetUniformLocation(simpleDepthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+GLfloat near_plane = 1.0f, far_plane = 7.5f;
+glCullFace(GL_FRONT);
+
+//    renderScene();
+//    renderSceneShadow();
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        renderSceneShadow();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // 2. Render scene as normal
+    glViewport(0, 0, winWidth, winHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //shader.Use();
+
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, woodTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    renderSceneWithShadow();
+
+
+
+    glCullFace(GL_BACK);
+
+
+
+//    debugDepthQuad.Use();
+//    glUniform1f(glGetUniformLocation(debugDepthQuad.Program, "near_plane"), near_plane);
+//    glUniform1f(glGetUniformLocation(debugDepthQuad.Program, "far_plane"), far_plane);
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, depthMap);
+    //RenderQuad();
+
+
+
+
+
+
+//    // 1. first render to depth map
+//    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+//    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        configureShaderAndMatrices();
+        //renderScene();
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//    // 2. then render scene as normal with shadow mapping (using depth map)
+//    glViewport(0, 0, winWidth, winHeight);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    ConfigureShaderAndMatrices();
+//    glBindTexture(GL_TEXTURE_2D, depthMap);
+//    RenderScene();
+
+
+
+
 
 //    m_cube->material()->bind();
 //    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
@@ -974,7 +1234,7 @@ void GLWidget::paintGL()
     //glutSwapBuffers();
 
     //calculateFPS();
-
+    setScreenShot();
 
 }
 
@@ -1200,6 +1460,11 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         if(scene->getCharacter(0)->has_suitcase) scene->getCharacter(0)->deleteSuitcase();
         else  scene->getCharacter(0)->setSuitcase(3,mass_suitcase);
         updateJoints(scene->jointsScene());
+    }
+
+    if(event->key() == Qt::Key_S ){
+        setScreenShot(!screenshot);
+        return;
     }
 
     if(event->key() == Qt::Key_Space ){
