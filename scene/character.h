@@ -107,6 +107,7 @@ public:
 
     //desenho
     void           draw();
+    void           drawPreShadows();
     void           drawShadows();
     void           drawCOM(); //desenha a posição do centro de massa
     void           drawMoCap(bool b);

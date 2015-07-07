@@ -92,15 +92,28 @@ void Character::draw()
     drawCOMProjected();
 }
 
+void Character::drawPreShadows()
+{
+    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+    for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
+        (*it)->drawPreShadow();
+    }
+    for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
+        (*it)->drawPreShadow();
+    }
+
+}
+
 void Character::drawShadows()
 {
     if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+    for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
+        (*it)->drawShadow();
+    }
     for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
         (*it)->drawShadow();
     }
-    for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
-        (*it)->draw();
-    }
+
 
 }
 

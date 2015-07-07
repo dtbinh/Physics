@@ -9,7 +9,10 @@ public:
     float x1,x2,x3,x4;
 public:
     //construtor
-    Vec4(float x=0.0,float y=0.0,float z=0.0,float w=1.0);
+    Vec4();
+    Vec4(float x);
+    Vec4(float x,float y);
+    Vec4(float x,float y,float z,float w=1.0);
     //operadores
     bool                   operator == (Vec4 v);
     bool                   operator != (Vec4 v);

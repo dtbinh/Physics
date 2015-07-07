@@ -25,7 +25,6 @@ class Joint;
 class MatrixF;
 
 namespace Physics{
-
     //inicializadores do ode
     void nearCallback(void *data, GeomID o1, GeomID o2);
     void simSingleStep(Scene *scene);

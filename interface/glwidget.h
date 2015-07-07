@@ -139,6 +139,7 @@ public slots:
     void setShowGRF(bool b);
     void setShowMoCap(bool b);
     void drawScene();
+    void drawSceneOld();
     void drawParameters();
     void drawPoseProgression();
     void drawForceApply();

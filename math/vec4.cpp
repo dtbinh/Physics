@@ -1,5 +1,29 @@
 #include "vec4.h"
 
+Vec4::Vec4()
+{
+    this->x1 = 0;
+    this->x2 = 0;
+    this->x3 = 0;
+    this->x4 = 1.0;
+}
+
+Vec4::Vec4(float x1)
+{
+    this->x1 = x1;
+    this->x2 = x1;
+    this->x3 = x1;
+    this->x4 = 1.0;
+}
+
+Vec4::Vec4(float x1, float x2)
+{
+    this->x1 = x1;
+    this->x2 = x2;
+    this->x3 = 0;
+    this->x4 = 1.0;
+}
+
 Vec4::Vec4(float x1,float x2,float x3,float x4)
 {
     this->x1 = x1;

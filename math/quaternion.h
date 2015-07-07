@@ -40,7 +40,7 @@ class QuaternionQ
       QuaternionQ minusQuaternion(QuaternionQ quat); //menosq
       //calcula o menor arco (entre: this ate q ou this ate -q)
       QuaternionQ lessArc(QuaternionQ q); //menorArco
-      void setQuaternion(float r,float x, float y, float z);
+      void  setQuaternion(float r,float x, float y, float z);
       float getScalar();
       float getPosX();
       float getPosY();

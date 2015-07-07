@@ -135,5 +135,5 @@ CONFIG += release
 
 QT += xml
 
-QMAKE_CXXFLAGS += -fopenmp -ggdb
-QMAKE_LFLAGS +=  -fopenmp -ggdb
+QMAKE_CXXFLAGS += -fopenmp -ggdb -o3
+QMAKE_LFLAGS +=  -fopenmp -ggdb -o3

@@ -8,20 +8,21 @@ class GLWidget;
 #include "control/control.h"
 #include "character.h"
 #include "grf.h"
-
+#include <glm/glm.hpp>
 #include "control/pose.h"
 #include "control/graphicalpose.h"
 
 #include "graphics/ShaderPrimitives/material.h"
+#include "graphics/ShaderPrimitives/objloader.h"
 
 
 
-#ifndef FEEDBACKCONTACT_H
-#define FEEDBACKCONTACT_H
+//#ifndef FEEDBACKCONTACT_H
+//#define FEEDBACKCONTACT_H
 
 
 
-#endif
+//#endif
 
 class Ray;
 class MaterialObj;
@@ -30,6 +31,8 @@ class Cylinder;
 class Sphere;
 class Camera;
 class Plane;
+class ObjLoader;
+class Mesh;
 class Scene : public QGLWidget
 {
 private:
@@ -50,6 +53,7 @@ private:
     float          friction_foot_air;
     bool           is_ground_ice;
     Camera         *m_camera;
+    int            size_ground;
 
 
 
@@ -59,6 +63,13 @@ private:
     Cylinder       *m_cylinder;
     Plane          *m_plane;
     QMatrix4x4     m_modelMatrix;
+    ObjLoader      m_objload;
+    Mesh           *m_object;
+
+    //iluminação
+    glm::vec3 lightPos;
+    glm::vec3 lightPosUp;
+    float near_plane, far_plane;
 
 
     //interface
@@ -105,6 +116,30 @@ public:
     void        drawCube(Matrix4x4* transform, MaterialObj *mat);
     void        drawCubeShader(Matrix4x4* transform);
     void        drawCubeShader2(Matrix4x4* transform,MaterialObj *mat);
+
+    void        drawMesh();
+    void        drawMeshShader(Matrix4x4* transform);
+
+    // externo
+    void        drawMesh(Vec4 position, QuaternionQ quat, MaterialObj* mat, Mesh *m_obj);
+    void        drawMeshPreShadow(Vec4 position, QuaternionQ quat, Mesh *m_obj);
+    void        drawMeshShadow(Vec4 position, QuaternionQ quat, MaterialObj* mat, Mesh *m_obj);
+
+    void        drawCube(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj* mat);
+    void        drawCubePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat);
+    void        drawCubeShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj* mat);
+
+    void        drawSphere(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj* mat);
+    void        drawSpherePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat);
+    void        drawSphereShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj* mat);
+
+    void        drawPlane(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj* mat);
+    void        drawPlanePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat);
+    void        drawPlaneShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj* mat);
+
+    // --- externo
+
+    void        drawMeshShader2(Matrix4x4* transform,MaterialObj *mat);
 
 
 
@@ -249,6 +284,7 @@ public:
     void                   draw(); //desenha os objetos e/ou juntas com OpenGL
     void                   drawGRF(bool b); //desenha os objetos e/ou juntas com OpenGL
     void                   drawShadows(); //desenha os objetos e/ou juntas com OpenGL
+    void                   drawPreShadows(); //desenha os objetos e/ou juntas com OpenGL
     void                   loadSceneObjects();
     void                   setRenderMesh(bool b);
 

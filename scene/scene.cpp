@@ -20,8 +20,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-glm::vec3 lightPos(-2.0f, 4.0f, -1.0f);
-glm::vec3 lightPosUp(0.f,1.f,0.f);
+
+
 
 //shaders
 #include <QOpenGLContext>
@@ -32,6 +32,8 @@ glm::vec3 lightPosUp(0.f,1.f,0.f);
 #include "graphics/ShaderPrimitives/sphere.h"
 #include "graphics/ShaderPrimitives/cylinder.h"
 #include "graphics/ShaderPrimitives/plane.h"
+#include "graphics/ShaderPrimitives/objloader.h"
+#include "graphics/ShaderPrimitives/mesh.h"
 
 
 bool apply = true;
@@ -50,7 +52,7 @@ Scene::Scene(GLWidget *parent)
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
     glFormat.setSampleBuffers( true );
-    glFormat.setSamples(32);
+    glFormat.setSamples(4);
 
     this->setFormat(glFormat);
 
@@ -76,6 +78,14 @@ Scene::Scene(GLWidget *parent)
     this->viewer[0] = Vec4(0,1,5);
     this->viewer[1] = Vec4(0,1,0);
     this->viewer[2] = Vec4(0,1,0);
+
+    lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
+    lightPosUp = glm::vec3(0.f,1.f,1.f);
+
+    near_plane = 1.0f;
+    far_plane = 17.5f;
+
+    size_ground = 10;
 
 
 
@@ -105,12 +115,25 @@ void Scene::initializeShaders()
     MaterialPtr materialtex2 = createTextureMaterial("../texture/awesomeface.png");
 
 
+    //m_objload = new ObjLoader();
+
+
+    m_objload.setLoadTextureCoordinatesEnabled(false);
+    m_objload.setTangentGenerationEnabled(false);
+    m_objload.setMeshCenteringEnabled(true);
+    m_objload.load("../objs/chara/Torax.obj");
+
+    m_object = new Mesh(this);
+    m_object->setMaterial(material);
+    m_object->setMeshData(m_objload);
+
+
     m_cube = new Cube(this);
     m_cube->setMaterial( material );
     m_cube->create();
 
     m_sphere = new Sphere(this);
-    m_sphere->setMaterial( materialtex );
+    m_sphere->setMaterial( material );
     m_sphere->create();
 
     m_cylinder = new Cylinder(this);
@@ -422,7 +445,7 @@ void Scene::drawCubeShader2(Matrix4x4 *transform, MaterialObj *mat)
     lightSpaceMatrix = lightProjection * lightView;
 
 
-    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
     glm::mat4 view = m_camera->GetViewMatrix();
     glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -480,6 +503,807 @@ void Scene::drawCubeShader2(Matrix4x4 *transform, MaterialObj *mat)
     // Let the mesh setup the remainder of its state and draw itself
     m_cube->render();
     m_cube->setMaterial(old);
+}
+
+void Scene::drawMesh()
+{
+    m_object->material()->bind();
+
+    QOpenGLShaderProgramPtr shader = m_object->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    //lembrar de multiplicar a posição da luz pelo modelViewMatrix
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( 15.0f, 15.0f, 15.0f, 1.0f ) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+    // Set the material properties
+    shader->setUniformValue( "material.ka", QVector3D( 0.1f, 0.1f, 0.3f ) );
+    shader->setUniformValue( "material.kd", QVector3D( 0.0f, 0.2f, 0.9f ) );
+    shader->setUniformValue( "material.ks", QVector3D( 0.4f, 0.4f, 0.4f ) );
+    shader->setUniformValue( "material.shininess", 20.0f );
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_object->render();
+}
+
+void Scene::drawMeshShader(Matrix4x4 *transform)
+{
+    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+    MaterialPtr old = m_object->material();
+    m_object->setMaterial(material);
+    m_object->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_object->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    Vec4 translate = transform->getTranslateSeted();
+    Vec4 scale     = transform->getScaleSeted();
+    Vec4 rotate  = transform->getRotationSetedQuaternion();
+
+
+//    printf("\nBegin ------- \n");
+
+//    transform->showMatrix4x4();
+
+
+    QQuaternion rot(rotate.x(),rotate.y(),rotate.z(),rotate.w());
+    m_modelMatrix.translate(translate.x(),translate.y(),translate.z());
+    m_modelMatrix.scale(scale.x(),scale.y(),scale.z());
+    m_modelMatrix.rotate(rot);
+
+
+//    printf("\n");
+
+//    for (int i=0;i<4;i++){
+//        for (int j=0;j<4;j++)
+//              printf("%d -  %.3f ",(4*i)+j,m_modelMatrix.data()[(4*i)+j]);
+//        printf("\n");
+//    }
+
+//    printf("\nEnd ------- \n");
+    //qDebug() << m_modelMatrix.data();
+
+
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    //QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    //QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+//    float dArray[16] = {0.0};
+
+//    //const float *pSource = (const float*) glm::value_ptr(lightSpaceMatrix);
+//    for (int i = 0; i < 16; ++i)
+//        dArray[i] = pSource[i];
+
+
+
+//    QMatrix4x4 lightSpace(dArray);
+
+    // - render scene from light's point of view
+    //simpleDepthShader.Use();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+
+
+
+
+
+
+    //m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    //shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+//    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( 5.0f, 5.0f, -5.0f, 1.0f) );
+//    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+//    // Set the material properties
+//    Vec4 amb = mat->ambientMaterial();
+//    Vec4 diff = mat->diffuseMaterial();
+//    Vec4 spe = mat->specularMaterial();
+//    float shine = mat->shininessMaterial();
+
+
+//    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+//    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+//    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+//    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_object->render();
+    m_object->setMaterial(old);
+}
+
+void Scene::drawMesh(Vec4 position, QuaternionQ quat, MaterialObj *mat, Mesh *m_obj)
+{
+    m_obj->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_obj->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+
+
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * m_modelMatrix;
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp);
+
+//    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D(lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+//    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    m_obj->render();
+}
+
+void Scene::drawMeshPreShadow(Vec4 position, QuaternionQ quat, Mesh *m_obj)
+{
+    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+    MaterialPtr old = m_obj->material();
+    m_obj->setMaterial(material);
+    m_obj->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_obj->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+
+
+
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    //QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    //QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+//    float dArray[16] = {0.0};
+
+//    //const float *pSource = (const float*) glm::value_ptr(lightSpaceMatrix);
+//    for (int i = 0; i < 16; ++i)
+//        dArray[i] = pSource[i];
+
+
+
+//    QMatrix4x4 lightSpace(dArray);
+
+    // - render scene from light's point of view
+    //simpleDepthShader.Use();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+
+
+
+
+
+
+    //m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    //shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+    m_obj->render();
+    m_obj->setMaterial(old);
+}
+
+void Scene::drawMeshShadow(Vec4 position, QuaternionQ quat, MaterialObj *mat, Mesh *m_obj)
+{
+    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+    MaterialPtr old = m_obj->material();
+    m_obj->setMaterial(material);
+    m_obj->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_obj->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
+    glm::mat4 view = m_camera->GetViewMatrix();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    // Set light uniforms
+    glUniform3fv(glGetUniformLocation(shader->programId(), "lightPos"), 1, &lightPos[0]);
+    glUniform3fv(glGetUniformLocation(shader->programId(), "viewPos"), 1, &m_camera->position()[0]);
+
+    glUniform1i(glGetUniformLocation(shader->programId(), "shadows"), true);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+
+
+
+
+
+
+    //m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_obj->render();
+    m_obj->setMaterial(old);
+}
+
+void Scene::drawCube(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
+{
+    m_cube->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),prop.y(),prop.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_cube->render();
+}
+
+void Scene::drawCubePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat)
+{
+    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+    MaterialPtr old = m_cube->material();
+    m_cube->setMaterial(material);
+    m_cube->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),prop.y(),prop.z());
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    // Let the mesh setup the remainder of its state and draw itself
+    m_cube->render();
+    m_cube->setMaterial(old);
+}
+
+void Scene::drawCubeShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
+{
+    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+    MaterialPtr old = m_cube->material();
+    m_cube->setMaterial(material);
+    m_cube->material()->bind();
+    QOpenGLShaderProgramPtr shader =  m_cube->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),prop.y(),prop.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    //QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
+    glm::mat4 view = m_camera->GetViewMatrix();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    // Set light uniforms
+    glUniform3fv(glGetUniformLocation(shader->programId(), "lightPos"), 1, &lightPos[0]);
+    glUniform3fv(glGetUniformLocation(shader->programId(), "viewPos"), 1, &m_camera->position()[0]);
+    //glUniformMatrix4fv(glGetUniformLocation(shader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+    // Enable/Disable shadows by pressing 'SPACE'
+    glUniform1i(glGetUniformLocation(shader->programId(), "shadows"), true);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+     m_cube->render();
+     m_cube->setMaterial(old);
+}
+
+void Scene::drawSphere(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
+{
+    m_sphere->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_sphere->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),prop.y(),prop.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_sphere->render();
+}
+
+void Scene::drawSpherePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat)
+{
+    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+    MaterialPtr old = m_sphere->material();
+    m_sphere->setMaterial(material);
+    m_sphere->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_sphere->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),prop.y(),prop.z());
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    // Let the mesh setup the remainder of its state and draw itself
+    m_sphere->render();
+    m_sphere->setMaterial(old);
+}
+
+void Scene::drawSphereShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
+{
+    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+    MaterialPtr old = m_sphere->material();
+    m_sphere->setMaterial(material);
+    m_sphere->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_sphere->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),prop.y(),prop.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    //QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
+    glm::mat4 view = m_camera->GetViewMatrix();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    // Set light uniforms
+    glUniform3fv(glGetUniformLocation(shader->programId(), "lightPos"), 1, &lightPos[0]);
+    glUniform3fv(glGetUniformLocation(shader->programId(), "viewPos"), 1, &m_camera->position()[0]);
+    //glUniformMatrix4fv(glGetUniformLocation(shader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+    // Enable/Disable shadows by pressing 'SPACE'
+    glUniform1i(glGetUniformLocation(shader->programId(), "shadows"), true);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_sphere->render();
+    m_sphere->setMaterial(old);
+}
+
+void Scene::drawPlane(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
+{
+    m_plane->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_plane->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),1.0,prop.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "modelViewMatrix", modelViewMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    shader->setUniformValue( "mvp", mvp );
+
+    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_plane->render();
+}
+
+void Scene::drawPlanePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat)
+{
+    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+    MaterialPtr old = m_plane->material();
+    m_plane->setMaterial(material);
+    m_plane->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_plane->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),1.0,prop.z());
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    // Let the mesh setup the remainder of its state and draw itself
+    m_plane->render();
+    m_plane->setMaterial(old);
+}
+
+void Scene::drawPlaneShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
+{
+    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+    MaterialPtr old = m_plane->material();
+    m_plane->setMaterial(material);
+    m_plane->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_plane->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+    m_modelMatrix.translate(position.x(),position.y(),position.z());
+    m_modelMatrix.rotate(QQuaternion(quat.qw(),quat.qx(),quat.qy(),quat.qz()));
+    m_modelMatrix.scale(prop.x(),1.0,prop.z());
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+    //QMatrix4x4 mvp = m_camera->viewProjectionMatrix() * modelViewMatrix;
+
+    // 1. Render depth of scene to texture (from light's perspective)
+    // - Get light projection/view matrix.
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
+    glm::mat4 view = m_camera->GetViewMatrix();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    // Set light uniforms
+    glUniform3fv(glGetUniformLocation(shader->programId(), "lightPos"), 1, &lightPos[0]);
+    glUniform3fv(glGetUniformLocation(shader->programId(), "viewPos"), 1, &m_camera->position()[0]);
+    //glUniformMatrix4fv(glGetUniformLocation(shader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+    // Enable/Disable shadows by pressing 'SPACE'
+    glUniform1i(glGetUniformLocation(shader->programId(), "shadows"), true);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_plane->render();
+    m_plane->setMaterial(old);
+}
+
+void Scene::drawMeshShader2(Matrix4x4 *transform, MaterialObj *mat)
+{
+    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+    MaterialPtr old = m_object->material();
+    m_object->setMaterial(material);
+    m_object->material()->bind();
+    QOpenGLShaderProgramPtr shader = m_object->material()->shader();
+
+    m_modelMatrix.setToIdentity();
+
+    Vec4 translate = transform->getTranslateSeted();
+    Vec4 scale     = transform->getScaleSeted();
+    Vec4 rotate  = transform->getRotationSetedQuaternion();
+
+
+    QQuaternion rot(rotate.x(),rotate.y(),rotate.z(),rotate.w());
+    m_modelMatrix.translate(translate.x(),translate.y(),translate.z());
+    m_modelMatrix.scale(scale.x(),scale.y(),scale.z());
+    m_modelMatrix.rotate(rot);
+
+
+    QMatrix4x4 modelViewMatrix = m_camera->viewMatrix() * m_modelMatrix;
+    QMatrix3x3 normalMatrix = modelViewMatrix.normalMatrix();
+
+    glm::mat4 lightProjection, lightView;
+    glm::mat4 lightSpaceMatrix;
+    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+    lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
+    lightSpaceMatrix = lightProjection * lightView;
+
+
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
+    glm::mat4 view = m_camera->GetViewMatrix();
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+    // Set light uniforms
+    glUniform3fv(glGetUniformLocation(shader->programId(), "lightPos"), 1, &lightPos[0]);
+    glUniform3fv(glGetUniformLocation(shader->programId(), "viewPos"), 1, &m_camera->position()[0]);
+
+    glUniform1i(glGetUniformLocation(shader->programId(), "shadows"), true);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+
+
+
+
+
+
+
+    //m_camera->setStandardUniforms( shader, m_modelMatrix );
+
+    shader->setUniformValue( "model", m_modelMatrix );
+    shader->setUniformValue( "normalMatrix", normalMatrix );
+    //shader->setUniformValue( "lightSpaceMatrix ", lightSpace  );
+    shader->setUniformValue( "projectionMatrix", m_camera->projectionMatrix() );
+    //shader->setUniformValue( "mvp", mvp );
+
+//    // Set the lighting parameters
+    shader->setUniformValue( "light.position", modelViewMatrix * QVector4D( lightPos[0], lightPos[1], lightPos[2], 1.0f) );
+    shader->setUniformValue( "light.intensity", QVector3D( 1.0f, 1.0f, 1.0f ) );
+
+
+    // Set the material properties
+    Vec4 amb = mat->ambientMaterial();
+    Vec4 diff = mat->diffuseMaterial();
+    Vec4 spe = mat->specularMaterial();
+    float shine = mat->shininessMaterial();
+
+
+    shader->setUniformValue( "material.ka", QVector3D( amb.x(), amb.y(), amb.z() ) );
+    shader->setUniformValue( "material.kd", QVector3D( diff.x(), diff.y(), diff.z() ) );
+    shader->setUniformValue( "material.ks", QVector3D( spe.x(), spe.y(), spe.z() ) );
+    shader->setUniformValue( "material.shininess", shine*128);
+
+    // Let the mesh setup the remainder of its state and draw itself
+    m_object->render();
+    m_object->setMaterial(old);
 }
 
 void Scene::drawSphere()
@@ -747,7 +1571,7 @@ void Scene::drawPlaneShader(Matrix4x4 *transform)
     // - Get light projection/view matrix.
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
     lightSpaceMatrix = lightProjection * lightView;
@@ -834,7 +1658,7 @@ void Scene::drawPlaneShader2(Matrix4x4 *transform, MaterialObj *mat)
 
 
 
-    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
     glm::mat4 view = m_camera->GetViewMatrix();
     glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -1126,6 +1950,10 @@ void Scene::draw()
             }
         objs.clear();
     }
+    MaterialObj* mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,MATERIAL_BRASS);
+    drawPlane(Vec4(),Vec4(size_ground),QuaternionQ(rotate_plane),mat);
+    delete mat;
 
 //    if (show_grf)
 //    if (characters.size()>0){
@@ -1154,11 +1982,31 @@ void Scene::drawGRF(bool b)
 
 void Scene::drawShadows()
 {
+    MaterialObj* mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,MATERIAL_BRASS);
+    drawPlaneShadow(Vec4(),Vec4(size_ground),QuaternionQ(rotate_plane),mat);
+    delete mat;
+
     for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
-        (*it)->draw();
+        (*it)->drawShadow();
     }
     for(std::vector<Character*>::iterator it = characters.begin(); it!= characters.end(); it++){
         (*it)->drawShadows();
+    }
+
+
+
+
+}
+
+void Scene::drawPreShadows()
+{
+    drawPlanePreShadow(Vec4(),Vec4(size_ground),QuaternionQ(rotate_plane));
+    for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
+        (*it)->drawPreShadow();
+    }
+    for(std::vector<Character*>::iterator it = characters.begin(); it!= characters.end(); it++){
+        (*it)->drawPreShadows();
     }
 
 

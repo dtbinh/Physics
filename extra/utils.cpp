@@ -861,6 +861,7 @@ bool Utils::loadSimulationConfig(Scene *scene, const string &fileName)
     QDomElement root = doc.documentElement();
     if( root.tagName() != "SimulationScene" )
         return false;
+
     scene->clear();
 
     scene->initPhysics();

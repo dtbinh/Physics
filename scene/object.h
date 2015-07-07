@@ -6,12 +6,14 @@
 #include "math/vec4.h"
 #include "math/quaternion.h"
 #include "extra/ObjMesh.h"
+#include "graphics/ShaderPrimitives/objloader.h"
 
 class Ray;
 class MaterialObj;
 class Matrix4x4;
 class MatrixF;
 class MeshObj;
+class Mesh;
 
 #define TYPE_CUBE      dBoxClass
 #define TYPE_CYLINDER  dCylinderClass
@@ -29,7 +31,7 @@ private:
     bool         bodyBalance;
     bool         isFoot;
     QString      objFile;
-    ObjMesh      *objMesh;
+    //ObjMesh      *objMesh;
     bool         rendermesh;
 
     // --------Physics
@@ -47,6 +49,10 @@ private:
     int          id_material;
     float        fmass;                                                   //massa em float na inicialização
     MeshObj*        mesh;
+
+    // --------Geometry Shadow
+    ObjLoader      m_objload;
+    Mesh           *m_object;
 
     // --------Strategy Equilibrium
     float        compensable;
@@ -119,12 +125,13 @@ public:
     // --------Geometry
     void        setMaterial(int);                                          //aplica um determinado material pré-determinado ao objeto
     int         getIntMaterial();
-    MeshObj *getMesh();                                                 //extraí a malha do objeto
-    Matrix4x4*  getMatrixTransformation();                                 //extraí a matriz de transformação do objeto (corrente)
+    MeshObj     *getMesh();                                                 //extraí a malha do objeto
+    Matrix4x4   *getMatrixTransformation();                                 //extraí a matriz de transformação do objeto (corrente)
     Matrix4x4   getMatrixTransformationODE();                                 //extraí a matriz de transformação do objeto (corrente)
     void        setMaterial(Vec4 amb,Vec4 diff,Vec4 spe,float shininess);  //inclui propriedades de material ao objeto
     void        wireframe();                                               //desenha o objeto como wireframe
     void        draw(bool wire=false);                                                    //desenha o objeto
+    void        drawPreShadow();
     void        drawShadow();                                                    //desenha o objeto
     void        draw(Vec4 position,QuaternionQ q,int mat=-1);
     Vec4        getProperties();                                           //extraí propriedades de escala do objeto

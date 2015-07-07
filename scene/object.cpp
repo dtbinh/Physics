@@ -7,6 +7,7 @@
 #include "math/matrix.h"
 #include "control/sensor.h"
 #include "math/ray.h"
+#include "graphics/ShaderPrimitives/mesh.h"
 
 
 //calculo para interseção ray-plane limitado
@@ -50,6 +51,7 @@ Object::Object()
     this->chara = NULL;
     this->objFile = "";
     this->rendermesh = false;
+    this->m_object = NULL;
 
 
 }
@@ -118,7 +120,7 @@ Object::~Object()
     delete this->scene;
     delete this->mass;
     delete this->material;
-    delete this->objMesh;
+    //delete this->objMesh;
 }
 
 //---------------------Scene
@@ -164,7 +166,16 @@ void Object::setObjFile(QString obj)
 {
 
     this->objFile = obj;
-    objMesh = new ObjMesh(obj.toStdString());
+    m_objload.setLoadTextureCoordinatesEnabled(false);
+    m_objload.setTangentGenerationEnabled(false);
+    m_objload.load(this->objFile);
+    m_object = new Mesh(this);
+
+    m_object->setMaterial(scene->createMaterial());
+
+    //m_object->setMaterial(material);
+    m_object->setMeshData(m_objload);
+    //objMesh = new ObjMesh(obj.toStdString());
 }
 
 QString Object::getObjFile()
@@ -479,12 +490,14 @@ void Object::draw(bool wire)
     switch (this->type){
     case TYPE_CUBE:{
             if (wire){
-                Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(1,0,0));
+                //Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(1,0,0));
                 if(objFile.isEmpty() || !rendermesh){
-                    Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+                    scene->drawCube(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+                    //Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
                 }else{
                     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-                    Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+                    scene->drawMesh(getPositionCurrent(),getRotationCurrent(),material,m_object);
+                    //Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
                     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
                 }
             }
@@ -496,15 +509,50 @@ void Object::draw(bool wire)
 //                }else{
 
                 if(objFile.isEmpty() || !rendermesh){
-                    Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+                    scene->drawCube(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+                    //Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
                 }else{
-                    Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+
+                    scene->drawMesh(getPositionCurrent(),getRotationCurrent(),material,m_object);
+                    //Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
                 }
 
 //                }
             }
             //if(this->selected) Draw::drawSelection(getMatrixTransformation(),this->properties);
             //if(this->isFoot) Draw::drawSelection(getMatrixTransformation(),this->properties,Vec4(0,0,1));
+            break;
+        }
+    case TYPE_CYLINDER:{
+            Draw::drawCylinder(getMatrixTransformation(),this->material);
+            break;
+        }
+    case TYPE_SPHERE:{
+            Draw::drawSphere(getMatrixTransformation(),this->material,properties.x());
+            break;
+        }
+    }
+}
+
+void Object::drawPreShadow()
+{
+    if (this->geometry==0) return;
+    if(has_cup) Draw::drawCoffeeCup(getPositionCurrent(),MATERIAL_WHITE_PLASTIC,QuaternionQ(Vec4(-90,0,0))*getRotationCurrent().conjugate());
+    if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
+//    if (show_effector && show_target){
+//        if(enabled_cpdp) Draw::drawLine(target,getPositionCurrent(),Vec4(0,.9,0),1.4);
+//        else Draw::drawLine(target,getPositionCurrent(),Vec4(0.9,0,0),1.4);
+//    }
+
+    switch (this->type){
+    case TYPE_CUBE:{
+        if(objFile.isEmpty() || !rendermesh){
+            scene->drawCubePreShadow(getPositionCurrent(),this->properties,getRotationCurrent());
+            //Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+        }else{
+            scene->drawMeshPreShadow(getPositionCurrent(),getRotationCurrent(),m_object);
+            //Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+        }
             break;
         }
     case TYPE_CYLINDER:{
@@ -531,9 +579,11 @@ void Object::drawShadow()
     switch (this->type){
     case TYPE_CUBE:{
         if(objFile.isEmpty() || !rendermesh){
-            Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
+            scene->drawCubeShadow(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+            //Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
         }else{
-            Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
+            scene->drawMeshShadow(getPositionCurrent(),getRotationCurrent(),material,m_object);
+            //Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
         }
             break;
         }
@@ -578,15 +628,19 @@ void Object::draw(Vec4 position, QuaternionQ q, int mat)
     case TYPE_CUBE:{
         if(mat==-1){
             if(objFile.isEmpty() || !rendermesh)
-              Draw::drawCube(transform,this->properties,mat);
+                scene->drawCube(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+              //Draw::drawCube(transform,this->properties,mat);
             else{
-              Draw::drawObj(transform,this->id_material,objMesh);
+                scene->drawMesh(getPositionCurrent(),getRotationCurrent(),material,m_object);
+              //Draw::drawObj(transform,this->id_material,objMesh);
              }
         }else{
             if(objFile.isEmpty() || !rendermesh)
-                Draw::drawCube(transform,this->properties,mat);
+                scene->drawCube(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+                //Draw::drawCube(transform,this->properties,mat);
             else{
-                Draw::drawObj(transform,mat,objMesh);
+                scene->drawMesh(getPositionCurrent(),getRotationCurrent(),material,m_object);
+                //Draw::drawObj(transform,mat,objMesh);
             }
             break;
         }

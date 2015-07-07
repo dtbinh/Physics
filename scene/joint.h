@@ -80,6 +80,8 @@ public:
     //-------Graphics
 
     void draw();
+    void drawShadow();
+    void drawPreShadow();
 };
 
 #endif // JOINT_H

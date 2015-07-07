@@ -44,7 +44,6 @@
 // Options
 GLboolean shadows = true;
 
-const GLuint SHADOW_WIDTH = 2*1024, SHADOW_HEIGHT = 2*1024;
 
 static int stencilReflection = 1, stencilShadow = 1;
 static int  renderReflection = 1;
@@ -59,7 +58,7 @@ bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
 
-
+const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 Shader debugDepthQuad("../shaders/debug_quad.vert", "../shaders/debug_quad_depth.frag");
 Shader simpleDepthShader("../shaders/shadow_mapping_depth.vert", "../shaders/shadow_mapping_depth.frag");
 Shader shader("../shaders/shadow_mapping.vs", "../shaders/shadow_mapping.frag");
@@ -227,14 +226,29 @@ void GLWidget::renderSceneShadow()
     transform->scale(1.0,1.0,1.0);
     transform->translate(0,1.5,0);
     mate->setMaterial(mate,MATERIAL_RUBY);
-    scene->drawCubeShader(transform);
+    //scene->drawCubeShader(transform);
+    scene->drawCubePreShadow(Vec4(0,1.5,0),Vec4(1.0),QuaternionQ());
+
+    transform->setIdentity();
+    transform->scale(4.0,4.0,4.0);
+    transform->translate(1,1.5,-2.0);
+    mate->setMaterial(mate,MATERIAL_CHROME);
+    scene->drawMeshShader(transform);
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(0,2.0,-2);
+    mate->setMaterial(mate,MATERIAL_CHROME);
+    scene->drawMeshShader(transform);
+    //scene->drawMeshPreShadow(Vec4(1,1.5,-2),Vec4(1.0),QuaternionQ());
+    //scene->drawMeshPreShadow(Vec4(0,2.0,-2),Vec4(1.0),QuaternionQ());
 
 
     transform->setIdentity();
     transform->scale(1.0,1.0,1.0);
     transform->translate(2,0,1);
     mate->setMaterial(mate,MATERIAL_TURQUOSIE);
-    scene->drawCubeShader(transform);
+    //scene->drawCubeShader(transform);
+    scene->drawCubePreShadow(Vec4(2,0,1),Vec4(1.0),QuaternionQ());
 
     transform->setIdentity();
 
@@ -279,14 +293,30 @@ void GLWidget::renderSceneWithShadow()
     transform->scale(1.0,1.0,1.0);
     transform->translate(0,1.5,0);
     mate->setMaterial(mate,MATERIAL_RUBY);
-    scene->drawCubeShader2(transform,mate);
+    //scene->drawCubeShader2(transform,mate);
+    scene->drawCubeShadow(Vec4(0,1.5,0),Vec4(1.0),QuaternionQ(),mate);
+
+    transform->setIdentity();
+    transform->scale(4.0,4.0,4.0);
+    transform->translate(1,1.5,-2.0);
+    mate->setMaterial(mate,MATERIAL_CHROME);
+    scene->drawMeshShader2(transform,mate);
+
+    transform->setIdentity();
+    transform->scale(1.0,1.0,1.0);
+    transform->translate(0,2.0,-2);
+    mate->setMaterial(mate,MATERIAL_CHROME);
+    scene->drawMeshShader2(transform,mate);
+    //scene->drawMeshShadow(Vec4(1,1.5,-2),Vec4(1.0),QuaternionQ(),mate);
+    //scene->drawMeshShadow(Vec4(0,2.0,-2),Vec4(1.0),QuaternionQ(),mate);
 
 
     transform->setIdentity();
     transform->scale(1.0,1.0,1.0);
     transform->translate(2,0,1);
     mate->setMaterial(mate,MATERIAL_TURQUOSIE);
-    scene->drawCubeShader2(transform,mate);
+    //scene->drawCubeShader2(transform,mate);
+    scene->drawCubeShadow(Vec4(2,0,1),Vec4(1.0),QuaternionQ(),mate);
 
     transform->setIdentity();
 
@@ -451,10 +481,11 @@ GLWidget::GLWidget(QWidget *parent) :
 {
 
     QGLFormat glFormat;
+    glFormat.setDepthBufferSize( 24 );
     glFormat.setVersion( 3, 3 );
     glFormat.setProfile( QGLFormat::CoreProfile ); // Requires >=Qt-4.8.0
     glFormat.setSampleBuffers( true );
-    glFormat.setSamples(16);
+    glFormat.setSamples(4);
 
     this->setFormat(glFormat);
 
@@ -485,27 +516,27 @@ GLWidget::GLWidget(QWidget *parent) :
 //    //simTimer->start(0);
 //    //simTimer->setInterval(0);
 
-//    move = false;
-//    sim_pause = false;
-//    capture_pause = true;
-//    editing_frame = false;
-//    frame_edit = 0;
-//    show_character = true;
-//    load_exemple_curve = false;
-//    showInfo = false;
-//    screenshot = false;
-//    frames = 0;
-//    time_current = 0;
-//    updateKsProp(scene->getProportionalKsPD());
-//    updateKdProp(scene->getProportionalKdPD());
-//    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
-//    density = 0.5; //massa
-//    velocity = 5.;
+    move = false;
+    sim_pause = false;
+    capture_pause = true;
+    editing_frame = false;
+    frame_edit = 0;
+    show_character = false;
+    load_exemple_curve = false;
+    showInfo = false;
+    screenshot = false;
+    frames = 0;
+    time_current = 0;
+    updateKsProp(scene->getProportionalKsPD());
+    updateKdProp(scene->getProportionalKdPD());
+    updateBalancePD(scene->getKsTorqueBalance(),scene->getKdTorqueBalance(),scene->getKsForceBalance(),scene->getKdForceBalance(),scene->getKMomLinearBalance(),scene->getKMomAngularBalance());
+    density = 0.5; //massa
+    velocity = 5.;
 
-//    mass_suitcase = 1.0;
-//    has_ball_shot = false;
-//    ball_shot_debug = Vec4();
-//    frames_force = 6;
+    mass_suitcase = 1.0;
+    has_ball_shot = false;
+    ball_shot_debug = Vec4();
+    frames_force = 6;
 
 
 
@@ -534,8 +565,7 @@ void GLWidget::initializeGL()
 //    m_cube->create();
 
 
-    // Enable depth testing
-    glEnable( GL_DEPTH_TEST );
+
 
     // Set the clear color to white
     glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
@@ -560,6 +590,9 @@ void GLWidget::initializeGL()
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    //glEnable(GL_CULL_FACE | GL_CULL_FACE_MODE);
+    // Enable depth testing
+    glEnable( GL_DEPTH_TEST );
 
 
 //        // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
@@ -701,54 +734,188 @@ void GLWidget::resizeGL(int w, int h)
 //    scene->setWindow(w,h);
 //    //printf("\nW %d H %d\n",w,h);
     float aspect = static_cast<float>( w ) / static_cast<float>( h );
-    m_camera->setPerspectiveProjection( 30.0f, aspect, 0.1, 10000.0f );
+    m_camera->setPerspectiveProjection( 30.0f, aspect, 0.1, 1000.0f );
     scene->setWindow(w,h);
 
 
 }
 void GLWidget::drawScene(){
-    //determinação da camera
-
-    const float ar = winWidth>0 ? (float) winWidth / (float) winHeight : 1.0;
-    glViewport(0, 0, winWidth, winHeight);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
-    gluPerspective(30.,ar,0.001,1200000.);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glPushMatrix();
-
-        glTranslated(-0.20,-0.135,-0.6);
-        gluLookAt(cam->eye.x(),cam->eye.y(),cam->eye.z(), cam->at.x(),cam->at.y(),cam->at.z(), cam->up.x(),cam->up.y(),cam->up.z());
-        scene->setViewer(cam->eye,cam->at,cam->up);
-        glTranslated(cam->eye.x(),cam->eye.y(),cam->eye.z());
-        Draw::drawAxisCameraView(0.02);
-    glPopMatrix();
-    glPushMatrix();
 
 
-    glColor3f(1,1,0);
-    QString text = QString("Lock Axis: ");
-    if(cam->axis_x)
-        text += "x ";
-    if(cam->axis_y)
-        text += "y ";
-    if(cam->axis_z)
-        text += "z ";
-    if(cam->axis_x || cam->axis_y || cam->axis_z)
+    if (shadow && show_character){
 
-        renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCullFace(GL_FRONT);
+            glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+            glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+                glClear(GL_DEPTH_BUFFER_BIT);
+                scene->drawPreShadows();
+                //renderSceneShadow();
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            // 2. Render scene as normal
+            glViewport(0, 0, winWidth, winHeight);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // 3. draw scene with shadow
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, depthMap);
+            scene->drawShadows();
+            glCullFace(GL_BACK);
+            if(has_ball_shot){
+                MaterialObj *mat = new MaterialObj();
+                MaterialObj::setMaterial(mat,MATERIAL_COPPER);
+                scene->drawSphere(ball_shot_debug,Vec4(0.03),QuaternionQ(),mat);
+                delete mat;
+                //Draw::drawSphere(ball_shot_debug,MATERIAL_COPPER);
+            }
+
+            if(!capture_pause)
+                if(scene->getSizeCharacter()!=0)
+                    if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+                        motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
+            if (scene->getExternalForce().module()!=0){
+                drawForceApply();
+                ciclo++;
+            }
+            if (ciclo>=frames_force){
+                scene->setExternalForce(Vec4(0,0,0));
+                ciclo = 0;
+            }
+            if (ciclo_arrow>0){
+                //Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
+                if(scene->getCharacter(0)->getMoCap()->status){
+                    Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),scene->getCharacter(0)->getVelCOM(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+                }else{
+                    Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),Vec4(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+                }
+                ciclo_arrow++;
+                if(ciclo_arrow>30) ciclo_arrow = 0;
+            }
+
+            showCompensableConeFriction();
+
+    }else if (show_character){
+
+            if(has_ball_shot){
+                MaterialObj *mat = new MaterialObj();
+                MaterialObj::setMaterial(mat,MATERIAL_COPPER);
+                scene->drawSphere(ball_shot_debug,Vec4(0.03),QuaternionQ(),mat);
+                delete mat;
+                //Draw::drawSphere(ball_shot_debug,MATERIAL_COPPER);
+            }
+            scene->draw();
+
+
+            if(!capture_pause)
+                if(scene->getSizeCharacter()!=0)
+                    if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+                        motionCurrentFrame(scene->getCharacter(0)->getMoCap()->currentFrame());
+            if (scene->getExternalForce().module()!=0){
+                drawForceApply();
+                ciclo++;
+            }
+            if (ciclo>=frames_force){
+                scene->setExternalForce(Vec4(0,0,0));
+                ciclo = 0;
+            }
+            if (ciclo_arrow>0){
+                //Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
+                if(scene->getCharacter(0)->getMoCap()->status){
+                    Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),scene->getCharacter(0)->getVelCOM(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+                }else{
+                    Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),Vec4(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+                }
+                ciclo_arrow++;
+                if(ciclo_arrow>30) ciclo_arrow = 0;
+            }
+
+            showCompensableConeFriction();
+    }else{
+
+         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            renderSceneShadow();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 2. Render scene as normal
+        glViewport(0, 0, winWidth, winHeight);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //shader.Use();
+
+    //    glActiveTexture(GL_TEXTURE0);
+    //    glBindTexture(GL_TEXTURE_2D, woodTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        renderSceneWithShadow();
+//        MaterialObj *mat = new MaterialObj();
+//        MaterialObj::setMaterial(mat,MATERIAL_BRASS);
+//        scene->drawPlane(Vec4(),Vec4(10),QuaternionQ(),mat);
+//        delete mat;
+    }
+
+    return;
+    if (!sim_pause) if (load_exemple_curve) showCurveExample();
+
+    if (editing_frame)
+        if(scene->getSizeCharacter()!=0)
+            if(scene->getCharacter(0)->getMoCap()->sizeFrames()>0)
+                scene->getCharacter(0)->getMoCap()->showMoCap(Vec4(0,0,-2.0),frame_edit);
+
+
+
+}
+
+void GLWidget::drawSceneOld()
+{
+    // antigo
+//    //determinação da camera
+
+//    const float ar = winWidth>0 ? (float) winWidth / (float) winHeight : 1.0;
+//    glViewport(0, 0, winWidth, winHeight);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    //glFrustum(-ar, ar, -1.0, 1.0, 2.0, 100.0);
+//    gluPerspective(30.,ar,0.001,1200000.);
+
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
+
+//    glPushMatrix();
+
+//        glTranslated(-0.20,-0.135,-0.6);
+//        gluLookAt(cam->eye.x(),cam->eye.y(),cam->eye.z(), cam->at.x(),cam->at.y(),cam->at.z(), cam->up.x(),cam->up.y(),cam->up.z());
+//        scene->setViewer(cam->eye,cam->at,cam->up);
+//        glTranslated(cam->eye.x(),cam->eye.y(),cam->eye.z());
+//        Draw::drawAxisCameraView(0.02);
+//    glPopMatrix();
+//    glPushMatrix();
+
+
+//    glColor3f(1,1,0);
+//    QString text = QString("Lock Axis: ");
+//    if(cam->axis_x)
+//        text += "x ";
+//    if(cam->axis_y)
+//        text += "y ";
+//    if(cam->axis_z)
+//        text += "z ";
+//    if(cam->axis_x || cam->axis_y || cam->axis_z)
+
+//        renderText(0,0,0,text,QFont("../fonts/Quicksand_Book.otf"));
+
+    //---------- antigo
  //   glPushMatrix();
 
-    glPopMatrix();
+    //glPopMatrix();
 
-    gluLookAt(cam->eye.x1,cam->eye.x2,cam->eye.x3, cam->at.x1,cam->at.x2,cam->at.x3, cam->up.x1,cam->up.x2,cam->up.x3);
+    //gluLookAt(cam->eye.x1,cam->eye.x2,cam->eye.x3, cam->at.x1,cam->at.x2,cam->at.x3, cam->up.x1,cam->up.x2,cam->up.x3);
 
     //fim de determinação da camera
-    glPushMatrix();
+    //glPushMatrix();
 
     if (shadow){
         if (scene->isGroundIce()) drawReflections();
@@ -816,7 +983,6 @@ void GLWidget::drawScene(){
     //glPopMatrix();
     //glEnable(GL_LIGHTING);
     //glPopMatrix();
-
 
 }
 
@@ -1060,6 +1226,9 @@ void GLWidget::paintGL()
     // Clear the buffer with the current clearing color
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+//    scene->drawMesh();
+//    return;
+
 
 //    // 1. Render depth of scene to texture (from light's perspective)
 //    // - Get light projection/view matrix.
@@ -1072,32 +1241,8 @@ void GLWidget::paintGL()
 //    // - render scene from light's point of view
     //simpleDepthShader.Use();
 //    glUniformMatrix4fv(glGetUniformLocation(simpleDepthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-GLfloat near_plane = 1.0f, far_plane = 7.5f;
-glCullFace(GL_FRONT);
-
-//    renderScene();
-//    renderSceneShadow();
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        renderSceneShadow();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // 2. Render scene as normal
-    glViewport(0, 0, winWidth, winHeight);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //shader.Use();
-
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, woodTexture);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    renderSceneWithShadow();
 
 
-
-    glCullFace(GL_BACK);
 
 
 
@@ -1220,21 +1365,18 @@ glCullFace(GL_FRONT);
     //qDebug() << "update";
 
 //    //GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 //    glLoadIdentity();
 
-//    drawScene();
+    drawScene();
 //    if(showInfo){
 //        if (!screenshot) drawFPS();
 //        drawParameters();
 //        drawPoseProgression();
 //    }
 
-    //glutSwapBuffers();
-    //glutSwapBuffers();
 
-    //calculateFPS();
-    setScreenShot();
 
 }
 
@@ -1274,13 +1416,13 @@ void GLWidget::simStep(){
     ti = tf = tempo = 0;
     timeval tempo_inicio,tempo_fim;
     gettimeofday(&tempo_inicio,NULL);
-//    if(!sim_pause){
-//        scene->simulationStep(enable_balance);
-//        update();
-//        if (screenshot) setScreenShot();
-//    }else{
+    if(!sim_pause){
+        scene->simulationStep(enable_balance);
         update();
-//    }
+        if (screenshot) setScreenShot();
+    }else{
+        update();
+    }
 
     //calculateFPSPaint();
     //update();
