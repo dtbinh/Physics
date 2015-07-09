@@ -58,7 +58,7 @@ bool enable_balance=true;
 vector3d lightPosition(-1.93849,11.233,21.9049);
 vector3d lightDirection(-26.4,355.2);
 
-const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+const GLuint SHADOW_WIDTH = 4*1024, SHADOW_HEIGHT = 4*1024;
 Shader debugDepthQuad("../shaders/debug_quad.vert", "../shaders/debug_quad_depth.frag");
 Shader simpleDepthShader("../shaders/shadow_mapping_depth.vert", "../shaders/shadow_mapping_depth.frag");
 Shader shader("../shaders/shadow_mapping.vs", "../shaders/shadow_mapping.frag");
@@ -745,7 +745,7 @@ void GLWidget::drawScene(){
     if (shadow && show_character){
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glCullFace(GL_FRONT);
+        //glCullFace(GL_FRONT);
             glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
                 glClear(GL_DEPTH_BUFFER_BIT);
@@ -761,7 +761,8 @@ void GLWidget::drawScene(){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, depthMap);
             scene->drawShadows();
-            glCullFace(GL_BACK);
+            //glCullFace(GL_BACK);
+
             if(has_ball_shot){
                 MaterialObj *mat = new MaterialObj();
                 MaterialObj::setMaterial(mat,MATERIAL_COPPER);
@@ -794,6 +795,7 @@ void GLWidget::drawScene(){
             }
 
             showCompensableConeFriction();
+
 
     }else if (show_character){
 
@@ -2592,6 +2594,10 @@ void GLWidget::loadSimulationParameters(QString file)
     cam->eye = scene->getEye();
     cam->at = scene->getAt();
     cam->up = scene->getUp();
+
+    show_character = true;
+
+
     //scene->createArena();
 
 

@@ -71,14 +71,14 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 vec3 adsModel( const in vec3 pos, const in vec3 norm )
 {
     // Calculate the vector from the light to the fragment
-    vec3 s = normalize( vec3( light.position ) - vec3(0,0,0) );
+    vec3 s = normalize( lightPos - pos );
 
     float fator = max( (dot(norm,s))/(length(s)) ,0.0);
 
 
     // Calculate the vector from the fragment to the eye position
     // (origin since this is in "eye" or "camera" space)
-    vec3 v = normalize( -position.xyz );
+    vec3 v = normalize( -pos.xyz );
 
     // Reflect the light beam using the normal at this fragment
     vec3 r = reflect( -s, norm );
@@ -105,7 +105,7 @@ vec3 adsModel( const in vec3 pos, const in vec3 norm )
     if ( dot( r, norm ) > 0.0 )
         specular = pow( max( dot( r, v ), 0.0 ), material.shininess );
 
-    vec3 lightColor = vec3(0.8);
+    vec3 lightColor = vec3(1.0);
     return (lightColor * ( material.ka + material.kd * diffuse + material.ks * specular ));
 
 }
@@ -113,7 +113,7 @@ vec3 adsModel( const in vec3 pos, const in vec3 norm )
 void main()
 {           
     vec3 normal = normalize(fs_in.Normal);
-    vec3 color = adsModel(lightPos, normal); //texture(diffuseTexture, fs_in.TexCoords).rgb; // adsModel(lightPos, normal);//;
+    vec3 color = adsModel(fs_in.FragPos, normal); //texture(diffuseTexture, fs_in.TexCoords).rgb; // adsModel(lightPos, normal);//;
 
     vec3 lightColor = vec3(1.0);
     // Ambient
@@ -134,5 +134,5 @@ void main()
     //vec3 lighting = color;
     //if (shadow > 0.0)                   
     vec3  lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
-    FragColor = vec4(lighting, 1.0f);
+    FragColor = vec4(lighting/2., 1.0f);
 }

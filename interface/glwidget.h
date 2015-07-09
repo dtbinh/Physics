@@ -138,7 +138,6 @@ public slots:
     void setShowShadow(bool b);
     void setShowGRF(bool b);
     void setShowMoCap(bool b);
-    void drawScene();
     void drawSceneOld();
     void drawParameters();
     void drawPoseProgression();
@@ -194,6 +193,7 @@ public:
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
+    void drawScene();
     void updateCamera();
     void showCompensableConeFriction();
     //funções de câmera

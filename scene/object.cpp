@@ -536,7 +536,7 @@ void Object::draw(bool wire)
 
 void Object::drawPreShadow()
 {
-    if (this->geometry==0) return;
+    //if (this->geometry==0) return;
     if(has_cup) Draw::drawCoffeeCup(getPositionCurrent(),MATERIAL_WHITE_PLASTIC,QuaternionQ(Vec4(-90,0,0))*getRotationCurrent().conjugate());
     if(show_target) Draw::drawSphere(target,MATERIAL_GOLD,0.05);
 //    if (show_effector && show_target){
@@ -624,22 +624,26 @@ void Object::draw(Vec4 position, QuaternionQ q, int mat)
     transform->set(13,position.y());
     transform->set(14,position.z());
 
+    MaterialObj* mat_n = new MaterialObj();
+    if(mat!=-1) MaterialObj::setMaterial(mat_n,mat);
+
+
     switch (this->type){
     case TYPE_CUBE:{
         if(mat==-1){
             if(objFile.isEmpty() || !rendermesh)
-                scene->drawCube(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+                scene->drawCube(position,this->properties,q,material);
               //Draw::drawCube(transform,this->properties,mat);
             else{
-                scene->drawMesh(getPositionCurrent(),getRotationCurrent(),material,m_object);
+                scene->drawMesh(position,q,material,m_object);
               //Draw::drawObj(transform,this->id_material,objMesh);
              }
         }else{
             if(objFile.isEmpty() || !rendermesh)
-                scene->drawCube(getPositionCurrent(),this->properties,getRotationCurrent(),material);
+                scene->drawCube(position,this->properties,q,mat_n);
                 //Draw::drawCube(transform,this->properties,mat);
             else{
-                scene->drawMesh(getPositionCurrent(),getRotationCurrent(),material,m_object);
+                scene->drawMesh(position,q,mat_n,m_object);
                 //Draw::drawObj(transform,mat,objMesh);
             }
             break;
@@ -655,6 +659,139 @@ void Object::draw(Vec4 position, QuaternionQ q, int mat)
         }
     }
     delete transform;
+    delete mat_n;
+}
+
+void Object::drawPreShadow(Vec4 position, QuaternionQ q, int mat)
+{
+
+    // Draw::drawPoint(posEffectorForward(),0.2,Vec4(0.5,0.5,0.5));
+     //if (this->geometry==0) return;
+     Matrix4x4 *transform = new Matrix4x4();
+     Matrix4x4 transformx = q.getMatrix();
+
+     transform->set( 0, transformx.matrix[0] );
+     transform->set( 1, transformx.matrix[4] );
+     transform->set( 2, transformx.matrix[8] );
+     transform->set( 3, 0 );
+     transform->set( 4, transformx.matrix[1] );
+     transform->set( 5, transformx.matrix[5] );
+     transform->set( 6, transformx.matrix[9] );
+     transform->set( 7, 0 );
+     transform->set( 8, transformx.matrix[2] );
+     transform->set( 9, transformx.matrix[6] );
+     transform->set( 10, transformx.matrix[10]);
+     transform->set( 11, 0 );
+
+     transform->set( 15, 1.0 );
+
+     transform->set(12,position.x());
+     transform->set(13,position.y());
+     transform->set(14,position.z());
+
+     MaterialObj* mat_n = new MaterialObj();
+     if(mat!=-1) MaterialObj::setMaterial(mat_n,mat);
+
+
+     switch (this->type){
+     case TYPE_CUBE:{
+         if(mat==-1){
+             if(objFile.isEmpty() || !rendermesh)
+                 scene->drawCubePreShadow(position,this->properties,q);
+               //Draw::drawCube(transform,this->properties,mat);
+             else{
+                 scene->drawMeshPreShadow(position,q,m_object);
+               //Draw::drawObj(transform,this->id_material,objMesh);
+              }
+             return;
+         }else{
+             if(objFile.isEmpty() || !rendermesh)
+                 scene->drawCubePreShadow(position,this->properties,q);
+                 //Draw::drawCube(transform,this->properties,mat);
+             else{
+                 scene->drawMeshPreShadow(position,q,m_object);
+                 //Draw::drawObj(transform,mat,objMesh);
+             }
+             return;
+         }
+         }
+     case TYPE_CYLINDER:{
+             Draw::drawCylinder(getMatrixTransformation(),this->material);
+             break;
+         }
+     case TYPE_SPHERE:{
+             Draw::drawSphere(getMatrixTransformation(),this->material);
+             break;
+         }
+     }
+     delete transform;
+     delete mat_n;
+}
+
+void Object::drawShadow(Vec4 position, QuaternionQ q, int mat)
+{
+
+    // Draw::drawPoint(posEffectorForward(),0.2,Vec4(0.5,0.5,0.5));
+     //if (this->geometry==0) return;
+     Matrix4x4 *transform = new Matrix4x4();
+     Matrix4x4 transformx = q.getMatrix();
+
+     transform->set( 0, transformx.matrix[0] );
+     transform->set( 1, transformx.matrix[4] );
+     transform->set( 2, transformx.matrix[8] );
+     transform->set( 3, 0 );
+     transform->set( 4, transformx.matrix[1] );
+     transform->set( 5, transformx.matrix[5] );
+     transform->set( 6, transformx.matrix[9] );
+     transform->set( 7, 0 );
+     transform->set( 8, transformx.matrix[2] );
+     transform->set( 9, transformx.matrix[6] );
+     transform->set( 10, transformx.matrix[10]);
+     transform->set( 11, 0 );
+
+     transform->set( 15, 1.0 );
+
+     transform->set(12,position.x());
+     transform->set(13,position.y());
+     transform->set(14,position.z());
+
+     MaterialObj* mat_n = new MaterialObj();
+     if(mat!=-1) MaterialObj::setMaterial(mat_n,mat);
+
+
+     switch (this->type){
+     case TYPE_CUBE:{
+         if(mat==-1){
+             if(objFile.isEmpty() || !rendermesh)
+                 scene->drawCubeShadow(position,this->properties,q,material);
+               //Draw::drawCube(transform,this->properties,mat);
+             else{
+                 scene->drawMeshShadow(position,q,material,m_object);
+               //Draw::drawObj(transform,this->id_material,objMesh);
+              }
+             return;
+         }else{
+             if(objFile.isEmpty() || !rendermesh)
+                 scene->drawCubeShadow(position,this->properties,q,mat_n);
+                 //Draw::drawCube(transform,this->properties,mat);
+             else{
+                 scene->drawMeshShadow(position,q,mat_n,m_object);
+                 //Draw::drawObj(transform,mat,objMesh);
+             }
+             return;
+         }
+         }
+     case TYPE_CYLINDER:{
+             Draw::drawCylinder(getMatrixTransformation(),this->material);
+             break;
+         }
+     case TYPE_SPHERE:{
+             Draw::drawSphere(getMatrixTransformation(),this->material);
+             break;
+         }
+     }
+     delete transform;
+     delete mat_n;
 }
 
 Vec4 Object::getProperties()

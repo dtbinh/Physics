@@ -8,6 +8,10 @@
 #include "extra/ObjMesh.h"
 #include "graphics/ShaderPrimitives/objloader.h"
 
+#define STATE_NORMAL 0
+#define STATE_PRESHADOW 1
+#define STATE_SHADOW 2
+
 class Ray;
 class MaterialObj;
 class Matrix4x4;
@@ -53,6 +57,7 @@ private:
     // --------Geometry Shadow
     ObjLoader      m_objload;
     Mesh           *m_object;
+    int            shad_state;
 
     // --------Strategy Equilibrium
     float        compensable;
@@ -134,6 +139,8 @@ public:
     void        drawPreShadow();
     void        drawShadow();                                                    //desenha o objeto
     void        draw(Vec4 position,QuaternionQ q,int mat=-1);
+    void        drawPreShadow(Vec4 position,QuaternionQ q,int mat=-1);
+    void        drawShadow(Vec4 position,QuaternionQ q,int mat=-1);
     Vec4        getProperties();                                           //extraí propriedades de escala do objeto
     void        setProperties(Vec4 properties);                            //seta propriedades de escala do objeto
     void        setPosition(Vec4 position);                                //seta posição inicial do centro de massa do objeto

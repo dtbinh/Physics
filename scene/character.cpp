@@ -36,14 +36,6 @@ Character::~Character(){
 
 void Character::draw()
 {
-    for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
-        (*it)->draw(wire);
-        //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
-    }
-    for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
-        (*it)->draw();
-    }
-
     bool sensor_use = false;
     if(this->getMoCap()!=NULL){
         if(this->getMoCap()->status) sensor_use = true;
@@ -82,7 +74,13 @@ void Character::draw()
     }
 
 
-
+    for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
+        (*it)->draw(wire);
+        //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
+    }
+    for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
+        (*it)->draw();
+    }
 
     if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
 
@@ -94,25 +92,122 @@ void Character::draw()
 
 void Character::drawPreShadows()
 {
-    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
     for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
         (*it)->drawPreShadow();
     }
     for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
-        (*it)->drawPreShadow();
+        if(!(*it)->getFoot())
+            (*it)->drawPreShadow();
+        //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
+    }
+
+    bool sensor_use = false;
+    if(this->getMoCap()!=NULL){
+        if(this->getMoCap()->status) sensor_use = true;
+    }
+
+    std::vector<Object*> foots =  getBodiesFoot();
+
+    if ((foots.size()>0) && (this->balance!=NULL))
+    if(sensor_use){
+        if (Sensor::getHierarchy2UseMocap(this)!=2){
+            if (Sensor::getHierarchy2UseMocap(this)==0){
+                for(int i=0;i<this->getNumBodies();i++)
+                    if(objects.at(i)->getFoot()) objects.at(i)->drawPreShadow(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+            }
+            else{
+                int v = Sensor::getHierarchy2UseMocap(this);
+                v -= 3;
+                if(objects.at(v)->getFoot()){
+                    objects.at(v)->drawPreShadow(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+                    Object *foot_air;
+                    foot_air = this->getBodiesFoot(objects.at(v))[0];
+                    foot_air->drawPreShadow();
+                }
+
+            }
+        }
+    }
+    else{
+        if (Sensor::getHierarchy2Use(this)!=2){
+            if (Sensor::getHierarchy2Use(this)==0){
+                for(int i=0;i<this->getNumBodies();i++)
+                    if(objects.at(i)->getFoot()) objects.at(i)->drawPreShadow(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+
+            }
+            else{
+                int v = Sensor::getHierarchy2Use(this);
+                v -= 3;
+                if(objects.at(v)->getFoot()){
+                    objects.at(v)->drawPreShadow(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+                    Object *foot_air;
+                    foot_air = this->getBodiesFoot(objects.at(v))[0];
+                    foot_air->drawPreShadow();
+                }
+            }
+        }
     }
 
 }
 
 void Character::drawShadows()
 {
-    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
     for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
         (*it)->drawShadow();
     }
     for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
-        (*it)->drawShadow();
+        if(!(*it)->getFoot())
+            (*it)->drawShadow();
+        //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
     }
+
+    bool sensor_use = false;
+    if(this->getMoCap()!=NULL){
+        if(this->getMoCap()->status) sensor_use = true;
+    }
+
+    std::vector<Object*> foots =  getBodiesFoot();
+
+    if (foots.size()>0 && this->balance!=NULL)
+    if(sensor_use){
+        if (Sensor::getHierarchy2UseMocap(this)!=2){
+            if (Sensor::getHierarchy2UseMocap(this)==0){
+                for(int i=0;i<this->getNumBodies();i++)
+                    if(objects.at(i)->getFoot()) objects.at(i)->drawShadow(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+            }
+            else{
+                int v = Sensor::getHierarchy2UseMocap(this);
+                v -= 3;
+                if(objects.at(v)->getFoot()){
+                    objects.at(v)->drawShadow(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+                    Object *foot_air;
+                    foot_air = this->getBodiesFoot(objects.at(v))[0];
+                    foot_air->drawShadow();
+                }
+            }
+        }
+    }
+    else{
+        if (Sensor::getHierarchy2Use(this)!=2){
+            if (Sensor::getHierarchy2Use(this)==0){
+                for(int i=0;i<this->getNumBodies();i++)
+                    if(objects.at(i)->getFoot()) objects.at(i)->drawShadow(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+
+            }
+            else{
+                int v = Sensor::getHierarchy2Use(this);
+                v -= 3;
+                if(objects.at(v)->getFoot()){
+                    objects.at(v)->drawShadow(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+                    Object *foot_air;
+                    foot_air = this->getBodiesFoot(objects.at(v))[0];
+                    foot_air->drawShadow();
+                }
+            }
+        }
+    }
+
+
 
 
 }

@@ -79,11 +79,13 @@ Scene::Scene(GLWidget *parent)
     this->viewer[1] = Vec4(0,1,0);
     this->viewer[2] = Vec4(0,1,0);
 
-    lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
-    lightPosUp = glm::vec3(0.f,1.f,1.f);
+    //ajustar parametros de sombra
+    lightPos = glm::vec3(0.5f, 1.5f, 1.75f);
+    //lightPos = glm::vec3(2.0f, 4.0f, 4.0f);
+    lightPosUp = glm::vec3(0.f,1.f,0.f);
 
-    near_plane = 1.0f;
-    far_plane = 17.5f;
+    near_plane = -1.0f;
+    far_plane = 10.5f;
 
     size_ground = 10;
 
@@ -110,7 +112,9 @@ Scene::~Scene(){
 void Scene::initializeShaders()
 {
     // Create a material that performs multi-texturing
-    MaterialPtr material = createMaterial();
+    shad_Phong = createMaterial();
+    shad_PreShadow = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+    shad_Shadow = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
     MaterialPtr materialtex = createTextureMaterial("../texture/wood.png");
     MaterialPtr materialtex2 = createTextureMaterial("../texture/awesomeface.png");
 
@@ -124,24 +128,24 @@ void Scene::initializeShaders()
     m_objload.load("../objs/chara/Torax.obj");
 
     m_object = new Mesh(this);
-    m_object->setMaterial(material);
+    m_object->setMaterial(shad_Phong);
     m_object->setMeshData(m_objload);
 
 
     m_cube = new Cube(this);
-    m_cube->setMaterial( material );
+    m_cube->setMaterial( shad_Phong );
     m_cube->create();
 
     m_sphere = new Sphere(this);
-    m_sphere->setMaterial( material );
+    m_sphere->setMaterial( shad_Phong );
     m_sphere->create();
 
     m_cylinder = new Cylinder(this);
-    m_cylinder->setMaterial( material );
+    m_cylinder->setMaterial( shad_Phong );
     m_cylinder->create();
 
     m_plane = new Plane(this);
-    m_plane->setMaterial( material );
+    m_plane->setMaterial( shad_Phong );
     m_plane->create();
 
 }
@@ -339,7 +343,7 @@ void Scene::drawCubeShader(Matrix4x4 *transform)
     // - Get light projection/view matrix.
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
     lightSpaceMatrix = lightProjection * lightView;
@@ -439,7 +443,7 @@ void Scene::drawCubeShader2(Matrix4x4 *transform, MaterialObj *mat)
     // - Get light projection/view matrix.
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
     lightSpaceMatrix = lightProjection * lightView;
@@ -584,7 +588,7 @@ void Scene::drawMeshShader(Matrix4x4 *transform)
     // - Get light projection/view matrix.
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
     lightSpaceMatrix = lightProjection * lightView;
@@ -640,6 +644,7 @@ void Scene::drawMeshShader(Matrix4x4 *transform)
 
 void Scene::drawMesh(Vec4 position, QuaternionQ quat, MaterialObj *mat, Mesh *m_obj)
 {
+    m_obj->setMaterial(shad_Phong);
     m_obj->material()->bind();
     QOpenGLShaderProgramPtr shader = m_obj->material()->shader();
 
@@ -680,9 +685,9 @@ void Scene::drawMesh(Vec4 position, QuaternionQ quat, MaterialObj *mat, Mesh *m_
 
 void Scene::drawMeshPreShadow(Vec4 position, QuaternionQ quat, Mesh *m_obj)
 {
-    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
-    MaterialPtr old = m_obj->material();
-    m_obj->setMaterial(material);
+//    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+//    MaterialPtr old = m_obj->material();
+    m_obj->setMaterial(shad_PreShadow);
     m_obj->material()->bind();
     QOpenGLShaderProgramPtr shader = m_obj->material()->shader();
 
@@ -734,14 +739,14 @@ void Scene::drawMeshPreShadow(Vec4 position, QuaternionQ quat, Mesh *m_obj)
     //shader->setUniformValue( "mvp", mvp );
 
     m_obj->render();
-    m_obj->setMaterial(old);
+    //m_obj->setMaterial(old);
 }
 
 void Scene::drawMeshShadow(Vec4 position, QuaternionQ quat, MaterialObj *mat, Mesh *m_obj)
 {
-    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
-    MaterialPtr old = m_obj->material();
-    m_obj->setMaterial(material);
+//    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+//    MaterialPtr old = m_obj->material();
+    m_obj->setMaterial(shad_Shadow);
     m_obj->material()->bind();
     QOpenGLShaderProgramPtr shader = m_obj->material()->shader();
 
@@ -761,7 +766,7 @@ void Scene::drawMeshShadow(Vec4 position, QuaternionQ quat, MaterialObj *mat, Me
     lightSpaceMatrix = lightProjection * lightView;
 
 
-    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 1000.0f);
+    glm::mat4 projection = glm::perspective(30.f, (float)width / (float)height, 0.1f, 10000.0f);
     glm::mat4 view = m_camera->GetViewMatrix();
     glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(glGetUniformLocation(shader->programId(), "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -806,11 +811,12 @@ void Scene::drawMeshShadow(Vec4 position, QuaternionQ quat, MaterialObj *mat, Me
 
     // Let the mesh setup the remainder of its state and draw itself
     m_obj->render();
-    m_obj->setMaterial(old);
+    //m_obj->setMaterial(old);
 }
 
 void Scene::drawCube(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
 {
+    m_cube->setMaterial(shad_Phong);
     m_cube->material()->bind();
     QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
 
@@ -853,9 +859,9 @@ void Scene::drawCube(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *ma
 
 void Scene::drawCubePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat)
 {
-    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
-    MaterialPtr old = m_cube->material();
-    m_cube->setMaterial(material);
+//    MaterialPtr material = createMaterial("../shaders/simpleDepthShader.vert","../shaders/simpleDepthShader.frag");
+//    MaterialPtr old = m_cube->material();
+    m_cube->setMaterial(shad_PreShadow);
     m_cube->material()->bind();
     QOpenGLShaderProgramPtr shader = m_cube->material()->shader();
 
@@ -877,14 +883,14 @@ void Scene::drawCubePreShadow(Vec4 position, Vec4 prop, QuaternionQ quat)
     shader->setUniformValue( "model", m_modelMatrix );
     // Let the mesh setup the remainder of its state and draw itself
     m_cube->render();
-    m_cube->setMaterial(old);
+    //m_cube->setMaterial(old);
 }
 
 void Scene::drawCubeShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
 {
-    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
-    MaterialPtr old = m_cube->material();
-    m_cube->setMaterial(material);
+//    MaterialPtr material = createMaterial("../shaders/shadow_mapping.vert","../shaders/shadow_mapping.frag");
+//    MaterialPtr old = m_cube->material();
+    m_cube->setMaterial(shad_Shadow);
     m_cube->material()->bind();
     QOpenGLShaderProgramPtr shader =  m_cube->material()->shader();
 
@@ -945,7 +951,7 @@ void Scene::drawCubeShadow(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialO
 
     // Let the mesh setup the remainder of its state and draw itself
      m_cube->render();
-     m_cube->setMaterial(old);
+     //m_cube->setMaterial(old);
 }
 
 void Scene::drawSphere(Vec4 position, Vec4 prop, QuaternionQ quat, MaterialObj *mat)
@@ -1252,7 +1258,7 @@ void Scene::drawMeshShader2(Matrix4x4 *transform, MaterialObj *mat)
 
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
     lightSpaceMatrix = lightProjection * lightView;
@@ -1651,7 +1657,7 @@ void Scene::drawPlaneShader2(Matrix4x4 *transform, MaterialObj *mat)
     // - Get light projection/view matrix.
     glm::mat4 lightProjection, lightView;
     glm::mat4 lightSpaceMatrix;
-    GLfloat near_plane = 1.0f, far_plane = 17.5f;
+
     lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(0.0f), lightPosUp);
     lightSpaceMatrix = lightProjection * lightView;
@@ -1982,10 +1988,7 @@ void Scene::drawGRF(bool b)
 
 void Scene::drawShadows()
 {
-    MaterialObj* mat = new MaterialObj();
-    MaterialObj::setMaterial(mat,MATERIAL_BRASS);
-    drawPlaneShadow(Vec4(),Vec4(size_ground),QuaternionQ(rotate_plane),mat);
-    delete mat;
+
 
     for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
         (*it)->drawShadow();
@@ -1993,6 +1996,10 @@ void Scene::drawShadows()
     for(std::vector<Character*>::iterator it = characters.begin(); it!= characters.end(); it++){
         (*it)->drawShadows();
     }
+    MaterialObj* mat = new MaterialObj();
+    MaterialObj::setMaterial(mat,MATERIAL_BRASS);
+    drawPlaneShadow(Vec4(),Vec4(size_ground),QuaternionQ(rotate_plane),mat);
+    delete mat;
 
 
 
@@ -2001,13 +2008,16 @@ void Scene::drawShadows()
 
 void Scene::drawPreShadows()
 {
+
     drawPlanePreShadow(Vec4(),Vec4(size_ground),QuaternionQ(rotate_plane));
-    for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
-        (*it)->drawPreShadow();
-    }
     for(std::vector<Character*>::iterator it = characters.begin(); it!= characters.end(); it++){
         (*it)->drawPreShadows();
     }
+    for(std::vector<Object*>::iterator it = objects_shoot.begin(); it!= objects_shoot.end(); it++){
+        (*it)->drawPreShadow();
+    }
+
+
 
 
 

@@ -66,6 +66,10 @@ private:
     ObjLoader      m_objload;
     Mesh           *m_object;
 
+    MaterialPtr    shad_PreShadow;
+    MaterialPtr    shad_Shadow;
+    MaterialPtr    shad_Phong;
+
     //iluminação
     glm::vec3 lightPos;
     glm::vec3 lightPosUp;
