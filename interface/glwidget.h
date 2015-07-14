@@ -136,6 +136,7 @@ public slots:
     void drawParameters();
     void drawPoseProgression();
     void drawForceApply();
+    void setMirrorObject(int id);
 
 
     //slots não utilizados

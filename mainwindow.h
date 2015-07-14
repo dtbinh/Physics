@@ -54,6 +54,7 @@ public slots:
     void checkHasCoffeeCup(bool);
     void changePoseTime(double);
     void changeJointAngle();
+    void updateComboObjects(std::vector<Object*> objects);
 
     void refactorOptions(int);
 

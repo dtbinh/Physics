@@ -50,6 +50,7 @@ Object::Object()
     this->chara = NULL;
     this->objFile = "";
     this->rendermesh = false;
+    this->mirror_obj = NULL;
 
 
 }
@@ -75,6 +76,7 @@ Object::Object(Scene *scene)
     this->chara = NULL;
     this->objFile = "";
     this->rendermesh = false;
+    this->mirror_obj = NULL;
 }
 
 Object::Object(Vec4 position, QuaternionQ rotation, Vec4 properties, int type, Scene *scene, QString name)
@@ -101,6 +103,7 @@ Object::Object(Vec4 position, QuaternionQ rotation, Vec4 properties, int type, S
     this->kd = Vec4();
     this->chara = NULL;
     this->rendermesh = false;
+    this->mirror_obj = NULL;
 }
 
 void Object::setCharacter(Character *chara)
@@ -917,6 +920,11 @@ Vec4 Object::getTarget()
     return target;
 }
 
+void Object::addMirrorPos(Vec4 pos)
+{
+    this->target +=pos;
+}
+
 void Object::setKs(Vec4 pos)
 {
     ks = pos;
@@ -960,6 +968,16 @@ void Object::evaluate(int val)
         Vec4 force = ks.mult(target - effector) - kd.mult(getRelVelLinear());
         Physics::bodyAddForce(this->body,force.x(),force.y(),force.z());
     }
+}
+
+void Object::setMirror(Object *m)
+{
+    this->mirror_obj = m;
+}
+
+Object *Object::getMirror()
+{
+    return this->mirror_obj;
 }
 
 void Object::setCoffeeCup(bool b)

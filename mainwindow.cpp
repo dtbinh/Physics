@@ -136,6 +136,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->show_target,SIGNAL(clicked(bool)),this,SLOT(checkShowTarget(bool)));
     connect(ui->show_effector,SIGNAL(clicked(bool)),this,SLOT(checkShowEffector(bool)));
     connect(ui->hasCup,SIGNAL(clicked(bool)),this,SLOT(checkHasCoffeeCup(bool)));
+    connect(ui->comboObjects,SIGNAL(activated(int)),this->ui->widgetPhysics,SLOT(setMirrorObject(int)));
+
 
     //manipuladores do equilíbrio e controladores geral
         //cone de fricção
@@ -303,12 +305,16 @@ MainWindow::~MainWindow()
 void MainWindow::updateListObjects(std::vector<Object*> objects)
 {
     ui->listWidgetObjects->clear();
+    ui->comboObjects->clear();
+    ui->comboObjects->addItem("NULL");
     for(unsigned int i=0;i<objects.size();i++){
-        QString s;
+        QString s,n;
         s.setNum(i);
         s.push_back(" - ");
         s.push_back(objects.at(i)->getName());
+        n.push_back(objects.at(i)->getName());
         ui->listWidgetObjects->addItem(s);
+        ui->comboObjects->addItem(n);
     }
 }
 
@@ -602,6 +608,13 @@ void MainWindow::showSelectedObject(int i)
     ui->show_target->setChecked(obj_selected->isShowTarget());
     ui->enable_cpdp->setChecked(obj_selected->isEnableCPDP());
     ui->hasCup->setChecked(obj_selected->hasCoffeeCup());
+    Object* mirror = obj_selected->getMirror();
+    if(mirror==NULL) ui->comboObjects->setCurrentIndex(0);
+    else{
+        int id = obj_selected->getCharacter()->getIdObject(mirror);
+        ui->comboObjects->setCurrentIndex(id+1);
+        //qDebug() << "update!";
+    }
 
 
 }
@@ -768,6 +781,17 @@ void MainWindow::changeJointAngle()
     //0std::cout.flush();
     pose_selected->updateAngle(pose_angle_selected, angle);
 }
+
+void MainWindow::updateComboObjects(std::vector<Object *> objects)
+{
+    ui->comboObjects->clear();
+    ui->comboObjects->addItem("NULL");
+    for(unsigned int i=0;i<objects.size();i++){
+        QString n;
+        n.push_back(objects.at(i)->getName());
+        ui->comboObjects->addItem(n);
+    }
+}
 void MainWindow::refactorOptions(int index)
 {
     if (index == 3) {
@@ -797,25 +821,22 @@ void MainWindow::infoSelectedObject(Object *obj)
     connect(ui->posx_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
     connect(ui->posy_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
     connect(ui->posz_target,SIGNAL(valueChanged(double)),this,SLOT(updateControlPDPositional()));
-    //ui->listWidgetObjects->itemClicked(ui->listWidgetObjects->item(i));
-    //ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
-    //ui->listWidgetObjects->setCurrentRow(obj_selected->getScene()->getCharacter(0)->getIdObject(obj_selected));
-    //ui->listWidgetObjects->item(i)->setHidden(true);
+    //disconnect(ui->comboObjects,SIGNAL(activated(int)),this->ui->widgetPhysics,SLOT(setMirrorObject(int)));
 
+    Object* mirror = obj->getMirror();
+    if(mirror==NULL) ui->comboObjects->setCurrentIndex(0);
+    else{
+        int id = obj->getCharacter()->getIdObject(mirror);
+        ui->comboObjects->setCurrentIndex(id+1);
+        //qDebug() << "update!";
+    }
 
-//    ui->listWidgetObjects->itemPressed(ui->listWidgetObjects->item(i));
-//    ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
-//    ui->listWidgetObjects->itemClicked(ui->listWidgetObjects->item(i));
-//    ui->listWidgetObjects->itemEntered(ui->listWidgetObjects->item(i));
-//    ui->listWidgetObjects->itemActivated(ui->listWidgetObjects->item(i));
-//    ui->listWidgetObjects->itemSelectionChanged();
     ui->listWidgetObjects->item(i)->setSelected(true);
-    //qDebug() <<"Nome " << ui->listWidgetObjects->item(i)->text();
-    //ui->listWidgetObjects->item(i)->setBackgroundColor(QColor(1.0,1.0,0));
-    //ui->listWidgetObjects->setFocus();
 
     connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),ui->widgetPhysics,SLOT(setObjectSelected(int)));
     connect(ui->listWidgetObjects,SIGNAL(currentRowChanged(int)),this,SLOT(showSelectedObject(int)));
+
+    connect(ui->comboObjects,SIGNAL(activated(int)),this->ui->widgetPhysics,SLOT(setMirrorObject(int)));
 
     ui->listWidgetObjects->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->listWidgetObjects->setSelectionBehavior(QAbstractItemView::SelectRows);

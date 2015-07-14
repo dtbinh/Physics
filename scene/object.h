@@ -59,6 +59,8 @@ private:
     Vec4         target;
     Vec4         ks;
     Vec4         kd;
+    Object*      mirror_obj;
+
     // --------Use Cases: Control Torque Coffee Cup
     bool         has_cup;
     Vec4         kscup;
@@ -164,11 +166,14 @@ public:
     bool        isEnableCPDP();
     void        setTarget(Vec4 pos);
     Vec4        getTarget();
+    void        addMirrorPos(Vec4 pos);
     void        setKs(Vec4 pos);
     Vec4        getKs();
     void        setKd(Vec4 pos);
     Vec4        getKd();
     void        evaluate(int val=1);
+    void        setMirror(Object *m);
+    Object*     getMirror();
     // -------Use Cases: Control Torque Coffee Cup
     void        setCoffeeCup(bool b);
     bool        hasCoffeeCup();

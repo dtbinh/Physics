@@ -69,7 +69,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>5</number>
+           <number>3</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -1663,15 +1663,52 @@ QGroupBox{
            <attribute name="title">
             <string>Manipulators Objects</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_12">
-            <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <item>
              <widget class="QListWidget" name="listWidgetObjects">
               <property name="styleSheet">
                <string notr="true"/>
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item>
+             <widget class="QGroupBox" name="groupBox_10">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+              </property>
+              <property name="title">
+               <string>Coffee Cup</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_13">
+               <item row="0" column="0">
+                <widget class="QCheckBox" name="hasCup">
+                 <property name="text">
+                  <string>has Coffee Cup</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <widget class="QGroupBox" name="groupBox_9">
               <property name="font">
                <font>
@@ -1697,8 +1734,8 @@ QGroupBox{
               <property name="title">
                <string>Control PD Linear</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_6">
-               <item row="0" column="0">
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_31">
                  <item>
                   <widget class="QCheckBox" name="enable_cpdp">
@@ -1723,7 +1760,7 @@ QGroupBox{
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_32">
                  <item>
                   <widget class="QLabel" name="label_31">
@@ -1782,7 +1819,7 @@ QGroupBox{
                  </item>
                 </layout>
                </item>
-               <item row="2" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_33">
                  <item>
                   <widget class="QLabel" name="label_32">
@@ -1841,7 +1878,7 @@ QGroupBox{
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_34">
                  <item>
                   <widget class="QLabel" name="label_33">
@@ -1900,10 +1937,26 @@ QGroupBox{
                  </item>
                 </layout>
                </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_51">
+                 <item>
+                  <widget class="QLabel" name="label_47">
+                   <property name="text">
+                    <string>Mirror</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboObjects"/>
+                 </item>
+                </layout>
+               </item>
               </layout>
+              <zorder></zorder>
+              <zorder></zorder>
              </widget>
             </item>
-            <item row="3" column="0">
+            <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="font">
                <font>
@@ -1930,33 +1983,7 @@ QGroupBox{
                <string>Properties Default</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_3">
-               <property name="horizontalSpacing">
-                <number>2</number>
-               </property>
-               <property name="verticalSpacing">
-                <number>0</number>
-               </property>
-               <item row="2" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                 <item>
-                  <widget class="QLabel" name="label_9">
-                   <property name="text">
-                    <string>Dim</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="scalex"/>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="scaley"/>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="scalez"/>
-                 </item>
-                </layout>
-               </item>
-               <item row="1" column="0">
+               <item row="0" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
                   <widget class="QLabel" name="label_7">
@@ -2006,21 +2033,27 @@ QGroupBox{
                  </item>
                 </layout>
                </item>
-               <item row="5" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_8">
                  <item>
-                  <widget class="QLabel" name="label_10">
+                  <widget class="QLabel" name="label_9">
                    <property name="text">
-                    <string>Mass</string>
+                    <string>Dim</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="mass"/>
+                  <widget class="QDoubleSpinBox" name="scalex"/>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="scaley"/>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="scalez"/>
                  </item>
                 </layout>
                </item>
-               <item row="3" column="0">
+               <item row="2" column="0">
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                  <item>
                   <widget class="QLabel" name="label_8">
@@ -2061,24 +2094,42 @@ QGroupBox{
                  </item>
                 </layout>
                </item>
-               <item row="6" column="0">
-                <widget class="QCheckBox" name="isFoot">
-                 <property name="text">
-                  <string>is foot</string>
-                 </property>
-                </widget>
+               <item row="3" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_9">
+                 <item>
+                  <widget class="QLabel" name="label_10">
+                   <property name="text">
+                    <string>Mass</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="mass"/>
+                 </item>
+                </layout>
                </item>
-               <item row="7" column="0">
-                <widget class="QCheckBox" name="isBodyBalance">
-                 <property name="text">
-                  <string>is body balance</string>
-                 </property>
-                </widget>
+               <item row="4" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_50">
+                 <item>
+                  <widget class="QCheckBox" name="isBodyBalance">
+                   <property name="text">
+                    <string>is body balance</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="isFoot">
+                   <property name="text">
+                    <string>is foot</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
             </item>
-            <item row="4" column="0">
+            <item>
              <widget class="QGroupBox" name="groupBox">
               <property name="font">
                <font>
@@ -2205,43 +2256,6 @@ QGroupBox{
                  </property>
                  <property name="value">
                   <double>0.200000000000000</double>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QGroupBox" name="groupBox_10">
-              <property name="font">
-               <font>
-                <pointsize>9</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QGroupBox::title { 
-   
-     subcontrol-position: top left; /* position at the top left*/ 
-  padding: 2px 13px;
-   margin-top: -5px;
-    
- }
-
-QGroupBox{
-   border: 1px solid rgb(182, 181, 179);
-  border-radius: 5px;
-}</string>
-              </property>
-              <property name="title">
-               <string>Coffee Cup</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_13">
-               <item row="0" column="0">
-                <widget class="QCheckBox" name="hasCup">
-                 <property name="text">
-                  <string>has Coffee Cup</string>
                  </property>
                 </widget>
                </item>
@@ -2996,7 +3010,7 @@ QGroupBox{
      <x>0</x>
      <y>0</y>
      <width>735</width>
-     <height>29</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -814,6 +814,33 @@ void GLWidget::drawForceApply()
 
 }
 
+void GLWidget::setMirrorObject(int id)
+{
+     if(scene->getSizeCharacter()>0){
+         Object* sel = scene->getCharacter(0)->getObjectSelected();
+         if(sel==NULL) return;
+         else{
+             Object* oldmirrror = sel->getMirror();
+             if(oldmirrror!=NULL){
+                 if((id-1<0)){
+                     oldmirrror->setMirror(NULL);
+                     sel->setMirror(NULL);
+
+                 }else{
+                     oldmirrror->setMirror(NULL);
+                     sel->setMirror(sel->getCharacter()->getBody(id-1));
+                     sel->getCharacter()->getBody(id-1)->setMirror(sel);
+                 }
+             }else{
+                 sel->setMirror(sel->getCharacter()->getBody(id-1));
+                 sel->getCharacter()->getBody(id-1)->setMirror(sel);
+             }
+
+         }
+     }
+
+}
+
 void GLWidget::paintGL()
 {
     //GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
