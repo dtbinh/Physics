@@ -48,6 +48,10 @@ Scene::Scene(GLWidget *parent)
     this->viewer[1] = Vec4(0,1,0);
     this->viewer[2] = Vec4(0,1,0);
 
+    this->flag_scene = SCENE_GROUND_ROTATIONAL;
+
+    elevator = NULL;
+
 
     //pose_time.start();
 
@@ -63,6 +67,7 @@ Scene::Scene(GLWidget *parent)
 }
 
 Scene::~Scene(){
+
     Physics::closeScene(this);
 }
 
@@ -89,7 +94,9 @@ Object* Scene::addObject(Vec4 properties, Vec4 position, QuaternionQ rotation,in
         Physics::createObject(obj, character->getSpace(), mass, position, rotation);
     }
 
+
     return obj;
+
 }
 
 void Scene::restartPhysics()
@@ -101,12 +108,25 @@ void Scene::restartPhysics()
 //          Physics::closeCharacter(characters.at(i));
 //    }
     Physics::closeScene(this);
+    objects.clear();
+
+    //for(int i=0;i<objects.size();i++)
+        //Physics::setDisableObject(objects.at(i));
+        //Physics::closeObject(objects.at(i));
+
+
     Physics::initScene(this);
-    for (unsigned int i=0;i<objects.size();i++){
-        Physics::createObject(objects.at(i), this->space, objects.at(i)->getFMass(), objects.at(i)->getPosition(), objects.at(i)->getRotation());
-    }
+    if (flag_scene == SCENE_ARENA_OBJECTS)
+        createArenaObjects();
+    else if (flag_scene == SCENE_GROUND_ROTATIONAL)
+        createGroundRotational();
+
+    //for (unsigned int i=0;i<objects.size();i++){
+//        Physics::createObject(objects.at(i), this->space, objects.at(i)->getFMass(), objects.at(i)->getPosition(), objects.at(i)->getRotation());
+//    }
     objects_shoot.clear();
     for (unsigned int i=0;i<characters.size();i++){
+        //getCharacter(i)->restartPhysics();
         characters.at(i)->restartPhysics();
         if (characters.at(i)->getBodiesFoot().size()>0)
             characters.at(i)->checkContactFoot(true);
@@ -120,7 +140,7 @@ void Scene::restartPhysics()
 void Scene::initPhysics()
 {
     Physics::initScene(this);
-
+    this->flag_scene = SCENE_GROUND_ROTATIONAL;
 }
 
 void Scene::stopPhysics()
@@ -224,8 +244,15 @@ void Scene::simulationStep(bool balance)
                }
 
            }
+           if(elevator!=NULL){ //teste do elevador
+               for(std::vector<ControlPD*>::iterator it = elevator->controllers.begin(); it!=elevator->controllers.end(); it++){
+                   (*it)->evaluate();
+               }
+           }
            Physics::simSingleStep(this);
         }
+
+
 //    if(initialize){
 //        gettimeofday(&tempo_fim,NULL);
 //        tf = (double)tempo_fim.tv_usec + ((double)tempo_fim.tv_sec * (1000000.0));
@@ -329,6 +356,9 @@ void Scene::drawShadows()
     }
     for(std::vector<Character*>::iterator it = characters.begin(); it!= characters.end(); it++){
         (*it)->drawShadows();
+    }
+    for(std::vector<Object*>::iterator it = objects.begin(); it!= objects.end(); it++){
+        (*it)->draw();
     }
 
 
@@ -701,6 +731,8 @@ std::vector<Object*> Scene::objectsScene()
 {
     std::vector<Object*> allobjetcs;
     for(unsigned int i=0;i<characters.size();i++) for(unsigned int j=0;j<characters.at(i)->objects.size();j++) allobjetcs.push_back(characters.at(i)->objects.at(j));
+    if(elevator!=NULL)
+        for(unsigned int j=0;j<elevator->objects.size();j++) allobjetcs.push_back(elevator->objects.at(j));
     //for(unsigned int i=0;i<objects.size();i++) allobjetcs.push_back(objects.at(i));
     for(unsigned int i=0;i<objects_shoot.size();i++) allobjetcs.push_back(objects_shoot.at(i));
     return allobjetcs;
@@ -731,6 +763,8 @@ std::vector<Joint*> Scene::jointsScene()
     //characters.at(0)->joints.at(0)->getChild();
     //printf("\num juntas: %s",characters.at(0)->joints.at(1)->getName().toLocal8Bit().data());
     for(unsigned int i=0;i<this->characters.size();i++) for(unsigned int j=0;j<this->characters.at(i)->joints.size();j++) alljoints.push_back(this->characters.at(i)->joints.at(j));
+    if(elevator!=NULL)
+        for(unsigned int j=0;j<elevator->joints.size();j++) alljoints.push_back(elevator->joints.at(j));
     return alljoints;
 }
 
@@ -838,6 +872,16 @@ Object *Scene::getObject(dBodyID id)
     for(unsigned int i=0;i<objs.size();i++)
         if (id == objs.at(i)->getBody()) return objs.at(i);
     return NULL;
+}
+
+void Scene::setSceneConfiguration(int flag)
+{
+    flag_scene = flag;
+}
+
+int Scene::getSceneConfiguration()
+{
+    return flag_scene;
 }
 
 
@@ -1579,6 +1623,293 @@ void Scene::createArena()
     this->setGravity(true);
 }
 
+void Scene::createArenaObjects()
+{
+    Vec4 offset;
+
+    float dim_unit = 0.3;
+
+    float height_wall = 0.2; //altura
+    float lenght_wall = 0.2; //largura
+    float mass_wall = 500;
+
+    int units = 12;
+
+    int color_wall = MATERIAL_CHROME;
+
+    //walls
+//    Object *wall_left = addObject(Vec4(lenght_wall,height_wall,(units+2)*dim_unit),offset+Vec4(-(units/2.)*dim_unit-lenght_wall/2.0,height_wall/2.0,0.0),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+//    Object *wall_top = addObject(Vec4(units*dim_unit,height_wall,lenght_wall),offset+Vec4(0.0,height_wall/2.0,-6*dim_unit-lenght_wall),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+//    Object *wall_right = addObject(Vec4(lenght_wall,height_wall,(units+2)*dim_unit),offset+Vec4((units/2.)*dim_unit+lenght_wall/2.0,height_wall/2.0,0.0),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+//    Object *wall_bottom = addObject(Vec4(units*dim_unit,height_wall,lenght_wall),offset+Vec4(0.0,height_wall/2.0,6*dim_unit+lenght_wall),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+
+
+//    objects.push_back(wall_left);
+//    objects.push_back(wall_right);
+//    objects.push_back(wall_top);
+//    objects.push_back(wall_bottom);
+//    joints.push_back(addJointFixed(wall_left,wall_right,NULL));
+//    joints.push_back(addJointFixed(wall_top,wall_bottom,NULL));
+
+    //tijolos
+    Vec4 dim_brick(0.07,0.03,0.15);
+    float mass_brick = 2.5;
+    int color_brick = MATERIAL_COPPER;
+    //posição varia de acordo com a dimensão -units*dim_units<= x & y <= units*dim_units
+         //posição varia de acordo com o quadrante -units/4.*dim_units<= x & y <= units/4.*dim_units
+    //primeiro quadrante
+
+    //Object *brick1_1 = addObject(dim_brick,offset+Vec4(2*dim_unit,dim_brick.y()/2.0,5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick1_1 = addObject(Vec4(dim_brick.x()/2,dim_brick.z(),dim_brick.x()/2),offset+Vec4(2*dim_unit,dim_brick.y()/2.0,5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CYLINDER,mass_brick,0,MATERIAL_EMERALD);
+    Object *brick2_1 = addObject(dim_brick,offset+Vec4(5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick3_1 = addObject(dim_brick,offset+Vec4(5.5*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,MATERIAL_EMERALD);
+    Object *brick3_1 = addObject(Vec4(dim_brick.x()/2,dim_brick.z(),dim_brick.x()/2),offset+Vec4(5.5*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CYLINDER,mass_brick,0,MATERIAL_EMERALD);
+    Object *brick4_1 = addObject(dim_brick,offset+Vec4(1.5*dim_unit,dim_brick.y()/2.0,1.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+    // segundo quadrante
+
+    Object *brick1_2 = addObject(dim_brick,offset+Vec4(-2*dim_unit,dim_brick.y()/2.0,3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick2_2 = addObject(dim_brick,offset+Vec4(-3*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick3_2 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick4_2 = addObject(dim_brick,offset+Vec4(-0.5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+    //terceiro quadrante
+
+    Object *brick1_3 = addObject(dim_brick,offset+Vec4(-1.2*dim_unit,dim_brick.y()/2.0,-3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick2_3 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick3_3 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,-0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick4_3 = addObject(dim_brick,offset+Vec4(-5.5*dim_unit,dim_brick.y()/2.0,-4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+    //quarto quadrante
+
+    Object *brick1_4 = addObject(dim_brick,offset+Vec4(1.2*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick2_4 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    //Object *brick2_4 = addObject(Vec4(dim_brick.x()/2,dim_brick.z(),dim_brick.x()/2),offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,0,0)),TYPE_CYLINDER,mass_brick,0,MATERIAL_OBSIDIAN);
+    //Object *brick2_4 = addObject(Vec4(dim_brick.x()/1.5,dim_brick.x()/1.5,dim_brick.x()/1.5),offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,0,0)),TYPE_SPHERE,mass_brick,0,MATERIAL_OBSIDIAN);
+    Object *brick3_4 = addObject(dim_brick,offset+Vec4(3.5*dim_unit,dim_brick.y()/2.0,-5.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+    Object *brick4_4 = addObject(dim_brick,offset+Vec4(2.0*dim_unit,dim_brick.y()/2.0,-3.0*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+
+    //boxes
+    float offset_up = dim_brick.y()+0.1; //altura de onde as caixas cairão=-
+    float dim_box = (units/3.0)*dim_unit-0.01;
+    float dim_box_y = (units/5.0)*dim_unit;
+    int color_box = MATERIAL_ZINN;
+    float mass_box = 35.;
+
+//    Object *box_1 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+//    Object *box_2 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+//    Object *box_3 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+//    Object *box_4 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+//    Object *box_5 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+//    Object *box_6 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+//    Object *box_7 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+//    Object *box_8 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+//    Object *box_9 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+
+
+
+
+
+
+//   objects.push_back(box_1);
+//   objects.push_back(box_2);
+//   objects.push_back(box_3);
+//   objects.push_back(box_4);
+//   objects.push_back(box_5);
+//   objects.push_back(box_6);
+//   objects.push_back(box_7);
+//   objects.push_back(box_8);
+//   objects.push_back(box_9);
+
+
+
+
+    objects.push_back(brick1_1);
+    objects.push_back(brick2_1);
+    objects.push_back(brick3_1);
+    objects.push_back(brick4_1);
+
+
+    objects.push_back(brick1_2);
+    objects.push_back(brick2_2);
+    objects.push_back(brick3_2);
+    objects.push_back(brick4_2);
+
+    objects.push_back(brick1_3);
+    objects.push_back(brick2_3);
+    objects.push_back(brick3_3);
+    objects.push_back(brick4_3);
+
+    objects.push_back(brick1_4);
+    objects.push_back(brick2_4);
+    objects.push_back(brick3_4);
+    objects.push_back(brick4_4);
+
+
+//    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),QuaternionQ(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+//    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),QuaternionQ(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+//    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),QuaternionQ(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    this->gravity = Vec4(0,-9.8,0);
+    this->setGravity(true);
+}
+
+void Scene::createGroundRotational()
+{
+    elevator = new Character(this);
+    elevator->setName("Elevator");
+    Vec4 offset;
+
+    float dim_unit = 0.3;
+
+    float height_wall = 0.2; //altura
+    float lenght_wall = 0.2; //largura
+    float mass_elevator = 100;
+
+    int units = 12;
+
+    int color_wall = MATERIAL_CHROME;
+
+    Vec4 pos_anchor = ((Vec4(0,units/18.,0)+Vec4(0,0.1,0)+Vec4(0,0.05,0))+(Vec4(0,units/36.,0)+Vec4(0,0.1,0)+Vec4(0,units/36.0)))/2.;
+    Vec4 pos_middle = (Vec4(0,units/18.,0)+Vec4(0,0.1,0)+Vec4(0,0.05,0))+((pos_anchor)-(Vec4(0,units/36.,0)+Vec4(0,0.1,0)+Vec4(0,units/36.0)));
+    //walls
+    Object *base_elevator = addObject(Vec4(units/4.,0.1,units/4.),Vec4(0,0.05,0),QuaternionQ(),TYPE_CUBE,mass_elevator/5.,elevator,MATERIAL_RUBY);
+    Object *base_vertical_elevator = addObject(Vec4(units/54.,units/18.,units/54.),Vec4(0,units/36.,0)+Vec4(0,0.1,0),QuaternionQ(),TYPE_CUBE,mass_elevator/2.,elevator,color_wall);
+    Object *top_elevator = addObject(Vec4(units/12.,0.1,units/12.),pos_middle,QuaternionQ(),TYPE_CUBE,mass_elevator/15.,elevator,MATERIAL_JADE);
+//    Object *wall_top = addObject(Vec4(units*dim_unit,height_wall,lenght_wall),offset+Vec4(0.0,height_wall/2.0,-6*dim_unit-lenght_wall),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+//    Object *wall_right = addObject(Vec4(lenght_wall,height_wall,(units+2)*dim_unit),offset+Vec4((units/2.)*dim_unit+lenght_wall/2.0,height_wall/2.0,0.0),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+//    Object *wall_bottom = addObject(Vec4(units*dim_unit,height_wall,lenght_wall),offset+Vec4(0.0,height_wall/2.0,6*dim_unit+lenght_wall),QuaternionQ(),TYPE_CUBE,mass_wall,0,color_wall);
+
+
+    objects.push_back(base_elevator);
+    objects.push_back(base_vertical_elevator);
+    objects.push_back(top_elevator);
+//    objects.push_back(wall_bottom);
+    joints.push_back(addJointFixed(base_elevator,base_vertical_elevator,NULL));
+
+
+    Joint *rotate_elevator = this->addJointBall(pos_anchor,base_vertical_elevator,top_elevator,elevator);
+    joints.push_back(rotate_elevator);
+
+    ControlPD *control = new ControlPD(rotate_elevator,QuaternionQ(1,0,0,0),Vec4(),Vec4());
+    control->setKs(Vec4(6500.0,6500.0,6500.0));
+    control->setKd(Vec4(1220.0,1220.0,1220.0));
+    elevator->controllers.push_back(control);
+//    upperLamp->setName("upperLamp");
+
+
+
+//    joints.push_back(addJointFixed(wall_top,wall_bottom,NULL));
+
+//    //tijolos
+//    Vec4 dim_brick(0.07,0.03,0.15);
+//    float mass_brick = 2.5;
+//    int color_brick = MATERIAL_COPPER;
+//    //posição varia de acordo com a dimensão -units*dim_units<= x & y <= units*dim_units
+//         //posição varia de acordo com o quadrante -units/4.*dim_units<= x & y <= units/4.*dim_units
+//    //primeiro quadrante
+
+//    //Object *brick1_1 = addObject(dim_brick,offset+Vec4(2*dim_unit,dim_brick.y()/2.0,5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick1_1 = addObject(Vec4(dim_brick.x()/2,dim_brick.z(),dim_brick.x()/2),offset+Vec4(2*dim_unit,dim_brick.y()/2.0,5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CYLINDER,mass_brick,0,MATERIAL_EMERALD);
+//    Object *brick2_1 = addObject(dim_brick,offset+Vec4(5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    //Object *brick3_1 = addObject(dim_brick,offset+Vec4(5.5*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,MATERIAL_EMERALD);
+//    Object *brick3_1 = addObject(Vec4(dim_brick.x()/2,dim_brick.z(),dim_brick.x()/2),offset+Vec4(5.5*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CYLINDER,mass_brick,0,MATERIAL_EMERALD);
+//    Object *brick4_1 = addObject(dim_brick,offset+Vec4(1.5*dim_unit,dim_brick.y()/2.0,1.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+//    // segundo quadrante
+
+//    Object *brick1_2 = addObject(dim_brick,offset+Vec4(-2*dim_unit,dim_brick.y()/2.0,3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick2_2 = addObject(dim_brick,offset+Vec4(-3*dim_unit,dim_brick.y()/2.0,2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick3_2 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick4_2 = addObject(dim_brick,offset+Vec4(-0.5*dim_unit,dim_brick.y()/2.0,4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+//    //terceiro quadrante
+
+//    Object *brick1_3 = addObject(dim_brick,offset+Vec4(-1.2*dim_unit,dim_brick.y()/2.0,-3.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick2_3 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick3_3 = addObject(dim_brick,offset+Vec4(-1.5*dim_unit,dim_brick.y()/2.0,-0.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick4_3 = addObject(dim_brick,offset+Vec4(-5.5*dim_unit,dim_brick.y()/2.0,-4.5*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+//    //quarto quadrante
+
+//    Object *brick1_4 = addObject(dim_brick,offset+Vec4(1.2*dim_unit,dim_brick.y()/2.0,-2.5*dim_unit),QuaternionQ(Vec4(0,20,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick2_4 = addObject(dim_brick,offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,120,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    //Object *brick2_4 = addObject(Vec4(dim_brick.x()/2,dim_brick.z(),dim_brick.x()/2),offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,0,0)),TYPE_CYLINDER,mass_brick,0,MATERIAL_OBSIDIAN);
+//    //Object *brick2_4 = addObject(Vec4(dim_brick.x()/1.5,dim_brick.x()/1.5,dim_brick.x()/1.5),offset+Vec4(0*dim_unit,dim_brick.y()/2.0,0*dim_unit),QuaternionQ(Vec4(0,0,0)),TYPE_SPHERE,mass_brick,0,MATERIAL_OBSIDIAN);
+//    Object *brick3_4 = addObject(dim_brick,offset+Vec4(3.5*dim_unit,dim_brick.y()/2.0,-5.5*dim_unit),QuaternionQ(Vec4(0,30,0)),TYPE_CUBE,mass_brick,0,color_brick);
+//    Object *brick4_4 = addObject(dim_brick,offset+Vec4(2.0*dim_unit,dim_brick.y()/2.0,-3.0*dim_unit),QuaternionQ(Vec4(0,-70,0)),TYPE_CUBE,mass_brick,0,color_brick);
+
+
+//    //boxes
+//    float offset_up = dim_brick.y()+0.1; //altura de onde as caixas cairão=-
+//    float dim_box = (units/3.0)*dim_unit-0.01;
+//    float dim_box_y = (units/5.0)*dim_unit;
+//    int color_box = MATERIAL_ZINN;
+//    float mass_box = 35.;
+
+////    Object *box_1 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+////    Object *box_2 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+////    Object *box_3 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(-4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+////    Object *box_4 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+////    Object *box_5 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+////    Object *box_6 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(0*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+////    Object *box_7 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,-4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+////    Object *box_8 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,0*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+////    Object *box_9 = addObject(Vec4(dim_box,dim_box_y,dim_box),offset+Vec4(4*dim_unit,dim_box/2.0+offset_up,4*dim_unit),QuaternionQ(),TYPE_CUBE,mass_box,0,color_box);
+
+
+
+
+
+
+
+////   objects.push_back(box_1);
+////   objects.push_back(box_2);
+////   objects.push_back(box_3);
+////   objects.push_back(box_4);
+////   objects.push_back(box_5);
+////   objects.push_back(box_6);
+////   objects.push_back(box_7);
+////   objects.push_back(box_8);
+////   objects.push_back(box_9);
+
+
+
+
+//    objects.push_back(brick1_1);
+//    objects.push_back(brick2_1);
+//    objects.push_back(brick3_1);
+//    objects.push_back(brick4_1);
+
+
+//    objects.push_back(brick1_2);
+//    objects.push_back(brick2_2);
+//    objects.push_back(brick3_2);
+//    objects.push_back(brick4_2);
+
+//    objects.push_back(brick1_3);
+//    objects.push_back(brick2_3);
+//    objects.push_back(brick3_3);
+//    objects.push_back(brick4_3);
+
+//    objects.push_back(brick1_4);
+//    objects.push_back(brick2_4);
+//    objects.push_back(brick3_4);
+//    objects.push_back(brick4_4);
+
+
+//    Object *ramp = addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,1.5),QuaternionQ(Vec4(80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+//    Object *cont = addObject(Vec4(1.8,0.12,0.5),Vec4(-0.1,0.02,2.09),QuaternionQ(Vec4(0,0,0)),TYPE_CUBE,20,0,MATERIAL_BRASS);
+//    Object *ramp2= addObject(Vec4(1.8,0.7,0.001),Vec4(-0.1,0.02,2.68),QuaternionQ(Vec4(-80,0,0)),TYPE_CUBE,1.2,0,MATERIAL_BRASS);
+    this->gravity = Vec4(0,-9.8,0);
+    this->setGravity(true);
+}
+
 void Scene::createCharacter()
 {
     Character *chara = new Character(this);
@@ -1722,6 +2053,15 @@ void Scene::startRecorder(bool b)
         initialize = false;
         record = true;
     }
+}
+
+void Scene::updateAngleElevatorAdd(Vec4 angle)
+{
+    if(elevator==NULL) return;
+    Vec4 atual = elevator->getController(0)->getEuler();
+    elevator->getController(0)->setEuler(atual+angle);
+    elevator->getController(0)->setQuaternionWanted(QuaternionQ(atual+angle));
+
 }
 
 Pose *Scene::addPose(Character *character, std::vector<Vec4> angles)

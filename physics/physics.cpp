@@ -393,7 +393,7 @@ void Physics::createObject(Object *object, SpaceID space, float mass, Vec4 posit
     case TYPE_CYLINDER:{
         object->setBody(dBodyCreate (object->getScene()->getWorld()));
         object->setGeometry(dCreateCylinder (space,object->getProperties().x(),object->getProperties().y()));
-        dMassSetCylinder(object->getMass(),1,1,object->getProperties().x(),object->getProperties().y());
+        dMassSetCylinderTotal(object->getMass(),object->getFMass(),1,object->getProperties().x(),object->getProperties().y());
         break;
     }
     default:{

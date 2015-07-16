@@ -3,7 +3,7 @@
  <Character>
   <Simulation FrictionGround="1000" FrictionFootAir="15" Steps="67"/>
   <Gravity Enable="1" x="0" y="-9.8" z="0"/>
-  <Offset x="0" y="1" z="0"/>
+  <Offset x="0" y="1.0" z="0"/>
   <Cam_Eye x="7.12415" y="2.89665" z="1.62837"/>
   <Cam_At x="0" y="1" z="0"/>
   <Cam_Up x="-0.244896" y="0.967932" z="-0.0559761"/>

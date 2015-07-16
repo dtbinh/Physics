@@ -295,7 +295,7 @@ Mesh *Draw::getMeshCube(Matrix4x4 *transform, Vec4 p, Mesh *mesh)
     return mesh;
 }
 
-void Draw::drawCylinder(Matrix4x4 *transform, Material *mat)
+void Draw::drawCylinder(Matrix4x4 *transform, Material *mat,Vec4 properties)
 {
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
@@ -310,9 +310,10 @@ void Draw::drawCylinder(Matrix4x4 *transform, Material *mat)
         //gluQuadricNormals(q, GLU_SMOOTH);
         glRotatef(90,0,1,0);
         glTranslatef(position.x(),position.y(),position.z());
-        gluCylinder(q, scale.x(),scale.x(),scale.y(), slices, stacks);
+        gluCylinder(q, properties.x(),properties.z(),properties.y(), slices, stacks);
     glPopMatrix();
     gluDeleteQuadric(q);
+    qDebug() << "Cylinder! "<< scale.x() << " " << scale.y() << " " << scale.z();
 }
 
 void Draw::drawCylinder(Matrix4x4 *transform, int material)

@@ -511,8 +511,24 @@ void Object::draw(bool wire)
             break;
         }
     case TYPE_CYLINDER:{
-            Draw::drawCylinder(getMatrixTransformation(),this->material);
-            break;
+        glPushMatrix();
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,material->ambient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material->diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material->specular);
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material->shininess*128);
+        const dReal* pos;
+        const dReal* R;
+        pos = dGeomGetPosition (geometry);
+        R = dGeomGetRotation (geometry);
+        Draw::setTransformODE(pos,R);
+        glTranslatef(0,0,-properties.x()/2.);
+        GLUquadricObj *quadrico = gluNewQuadric();
+        Draw::gluClosedCylinder(quadrico,properties.x(),properties.x(),properties.y(),20,20);
+        gluDeleteQuadric( quadrico );
+        //Draw::drawCylinderClosed(this->getPositionCurrent(),Vec4(0,0,1),properties.x(),properties.y(),this->id_material);
+        //Draw::drawCylinder(getMatrixTransformation(),this->material,this->properties);
+        glPopMatrix();
+        break;
         }
     case TYPE_SPHERE:{
             Draw::drawSphere(getMatrixTransformation(),this->material,properties.x());
@@ -541,7 +557,7 @@ void Object::drawShadow()
             break;
         }
     case TYPE_CYLINDER:{
-            Draw::drawCylinder(getMatrixTransformation(),this->material);
+            Draw::drawCylinder(getMatrixTransformation(),this->material,this->properties);
             break;
         }
     case TYPE_SPHERE:{
@@ -595,7 +611,7 @@ void Object::draw(Vec4 position, QuaternionQ q, int mat)
         }
         }
     case TYPE_CYLINDER:{
-            Draw::drawCylinder(getMatrixTransformation(),this->material);
+            Draw::drawCylinder(getMatrixTransformation(),this->material,this->properties);
             break;
         }
     case TYPE_SPHERE:{
@@ -912,7 +928,13 @@ bool Object::isEnableCPDP()
 
 void Object::setTarget(Vec4 pos)
 {
-    target = pos;
+    if(this->mirror_obj!=NULL){
+        Vec4 add = pos - target;
+        this->mirror_obj->addMirrorPos(add);
+        this->addMirrorPos(add);
+    }else{
+        target = pos;
+    }
 }
 
 Vec4 Object::getTarget()

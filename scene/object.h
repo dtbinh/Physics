@@ -174,6 +174,8 @@ public:
     void        evaluate(int val=1);
     void        setMirror(Object *m);
     Object*     getMirror();
+
+
     // -------Use Cases: Control Torque Coffee Cup
     void        setCoffeeCup(bool b);
     bool        hasCoffeeCup();

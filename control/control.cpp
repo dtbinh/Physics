@@ -35,6 +35,7 @@ ControlPD::ControlPD(Joint *joint, QuaternionQ qwanted, Vec4 ks, Vec4 kd)
     this->ks_fall = Vec4(5.,5.,5.);
     this->kd_fall = Vec4(0.5,0.5,0.5);
     this->is_fall = false;
+    this->euler = Vec4();
 }
 
 void ControlPD::setJoint(Joint *joint)
@@ -95,6 +96,16 @@ void ControlPD::setEnabledInertia(bool enabled_inertia)
 bool ControlPD::isEnabledInertia()
 {
     return this->enable_inertia;
+}
+
+void ControlPD::setEuler(Vec4 e)
+{
+    this->euler = e;
+}
+
+Vec4 ControlPD::getEuler()
+{
+    return this->euler;
 }
 
 void ControlPD::evaluate()

@@ -20,7 +20,7 @@ public:
     static void drawCube(Matrix4x4 *transform,Vec4 properties, Material *mat,float alpha=0);
     static void drawCube(Matrix4x4 *transform,Vec4 properties, int material);
     static Mesh*getMeshCube(Matrix4x4 *transform,Vec4 properties, Mesh *mesh=NULL);
-    static void drawCylinder(Matrix4x4 *transform, Material *mat);
+    static void drawCylinder(Matrix4x4 *transform, Material *mat, Vec4 properties);
     static void drawCylinder(Matrix4x4 *transform, int material);
     static void drawCylinder(Vec4 position, Vec4 axis, double radius, double height, int material);
     static void drawCylinderClosed(Vec4 position, Vec4 axis, double radius, double height, int material);

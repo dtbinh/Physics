@@ -19,6 +19,11 @@ class GLWidget;
 
 #endif
 
+#define SCENE_DEFAULT          -1
+#define SCENE_ARENA_OBJECTS     0
+#define SCENE_ARENA_BOXES       1
+#define SCENE_GROUND_ROTATIONAL 2
+
 class Ray;
 class Scene
 {
@@ -39,6 +44,7 @@ private:
     float          friction_ground;
     float          friction_foot_air;
     bool           is_ground_ice;
+    int            flag_scene;
 
 
     //interface
@@ -54,6 +60,8 @@ private:
     Vec4 externalForce;
     Vec4 propKs;
     Vec4 propKd;
+    //testes
+    Character* elevator;
 
 
 
@@ -133,12 +141,19 @@ public:
     int                   getSizeCharacter();
     Object*               getObject(dBodyID id);
     //extra simulation
+
+    void                  setSceneConfiguration(int flag);
+    int                   getSceneConfiguration();
     void                  clearObjectShooted();
     void                  createRamp();
     void                  createArena(); //caixas
+    void                  createArenaObjects(); //alguns objetos
+    void                  createGroundRotational(); //alguns objetos
     void                  createCharacter();
     void                  createLuxo();
     void                  startRecorder(bool b);
+    void                  updateAngleElevatorAdd(Vec4 angle);
+
     //pose control
     Pose*                 addPose(Character* character, std::vector<Vec4> angles);
     GraphicalPose*        addGraphicalPose(Character* character);

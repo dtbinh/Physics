@@ -352,7 +352,9 @@ GLWidget::GLWidget(QWidget *parent) :
     //scene->createCharacter();
     //scene->createLuxo();
     //scene->createLuxo2();
+    //scene->createArenaObjects();
     //controlLuxo = false;
+    scene->createGroundRotational();
 
 }
 
@@ -1136,8 +1138,9 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     }
     if(event->key() == Qt::Key_D ){
         if((scene->getSizeCharacter()<1)) return;
-        load_exemple_curve = true;
+        load_exemple_curve = !load_exemple_curve;
         loadCurveExample();
+
         //cam->lockAxisY(!cam->axis_y);
         //scene->addObject(Vec4(0.5,1.0,0.5),Vec4(0,30,0),Quaternion(),TYPE_CYLINDER);
         //count++;
@@ -1185,6 +1188,41 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 //        }
 
 //    }
+
+    //manipulando o elevador
+    if(event->key() == Qt::Key_Q && event->modifiers()==Qt::SHIFT){
+        scene->updateAngleElevatorAdd(Vec4(-0.5,0,0));
+        update();
+        return;
+    }else if(event->key() == Qt::Key_Q){
+        scene->updateAngleElevatorAdd(Vec4(0.5,0,0));
+        update();
+        return;
+    }
+
+    if(event->key() == Qt::Key_W && event->modifiers()==Qt::SHIFT){
+        scene->updateAngleElevatorAdd(Vec4(0,-0.5,0));
+        update();
+        return;
+    }else if(event->key() == Qt::Key_W){
+        scene->updateAngleElevatorAdd(Vec4(0,0.5,0));
+        update();
+        return;
+    }
+
+    if(event->key() == Qt::Key_E && event->modifiers()==Qt::SHIFT){
+        scene->updateAngleElevatorAdd(Vec4(0,0,-0.5));
+        update();
+        return;
+    }else if(event->key() == Qt::Key_E){
+        scene->updateAngleElevatorAdd(Vec4(0,0,0.5));
+        update();
+        return;
+    }
+
+
+
+
     if(event->key() == Qt::Key_Left && event->modifiers()==Qt::CTRL){
         if(manipulate==SET_OBJECT){
             Object *obj = scene->getCharacter(0)->getObjectSelected();
@@ -2060,7 +2098,8 @@ void GLWidget::loadSimulationParameters(QString file)
     cam->eye = scene->getEye();
     cam->at = scene->getAt();
     cam->up = scene->getUp();
-    //scene->createArena();
+
+    scene->createGroundRotational();
 
 
 

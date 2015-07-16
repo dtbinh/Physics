@@ -28,6 +28,7 @@ private:
     Vec4       velDesired;     //velocidade linear desejada
     bool       enable_inertia; //habilita ou não o fator de inercia da junta
     bool       is_fall; //personagem esta caindo
+    Vec4       euler;
 
 public:
     void setFall(bool b);
@@ -52,6 +53,11 @@ public:
     bool isEnabled();
     void setEnabledInertia(bool enabled_inertia);
     bool isEnabledInertia();
+    //algulos de euler
+    void setEuler(Vec4 e);
+    Vec4 getEuler();
+
+
     void evaluate();
     void updateKsKdCoros(float MassTotal);
     void setProportionalKs(Vec4 pks);

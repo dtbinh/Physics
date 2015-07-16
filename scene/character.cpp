@@ -199,11 +199,11 @@ void Character::restartPhysics()
     Physics::initCharacter(this);
     for(unsigned int i=0;i<objects.size();i++){
         Physics::createObject(objects.at(i),this->getSpace(),objects.at(i)->getFMass(),objects.at(i)->getPosition(),objects.at(i)->getRotation());
-        Physics::setDisableObject(objects.at(i));
+        //Physics::setDisableObject(objects.at(i));
     }
     for(unsigned int i=0;i<joints.size();i++){
         joints.at(i)->restartJoint();
-        Physics::setDisableJoint(joints.at(i));
+        //Physics::setDisableJoint(joints.at(i));
     }
 }
 
