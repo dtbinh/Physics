@@ -45,6 +45,9 @@ Balance::Balance(Character* chara)
     sensor_tolerance = 0.25;
     enable_gravitycomp = true;
     this->grav_comp = 1.0;
+    this->simbicon_enabled = false;
+    this->use_simbicon = false;
+    this->use_change_foot = false;
 }
 
 void Balance::contructRelationJointsBodies()
@@ -77,7 +80,7 @@ MatrixF Balance::getJacobianSum(Object *obj)
     //para cada junta que influencia o corpo b (corpo raiz eh a stance paw)
     int size = this->chara->getNumJoints();
     for (int i=0;i<size;i++) {
-        MatrixF Ad_j2w_i(6,6); //adjunta da junta para corpo obj
+        MatrixF Ad_j2w_i(6,6); //adjunta da junta para corpo obj        
         if (chara->hierarchy[useHierarchy][i][iBody]) {
             Ad_j2w_i = chara->getJoint(i)->getAd();
         }
@@ -189,8 +192,20 @@ Vec Balance::getTwistWrenchTotal(Vec twist, Vec4 com)
         int size = this->chara->getNumJoints();
         for (int i=0;i<size;i++) {
             MatrixF Ad_j2w_i(6,6); //adjunta da junta para corpo obj
+            //qDebug() << useHierarchy;
             if (chara->hierarchy[useHierarchy][i][b]) {
-                Ad_j2w_i = chara->getJoint(i)->getAd();
+//                if(useHierarchy==15 && simbicon_enabled) // pé esquerdo no chão
+//                {
+//                    if(!((b == 9 || b == 12 || b == 13))) Ad_j2w_i = chara->getJoint(i)->getAd();
+//                }
+//                else if(useHierarchy==16 && simbicon_enabled) // pé direito no chão
+//                {
+//                    if(!((b == 8 || b == 10 || b == 12))) Ad_j2w_i = chara->getJoint(i)->getAd();
+//                }
+//                else{
+                    Ad_j2w_i = chara->getJoint(i)->getAd();
+                //}
+
             }
             Ad_j2w.setSubmatrix(0,6*i,Ad_j2w_i);
         }
@@ -420,6 +435,36 @@ Vec4 Balance::getKDistanceLocomotion()
 void Balance::setKDistanceLocomotion(Vec4 k)
 {
     this->kDist = k;
+}
+
+void Balance::simbiconEnabled(bool b)
+{
+    simbicon_enabled = b;
+}
+
+bool Balance::isSimbiconEnabled()
+{
+    return simbicon_enabled;
+}
+
+void Balance::setUseSimbiconStrategy(bool b)
+{
+    use_simbicon = b;
+}
+
+bool Balance::isSimbiconUse()
+{
+    return use_simbicon;
+}
+
+void Balance::setUseChangeFootStrategy(bool b)
+{
+    this->use_change_foot = b;
+}
+
+bool Balance::isChangeFootStrategyUse()
+{
+    return this->use_change_foot;
 }
 
 Vec4 Balance::getKMomentumLinear()
@@ -738,7 +783,7 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
         }else{
             Fcom = ksForce.mult(Cfoot_ - COM_)*(1 - (1-steps/limitsteps)) - kdForce.mult(velCOM_)*(1 - (1-steps/limitsteps));
         }
-        if (useHierarchy!=0 && (chara->hasEffectorEnabled())){ // se só houver um pé em contado com o solo
+        if ((use_change_foot)&&(useHierarchy!=0 && (chara->hasEffectorEnabled()))){ // se só houver um pé em contado com o solo
             Object* foot_ground = chara->getBody(useHierarchy-3); // pega a posição do pé que esta em contato com o solo
             Object* foot_air = chara->getBodiesFoot(foot_ground)[0]; // pega a posição do pé que esta no ar
             Vec4 vp = foot_air->getPositionCurrent() - foot_ground->getPositionCurrent();
@@ -828,6 +873,14 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
         id_parent = chara->getIdObject(joint->getParent());
         id_child = chara->getIdObject(joint->getChild());
 
+        if (simbicon_enabled &&  use_simbicon && (useHierarchy==15 || useHierarchy==16)){
+            if(useHierarchy==15){
+                if(i==3 || i==4 || i==5) torque = Vec4();
+            }else{
+                if(i==0 || i==1 || i==2) torque = Vec4();
+            }
+
+        }
         if(chara->hierarchy[useHierarchy][i][chara->getPositionBody(joint->getChild())]){
 
             if (joint->getChild()->getFoot()&&(useHierarchy==0 || useHierarchy==id_child+3|| useHierarchy==id_child+3)){
@@ -883,7 +936,7 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
 
     //qDebug() << "end!";
 
-    if(this->kDist.module()>0 || this->kVel.module()>0)  evaluateSIMBICON();
+   if(simbicon_enabled && use_simbicon) if(this->kDist.module()>0 || this->kVel.module()>0)  evaluateSIMBICON();
 
 }
 

@@ -84,7 +84,7 @@ void Character::draw()
 
 
 
-    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.5,0,0),capMotion->frame_current);
 
 
     drawCOM();
@@ -94,7 +94,7 @@ void Character::draw()
 
 void Character::drawShadows()
 {
-    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.0,0,0),capMotion->frame_current);
+    if (shadow_motion) if (capMotion->sizeFrames()>0) capMotion->drawShadow(Vec4(-1.5,0,0),capMotion->frame_current);
     for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
         (*it)->drawShadow();
     }
@@ -179,7 +179,7 @@ void Character::drawCOMProjected()
 
 void Character::drawShadowMotion(int frame)
 {
-    Vec4 offset(-2.0,0,0);
+    Vec4 offset(-1.5,0,0);
     capMotion->drawShadow(offset,frame);
 
 }
@@ -759,7 +759,7 @@ void Character::showHierarchies()
 {
 
     if(hierarchy.size()==0) return;
-    for(int i=-3;i<-2;i++){
+    for(int i=-3;i<getNumBodies();i++){
         printf("Corpo (%d):\n",i);
         for(int j=0;j<getNumJoints();j++){
             for(int k=0;k<getNumBodies();k++){
@@ -926,8 +926,11 @@ void Character::deleteSuitcase()
 
 void Character::isFall(bool b)
 {
-     for(int i=0;i<this->controllers.size();i++)   {
+     for(int i=0;i<this->controllers.size();i++){
          this->controllers.at(i)->setFall(b);
+     }
+     if( b ){
+         for(int i=0;i<getNumBodies();i++) this->getBody(i)->setEnableCPDP(false);
      }
 }
 

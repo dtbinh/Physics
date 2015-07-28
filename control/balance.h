@@ -32,6 +32,9 @@ class Balance
     bool       enable_momentum;
     bool       enable_gravitycomp;
     bool       enable_balance;
+    bool       simbicon_enabled;
+    bool       use_change_foot;
+    bool       use_simbicon;
     int        useHierarchy;
     int        steps;
     int        limitsteps;
@@ -117,6 +120,13 @@ public:
     void setKVelocityLocomotion(Vec4 k);
     Vec4 getKDistanceLocomotion();
     void setKDistanceLocomotion(Vec4 k);
+    void simbiconEnabled(bool b);
+    bool isSimbiconEnabled();
+    void setUseSimbiconStrategy(bool b);
+    bool isSimbiconUse();
+
+    void setUseChangeFootStrategy(bool b);
+    bool isChangeFootStrategyUse();
 
 
     float getTorqueMaxCompensable(Object* foot,Vec4 torque);

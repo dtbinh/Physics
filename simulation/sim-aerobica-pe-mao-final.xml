@@ -52,7 +52,7 @@
      <KdCupPD x="0" y="0" z="0"/>
     </ControlPDCup>
    </Properties>
-   <Properties Material="4" Mass="2.1" Geometry="1" Name="forearm_l" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ArmLHandN.obj">
+   <Properties Material="4" Mass="2.1" Geometry="1" Name="forearm_l" Foot="0" BodyBalance="0" ObjFile="/home/danilo/GitHub/ODESys/objs/chara/ArmLHand.obj">
     <Position x="0.16" y="1.026" z="0.04"/>
     <Quaternion w="1" x="0" y="0" z="0"/>
     <Dimension x="0.075" y="0.25" z="0.08"/>

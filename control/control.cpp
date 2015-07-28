@@ -32,8 +32,8 @@ ControlPD::ControlPD(Joint *joint, QuaternionQ qwanted, Vec4 ks, Vec4 kd)
     inertia(0,0) = 1;
     inertia(1,1) = 1;
     inertia(2,2) = 1;
-    this->ks_fall = Vec4(5.,5.,5.);
-    this->kd_fall = Vec4(0.5,0.5,0.5);
+    this->ks_fall = Vec4(3.5,3.5,3.5);
+    this->kd_fall = Vec4(1.0,1.0,1.0);
     this->is_fall = false;
     this->euler = Vec4();
 }

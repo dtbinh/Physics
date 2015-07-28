@@ -354,7 +354,7 @@ GLWidget::GLWidget(QWidget *parent) :
     //scene->createLuxo2();
     //scene->createArenaObjects();
     //controlLuxo = false;
-    scene->createGroundRotational();
+    //scene->createGroundRotational();
 
 }
 
@@ -1889,10 +1889,22 @@ void GLWidget::setKDistanceLocomotion(Vec4 k)
     scene->getCharacter(0)->getBalance()->setKDistanceLocomotion(k);
 }
 
+void GLWidget::setSimbiconEnabled(bool b)
+{
+    if(scene->getSizeCharacter()<1) return;
+    scene->getCharacter(0)->getBalance()->setUseSimbiconStrategy(b);
+}
+
 void GLWidget::setVelocityDensityBalls(float den, float vel)
 {
     density = den;
     velocity = vel;
+}
+
+void GLWidget::setChangeFootEnabled(bool b)
+{
+    if(scene->getSizeCharacter()<1) return;
+    scene->getCharacter(0)->getBalance()->setUseChangeFootStrategy(b);
 }
 
 void GLWidget::updateAngleGround(Vec4 ang)
@@ -2099,13 +2111,14 @@ void GLWidget::loadSimulationParameters(QString file)
     cam->at = scene->getAt();
     cam->up = scene->getUp();
 
-    scene->createGroundRotational();
+    //scene->createGroundRotational();
 
 
 
 
 
-    //scene->getCharacter(0)->showHierarchies();
+    scene->getCharacter(0)->showHierarchies();
+    //exit(0);
     //printf("\nMassa total: %.3f",scene->getCharacter(0)->getMassTotal());
     //scene->createRamp();
 

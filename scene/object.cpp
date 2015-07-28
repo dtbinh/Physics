@@ -482,13 +482,20 @@ void Object::draw(bool wire)
     switch (this->type){
     case TYPE_CUBE:{
             if (wire){
-                Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(1,0,0));
+                Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(0.3,0.3,0.3));
                 if(objFile.isEmpty() || !rendermesh){
                     Draw::drawCube(getMatrixTransformation(),this->properties,this->material);
                 }else{
-                    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+                    glEnable(GL_BLEND);
+                    Material *m = new Material();
+                    Material::setMaterial(m,MATERIAL_ICE);
                     Draw::drawObj(getPositionCurrent(),this->id_material,getRotationCurrent().conjugate(),this->objFile,objMesh);
-                    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                    Draw::drawCube(getMatrixTransformation(),this->properties,m,0.4);
+                    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+                    glDisable(GL_BLEND);
+                    delete m;
+                    //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
                 }
             }
             else{

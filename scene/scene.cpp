@@ -48,7 +48,7 @@ Scene::Scene(GLWidget *parent)
     this->viewer[1] = Vec4(0,1,0);
     this->viewer[2] = Vec4(0,1,0);
 
-    this->flag_scene = SCENE_GROUND_ROTATIONAL;
+    this->flag_scene = SCENE_DEFAULT;
 
     elevator = NULL;
 
@@ -140,7 +140,7 @@ void Scene::restartPhysics()
 void Scene::initPhysics()
 {
     Physics::initScene(this);
-    this->flag_scene = SCENE_GROUND_ROTATIONAL;
+
 }
 
 void Scene::stopPhysics()
@@ -820,8 +820,14 @@ void Scene::addCharacter(Character *chara)
 
 void Scene::setExternalForce(Vec4 force)
 {
-    if(force.module()==0) apply = true;
-    else apply = false;
+    if(force.module()==0){
+        apply = true;
+        this->getCharacter(0)->getBalance()->simbiconEnabled(false);
+    }
+    else{
+        apply = false;
+        this->getCharacter(0)->getBalance()->simbiconEnabled(true);
+    }
     this->externalForce = force;
 }
 

@@ -244,9 +244,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ykFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
     connect(ui->zkFor,SIGNAL(valueChanged(double)),this,SLOT(setSimbiconForce()));
 
+    connect(ui->simbiconEnabled,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setSimbiconEnabled(bool)));
+
     //testes
     connect(ui->densityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
     connect(ui->velocityBall,SIGNAL(valueChanged(double)),this,SLOT(setBallsConfiguration()));
+
+    connect(ui->changeFootEnabled,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setChangeFootEnabled(bool)));
 
     //tempo força
     connect(ui->timeApplyForce,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setFramesForce2Time(double)));

@@ -1268,52 +1268,56 @@ bool Utils::saveFramesConfig(Character *chara, const string &fileName)
 
 bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileName)
 {
-        moCap->clear();
-        ifstream file(fileName.data(), ios::in);
-        stringstream ss;
-        std::string stmp;
-        //int itmp;
-        int num_frames = 0;
-        double dtmp = 0.0;
-        std::istream& istr = * (istream*) &file;
-        //ifstream istr(fileName.data(), ios::in);
-        getline(istr, stmp);
-        ss << stmp;
-        ss >> stmp;
-        ss >> num_frames;
-        ss.clear();
+    moCap->clear();
+    ifstream file(fileName.data(), ios::in);
+    stringstream ss;
+    std::string stmp;
+    //int itmp;
+    int num_frames = 0;
+    double dtmp = 0.0;
+    std::istream& istr = * (istream*) &file;
+    //ifstream istr(fileName.data(), ios::in);
+    getline(istr, stmp);
+    ss << stmp;
+    ss >> stmp;
+    ss >> num_frames;
+    ss.clear();
 
 
-        //inicializa moCapMot
-        for (int i=0;i<num_frames;i++) {
-            moCap->appendFrame(new Frame());
-          //inicializa os vectors pos e quat
-          for (int j=0;j<chara->getNumBodies();j++) {
+    //inicializa moCapMot
+    for (int i=0;i<num_frames;i++) {
+        moCap->appendFrame(new Frame());
+        //inicializa os vectors pos e quat
+        for (int j=0;j<chara->getNumBodies();j++) {
             moCap->getFrameMotion(i)->appendPosition( Vec4(0.0,0.0,0.0) );
             moCap->getFrameMotion(i)->appendOrientation(QuaternionQ( 1.0,0.0,0.0,0.0));
-          }
         }
+    }
 
 
 
-        //para cada corpo
-        for (int j=0;j<chara->getNumBodies();j++) {
-            if(j==15){
-                for( int i=0; i<num_frames; i++ ) {
-                    moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(3));
-                }
-            }
-            if(j==16){
-                for( int i=0; i<num_frames; i++ ) {
-                  moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(4));
-                }
-            }
-            else{
+    //para cada corpo
+    for (int j=0;j<chara->getNumBodies();j++) {
+        //            if(j==14){
+        //                for( int i=0; i<num_frames; i++ ) {
+        //                    moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(3));
+        //                    //Vec4 p = chara->getBody(3)->getProperties();
+        //                    //moCap->getFrameMotion(i)->setPosition(j,moCap->getFrameMotion(i)->getPosition(3)-Vec4(0,p.y()/2.0,0));
+        //                }
+        //            }
+        //            else if(j==15){
+        //                for( int i=0; i<num_frames; i++ ) {
+        //                  //Vec4 p = chara->getBody(4)->getProperties();
+        //                  moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(4));
+        //                  //moCap->getFrameMotion(i)->setPosition(j,moCap->getFrameMotion(i)->getPosition(4)-Vec4(0,p.y()/2.,0));
+        //                }
+        //            }
+        //            else{
 
-          //pula uma linha
-            getline(istr, stmp);
-          //le as n posicoes
-          for( int i=0; i<num_frames; i++ ) {
+        //pula uma linha
+        getline(istr, stmp);
+        //le as n posicoes
+        for( int i=0; i<num_frames; i++ ) {
             getline(istr, stmp);
             ss.clear();
             Vec4 pos;
@@ -1324,18 +1328,18 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             pos.x1 = dtmp;
             ss >> dtmp;
             pos.x2 = dtmp;
-//            Caso do chute rodado
-//            if(j==13) //caso o pé esteja invertido
-//                moCap->getFrameMotion(i)->setPosition(j,pos-Vec4(0,0.031,0));
-//            else
-//                moCap->getFrameMotion(i)->setPosition(j,pos);
+            //            Caso do chute rodado
+            //            if(j==13) //caso o pé esteja invertido
+            //                moCap->getFrameMotion(i)->setPosition(j,pos-Vec4(0,0.031,0));
+            //            else
+            //                moCap->getFrameMotion(i)->setPosition(j,pos);
             moCap->getFrameMotion(i)->setPosition(j,pos);
-          }
-          //pula duas linhas
-            getline(istr, stmp);
-            getline(istr, stmp);
-          //le os n quaternions
-          for( int i=0; i<num_frames; i++ ) {
+        }
+        //pula duas linhas
+        getline(istr, stmp);
+        getline(istr, stmp);
+        //le os n quaternions
+        for( int i=0; i<num_frames; i++ ) {
             getline(istr, stmp);
             ss.clear();
             ss << stmp;
@@ -1348,20 +1352,35 @@ bool Utils::loadMotionCapture(MoCap *moCap,Character *chara, const string &fileN
             quat.setPosX(dtmp);
             ss >> dtmp;
             quat.setPosY(dtmp);
-//            Caso swing one foot
-//            if (j==3)
-//                moCap->getFrameMotion(i)->setOrientation(j,quat*Quaternion(0,180,0));
-//            else
-//            Caso chute rodado            
-//            if(j==13) //caso o pé esteja invertido
-//                moCap->getFrameMotion(i)->setOrientation(j,quat*QuaternionQ(-8,10,160));
-//            else
-                moCap->getFrameMotion(i)->setOrientation(j,quat);
-          }
-          //pula uma linha
-            getline(istr, stmp);
+            //            Caso swing one foot
+            //            if (j==3)
+            //                moCap->getFrameMotion(i)->setOrientation(j,quat*QuaternionQ(0,180,0));
+            //            else
+            //            Caso chute rodado
+            //            if(j==13) //caso o pé esteja invertido
+            //                moCap->getFrameMotion(i)->setOrientation(j,quat*QuaternionQ(-8,10,160));
+            //            else
+            moCap->getFrameMotion(i)->setOrientation(j,quat);
+        }
+        //pula uma linha
+        getline(istr, stmp);
+        //}
+        if(j==14){
+            for( int i=0; i<num_frames; i++ ) {
+                moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(3));
+                //Vec4 p = chara->getBody(3)->getProperties();
+                //moCap->getFrameMotion(i)->setPosition(j,moCap->getFrameMotion(i)->getPosition(3)-Vec4(0,p.y()/2.0,0));
             }
         }
+        else if(j==15){
+            for( int i=0; i<num_frames; i++ ) {
+                //Vec4 p = chara->getBody(4)->getProperties();
+                moCap->getFrameMotion(i)->setOrientation(j,moCap->getFrameMotion(i)->getOrientation(4));
+                //moCap->getFrameMotion(i)->setPosition(j,moCap->getFrameMotion(i)->getPosition(4)-Vec4(0,p.y()/2.,0));
+            }
+        }
+
+    }
         //moCap->setEndClycle(moCap->sizeFrames());
         return true;
 }

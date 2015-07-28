@@ -55,7 +55,7 @@ Draw::Draw()
     delete image;
 }
 
-void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
+void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float alpha)
 {
     Vec4 vertexs[8];
     Vec4 normals[6];
@@ -83,6 +83,9 @@ void Draw::drawCube(Matrix4x4 *transform,Vec4 p, Material *mat, float)
 //    normals[5] = transform->transform_normal_ray(transform,Vec4(-1, 0, 0)).unitary();
 
 
+    mat->ambient[3] = alpha;
+    mat->diffuse[3] = alpha;
+    mat->specular[3] = alpha;
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);

@@ -69,7 +69,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>6</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -2801,195 +2801,241 @@ QGroupBox{
            <attribute name="title">
             <string>Robustez</string>
            </attribute>
-           <widget class="QWidget" name="layoutWidget_2">
+           <widget class="QGroupBox" name="groupBox_14">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>70</y>
-              <width>329</width>
-              <height>33</height>
+              <x>12</x>
+              <y>10</y>
+              <width>301</width>
+              <height>108</height>
              </rect>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_40">
-             <item>
-              <widget class="QLabel" name="label_25">
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
+            </property>
+            <property name="title">
+             <string>Simbicon</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_6">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_41">
+               <item>
+                <widget class="QLabel" name="label_38">
+                 <property name="text">
+                  <string>Vel K:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="xkFor">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="ykFor">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="zkFor">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_40">
+               <item>
+                <widget class="QLabel" name="label_25">
+                 <property name="text">
+                  <string>Dis K:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="xkDis">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="ykDis">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="zkDis">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="simbiconEnabled">
                <property name="text">
-                <string>Dis K:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="xkDis">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="ykDis">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="zkDis">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
+                <string>Enabled</string>
                </property>
               </widget>
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="layoutWidget_3">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>20</y>
-              <width>329</width>
-              <height>33</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_41">
-             <item>
-              <widget class="QLabel" name="label_38">
-               <property name="text">
-                <string>Vel K:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="xkFor">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="ykFor">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="zkFor">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="layoutWidget">
+           <widget class="QGroupBox" name="groupBox_15">
             <property name="geometry">
              <rect>
               <x>10</x>
               <y>130</y>
-              <width>182</width>
-              <height>33</height>
+              <width>301</width>
+              <height>141</height>
              </rect>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_43">
-             <item>
-              <widget class="QLabel" name="label_40">
-               <property name="text">
-                <string>Mass Balls:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="densityBall">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>0.500000000000000</double>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>170</y>
-              <width>192</width>
-              <height>33</height>
-             </rect>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_44">
-             <item>
-              <widget class="QLabel" name="label_41">
-               <property name="text">
-                <string>Velocity Balls:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="velocityBall">
-               <property name="minimum">
-                <double>-500.000000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>500.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>5.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>210</y>
-              <width>183</width>
-              <height>29</height>
-             </rect>
+            <property name="styleSheet">
+             <string notr="true">QGroupBox::title { 
+   
+     subcontrol-position: top left; /* position at the top left*/ 
+  padding: 2px 13px;
+   margin-top: -5px;
+    
+ }
+
+QGroupBox{
+   border: 1px solid rgb(182, 181, 179);
+  border-radius: 5px;
+}</string>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_49">
-             <item>
-              <widget class="QLabel" name="label_46">
-               <property name="text">
-                <string>Suitcase Mass:</string>
-               </property>
-              </widget>
+            <property name="title">
+             <string>Tests</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_12">
+             <item row="0" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_43">
+               <item>
+                <widget class="QLabel" name="label_40">
+                 <property name="text">
+                  <string>Mass Balls:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="densityBall">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.500000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
-             <item>
-              <widget class="QDoubleSpinBox" name="massSuitcase">
-               <property name="maximum">
-                <double>999.990000000000009</double>
-               </property>
-               <property name="singleStep">
-                <double>5.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>1.000000000000000</double>
+             <item row="1" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_44">
+               <item>
+                <widget class="QLabel" name="label_41">
+                 <property name="text">
+                  <string>Velocity Balls:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="velocityBall">
+                 <property name="minimum">
+                  <double>-500.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>500.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <layout class="QHBoxLayout" name="horizontalLayout_49">
+               <item>
+                <widget class="QLabel" name="label_46">
+                 <property name="text">
+                  <string>Suitcase Mass:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="massSuitcase">
+                 <property name="maximum">
+                  <double>999.990000000000009</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>5.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>1.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="3" column="0">
+              <widget class="QCheckBox" name="changeFootEnabled">
+               <property name="text">
+                <string>Change foot strategy</string>
                </property>
               </widget>
              </item>
