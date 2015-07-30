@@ -37,7 +37,8 @@ Character::~Character(){
 void Character::draw()
 {
     for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
-        (*it)->draw(wire);
+        if(!(*it)->getFoot())
+            (*it)->draw(wire);
         //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
     }
     for(std::vector<Joint*>::iterator it=joints.begin(); it!=joints.end(); it++){
@@ -56,12 +57,20 @@ void Character::draw()
         if (Sensor::getHierarchy2UseMocap(this)!=2){
             if (Sensor::getHierarchy2UseMocap(this)==0){
                 for(int i=0;i<this->getNumBodies();i++)
-                    if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+                    if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD,wire);
             }
             else{
                 int v = Sensor::getHierarchy2UseMocap(this);
                 v -= 3;
-                if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+                if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD,wire);
+                Object* other_foot = this->getBodiesFoot(objects.at(v))[0];
+                other_foot->draw(wire);
+            }
+        }else{
+            for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
+                if((*it)->getFoot())
+                    (*it)->draw(wire);
+                //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
             }
         }
     }
@@ -69,14 +78,22 @@ void Character::draw()
         if (Sensor::getHierarchy2Use(this)!=2){
             if (Sensor::getHierarchy2Use(this)==0){
                 for(int i=0;i<this->getNumBodies();i++)
-                    if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD);
+                    if(objects.at(i)->getFoot()) objects.at(i)->draw(objects.at(i)->getPositionCurrent(),objects.at(i)->getRotationCurrent(),MATERIAL_EMERALD,wire);
 
             }
             else{
                 int v = Sensor::getHierarchy2Use(this);
                 v -= 3;
-                if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD);
+                if(objects.at(v)->getFoot()) objects.at(v)->draw(objects.at(v)->getPositionCurrent(),objects.at(v)->getRotationCurrent(),MATERIAL_EMERALD,wire);
+                Object* other_foot = this->getBodiesFoot(objects.at(v))[0];
+                other_foot->draw(wire);
 
+            }
+        }else{
+            for(std::vector<Object*>::iterator it=objects.begin(); it!=objects.end(); it++){
+                if((*it)->getFoot())
+                    (*it)->draw(wire);
+                //if (getGRFSum(*it).module()>0) (*it)->draw((*it)->getPositionCurrent(),(*it)->getRotationCurrent(),MATERIAL_EMERALD);
             }
         }
     }
@@ -363,6 +380,14 @@ Joint *Character::getJoint2ObjectParent(Object *obj)
 Object *Character::getBody(int i)
 {
     return this->objects.at(i);
+}
+
+Object *Character::getBodyBalance()
+{
+    for(int i=0;i<getNumBodies();i++){
+        if(this->getBody(i)->getBodyBalance()) return this->getBody(i);
+    }
+    return NULL;
 }
 
 int Character::getPositionBody(Object *obj)

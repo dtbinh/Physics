@@ -1428,14 +1428,74 @@ void Draw::drawArrow(Vec4 origin, Vec4 direction, float size,int material)
 
 void Draw::drawArrow3D(Vec4 origin, Vec4 velocity, Vec4 dir, float size,int material, Vec4 ground_inclination) //origen COM
 {
+    if(true){
     Vec4 direction = Vec4(0,0,1);
-    Vec4 begin = Vec4(0,0,0.0);
-    if(velocity.module()!=0 && velocity*direction<0){
-        direction = Vec4(0,0,-1);
-        begin = Vec4(0,0,-0.0);
-    }
-
+    Vec4 begin = Vec4(0,-0.1,0.25);
     QuaternionQ qat(dir);
+    begin = qat.getMatrix().vector(begin);
+//    if(velocity.module()!=0 && velocity*direction<0){
+//        direction = Vec4(0,0,-1);
+//        begin = Vec4(0,0,-0.0);
+//    }
+
+
+    direction = qat.getMatrix().vector(direction);
+
+    glPushMatrix();
+    GLUquadricObj *quad = gluNewQuadric();
+    float larg = size;
+    Vec4 from = origin+begin;
+    Vec4 to = direction*size+origin+begin;
+    Vec4 from2to = to-from;
+    float tam = from2to.module();
+    from2to.normalize();
+    Material *mat = new Material();
+    mat->setMaterial(mat,material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,mat->ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat->diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat->specular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, mat->shininess*128);
+    glPushMatrix();
+    //transformacao
+    Vec4 k = Vec4( 0.0,0.0,1.0 );
+    Vec4 axis = k^from2to;
+    float angle = acos(k*from2to);
+    QuaternionQ quat;
+    quat.fromAxisAngle(axis,angle*180/M_PI);
+    if (from2to.z()==-1.0) quat.fromAxisAngle( Vec4(1.0,0.0,0.0), 180.0 );
+    dQuaternion dQ;
+    to_dQuaternion(quat,dQ);
+    dMatrix3 R;
+    dQtoR(dQ,R);
+    dVector3 pos;
+    pos[0] = from.x(); pos[1] = from.y(); pos[2] = from.z();
+    setTransformODE(pos,R);
+    //desenha seta
+    if (larg == 0.0) {
+        gluClosedCylinder(quad, 0.03*tam, 0.03*tam, tam, 10, 10);
+        glTranslated(0,0,tam);
+        gluClosedCylinder(quad, 0.1*tam, 0.0, 0.2*tam, 10, 10);
+    } else {
+        gluClosedCylinder(quad, 0.03*2.0*larg, 0.03*2.0*larg, tam, 10, 10);
+        glTranslated(0,0,tam);
+        gluClosedCylinder(quad, 0.1*larg, 0.0, 0.2*larg, 10, 10);
+    }
+    glPopMatrix();
+
+    glPopMatrix();
+    gluDeleteQuadric( quad );
+    delete mat;
+    }
+    Vec4 direction = Vec4(0,1,0);
+    Vec4 begin = Vec4(0,-0.1,0.25);
+    QuaternionQ qat(dir);
+    begin = qat.getMatrix().vector(begin);
+//    if(velocity.module()!=0 && velocity*direction<0){
+//        direction = Vec4(0,1,0);
+//        begin = Vec4(0,-0.1,-0.25);
+//    }
+
+    //QuaternionQ qat(dir);
     direction = qat.getMatrix().vector(direction);
 
     glPushMatrix();

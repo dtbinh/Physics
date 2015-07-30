@@ -574,7 +574,7 @@ void Object::drawShadow()
     }
 }
 
-void Object::draw(Vec4 position, QuaternionQ q, int mat)
+void Object::draw(Vec4 position, QuaternionQ q, int mat, bool wire)
 {
    // Draw::drawPoint(posEffectorForward(),0.2,Vec4(0.5,0.5,0.5));
     //if (this->geometry==0) return;
@@ -603,16 +603,51 @@ void Object::draw(Vec4 position, QuaternionQ q, int mat)
     switch (this->type){
     case TYPE_CUBE:{
         if(mat==-1){
+            if(wire){
+            Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(0.3,0.3,0.3));
+            if(objFile.isEmpty() || !rendermesh){
+                Draw::drawCube(getMatrixTransformation(),this->properties,mat);
+            }else{
+                glEnable(GL_BLEND);
+                Material *m = new Material();
+                Material::setMaterial(m,MATERIAL_ICE);
+                Draw::drawObj(transform,this->id_material,objMesh);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                 Draw::drawCube(getMatrixTransformation(),this->properties,m,0.4);
+                 delete m;
+                glDisable(GL_BLEND);
+            }
+            }else{
             if(objFile.isEmpty() || !rendermesh)
               Draw::drawCube(transform,this->properties,mat);
             else{
               Draw::drawObj(transform,this->id_material,objMesh);
              }
+            }
         }else{
+            if(wire){
+            Draw::drawWireframe(getMatrixTransformation(),this->properties,Vec4(0.3,0.3,0.3));
+            if(objFile.isEmpty() || !rendermesh){
+                Draw::drawCube(getMatrixTransformation(),this->properties,mat);
+            }else{
+                glEnable(GL_BLEND);
+                Material *m = new Material();
+                Material::setMaterial(m,MATERIAL_ICE);
+                Draw::drawObj(transform,mat,objMesh);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                Draw::drawCube(getMatrixTransformation(),this->properties,m,0.4);
+                //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+                glDisable(GL_BLEND);
+                delete m;
+                //glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+            }
+            }else{
+
             if(objFile.isEmpty() || !rendermesh)
                 Draw::drawCube(transform,this->properties,mat);
             else{
                 Draw::drawObj(transform,mat,objMesh);
+            }
             }
             break;
         }

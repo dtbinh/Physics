@@ -538,9 +538,9 @@ void GLWidget::drawScene(){
         if (ciclo_arrow>0){
             //Draw::drawArrow2D(angle_quat,scene->getCharacter(0)->getPosCOM());
             if(scene->getCharacter(0)->getMoCap()->status){
-                Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),scene->getCharacter(0)->getVelCOM(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+                Draw::drawArrow3D(scene->getCharacter(0)->getBodyBalance()->getPositionCurrent(),scene->getCharacter(0)->getVelCOM(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
             }else{
-                Draw::drawArrow3D(scene->getCharacter(0)->getPosCOM(),Vec4(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
+                Draw::drawArrow3D(scene->getCharacter(0)->getBodyBalance()->getPositionCurrent(),Vec4(),Vec4(angle_directionx,angle_directiony,angle_directionz),0.3,MATERIAL_EMERALD,Vec4());
             }
             ciclo_arrow++;
             if(ciclo_arrow>30) ciclo_arrow = 0;

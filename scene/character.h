@@ -65,6 +65,7 @@ public:
     Joint*         getJoint(Object *parent, Object *child);
     Joint*         getJoint2ObjectParent(Object* obj); //retorna a junta cujo o objeto passado como parâmetro seja seu parent
     Object*         getBody(int i);
+    Object*         getBodyBalance();
     int            getPositionBody(Object* obj);
     std::vector<Joint*> getJointChilds(Joint* exclude,Object* obj);
     std::vector<Object*> getBodiesFoot(Object *nofoot=NULL);

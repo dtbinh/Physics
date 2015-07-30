@@ -128,7 +128,7 @@ public:
     void        wireframe();                                               //desenha o objeto como wireframe
     void        draw(bool wire=false);                                                    //desenha o objeto
     void        drawShadow();                                                    //desenha o objeto
-    void        draw(Vec4 position,QuaternionQ q,int mat=-1);
+    void        draw(Vec4 position,QuaternionQ q,int mat=-1,bool wire=false);
     Vec4        getProperties();                                           //extraí propriedades de escala do objeto
     void        setProperties(Vec4 properties);                            //seta propriedades de escala do objeto
     void        setPosition(Vec4 position);                                //seta posição inicial do centro de massa do objeto
