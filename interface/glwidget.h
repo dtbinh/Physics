@@ -48,6 +48,8 @@ public slots:
     void setScreenShot(bool b);
     void setRenderMesh(bool b);
     void setShowInfos(bool b);
+    void showCompensation(bool b);
+    void setTorqueLimits(double v);
 
     //fricção
 
@@ -136,6 +138,7 @@ public slots:
     void setShowMoCap(bool b);
     void drawScene();
     void drawParameters();
+    void drawCompensateParameters();
     void drawPoseProgression();
     void drawForceApply();
     void setMirrorObject(int id);
@@ -158,6 +161,7 @@ public:
     bool editing_frame;
     bool show_character;
     bool showInfo;
+    bool show_compensation;
     int  frame_edit;
     QList<Vec4> curve_quat;
     QList<int>  curve_quat_time;
@@ -171,6 +175,8 @@ public:
     QTime m_time;
     bool  has_ball_shot;
     Vec4  ball_shot_debug;
+    int slide_left, slide_right;
+    Vec4 color_text;
 
 
     void bindShader();

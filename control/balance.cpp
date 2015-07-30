@@ -48,6 +48,7 @@ Balance::Balance(Character* chara)
     this->simbicon_enabled = false;
     this->use_simbicon = false;
     this->use_change_foot = false;
+    this->torque_limit = -1;
 }
 
 void Balance::contructRelationJointsBodies()
@@ -467,6 +468,16 @@ bool Balance::isChangeFootStrategyUse()
     return this->use_change_foot;
 }
 
+void Balance::setTorqueLimits(float v)
+{
+    torque_limit = v;
+}
+
+float Balance::getTorqueLimits()
+{
+    return torque_limit;
+}
+
 Vec4 Balance::getKMomentumLinear()
 {
     return this->kmomlin;
@@ -869,6 +880,8 @@ void Balance::evaluate(Joint* jDes,float mass_total,int frame,QuaternionQ qdesir
 
         Joint *joint = chara->getJoint(i);
         Vec4 torque(wrenchTotal[i+i*5],wrenchTotal[i+1+i*5],wrenchTotal[i+2+i*5]);
+        if(torque_limit>0) torque = limitingTorque(torque_limit,torque);
+
         int id_parent,id_child;
         id_parent = chara->getIdObject(joint->getParent());
         id_child = chara->getIdObject(joint->getChild());
@@ -1014,6 +1027,7 @@ void Balance::evaluateSIMBICON()
         for (int i=l1;i<l2+1;i++){
             Joint *joint = chara->getJoint(i);
             Vec4 torque(wrenchSwing[j+j*5],wrenchSwing[j+1+j*5],wrenchSwing[j+2+j*5]);
+            if(torque_limit>0) torque = limitingTorque(torque_limit,torque);
 
 
             //printf("Torque Joint %d - (%.3f,%.3f,%.3f)\n",j,torque.x(),torque.y(),torque.z());

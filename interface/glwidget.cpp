@@ -339,6 +339,10 @@ GLWidget::GLWidget(QWidget *parent) :
     has_ball_shot = false;
     ball_shot_debug = Vec4();
     frames_force = 6;
+    show_compensation = false;
+    slide_left = 0;
+    slide_right = 0;
+    color_text.setVec4(0,0,0,0);
 
 
 
@@ -548,6 +552,7 @@ void GLWidget::drawScene(){
         }
 
         showCompensableConeFriction();
+        if(show_compensation) drawCompensateParameters();
     }
 
     if (editing_frame)
@@ -723,6 +728,60 @@ void GLWidget::drawParameters()
 
 }
 
+void GLWidget::drawCompensateParameters()
+{
+    if (! scene->getSizeCharacter()>0) return;
+    Character *chara = scene->getCharacter(0);
+    QString dados;
+    Vec4 out;
+    glDisable(GL_LIGHTING);
+    glColor3f(color_text.x(),color_text.y(),color_text.z());
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, winWidth, 0.0, winHeight);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    int x = 580;
+    int k = 0;
+    if (chara->getBalance() != NULL){
+        glRasterPos2f(750, x);
+        dados = QString().sprintf("\nFoot Right: %d %\n", slide_right);
+        //char* n = (char*)dados.toStdString().data();
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+        glRasterPos2f(750, x);
+        dados = QString().sprintf("\nFoot Left: %d %\n", slide_left);
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,dados.at(k).toLatin1());
+            k++;
+        }
+        x -= 20;
+
+        if(chara->getBalance()->getCompensation()>0){
+        glRasterPos2f(750, x);
+        dados = QString().sprintf("\nMax Compensation: %d %\n", (int)chara->getBalance()->getLimitCone());
+        k = 0;
+        while (k<dados.size()){
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,dados.at(k).toLatin1());
+            k++;
+        }
+        }
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+}
+
 void GLWidget::drawPoseProgression()
 {
     if (! scene->getSizeCharacter()>0) {
@@ -885,14 +944,24 @@ void GLWidget::showCompensableConeFriction()
         float perc = foots.at(0)->getCompensableFactor();
         int slide = (int)100*perc;
         setSliderFoot1(slide);
+        slide_left = slide;
         perc = foots.at(1)->getCompensableFactor();
         slide = (int)100*perc;
         setSliderFoot2(slide);
+        slide_right = slide;
 
     }else if (foots.size()==1){
+        if(scene->getCharacter(0)->getIdObject(foots.at(0))==12){ // right foot
         float perc = foots.at(0)->getCompensableFactor();
         int slide = (int)100*perc;
         setSliderFoot1(slide);
+        slide_left = slide;
+        }else{
+            float perc = foots.at(0)->getCompensableFactor();
+            int slide = (int)100*perc;
+            setSliderFoot1(slide);
+            slide_right = slide;
+        }
     }
 }
 int teste = 0;
@@ -1366,6 +1435,14 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
     if (event->key() == Qt::Key_M){
         controlLuxo = !controlLuxo;
+    }
+
+    if (event->key() == Qt::Key_T){
+        if(color_text.w()>0){ //o texto esta branco
+            color_text.setVec4(0,0,0,0);
+        }else{
+            color_text.setVec4(1,1,1,1);
+        }
     }
 
     updateObjects(scene->objectsScene());
@@ -2144,6 +2221,19 @@ void GLWidget::setRenderMesh(bool b)
 void GLWidget::setShowInfos(bool b)
 {
     showInfo = b;
+}
+
+void GLWidget::showCompensation(bool b)
+{
+    show_compensation = b;
+}
+
+void GLWidget::setTorqueLimits(double v)
+{
+    if(!(scene->getSizeCharacter()>0)) return;
+    if (scene->getCharacter(0)->getBalance()!=NULL){
+        scene->getCharacter(0)->getBalance()->setTorqueLimits((float)v);
+    }
 }
 
 void GLWidget::setFrictionGround(double friction)

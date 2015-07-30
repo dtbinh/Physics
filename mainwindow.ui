@@ -69,7 +69,7 @@
            <enum>QTabWidget::West</enum>
           </property>
           <property name="currentIndex">
-           <number>6</number>
+           <number>0</number>
           </property>
           <property name="tabsClosable">
            <bool>false</bool>
@@ -117,7 +117,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>140</y>
+              <y>170</y>
               <width>131</width>
               <height>20</height>
              </rect>
@@ -191,7 +191,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>170</y>
+              <y>200</y>
               <width>281</width>
               <height>16</height>
              </rect>
@@ -204,7 +204,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>200</y>
+              <y>230</y>
               <width>201</width>
               <height>22</height>
              </rect>
@@ -217,7 +217,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>230</y>
+              <y>260</y>
               <width>181</width>
               <height>22</height>
              </rect>
@@ -230,7 +230,7 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>260</y>
+              <y>320</y>
               <width>97</width>
               <height>22</height>
              </rect>
@@ -324,6 +324,70 @@
                </property>
                <property name="value">
                 <double>1000.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QCheckBox" name="showCompensation">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>290</y>
+              <width>171</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Show Compensation</string>
+            </property>
+           </widget>
+           <widget class="QWidget" name="">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>130</y>
+              <width>311</width>
+              <height>29</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_52">
+             <item>
+              <widget class="QLabel" name="label_48">
+               <property name="text">
+                <string>Torque Limit</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="torqueLimit">
+               <property name="suffix">
+                <string/>
+               </property>
+               <property name="minimum">
+                <double>-1.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>99999.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>10.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_49">
+               <property name="maximumSize">
+                <size>
+                 <width>10</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>N</string>
                </property>
               </widget>
              </item>

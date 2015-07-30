@@ -38,6 +38,7 @@ class Balance
     int        useHierarchy;
     int        steps;
     int        limitsteps;
+    float      torque_limit;
     //estratégia de cone de fricção
 
     float angle;     //angulo do cone
@@ -127,6 +128,8 @@ public:
 
     void setUseChangeFootStrategy(bool b);
     bool isChangeFootStrategyUse();
+    void setTorqueLimits(float v);
+    float getTorqueLimits();
 
 
     float getTorqueMaxCompensable(Object* foot,Vec4 torque);

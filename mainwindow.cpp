@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widgetPhysics->setObjectSelected(-1);
 
     connect(ui->Options,SIGNAL(currentChanged(int)),this,SLOT(refactorOptions(int)));
+    connect(ui->showCompensation,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(showCompensation(bool)));
+    connect(ui->torqueLimit,SIGNAL(valueChanged(double)),ui->widgetPhysics,SLOT(setTorqueLimits(double)));
 
     connect(ui->checkScreenShot,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setScreenShot(bool)));
     connect(ui->checkMesh,SIGNAL(clicked(bool)),ui->widgetPhysics,SLOT(setRenderMesh(bool)));
