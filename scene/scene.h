@@ -23,6 +23,7 @@ class GLWidget;
 #define SCENE_ARENA_OBJECTS     0
 #define SCENE_ARENA_BOXES       1
 #define SCENE_GROUND_ROTATIONAL 2
+#define SCENE_POOL_OBJECTS      3
 
 class Ray;
 class Scene
@@ -148,6 +149,7 @@ public:
     void                  createRamp();
     void                  createArena(); //caixas
     void                  createArenaObjects(); //alguns objetos
+    void                  createArenaPoolObjects(); //alguns objetos
     void                  createGroundRotational(); //alguns objetos
     void                  createCharacter();
     void                  createLuxo();

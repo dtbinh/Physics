@@ -528,7 +528,7 @@ void Object::draw(bool wire)
         pos = dGeomGetPosition (geometry);
         R = dGeomGetRotation (geometry);
         Draw::setTransformODE(pos,R);
-        glTranslatef(0,0,-properties.x()/2.);
+        glTranslatef(0,0,-properties.x()*2);
         GLUquadricObj *quadrico = gluNewQuadric();
         Draw::gluClosedCylinder(quadrico,properties.x(),properties.x(),properties.y(),20,20);
         gluDeleteQuadric( quadrico );

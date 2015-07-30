@@ -355,6 +355,7 @@ GLWidget::GLWidget(QWidget *parent) :
     //scene->createArenaObjects();
     //controlLuxo = false;
     //scene->createGroundRotational();
+    scene->createArenaPoolObjects();
 
 }
 
